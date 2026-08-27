@@ -263,16 +263,44 @@ namespace Hezarfen.Editor.Pipeline
         /// Iki kademeli eski varliklar icin ayni ladder'in ilk ve son
         /// basamagi kullanilir.
         /// </summary>
+        /// <summary>Küçük/büyük ayrımı (m). Ev ~10 m, cami ~100 m.</summary>
+        public const float SmallObjectSize = 40f;
+
+        //  boy < 40 m  (ev, dukkan, mezar, agac…)
+        static readonly float[] KucukUc = { 0.08f, 0.012f, 0.0015f };
+        static readonly float[] KucukIki = { 0.08f, 0.0015f };
+        //  boy >= 40 m (cami, sur, bedesten…)
+        static readonly float[] BuyukUc = { 0.25f, 0.03f, 0.004f };
+        static readonly float[] BuyukIki = { 0.25f, 0.004f };
+
         static void SetLodThresholds(LODGroup group)
         {
             var lods = group.GetLODs();
-            float[] ucKademe = { 0.25f, 0.03f, 0.004f };
-            float[] ikiKademe = { 0.25f, 0.004f };
-            float[] esik = lods.Length >= 3 ? ucKademe : ikiKademe;
+            if (lods.Length == 0) return;
+
+            // Esik nesnenin BOYUNA gore secilir. Neden iki merdiven:
+            //
+            // Ekran yuksekligi orani buyuk yapilar icin dogru davraniyor ama
+            // kucuk olanlar icin degil — OLCULDU. Tek merdivende (0,25/0,03/
+            // 0,004) 10 m'lik bir ev yalnizca 55 m'ye kadar tam ayrintili
+            // kaliyor ve 3 434 m'de kul ediliyordu. Planor 50-100 m'de ucuyor
+            // ve Hezarfen'in ucusu 3 336 m: yani hem sehir hep orta kademede
+            // goruntuleniyordu, hem varis semti ucus sirasinda yoktan var
+            // oluyordu.
+            //
+            // Butce sayisi bunu GIZLEDI: %6,7 kullanim verimlilik gibi
+            // okunuyordu, oysa yokluktu. Ayni bakista cizilen nesne sayisi
+            // 472'ydi; kucuk merdivenle 3 194 oluyor — yani sehrin coğu
+            // gorunmuyordu. Maliyeti %6,7'den %8,6'ya cikiyor.
+            bool kucuk = group.size < SmallObjectSize;
+            float[] esik = lods.Length >= 3
+                ? (kucuk ? KucukUc : BuyukUc)
+                : (kucuk ? KucukIki : BuyukIki);
+
             for (int i = 0; i < lods.Length; i++)
             {
                 lods[i].screenRelativeTransitionHeight =
-                    i < esik.Length ? esik[i] : 0.004f;
+                    i < esik.Length ? esik[i] : esik[esik.Length - 1];
             }
             group.SetLODs(lods);
         }

@@ -158,6 +158,86 @@ namespace Hezarfen.Editor.Diagnostics
             };
         }
 
+
+        /// <summary>
+        /// Aday LOD merdivenlerinin <b>maliyetini uygulamadan</b> ölçer.
+        ///
+        /// Merdiveni prefab'lara yazıp ölçmek, ölçüm için 122 prefab'ı
+        /// değiştirmek demekti; üstelik yanlış çıkarsa geri almak gerekirdi.
+        /// Burada eşikler yalnızca **hesapta** kullanılır: sahnedeki hiçbir
+        /// şeye dokunulmaz.
+        ///
+        /// <paramref name="kucukEsik"/> boyu <paramref name="sinir"/>
+        /// altındaki nesnelere, <paramref name="buyukEsik"/> üstündekilere
+        /// uygulanır. İkiye ayırmanın sebebi ölçüldü: ekran yüksekliği oranı
+        /// büyük yapılar için doğru davranıyor ama 10 m'lik bir evi 55 m'de
+        /// orta kademeye, 3 434 m'de küle düşürüyor — oysa planör 50-100 m'de
+        /// uçuyor ve Hezarfen'in uçuşu 3 336 m.
+        /// </summary>
+        public static string Sweep(Vector3 eye, float fov, int dirs,
+                                   float sinir,
+                                   float[] kucukEsik, float[] buyukEsik)
+        {
+            var gruplar = new List<LODGroup>();
+            var tekil = new List<Renderer>();
+            Topla(gruplar, tekil);
+
+            float k = 2f * Mathf.Tan(fov * 0.5f * Mathf.Deg2Rad);
+            float bias = QualitySettings.lodBias;
+            long enKotu = 0;
+            int enKotuRend = 0;
+
+            for (int d = 0; d < dirs * Pitches.Length; d++)
+            {
+                float a = 360f * (d % dirs) / dirs;
+                var rot = Quaternion.Euler(Pitches[d / dirs], a, 0f);
+                var m = Matrix4x4.Perspective(fov, 16f / 9f, 1f, 20000f)
+                        * Matrix4x4.TRS(eye, rot, Vector3.one).inverse;
+                var duzlem = GeometryUtility.CalculateFrustumPlanes(m);
+
+                long tri = 0;
+                int rn = 0;
+                foreach (var g in gruplar)
+                {
+                    var lods = g.GetLODs();
+                    if (lods.Length == 0) continue;
+                    float boy = g.size;
+                    float uz = Vector3.Distance(
+                        eye, g.transform.TransformPoint(g.localReferencePoint));
+                    if (uz < 0.01f) uz = 0.01f;
+                    float h = boy / (uz * k) * bias;
+
+                    var esik = boy < sinir ? kucukEsik : buyukEsik;
+                    int sec = -1;
+                    for (int i = 0; i < lods.Length; i++)
+                    {
+                        float e = i < esik.Length ? esik[i] : esik[esik.Length - 1];
+                        if (h >= e) { sec = i; break; }
+                    }
+                    if (sec < 0) continue;
+
+                    foreach (var rend in lods[sec].renderers)
+                    {
+                        if (rend == null || !rend.enabled) continue;
+                        if (!GeometryUtility.TestPlanesAABB(duzlem, rend.bounds))
+                            continue;
+                        tri += Ucgen(rend);
+                        rn++;
+                    }
+                }
+                foreach (var rend in tekil)
+                {
+                    if (rend == null || !rend.enabled) continue;
+                    if (!GeometryUtility.TestPlanesAABB(duzlem, rend.bounds)) continue;
+                    tri += Ucgen(rend);
+                    rn++;
+                }
+                if (tri > enKotu) { enKotu = tri; enKotuRend = rn; }
+            }
+            float yuzde = 100f * enKotu / TriangleBudget;
+            return $"{enKotu,10:N0} ucgen  {enKotuRend,5} rend  %{yuzde:0.0}";
+        }
+
         /// <summary>
         /// Açık BÜTÜN sahnelerdeki renderer'lar. Semtler kendi sahnelerinde
         /// durduğu için tek sahneye bakmak şehri göremezdi.

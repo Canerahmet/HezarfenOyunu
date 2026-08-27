@@ -374,9 +374,15 @@ namespace Hezarfen.Tests
                 if (tris > 20000 && lods.Length < 3)
                     eksik.Add($"{pf.name} ({tris} ucgen, {lods.Length} kademe)");
 
+                // Merdiven nesnenin BOYUNA gore secilir: kucuk olanlar
+                // (ev, dukkan) daha uzun mesafede ayrintili kalir. Gerekcesi
+                // olculdu — bkz. ADR 0063.
+                bool kucuk = grup.size < ImportLanding.SmallObjectSize;
                 float[] merdiven = lods.Length >= 3
-                    ? new[] { 0.25f, 0.03f, 0.004f }
-                    : new[] { 0.25f, 0.004f };
+                    ? (kucuk ? new[] { 0.08f, 0.012f, 0.0015f }
+                             : new[] { 0.25f, 0.03f, 0.004f })
+                    : (kucuk ? new[] { 0.08f, 0.0015f }
+                             : new[] { 0.25f, 0.004f });
                 for (int i = 0; i < lods.Length && i < merdiven.Length; i++)
                 {
                     float e = lods[i].screenRelativeTransitionHeight;
