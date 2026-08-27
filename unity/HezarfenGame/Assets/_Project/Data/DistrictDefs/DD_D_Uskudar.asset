@@ -36,8 +36,19 @@ MonoBehaviour:
   coreKind: mescit
   churchPrefabs: []
   hasHan: 0
+  nonMuslimQuarterCount: 0
+  nonMuslimCoreKind: sinagog
+  nonMuslimChurchPrefabs: []
   quarterSpacingMeters: 340
   settlementDensity: 1
+  churchCount: 6
+  hamamCount: 5
+  medreseCount: 2
+  hanCount: 1
+  firinCount: 10
+  kahvehaneCount: 8
+  bozahaneCount: 3
+  sebilCount: 4
   maxSlopeDegrees: 22
   minElevationMeters: 4
   landmarkClearanceMeters: 70

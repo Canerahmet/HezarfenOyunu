@@ -35,10 +35,25 @@ MonoBehaviour:
   exclusiveLandAreaHectares: 410.2
   housePalette: default
   coreKind: mescit
-  churchPrefabs: []
-  hasHan: 0
-  quarterSpacingMeters: 320
-  settlementDensity: 0
-  maxSlopeDegrees: 22
+  churchPrefabs:
+  - PF_Kilise_Rum_A
+  - PF_Kilise_Rum_B
+  hasHan: 1
+  nonMuslimQuarterCount: 6
+  nonMuslimCoreKind: sinagog
+  nonMuslimChurchPrefabs:
+  - PF_Sinagog_A
+  - PF_Sinagog_B
+  quarterSpacingMeters: 300
+  settlementDensity: 1
+  churchCount: 5
+  hamamCount: 8
+  medreseCount: 6
+  hanCount: 4
+  firinCount: 14
+  kahvehaneCount: 12
+  bozahaneCount: 4
+  sebilCount: 6
+  maxSlopeDegrees: 24
   minElevationMeters: 3
   landmarkClearanceMeters: 70

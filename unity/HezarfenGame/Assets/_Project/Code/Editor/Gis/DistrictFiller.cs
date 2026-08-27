@@ -150,6 +150,11 @@ namespace Hezarfen.Editor.Gis
             var kahve = Dagit(n, def.kahvehaneCount, seed ^ 0x66);
             var boza = Dagit(n, def.bozahaneCount, seed ^ 0x77);
             var sebil = Dagit(n, def.sebilCount, seed ^ 0x88);
+            // Cemaat mahalle basina belirlenir, semt basina DEGIL:
+            // Balat agirlikli Yahudi, Fener Rum'dur ve ikisi de
+            // Surici'nin icindedir. Semtin tamamini tek cemaate
+            // baglamak kaynagi cignerdi.
+            var gayri = Dagit(n, def.nonMuslimQuarterCount, seed ^ 0x99);
 
             OttomanStreetBuilder.ResetQuarterState();
             toplamEv = 0;
@@ -157,7 +162,7 @@ namespace Hezarfen.Editor.Gis
             for (int i = 0; i < noktalar.Count; i++)
             {
                 var (nokta, yon) = noktalar[i];
-                var q = SpecFor(def, i, nokta, yon);
+                var q = SpecFor(def, i, nokta, yon, gayri.Contains(i));
                 q.HasChurch = kilise.Contains(i) && q.ChurchPrefabs.Length > 0;
                 q.HasHamam = hamam.Contains(i);
                 q.HasMedrese = medrese.Contains(i);
@@ -296,7 +301,8 @@ namespace Hezarfen.Editor.Gis
         /// İki yerde tutulan bir gerçek bir gün ayrışır.
         /// </summary>
         static OttomanStreetBuilder.QuarterSpec SpecFor(
-            DistrictDef def, int index, Vector2 nokta, Vector2 yon)
+            DistrictDef def, int index, Vector2 nokta, Vector2 yon,
+            bool gayrimuslim)
         {
             return new OttomanStreetBuilder.QuarterSpec
             {
@@ -305,9 +311,14 @@ namespace Hezarfen.Editor.Gis
                 ScenePath = "",                 // BuildInto sahne kaydetmez
                 Origin = nokta,
                 Direction = yon,
-                HousePalette = def.housePalette,
-                CoreKind = def.coreKind,
-                ChurchPrefabs = def.churchPrefabs ?? new string[0],
+                // Gayrimuslim mahallede palet de cekirdek de degisir.
+                // `HasVakif` cekirdekten TUREr (mescit degilse sibyan mektebi
+                // ve turbe dusler) — bayrak elle konsaydi bir gun ayrisirdi.
+                HousePalette = gayrimuslim ? "nonmuslim" : def.housePalette,
+                CoreKind = gayrimuslim ? def.nonMuslimCoreKind : def.coreKind,
+                ChurchPrefabs = (gayrimuslim
+                    ? def.nonMuslimChurchPrefabs : def.churchPrefabs)
+                    ?? new string[0],
                 // Han ticarî semte aittir ve semtte BIR tanedir: her mahalleye
                 // han koymak semti hanlar caddesine cevirirdi.
                 // Nadir yapi bayraklari burada DEGIL, `Fill` icinde semt

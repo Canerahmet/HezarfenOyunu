@@ -79,6 +79,20 @@ namespace Hezarfen.Streaming
         [Tooltip("Han ticarî semte aittir; her mahallede bulunmaz.")]
         public bool hasHan = false;
 
+        [Tooltip("Bu semtteki GAYRIMÜSLİM mahalle sayısı. Semt tek cemaatli " +
+                 "değildir: Balat ağırlıklı Yahudi, Fener Rum'dur ve ikisi de " +
+                 "kaynakta adıyla geçer. Sıfır bırakmak semti tümüyle " +
+                 "müslüman ilan etmek olurdu.")]
+        public int nonMuslimQuarterCount = 0;
+
+        [Tooltip("Gayrimüslim mahallenin çekirdeği: 'sinagog' ya da 'mescit' " +
+                 "dışında bir değer. Sıbyan mektebi ve türbe VAKIF " +
+                 "kurumlarıdır ve çekirdekten türer — otomatik olarak düşer.")]
+        public string nonMuslimCoreKind = "sinagog";
+
+        [Tooltip("Gayrimüslim mahallenin ibadet yapıları.")]
+        public string[] nonMuslimChurchPrefabs = new string[0];
+
         [Header("Faz 4 — yerleşim yoğunluğu")]
         [Tooltip("İki mahalle çekirdeği arası hedef uzaklık (m). Mahalle birkaç " +
                  "yüz metredir; küçültmek semti kalabalıklaştırır.")]

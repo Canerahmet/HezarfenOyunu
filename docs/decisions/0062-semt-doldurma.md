@@ -72,7 +72,43 @@ fazla değil **eksik** üretsin.
 yeniden kurulacak — her kurulum 15 MB'lık bambaşka bir YAML üretecekti.
 ADR 0059'un yeniden üretim gürültüsü, sahne ölçeğinde.
 
-## Ölçülen sonuç — Galata ve Üsküdar
+## Şehrin tamamı (2026-08-27, ikinci tur)
+
+| semt | mahalle | ev | mescit | kilise | sinagog |
+|---|---:|---:|---:|---:|---:|
+| Galata | 34 | 2 931 | 30 | 5 | 5 |
+| Üsküdar | 30 | 2 632 | 30 | — | — |
+| Suriçi Doğu | 43 | 3 571 | 37 | 3 | 8 |
+| Suriçi Batı | 26 | 2 324 | 24 | 2 | 2 |
+| Eyüp | 9 | 790 | 9 | — | — |
+| **toplam** | **142** | **12 248** | | | |
+
+**Kule tepesinden 360°, bütün şehir açıkken: 407 341 üçgen, 5 402 renderer
+— bütçenin %16,3'ü.** 21 283 LODGroup tarandı.
+
+Okmeydanı bilerek boş: orası talim alanıdır, yerleşim değil.
+
+### Yoğunluk kaynaktan gelir
+
+Suriçi Batı'nın yoğunluğu 0,55 ve bu bir tahmin değil: semtin kendi tanımı
+*"Suriçinin daha **seyrek, bostanlı** batısı"* diyor. Eyüp 0,5 — planın
+*"sonra Eyüp; dikey dilimde içeriksiz siluet olarak kalır"* notu yüzünden
+seyrek ama boş değil; boş bırakmak Haliç'in karşı kıyısını çıplak
+bırakırdı.
+
+### Semt tek cemaatli değildir
+
+Balat ağırlıklı Yahudi, Fener Rum'dur ve ikisi de kaynakta adıyla geçer —
+ikisi de Suriçi'nin içinde. Semtin tamamını müslüman ilan etmek kaynağı
+çiğnemek olurdu. `DistrictDef.nonMuslimQuarterCount` mahalle bazında dağıtır;
+o mahallelerde **hem palet hem çekirdek** değişir ve `HasVakif` çekirdekten
+türediği için sıbyan mektebi ile türbe kendiliğinden düşer — bayrak elle
+konsaydı bir gün ayrışırdı.
+
+Mahalle sayıları **taslaktır (T2)**: 1632'nin mahalle sınırları kayıtlı
+değil, oranlar seçimdir.
+
+## Ölçülen sonuç — Galata ve Üsküdar (birinci tur)
 
 | ne | değer |
 |---|---:|

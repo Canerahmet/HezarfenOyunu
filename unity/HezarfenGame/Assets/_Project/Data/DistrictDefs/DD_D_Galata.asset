@@ -39,8 +39,21 @@ MonoBehaviour:
   - PF_Kilise_Latin_A
   - PF_Kilise_Latin_B
   hasHan: 1
+  nonMuslimQuarterCount: 4
+  nonMuslimCoreKind: sinagog
+  nonMuslimChurchPrefabs:
+  - PF_Sinagog_A
+  - PF_Sinagog_B
   quarterSpacingMeters: 320
   settlementDensity: 1
+  churchCount: 6
+  hamamCount: 5
+  medreseCount: 2
+  hanCount: 1
+  firinCount: 10
+  kahvehaneCount: 8
+  bozahaneCount: 3
+  sebilCount: 4
   maxSlopeDegrees: 24
   minElevationMeters: 4
   landmarkClearanceMeters: 70
