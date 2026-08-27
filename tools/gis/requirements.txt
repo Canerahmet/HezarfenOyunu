@@ -1,0 +1,22 @@
+# Hezarfen: 1632 — GIS araç zinciri (plan Görev 9)
+#
+# Sürümler SABİTLENMİŞTİR. Gerekçe: DEM işleme zinciri (yeniden örnekleme
+# çekirdeği, yeniden projeksiyon) sürümden sürüme milimetrik farklar üretebilir;
+# arazi yeniden üretildiğinde şehir yerleşimi kaymamalı.
+#
+# Kurulum:
+#   uv venv tools/gis/.venv --python 3.13
+#   uv pip install --python tools/gis/.venv -r tools/gis/requirements.txt
+#
+# Çözüm tarihi: 2026-08-17 (uv 0.12.3, Python 3.13)
+
+rasterio==1.5.1
+numpy==2.5.2
+
+# --- rasterio geçişli bağımlılıkları (açıkça pinlendi) ---
+affine==3.0.0
+attrs==26.1.0
+certifi==2026.7.22
+click==8.4.2
+colorama==0.4.6
+pyparsing==3.3.2
