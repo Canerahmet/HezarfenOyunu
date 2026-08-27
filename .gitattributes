@@ -1,0 +1,55 @@
+# Satır sonu normalizasyonu
+* text=auto
+
+# Unity YAML dosyaları — LFS'e KOYMA, merge tool kullan
+*.unity      merge=unityyamlmerge eol=lf
+*.prefab     merge=unityyamlmerge eol=lf
+*.asset      merge=unityyamlmerge eol=lf
+*.mat        merge=unityyamlmerge eol=lf
+*.controller merge=unityyamlmerge eol=lf
+*.meta       merge=unityyamlmerge eol=lf
+
+# --- Git LFS (plan Bölüm 1) ---
+# 3D
+*.blend  filter=lfs diff=lfs merge=lfs -text
+*.fbx    filter=lfs diff=lfs merge=lfs -text
+*.obj    filter=lfs diff=lfs merge=lfs -text
+*.dae    filter=lfs diff=lfs merge=lfs -text
+
+# Doku / görsel
+*.png    filter=lfs diff=lfs merge=lfs -text
+*.jpg    filter=lfs diff=lfs merge=lfs -text
+*.jpeg   filter=lfs diff=lfs merge=lfs -text
+*.tga    filter=lfs diff=lfs merge=lfs -text
+*.psd    filter=lfs diff=lfs merge=lfs -text
+*.tif    filter=lfs diff=lfs merge=lfs -text
+*.tiff   filter=lfs diff=lfs merge=lfs -text
+*.exr    filter=lfs diff=lfs merge=lfs -text
+*.hdr    filter=lfs diff=lfs merge=lfs -text
+
+# Ses
+*.wav    filter=lfs diff=lfs merge=lfs -text
+*.ogg    filter=lfs diff=lfs merge=lfs -text
+*.mp3    filter=lfs diff=lfs merge=lfs -text
+
+# Video (inceleme GIF/klipleri depoya girerse)
+*.mp4    filter=lfs diff=lfs merge=lfs -text
+
+# Terrain / GIS ikili
+*.raw    filter=lfs diff=lfs merge=lfs -text
+
+# --- Yol'a özgü düzeltmeler (2026-08-27, ADR 0059) ---
+#
+# TerrainData, Unity'nin "Force Text" ayarına RAĞMEN İKİLİ serileşir ve
+# 32 MB'dır. Yukarıdaki `*.asset merge=unityyamlmerge` kuralı onu METİN
+# sanıyordu: ikili bir dosyayı YAML birleştiricisine vermek hem birleştirmeyi
+# bozar hem de her düzenlemede 32 MB'lık yeni bir nesneyi geçmişe kalıcı
+# olarak yazar. Sonraki eşleşme kazandığı için bu satır onu LFS'e alır.
+# (Ölçüldü: dosyanın başında %YAML imzası YOK.)
+unity/HezarfenGame/Assets/_Project/Art/Terrain/TD_*.asset filter=lfs diff=lfs merge=lfs -text
+
+# Unity paket kilidi ve JSON'lar metin kalsın (LFS'e düşmesinler diye açıkça).
+*.json  text eol=lf
+*.md    text eol=lf
+*.py    text eol=lf
+*.cs    text eol=lf diff=csharp

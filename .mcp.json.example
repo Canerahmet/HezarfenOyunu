@@ -1,0 +1,26 @@
+{
+  "_comment_tr": "ISKELET. Unity adaylari kurulana kadar bu dosya .mcp.json OLARAK KOPYALANMAZ (kurulmamis sunucu her oturumda baglanti hatasi uretir). Blender bolumu kullanima HAZIR. Guncel sozdizimi: https://docs.claude.com/en/docs/claude-code/mcp",
+  "mcpServers": {
+    "blender": {
+      "_comment_tr": "blender-mcp (ahujasid, MIT). Eklenti Blender 5.2'ye kuruldu ve etkinlestirildi. Sunucu localhost:9876'ya baglanir. Blender GUI acik ve MCP sunucusu calisir olmalidir: tools/blender/start_mcp_server.py",
+      "_comment_telemetry_tr": "DISABLE_TELEMETRY: paket varsayilan olarak Supabase'e telemetri gonderir; onay verilirse prompt/kod/EKRAN GORUNTUSU de yuklenir. Bizim viewport render'larimiz yayinlanmamis oyun icerigidir. Bu degisken tum gonderimi kaynakta keser (config.enabled=False). ELLEME.",
+      "command": "uvx",
+      "args": ["blender-mcp"],
+      "env": {
+        "DISABLE_TELEMETRY": "true",
+        "BLENDER_MCP_DISABLE_TELEMETRY": "true",
+        "MCP_DISABLE_TELEMETRY": "true"
+      }
+    },
+    "unity_official": {
+      "_comment_tr": "ADAY 1 — Resmi Unity MCP Server (Unity AI paketi, beta). Project Settings > AI > Unity MCP'den etkinlestirilir; komut/arg Unity'nin uretecegi yapilandirmadan alinir. Duman testinde (ADR 0002) denenecek.",
+      "command": "TBD",
+      "args": []
+    },
+    "unity_coplay": {
+      "_comment_tr": "ADAY 2 — MCP for Unity (CoplayDev, MIT, v10.1.2 @ 2026-08-02 — depo canli). Package Manager > git URL: https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#v10.1.2 ; ardindan Window > MCP for Unity > Configure All Detected Clients kendi yapilandirmasini yazar. Duman testinde denenecek. NOT: plan v10.0.0 diyor, guncel surum v10.1.2 — pin bu.",
+      "command": "TBD",
+      "args": []
+    }
+  }
+}

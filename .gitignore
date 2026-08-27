@@ -1,0 +1,91 @@
+# --- Unity ---
+unity/HezarfenGame/[Ll]ibrary/
+unity/HezarfenGame/[Tt]emp/
+unity/HezarfenGame/[Oo]bj/
+unity/HezarfenGame/[Bb]uild/
+unity/HezarfenGame/[Bb]uilds/
+unity/HezarfenGame/[Ll]ogs/
+unity/HezarfenGame/[Uu]ser[Ss]ettings/
+unity/HezarfenGame/[Mm]emoryCaptures/
+unity/HezarfenGame/[Rr]ecordings/
+unity/HezarfenGame/Assets/AssetStoreTools*
+unity/HezarfenGame/Assets/Plugins/Editor/JetBrains*
+
+# Visual Studio / Rider / VS Code
+.vs/
+.idea/
+.vscode/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Unity crash/build artifacts
+sysinfo.txt
+*.apk
+*.aab
+*.unitypackage
+*.app
+crashlytics-build.properties
+
+# --- Bu proje ---
+# İnceleme render'ları depoya girmez (plan Bölüm 3)
+renders/
+# Unity MCP ekran yakalamaları — Assets DIŞINDA tutulur (Assets'e düşerse doku olarak
+# import edilip projeyi şişirir ve "Assets/_Project dışına dosya koyma" kuralını çiğner)
+unity/HezarfenGame/Captures/
+# Blender geçici/yedek
+*.blend1
+*.blend2
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+# GIS ara çıktıları (ham DEM/raster indirmeleri)
+tools/gis/_cache/
+# DEM türevleri: heightmap + önizlemeler. TÜRETİLMİŞ veridir — dem_fetch.py ile
+# birebir yeniden üretilir (kaynak sabit, sürümler pinli). Kalıcı varlık, Unity'deki
+# TerrainData'dır ve o depoya girer. Bkz. ADR 0007.
+data/
+*.tif
+*.tiff
+!refs/maps/*.tif
+
+# OS
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# --- Üçüncü taraf doku kaynakları (2026-08-27, ADR 0059) ---
+# Poly Haven CC0 dokuları ve HDRI'lar: 264 MB ve TEKRARLANABILIR indirilir.
+# `tools/textures/fetch_polyhaven.py` sabit bir CATALOG'tan indirir, gerçek
+# dünya ölçüsünü `meta.json`a yazar ve `refs/LICENSES.md`yi günceller — yani
+# kayıt depoda kalır, yalnızca yük dışarıda. `data/` için verilmiş kararın
+# (ADR 0007) aynısı: türetilmiş/yeniden indirilebilir veri depoya girmez.
+#
+# Unity'nin OKUDUĞU dokular (Assets/_Project/Art/Textures) depoya GİRER —
+# proje klonlandığında eksiksiz açılmalı. Dışarıda kalan yalnızca kaynaktır.
+# Yük dosya TİPİNE göre dışlanır, dizine göre DEĞİL. Sebep ölçüldü:
+# `art/textures/polyhaven/**` yazınca git alt DİZİNİ de dışlıyor ve içine
+# hiç inmiyor; bu yüzden `!.../meta.json` geri-dahil kuralı asla çalışmıyordu
+# (`git check-ignore` ile doğrulandı). Böyle yazılınca dizinler gezilebilir
+# kalır ve kayıt dosyaları takipte kalır.
+art/textures/polyhaven/**/*.jpg
+art/textures/polyhaven/**/*.png
+art/textures/polyhaven/**/*.exr
+art/textures/hdri/**/*.hdr
+art/textures/hdri/**/*.exr
+art/textures/hdri/**/*.jpg
+
+# Claude Code makineye özel izinler (paylaşılan ayar .claude/settings.json'da)
+.claude/settings.local.json
