@@ -56,6 +56,10 @@ def silme(name, w, d, z, col, steps=3, h=0.72, out=0.42, ters=False):
 
     `w`, `d` kuşağın oturduğu kütlenin ölçüsü; `out` toplam taşma.
     """
+    # Basamak yüksekliği eşiğin altındaysa tek basamağa iner: kuşağın
+    # kendisi siluete girer, basamaklarının gölgesi girmez.
+    if not hz.detay_var(h / max(1, steps) * 2.0):
+        steps = 1
     parts = []
     for i in range(steps):
         t = (i + 1) / steps
@@ -90,6 +94,13 @@ def mukarnas(name, cx, cy, r_alt, r_ust, z, h, col, tiers=4, segments=12):
     `r_alt` altta (dar), `r_ust` üstte (geniş) yarıçap: mukarnas yukarı
     doğru **açılır**, çünkü işi bir çıkmayı taşımaktır.
     """
+    # ORTA KADEME: hücre boyu eşiğin altındaysa mukarnas TEK BİLEZİĞE
+    # düşer. Boş dönmek yanlış olurdu — mukarnasın işi bir çıkmayı taşımak
+    # ve o taşıma siluete girer; kaybolması gereken şey hücrelerin gölge
+    # dokusu, taşıyıcının kendisi değil.
+    if not hz.detay_var((r_ust - r_alt) * 1.6):
+        return [hz.make_tube(f"{name}_Sade", r_alt, r_ust, h, (cx, cy), z,
+                             segments=8, col=col)]
     parts = []
     for k in range(tiers):
         t = (k + 0.5) / tiers
@@ -109,6 +120,9 @@ def mukarnas(name, cx, cy, r_alt, r_ust, z, h, col, tiers=4, segments=12):
 
 def mukarnas_konsol(name, cx, cy, w, z, h, col, tiers=3):
     """Düz bir yüze oturan mukarnas konsol — taçkapı ve mihrap için."""
+    if not hz.detay_var(w / 5.0):
+        return [hz.make_box(f"{name}_Sade", (w, w * 0.35, h),
+                            (cx, cy, z + h * 0.5), col)]
     parts = []
     for k in range(tiers):
         t = (k + 0.5) / tiers
@@ -173,6 +187,9 @@ def serefe(name, cx, cy, z, r, col, korkuluk_n=16):
     yapıldığında minare "çubuk" gibi kalıyordu. Mukarnas altta, korkuluk
     üstte; korkuluğun **boşlukları** onu korkuluk yapar.
     """
+    # Korkuluk dikmeleri kademeyle seyrelir: boşlukları siluete girer,
+    # ama on altı dikme birkaç yüz metreden dolu bir bileziğe döner.
+    korkuluk_n = max(6, int(round(korkuluk_n * hz.DETAIL)))
     parts = []
     parts += mukarnas(f"{name}_Konsol", cx, cy, r * 1.02, r * 1.75,
                       z - r * 0.9, r * 0.9, col, tiers=4, segments=12)
@@ -281,6 +298,7 @@ def kemer(name, cx, cy, ux, uy, half_span, spring_z, band_w, depth, col,
     # ama Galata Kulesi Cenevizlidir (1348) ve onun kemerleri yarim
     # dairedir; sehrin tek bir kemer dilini varsaymak, Galata'yi Osmanli
     # gostermek olurdu.
+    steps = max(3, int(round(steps * hz.DETAIL)))
     if sivri:
         pts, _rise = sk.arch_points(half_span, spring_z, steps=steps)
     else:
@@ -428,6 +446,12 @@ def konsol_dizisi(name, cx, cy, r, z, col, n=24, out=0.45, h=0.85):
     olarak okunur; bu sıra olmadan siper gövdeden büyümüş gibi görünür,
     yani kule bir boru olur.
     """
+    # Konsol sırası da gölge ritmidir; orta kademede yerini tek bir
+    # bileziğe bırakır — siper yine gövdeden taşmış görünür.
+    if not hz.detay_var(h * 1.5):
+        return [hz.make_tube(f"{name}_Sade", r + out * 0.5, r + out * 0.5, h,
+                             (cx, cy), z, segments=12, cap_top=False,
+                             cap_bottom=False, col=col)]
     out_ = []
     for i in range(n):
         a = 2.0 * math.pi * i / n
@@ -503,6 +527,11 @@ def kubbe_kaburga(name, cx, cy, r, base_z, rise, col, n=24, w=0.16,
     ## oturması için `ψ = a + π/2` ve `φ = atan2(Δz, Δyarıçap)` gerekir —
     ## Δyarıçap **pozitif** alınır (yukarı çıkarken yarıçap küçülür).
     ## İlk yazımda işaret tersti.
+    # Kaburga bir GÖLGE ÇİZGİSİDİR, kütle değil: 0,16 m genişliğinde bir
+    # şerit birkaç yüz metreden piksel altına düşer. Orta kademede
+    # tümüyle kalkar ve kubbenin silueti hiç değişmez.
+    if not hz.detay_var(w * 2.0):
+        return []
     parts = []
     for i in range(n):
         a = a0 + (a1 - a0) * i / n
@@ -580,6 +609,11 @@ def mukarnas_kavsara(name, cx, cy, w, z, h, col, tiers=5, ters=False):
     kubbe siluetı ve minare). Taçkapıyı iki kutuyla geçmek, camiyi
     kapısından tanınmaz kılıyordu.
     """
+    # ORTA KADEME: kavsara hücreleri yarım metrenin altındadır; o mesafede
+    # okunmazlar. Yerine nişin başını kapatan sade bir kavis kalır.
+    if not hz.detay_var(HUCRE_EN):
+        return [hz.make_dome(f"{name}_Sade", w * 0.5, h, (cx, cy), z,
+                             segments=10, rings=3, col=col)]
     out = []
     sy = -1.0 if not ters else 1.0
     for t in range(tiers):

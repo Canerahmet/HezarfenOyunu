@@ -17,6 +17,7 @@ for _p in (_HERE, os.path.join(_HERE, "lib")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
+import ottoman_kit as kit    # noqa: E402
 import hz_blender as hz            # noqa: E402
 import ayasofya_kit as ak          # noqa: E402
 from export_fbx import export_fbx  # noqa: E402
@@ -94,8 +95,9 @@ def main():
     col = hz.collection(COLLECTION)
 
     p = ak.AyasofyaParams(palette=a.palette)
-    lod0, lod1, ucx, info = ak.build_ayasofya(p, col, a.asset,
-                                              textured=a.textured)
+    # Uc kademe: tam / orta / blok — `ottoman_kit.build_with_mid_lod`.
+    lod0, lod1, lod2, ucx, info = kit.build_with_mid_lod(
+        ak.build_ayasofya, p, col, a.asset, textured=a.textured)
 
     # SAYILAN degerler geometriyi baglar; katalogda yazip meshde olmamasi
     # bir kayit degil bir YALANDIR.

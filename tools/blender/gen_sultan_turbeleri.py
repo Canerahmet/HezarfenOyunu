@@ -17,6 +17,7 @@ for _p in (_HERE, os.path.join(_HERE, "lib")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
+import ottoman_kit as kit    # noqa: E402
 import hz_blender as hz            # noqa: E402
 import sultan_turbe_kit as tk      # noqa: E402
 from export_fbx import export_fbx  # noqa: E402
@@ -100,8 +101,9 @@ def main():
         p = tk.SultanTurbeParams(v["plan"], v["half"], v["wall_h"], v["rise"],
                                  revak=v["revak"], marble=v["marble"],
                                  palette=a.palette)
-        lod0, lod1, ucx, info = tk.build_sultan_turbe(p, col, v["asset"],
-                                                      textured=a.textured)
+        # Uc kademe: tam / orta / blok — `ottoman_kit.build_with_mid_lod`.
+        lod0, lod1, lod2, ucx, info = kit.build_with_mid_lod(
+            tk.build_sultan_turbe, p, col, v["asset"], textured=a.textured)
         if abs(info["pivot_min_z"]) > 0.01:
             raise SystemExit(f"[HZ] HATA pivot {info['pivot_min_z']:.3f}")
 

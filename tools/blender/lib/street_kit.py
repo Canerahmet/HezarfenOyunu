@@ -270,6 +270,12 @@ def iron_grille(name, ow, oh, origin, u_axis, n_axis, cu, cv, thick, mats, col):
     kilisede ve sinagogda aynı şebeke kullanılır: demir işçiliği mahalleye
     aittir, cemaate değil.
     """
+    # ORTA KADEME: şebeke bir GÖLGE DOKUSUDUR. 2 cm'lik demir çubuklar
+    # birkaç yüz metreden piksel altına düşer ve açıklığın koyu
+    # dikdörtgeni zaten okunur. Ölçüldü: Süleymaniye'nin orta
+    # kademesinin %13'ü (7 200 üçgen) şebekeydi.
+    if not hz.detay_var(0.35):
+        return []
     ox, oy, oz = origin
     n = thick * 0.5 - 0.09
     bar = 0.032

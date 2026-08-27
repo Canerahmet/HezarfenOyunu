@@ -321,5 +321,80 @@ namespace Hezarfen.Tests
             Assert.AreEqual(0, stray.Length,
                 "_Import bos olmali: 'Hezarfen/Boru Hatti/_Import'u yerlestir' calistirin.");
         }
-    }
+    
+        /// <summary>
+        /// <b>Ayrıntı, görüntülendiği yerde olmalı.</b>
+        ///
+        /// Ayrıntı geçişi LOD0'ı altı katına çıkardı ve LOD1'e dokunmadı.
+        /// Sonuç ÖLÇÜLDÜ: LODGroup eşiği 0,25 ekran yüksekliği ve FOV 40°
+        /// iken Süleymaniye'nin tam ayrıntılı mesh'i yalnızca <b>573 m</b>'ye
+        /// kadar görüntüleniyordu; ötesinde 456 üçgenlik blok geliyordu.
+        /// Hezarfen'in uçuşu ise <b>3336 m</b>. Yani üretilen ayrıntının
+        /// tamamı, oyunun merkez sahnesinde hiç görünmüyordu ve geçiş tek
+        /// adımda 197 kat düşüyordu.
+        ///
+        /// Bu testin tuttuğu iki olgu:
+        /// <list type="number">
+        /// <item>Ağır bir varlık (LOD0 &gt; 20 bin üçgen) <b>üç kademeli</b>
+        ///       olmak zorunda — arada bir orta kademe bulunmalı.</item>
+        /// <item>Geçiş eşikleri Unity'nin varsayılanına bırakılmaz; merdiven
+        ///       <c>ImportLanding.SetLodThresholds</c>'ta yazılıdır.</item>
+        /// </list>
+        ///
+        /// Gözle yakalanamayacak bir kusurdu: her şey doğru görünüyordu,
+        /// çünkü yakından bakınca ayrıntı gerçekten oradaydı.
+        /// Gerekçe: docs/decisions/0061-lod-merdiveni.md
+        /// </summary>
+        [Test]
+        public void HeavyLandmarksHaveAMidLodAndAnExplicitLadder()
+        {
+            var eksik = new List<string>();
+            var yanlisEsik = new List<string>();
+
+            foreach (var guid in AssetDatabase.FindAssets(
+                         "t:Prefab", new[] { "Assets/_Project/Art/Prefabs" }))
+            {
+                string yol = AssetDatabase.GUIDToAssetPath(guid);
+                var pf = AssetDatabase.LoadAssetAtPath<GameObject>(yol);
+                if (pf == null) continue;
+                var grup = pf.GetComponent<LODGroup>();
+                if (grup == null) continue;
+
+                var lods = grup.GetLODs();
+                if (lods.Length == 0) continue;
+
+                int tris = 0;
+                foreach (var r in lods[0].renderers)
+                {
+                    var mf = r != null ? r.GetComponent<MeshFilter>() : null;
+                    if (mf != null && mf.sharedMesh != null)
+                        tris += mf.sharedMesh.triangles.Length / 3;
+                }
+
+                if (tris > 20000 && lods.Length < 3)
+                    eksik.Add($"{pf.name} ({tris} ucgen, {lods.Length} kademe)");
+
+                float[] merdiven = lods.Length >= 3
+                    ? new[] { 0.25f, 0.03f, 0.004f }
+                    : new[] { 0.25f, 0.004f };
+                for (int i = 0; i < lods.Length && i < merdiven.Length; i++)
+                {
+                    float e = lods[i].screenRelativeTransitionHeight;
+                    if (Mathf.Abs(e - merdiven[i]) > 1e-4f)
+                        yanlisEsik.Add($"{pf.name} LOD{i}: {e} != {merdiven[i]}");
+                }
+            }
+
+            Assert.IsEmpty(eksik,
+                "Agir varlik orta kademesiz: bu mesh'ler ancak birkac yuz "
+                + "metreden goruntuleniyor, otesinde bloga dusuyor. "
+                + "Uretecte `ottoman_kit.build_with_mid_lod` kullan. "
+                + string.Join("; ", eksik));
+
+            Assert.IsEmpty(yanlisEsik,
+                "LOD esikleri merdivenden sapmis — `ImportLanding."
+                + "SetLodThresholds` calismamis ya da prefab elle "
+                + "duzenlenmis. " + string.Join("; ", yanlisEsik));
+        }
+}
 }

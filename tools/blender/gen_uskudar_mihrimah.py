@@ -18,6 +18,7 @@ for _p in (_HERE, os.path.join(_HERE, "lib")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
+import ottoman_kit as kit    # noqa: E402
 import hz_blender as hz            # noqa: E402
 import sinan_kit as sk             # noqa: E402
 from export_fbx import export_fbx  # noqa: E402
@@ -72,8 +73,9 @@ def main():
 
     p = sk.MihrimahParams(palette=a.palette,
                           outer_revak=not a.no_outer_revak)
-    lod0, lod1, ucx, info = sk.build_mihrimah(p, col, a.asset,
-                                              textured=a.textured)
+    # Uc kademe: tam / orta / blok — `ottoman_kit.build_with_mid_lod`.
+    lod0, lod1, lod2, ucx, info = kit.build_with_mid_lod(
+        sk.build_mihrimah, p, col, a.asset, textured=a.textured)
 
     hz.log(f"{a.asset}: kubbe {p.dome_d:.2f} m cap / {p.crown_z:.2f} m kilit "
            f"(OLCULU), harim {p.hall_w:.1f}x{p.hall_d:.1f} m (turetilen)")

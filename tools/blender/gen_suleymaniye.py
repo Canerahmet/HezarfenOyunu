@@ -18,6 +18,7 @@ for _p in (_HERE, os.path.join(_HERE, "lib")):
         sys.path.insert(0, _p)
 
 import hz_blender as hz            # noqa: E402
+import ottoman_kit as kit    # noqa: E402
 import sinan_kit as sk             # noqa: E402
 from export_fbx import export_fbx  # noqa: E402
 
@@ -62,8 +63,10 @@ def main():
     col = hz.collection(COLLECTION)
 
     p = sk.SuleymaniyeParams(palette=a.palette)
-    lod0, lod1, ucx, info = sk.build_suleymaniye(p, col, a.asset,
-                                                 textured=a.textured)
+    # Uc kademe: tam / orta / blok. Orta kademe ayni ureteçten, daha az
+    # bolutle kurulur — gerekçe `ottoman_kit.build_with_mid_lod`.
+    lod0, lod1, lod2, ucx, info = kit.build_with_mid_lod(
+        sk.build_suleymaniye, p, col, a.asset, textured=a.textured)
 
     if info["sherefe_total"] != 10 or info["minarets"] != 4:
         raise SystemExit("[HZ] HATA: DORT minare ve ON serefe olmali.")
@@ -75,7 +78,9 @@ def main():
     hz.log(f"{info['minarets']} minare / {info['sherefe_total']} serefe "
            f"{info['sherefe_each']}, {info['half_domes']} yarim kubbe")
     hz.log(f"ayak izi {info['footprint_x']:.1f}x{info['footprint_y']:.1f} m, "
-           f"yukseklik {info['height']:.2f} m, LOD0={info['tris_lod0']}")
+           f"yukseklik {info['height']:.2f} m, "
+           f"LOD 0/1/2 = {info['tris_lod0']}/{info['tris_lod1']}/"
+           f"{info['tris_lod2']}")
 
     if abs(info["pivot_min_z"]) > 0.01:
         raise SystemExit(f"[HZ] HATA pivot {info['pivot_min_z']:.3f}")

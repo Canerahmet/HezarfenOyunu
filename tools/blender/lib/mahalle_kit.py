@@ -102,6 +102,8 @@ def _face_shadow(parts, mats, col, name, ow, oh, center, u_axis, n_axis, thick):
 def _face_grille(parts, mats, col, name, ow, oh, center, u_axis, n_axis, thick,
                  bars=3, rails=1):
     """Dövme demir şebeke — açıklığın dış yüzüne yakın."""
+    if not hz.detay_var(0.35):
+        return
     N = hz.Vector((n_axis[0], n_axis[1], 0.0)).normalized()
     U = hz.Vector((u_axis[0], u_axis[1], 0.0)).normalized()
     base = hz.Vector(center) + N * (thick * 0.5 - 0.07)

@@ -211,6 +211,61 @@ def _mark_metric(bm, face_uvs):
             loop[uv].uv = c
 
 
+
+# ------------------------------------------------------- ayrıntı kademesi
+
+#: Eğri yüzeylerin bölüt sayısı bu çarpanla ölçeklenir. 1.0 tam ayrıntı.
+#: `set_detail` dışında ELLE değiştirme.
+DETAIL = 1.0
+
+#: Bu uzunluğun altındaki öğeler orta kademede hiç üretilmez (m). 0 = hepsi.
+DETAIL_MIN = 0.0
+
+
+def set_detail(scale, min_size=0.0):
+    """
+    **Ayrıntı kademesini** ayarlar — orta LOD'u aynı üreteçten kurmak için.
+
+    ## Neden gerekti
+
+    Ayrıntı geçişi LOD0'ı altı katına çıkardı ama LOD1'e dokunmadı ve arada
+    kalan boşluk **ölçüldü**: Süleymaniye'nin LOD0'ı yalnızca **573 m**'ye
+    kadar görüntüleniyor (LODGroup eşiği 0,25 ekran yüksekliği, FOV 40°);
+    ötesinde 456 üçgenlik blok geliyor. Hezarfen'in uçuşu **3336 m**. Yani
+    ayrıntının tamamı, oyunun merkez sahnesinde hiç görünmüyordu.
+
+    Boşluk sonradan **filtreleyerek** kapatılamaz: ölçüldü, 4 m altındaki her
+    parça atılsa bile üçgenlerin %33'ü kalıyor — çünkü yük küçük süslerde
+    değil, **çok bölütlü kubbelerde ve kütlelerdedir**. Orta kademe bu yüzden
+    aynı üreteçten, **daha az bölütle yeniden kurulur**.
+
+    `scale` eğri yüzeylerin bölütlerini, `min_size` ise ayrıntı dağarcığının
+    alt sınırını belirler: o boyun altındaki öğe (mukarnas hücresi, kubbe
+    kaburgası, pencere kaydı) orta kademede zaten piksel altıdır.
+    """
+    global DETAIL, DETAIL_MIN
+    DETAIL = float(scale)
+    DETAIL_MIN = float(min_size)
+
+
+def seg(n, alt=6):
+    """
+    Bölüt sayısını kademeye göre ölçekler; `alt` altına düşmez ama
+    **istenen sayının üstüne de çıkmaz**.
+
+    İlk yazımda `max(alt, n*DETAIL)` idi ve tam ayrıntıda hiçbir şeyi
+    değiştirmemesi gerekirken zaten düşük bölütlü ilkelleri YÜKSELTİYORDU
+    (6 bölütlü bir boru `alt=8` yüzünden 8'e çıkıyordu). Süleymaniye
+    89 668'den 89 812'ye çıkınca yakalandı — kademe altyapısının tam
+    ayrıntıda **görünmez** olması gerekir, ve bunu doğrulayan şey sayıydı.
+    """
+    return max(min(n, alt), int(round(n * DETAIL)))
+
+
+def detay_var(boy):
+    """`boy` metrelik bir ayrıntı bu kademede üretilir mi?"""
+    return boy >= DETAIL_MIN
+
 def make_tube(name, r_bottom, r_top, height, center_xy=(0.0, 0.0), base_z=0.0,
               segments=16, cap_top=True, cap_bottom=False, smooth=True, col=None,
               phase=0.0):
@@ -231,6 +286,7 @@ def make_tube(name, r_bottom, r_top, height, center_xy=(0.0, 0.0), base_z=0.0,
     Varsayılan 0 bilinçlidir: minare ve külah gibi mevcut çağıranların
     çıktısı bit bit aynı kalsın.
     """
+    segments = seg(segments, 6)
     cx, cy = center_xy
     bm = bmesh.new()
     metric_layers(bm)
@@ -296,6 +352,7 @@ def make_dome(name, radius, height, center_xy=(0.0, 0.0), base_z=0.0,
     hafif basıktır. Yükseklik ayrı verilmezse bu oran kaybolur ve kubbe
     "balon" gibi durur.
     """
+    segments, rings = seg(segments, 8), seg(rings, 3)
     cx, cy = center_xy
     bm = bmesh.new()
     metric_layers(bm)
@@ -361,6 +418,7 @@ def make_half_dome(name, radius, height, center_xy=(0.0, 0.0), base_z=0.0,
     Kubbe ile aynı basıklık oranını taşır (`height` yarıçaptan bağımsız):
     yarım kubbe tam yarım küre yapılırsa ana kubbeyle uyumsuz durur.
     """
+    segments, rings = seg(segments, 8), seg(rings, 3)
     cx, cy = center_xy
     bm = bmesh.new()
     metric_layers(bm)

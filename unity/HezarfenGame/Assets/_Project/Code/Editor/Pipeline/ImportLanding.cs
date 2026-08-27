@@ -122,7 +122,11 @@ namespace Hezarfen.Editor.Pipeline
                 // UCX nesnesi silindikten sonra LOD sinirlari bayat kalir;
                 // yeniden hesaplanmazsa LOD gecisleri yanlis mesafede tetiklenir.
                 var lods = inst.GetComponent<LODGroup>();
-                if (lods != null) lods.RecalculateBounds();
+                if (lods != null)
+                {
+                    lods.RecalculateBounds();
+                    SetLodThresholds(lods);
+                }
 
                 // Tarihsel kademe KATALOGDAN gelir, elle konmaz.
                 //
@@ -207,5 +211,70 @@ namespace Hezarfen.Editor.Pipeline
             string projectRoot = Directory.GetParent(Application.dataPath).FullName;
             return Path.Combine(projectRoot, assetPath.Replace('/', Path.DirectorySeparatorChar));
         }
-    }
+    
+
+        /// <summary>
+        /// LOD merdivenini <b>mevcut butun prefab'lara</b> uygular.
+        ///
+        /// Neden ayri bir komut: esikler boru hattinda yaziliyor ama boru
+        /// hatti yalnizca <c>_Import</c>'a dusen varligi isler. Merdiven
+        /// eklendiginde depoda zaten 150'den fazla prefab vardi ve onlari
+        /// yenilemek icin butun FBX'leri yeniden aktarmak gerekirdi —
+        /// ki bu, icerigi hic degismeyen 150 ikili dosyayi LFS'e KALICI
+        /// olarak ikinci kez yazmak demekti (CLAUDE.md, yeniden uretim
+        /// gurultusu kurali). Prefab'i yerinde duzeltmek hem dogru hem ucuz.
+        /// </summary>
+        [MenuItem("Hezarfen/Boru Hatti/LOD merdivenini uygula")]
+        public static void ApplyLodLadderMenu()
+        {
+            int dokunulan = 0, atlanan = 0;
+            foreach (var guid in AssetDatabase.FindAssets(
+                         "t:Prefab", new[] { "Assets/_Project/Art/Prefabs" }))
+            {
+                string yol = AssetDatabase.GUIDToAssetPath(guid);
+                var pf = AssetDatabase.LoadAssetAtPath<GameObject>(yol);
+                if (pf == null) { atlanan++; continue; }
+                var grup = pf.GetComponent<LODGroup>();
+                if (grup == null) { atlanan++; continue; }
+                SetLodThresholds(grup);
+                EditorUtility.SetDirty(pf);
+                dokunulan++;
+            }
+            AssetDatabase.SaveAssets();
+            Debug.Log($"[Hezarfen] LOD merdiveni: {dokunulan} prefab "
+                      + $"guncellendi, {atlanan} atlandi (LODGroup yok).");
+        }
+
+        /// <summary>
+        /// LOD gecis esikleri — Unity'nin varsayilanina BIRAKILMAZ.
+        ///
+        /// Esik, nesnenin ekran yuksekliginin oranidir; FOV 40 derecede
+        /// mesafeye su formulle cevrilir: <c>d = boy / (esik * 2*tan(FOV/2))</c>.
+        /// Varsayilan iki kademeli kurulumda 0,25 / 0,01 geliyordu ve bu
+        /// OLCULDU: Suleymaniye'nin tam ayrintili mesh'i yalnizca
+        /// <b>573 m</b>'ye kadar goruntuleniyordu, otesinde 456 ucgenlik
+        /// blok. Hezarfen'in ucusu ise <b>3336 m</b> — yani butun ayrinti,
+        /// oyunun merkez sahnesinde hic gorunmuyordu.
+        ///
+        /// Uc kademeli ladder (varlik uretecinde orta kademe eklendi):
+        ///   LOD0 tam ayrinti  : 0,25'e kadar  → Suleymaniye'de ~570 m
+        ///   LOD1 orta kademe  : 0,03'e kadar  → ~4 800 m (ucusun tamami)
+        ///   LOD2 blok siluet  : 0,004'e kadar → ~36 km
+        /// Iki kademeli eski varliklar icin ayni ladder'in ilk ve son
+        /// basamagi kullanilir.
+        /// </summary>
+        static void SetLodThresholds(LODGroup group)
+        {
+            var lods = group.GetLODs();
+            float[] ucKademe = { 0.25f, 0.03f, 0.004f };
+            float[] ikiKademe = { 0.25f, 0.004f };
+            float[] esik = lods.Length >= 3 ? ucKademe : ikiKademe;
+            for (int i = 0; i < lods.Length; i++)
+            {
+                lods[i].screenRelativeTransitionHeight =
+                    i < esik.Length ? esik[i] : 0.004f;
+            }
+            group.SetLODs(lods);
+        }
+}
 }

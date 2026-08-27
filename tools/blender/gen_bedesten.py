@@ -17,6 +17,7 @@ for _p in (_HERE, os.path.join(_HERE, "lib")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
+import ottoman_kit as kit    # noqa: E402
 import hz_blender as hz            # noqa: E402
 import bedesten_kit as bk          # noqa: E402
 from export_fbx import export_fbx  # noqa: E402
@@ -89,8 +90,9 @@ def main():
         col = hz.collection(COLLECTION)
         p = bk.BedestenParams(v["w"], v["d"], v["cols"], v["rows"],
                               v["crown"], palette=a.palette)
-        lod0, lod1, ucx, info = bk.build_bedesten(p, col, v["asset"],
-                                                  textured=a.textured)
+        # Uc kademe: tam / orta / blok — `ottoman_kit.build_with_mid_lod`.
+        lod0, lod1, lod2, ucx, info = kit.build_with_mid_lod(
+            bk.build_bedesten, p, col, v["asset"], textured=a.textured)
 
         # IZGARA ILISKISI: uc sayi birbirini kapatmali.
         if info["domes"] != info["cols"] * info["rows"]:

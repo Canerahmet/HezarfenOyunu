@@ -31,6 +31,7 @@ for _p in (_HERE, os.path.join(_HERE, "lib")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
+import ottoman_kit as kit    # noqa: E402
 import civic_kit as ck             # noqa: E402
 import hz_blender as hz            # noqa: E402
 import mahalle_kit as mak          # noqa: E402
@@ -122,8 +123,9 @@ def build_medrese(a):
     p = ck.MedreseParams(width=24.0, depth=23.0, wing=5.2, arch_w=2.30,
                          floor_h=3.90, dershane=True, dershane_w=7.6,
                          palette=a.palette)
-    lod0, lod1, ucx, info = ck.build_medrese(p, col, "MihrimahMedrese",
-                                             textured=a.textured)
+    # Uc kademe: tam / orta / blok — `ottoman_kit.build_with_mid_lod`.
+    lod0, lod1, lod2, ucx, info = kit.build_with_mid_lod(
+        ck.build_medrese, p, col, "MihrimahMedrese", textured=a.textured)
     if info["hucre"] != MEDRESE_HUCRE:
         raise SystemExit(
             f"[HZ] HATA medrese {info['hucre']} hucre — belgeli sayi "

@@ -1216,6 +1216,70 @@ def _tris(obj):
     return sum(max(0, len(f.vertices) - 2) for f in obj.data.polygons)
 
 
+
+# ------------------------------------------------------------- orta kademe
+
+#: Orta kademenin bölüt çarpanı ve ayrıntı alt sınırı (m).
+MID_DETAIL, MID_MIN = 0.5, 0.55
+
+
+def build_with_mid_lod(build_fn, p, col, asset_name, textured=False,
+                       detail=MID_DETAIL, min_size=MID_MIN):
+    """
+    Yapıyı **iki kez** kurar: tam ayrıntı ve orta kademe.
+
+    ## Neden
+
+    Ayrıntı geçişi LOD0'ı altı katına çıkardı, LOD1'e dokunmadı ve arada
+    kalan boşluk ölçüldü: Süleymaniye'nin LOD0'ı yalnızca **573 m**'ye kadar
+    görüntüleniyor (LODGroup eşiği 0,25 ekran yüksekliği, FOV 40°),
+    ötesinde 456 üçgenlik blok geliyor. **Hezarfen'in uçuşu 3336 m.** Yani
+    ayrıntının tamamı, oyunun merkez sahnesinde hiç görünmüyordu — ve
+    LOD0'dan LOD1'e geçiş tek adımda **197 kat** düşüyordu.
+
+    ## Neden filtreleyerek değil, yeniden kurarak
+
+    Ölçüldü: 4 m'nin altındaki her parça atılsa bile üçgenlerin **%33'ü**
+    kalıyor, çünkü yük küçük süslerde değil **çok bölütlü kubbelerde ve
+    kütlelerdedir**. Sonradan filtrelemek ya da decimate etmek bu yüzden
+    işe yaramaz; orta kademe aynı üreteçten daha az bölütle kurulmalı.
+
+    Kademeyi taşıyan şey `hz.set_detail`: eğri ilkellerin bölütlerini
+    ölçekler, `detay_kit`in gölge-dokusu öğelerini (mukarnas hücresi, kubbe
+    kaburgası, konsol dizisi, silme basamağı) eşiğin altında düşürür.
+    Siluete giren hiçbir şey düşmez.
+
+    Adlandırma kayar: eldeki LOD1 **LOD2** olur, yeni orta kademe **LOD1**.
+    Unity LODGroup'u `_LOD0/_LOD1/_LOD2` adlarından kendisi kurar.
+    """
+    lod0, lod1, ucx, info = build_fn(p, col, asset_name, textured=textured)
+
+    lod0.name = f"SM_{asset_name}_LOD0"
+    lod1.name = f"SM_{asset_name}_LOD2"
+
+    tmp = hz.collection("_MidLOD")
+    hz.set_detail(detail, min_size)
+    try:
+        m0, m1, mucx, _ = build_fn(p, tmp, asset_name, textured=textured)
+    finally:
+        hz.set_detail(1.0, 0.0)
+
+    # Orta kademeden YALNIZCA LOD0 kalir; digerlerinin ikizi zaten var.
+    _purge([o for o in (m1, mucx) if o is not None])
+    for c in list(m0.users_collection):
+        c.objects.unlink(m0)
+    col.objects.link(m0)
+    m0.name = f"SM_{asset_name}_LOD1"
+
+    for o in list(tmp.objects):
+        _purge([o])
+    bpy.data.collections.remove(tmp)
+
+    info["tris_lod1"] = tri_count(m0)
+    info["tris_lod2"] = tri_count(lod1)
+    info["lod_detail"] = detail
+    return lod0, m0, lod1, ucx, info
+
 def _purge(objects):
     """Ara parçaları sahneden ve veriden temizler — FBX'e sızmasınlar."""
     for obj in objects:
