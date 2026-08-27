@@ -1,0 +1,143 @@
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+namespace Hezarfen.Player
+{
+    /// <summary>
+    /// <b>Yaya gezinti denetleyicisi</b> — Caner mahalleyi kendi gözüyle
+    /// dolaşsın diye (Caner, 2026-08-25: *"bir dolaşmak istiyorum, etrafa
+    /// bakmak istiyorum"*).
+    ///
+    /// ## Bu bir OYUN karakteri değil, bir ALET
+    ///
+    /// Faz 5'in Hezarfen karakteri ayrı bir iştir (animasyonlu, kuşanma ve
+    /// atlayış eylemleriyle). Bu sınıf onun yerini almaz: dokuyu **insan
+    /// ölçeğinden denetlemek** için bir kamera taşıyıcısıdır. İnceleme
+    /// paketi sabit kadrajlar verir; burada kadrajı sen seçersin.
+    ///
+    /// ## Ölçüler dokunun kendisinden
+    ///
+    /// Göz **1,70 m** — bütün inceleme paketlerindeki ölçü figürüyle aynı,
+    /// yani gördüğün şey render'larda ölçtüğüm şeyle aynı yükseklikten.
+    /// Gövde yarıçapı 0,30 m: 4,6 m'lik sokakta (ADR 0016) ve 2,70 m'lik sur
+    /// kapısında (Erdoğan 2013 rölövesi) sıkışmadan geçmeli — kapıdan
+    /// geçemeyen bir gezgin, kapının dar olduğunu değil aletin kaba olduğunu
+    /// gösterirdi.
+    ///
+    /// Yürüme hızı **1,4 m/s** (insan yürüyüşü); Shift ile 3,6 m/s. Hız
+    /// önemli çünkü mesafe duygusu ona bağlı: 2,5 km'lik sur hattını "hızlı"
+    /// bir kamerayla dolaşmak şehri küçük gösterir.
+    ///
+    /// ## Tuşlar
+    ///
+    /// WASD yürü · fare bak · Shift koş · Space zıpla · Ctrl çömel ·
+    /// <b>F uçuş kipi</b> (yerçekimsiz serbest kamera — damları ve kule
+    /// tepesini görmek için) · Esc imleci bırak.
+    /// </summary>
+    [AddComponentMenu("Hezarfen/Walk Controller")]
+    [RequireComponent(typeof(CharacterController))]
+    public class WalkController : MonoBehaviour
+    {
+        [Header("Ölçüler (m) — inceleme paketleriyle aynı")]
+        [Tooltip("Göz yüksekliği. 1,70 m: ölçü figürüyle aynı.")]
+        public float eyeHeight = 1.70f;
+
+        [Header("Hız (m/s)")]
+        public float walkSpeed = 1.4f;         // insan yuruyusu
+        public float runSpeed = 3.6f;
+        public float flySpeed = 12f;           // ucus kipi
+        public float jumpSpeed = 3.6f;
+        public float gravity = -9.81f;
+
+        [Header("Bakış")]
+        public float mouseSensitivity = 0.08f;
+        public float pitchLimit = 89f;
+
+        private CharacterController cc;
+        private Camera cam;
+        private float pitch;
+        private float vSpeed;
+        private bool flying;
+        private bool looking = true;
+
+        private void Awake()
+        {
+            cc = GetComponent<CharacterController>();
+            cam = GetComponentInChildren<Camera>();
+            if (cam != null)
+                cam.transform.localPosition = new Vector3(0f, eyeHeight, 0f);
+        }
+
+        private void OnEnable() => Capture(true);
+
+        private void OnDisable() => Capture(false);
+
+        private void Capture(bool on)
+        {
+            looking = on;
+            Cursor.lockState = on ? CursorLockMode.Locked : CursorLockMode.None;
+            Cursor.visible = !on;
+        }
+
+        private void Update()
+        {
+            var kb = Keyboard.current;
+            var mouse = Mouse.current;
+            if (kb == null) return;
+
+            // Esc: imleci birak — Editor'de pencereler arasi gecis icin sart.
+            if (kb.escapeKey.wasPressedThisFrame) Capture(!looking);
+            if (kb.fKey.wasPressedThisFrame) flying = !flying;
+
+            // --- bakis ---
+            if (looking && mouse != null)
+            {
+                Vector2 d = mouse.delta.ReadValue() * mouseSensitivity;
+                transform.Rotate(0f, d.x, 0f, Space.World);
+                pitch = Mathf.Clamp(pitch - d.y, -pitchLimit, pitchLimit);
+                if (cam != null)
+                    cam.transform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
+            }
+
+            // --- yatay girdi ---
+            float x = (kb.dKey.isPressed ? 1f : 0f) - (kb.aKey.isPressed ? 1f : 0f);
+            float z = (kb.wKey.isPressed ? 1f : 0f) - (kb.sKey.isPressed ? 1f : 0f);
+            var wish = transform.right * x + transform.forward * z;
+            if (wish.sqrMagnitude > 1f) wish.Normalize();
+
+            float speed = kb.leftShiftKey.isPressed ? runSpeed : walkSpeed;
+
+            if (flying)
+            {
+                // UCUS KIPI: yercekimi yok, bakis yonunde serbest hareket.
+                // Damlari, kubbeleri ve kule tepesini gormek icin — bunlar
+                // yaya seviyesinden hic gorunmuyor.
+                var f = cam != null ? cam.transform.forward : transform.forward;
+                var move = f * z + transform.right * x;
+                if (kb.spaceKey.isPressed) move += Vector3.up;
+                if (kb.leftCtrlKey.isPressed) move += Vector3.down;
+                cc.Move(move.normalized * flySpeed
+                        * (kb.leftShiftKey.isPressed ? 3f : 1f) * Time.deltaTime);
+                vSpeed = 0f;
+                return;
+            }
+
+            // --- yerde: yercekimi + zipla ---
+            if (cc.isGrounded)
+            {
+                // Kucuk bir negatif hiz: tam sifir olursa `isGrounded` yamacta
+                // titriyor ve karakter basamaklarda takiliyor.
+                vSpeed = -1.5f;
+                if (kb.spaceKey.isPressed) vSpeed = jumpSpeed;
+            }
+            else
+            {
+                vSpeed += gravity * Time.deltaTime;
+            }
+
+            var step = wish * speed;
+            step.y = vSpeed;
+            cc.Move(step * Time.deltaTime);
+        }
+    }
+}

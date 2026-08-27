@@ -1,0 +1,30 @@
+{
+    "name": "Hezarfen.Editor",
+    "rootNamespace": "Hezarfen.Editor",
+    "references": [
+        "Hezarfen.Runtime",
+        "Unity.InputSystem",
+        "Unity.Cinemachine",
+        "Unity.Cinemachine.Editor",
+        "Unity.Splines",
+        "Unity.Addressables",
+        "Unity.Addressables.Editor",
+        "Unity.ResourceManager",
+        "Unity.EditorCoroutines.Editor",
+        "Unity.RenderPipelines.HighDefinition.Runtime",
+        "Unity.RenderPipelines.HighDefinition.Editor",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.Core.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
