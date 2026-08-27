@@ -1,0 +1,1111 @@
+{
+ "type": "FeatureCollection",
+ "name": "greenery_1632",
+ "metadata": {
+  "title": "Yeşil doku ve ağaçsız alanlar — 1632 İstanbul",
+  "status": "Sınırların DAYANAĞI alan alan yazılı; Caner onayı bekliyor",
+  "basis_kinds": {
+   "documented": "Yayımlanmış alan ölçüsüne oturtuldu (biçim kaba, BÜYÜKLÜK belgeli).",
+   "walls": "Sınır sur çizgisinin kendisidir — ayrı bir çizim yok.",
+   "terrain": "Sınırı arazi tanımlar; iddia ölçülerek doğrulanır.",
+   "drawn": "Çapası yok; kaba kutudur ve öyle olduğunu söyler."
+  },
+  "NOT_measured": "Mesire, bostan ve bağ sınırları için ölçü YOKTUR ve arama sonuç vermedi. Bostan literatürünün kendi ifadesi: kayıtlar kira geliri ve adet tutar, alan tutmaz. CLAUDE.md: 'kaynak niteliksel olduğunda metrik geometri UYDURMA'.",
+  "negative_rule": "G_Okmeydani_Yasak bir YOKLUK kaydıdır: II. Bayezid vakfiyesi meydanda yapı, mezar, su yolu, bağ ve bahçe yapılmasını yasaklar. Oraya ağaç dikmek belgeye aykırı olur.",
+  "world_origin": {
+   "name": "Galata Kulesi tabani",
+   "lon": 28.974017,
+   "lat": 41.025637,
+   "utm_easting": 665958.1142269672,
+   "utm_northing": 4543479.981161056
+  },
+  "copyright": "Bu çizim bize aittir; hiçbir telifli harita kopyalanmadı."
+ },
+ "features": [
+  {
+   "type": "Feature",
+   "properties": {
+    "layer": "greenery",
+    "id": "G_Karacaahmet",
+    "name": "Karacaahmet Mezarlığı",
+    "kind": "mezarlik",
+    "species": "servi",
+    "density_per_m2": 0.02,
+    "tier": "Reconstruction",
+    "area_ha": 75.0,
+    "land_fraction": 1.0,
+    "elev_min_m": 35.7,
+    "elev_max_m": 88.1,
+    "source": "TDV 'Karacaahmet Mezarligi': I. Murad devrinden beri; servileriyle meshur; en eski tas 1520 (Seyh Hamdullah) — 1632'de coktan vardir.",
+    "basis": "documented",
+    "basis_note": "Bugunku mezarlik ~750 donum (750 000 m2 = 75 ha). Bu 1632 olcusu DEGIL, UST SINIRDIR: mezarlik yuzyillar boyunca buyudu. Poligon ust sinira oturtuldu, yani buradaki servi sayisi bir TAVANDIR. Elle cizim 76 ha -> belgeli capaya olceklendi 75 ha.",
+    "status": "anchored"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       29.01954389518188,
+       41.01083124322605
+      ],
+      [
+       29.029152980984176,
+       41.010236867109434
+      ],
+      [
+       29.031530482356956,
+       41.01459562669655
+      ],
+      [
+       29.027171722676478,
+       41.01816188169461
+      ],
+      [
+       29.02003921262109,
+       41.017171255054826
+      ],
+      [
+       29.0176617060399,
+       41.013803124709376
+      ],
+      [
+       29.01954389518188,
+       41.01083124322605
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "layer": "greenery",
+    "id": "G_EyupMezarligi",
+    "name": "Eyüp Mezarlığı",
+    "kind": "mezarlik",
+    "species": "servi",
+    "density_per_m2": 0.02,
+    "tier": "Reconstruction",
+    "area_ha": 79.3,
+    "land_fraction": 0.816,
+    "elev_min_m": -12.0,
+    "elev_max_m": 66.4,
+    "source": "TDV 'Eyup Mezarligi': Halic'in kuzey yakasinda, Eyup yamaclarina yayilmis; Gumussuyu bolumu bir tepenin IKI YAMACI; 16. yy definleri Kasgari tekkesinden asagi iner.",
+    "basis": "terrain",
+    "basis_note": "Kaynak niteliksel ama TOPOGRAFIK: 'bir tepenin iki yamaci'. Poligonun gercekten bir tepeyi kapsayip kapsamadigi olculuyor (kot farki >= 40 m).",
+    "status": "draft"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       28.929199999979986,
+       41.045199997404424
+      ],
+      [
+       28.937799999979894,
+       41.044799997404496
+      ],
+      [
+       28.940199999979907,
+       41.04919999740342
+      ],
+      [
+       28.935799999979977,
+       41.053199997402466
+      ],
+      [
+       28.928799999980047,
+       41.052399997402695
+      ],
+      [
+       28.92639999998005,
+       41.048799997403556
+      ],
+      [
+       28.929199999979986,
+       41.045199997404424
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "layer": "greenery",
+    "id": "G_PeraBaglari",
+    "name": "Pera Bağları",
+    "kind": "bag",
+    "species": "meyve",
+    "density_per_m2": 0.004,
+    "tier": "Reconstruction",
+    "area_ha": 157.6,
+    "land_fraction": 1.0,
+    "elev_min_m": 8.1,
+    "elev_max_m": 95.3,
+    "source": "Galata'nin UST SURLARININ OTESI bag, bahce, mezarlik ve korudur; yapilasma 18. yy ortasindan sonra baslar (Batur, 'Galata and Pera').",
+    "basis": "terrain",
+    "basis_note": "Sinirin buyuklugu bilinmiyor ama YERI tanimli: Galata surunun DISI. Poligonun hicbir kosesinin sur poligonu icinde olmadigi olculuyor.",
+    "status": "draft"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       28.97199999997944,
+       41.02959999740803
+      ],
+      [
+       28.985199999979294,
+       41.028599997408215
+      ],
+      [
+       28.988999999979296,
+       41.03419999740684
+      ],
+      [
+       28.982799999979395,
+       41.039999997405474
+      ],
+      [
+       28.97179999997951,
+       41.03899999740576
+      ],
+      [
+       28.96879999997951,
+       41.03399999740698
+      ],
+      [
+       28.97199999997944,
+       41.02959999740803
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "layer": "greenery",
+    "id": "G_Kagithane",
+    "name": "Kağıthane Mesiresi",
+    "kind": "mesire",
+    "species": "cinar",
+    "density_per_m2": 0.008,
+    "tier": "Reconstruction",
+    "area_ha": 212.4,
+    "land_fraction": 0.997,
+    "elev_min_m": -12.0,
+    "elev_max_m": 111.0,
+    "source": "Evliya Celebi 17. yy: unlu mesire ve CAYIR. SADABAD 1722'DIR — 1632'de kasir/saray YOKTUR.",
+    "basis": "terrain",
+    "basis_note": "Mesire dere boyu CAYIRDIR, yamac degil. Sinir artik cizilmiyor, DEM'den IZLENIYOR: her enlemde vadinin en alcak noktasi bulunup iki yana aciliyor. Elle cizilmis kutu olculdugunde ortalama kotu 46 m cikmisti — yani cayirda degil yamactaydi. Vadi ekseni 15 noktada izlendi.",
+    "status": "draft"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       28.948280204503533,
+       41.06704335260714
+      ],
+      [
+       28.953413793178918,
+       41.06791272812711
+      ],
+      [
+       28.952241868974408,
+       41.067474787001366
+      ],
+      [
+       28.95464279132915,
+       41.06996093852172
+      ],
+      [
+       28.961778572714497,
+       41.07097332313628
+      ],
+      [
+       28.960174856089168,
+       41.069847098044555
+      ],
+      [
+       28.960374405214257,
+       41.071954382490894
+      ],
+      [
+       28.962165674517824,
+       41.072474758029394
+      ],
+      [
+       28.961437567591215,
+       41.07395433308514
+      ],
+      [
+       28.966535629719033,
+       41.070928779926774
+      ],
+      [
+       28.948937275341166,
+       41.071913936970326
+      ],
+      [
+       28.944903411352502,
+       41.0754999138227
+      ],
+      [
+       28.94621599743429,
+       41.07747466864649
+      ],
+      [
+       28.9459665990609,
+       41.07749994568317
+      ],
+      [
+       28.945966546721735,
+       41.07849994626557
+      ],
+      [
+       28.952868892242282,
+       41.07849994509676
+      ],
+      [
+       28.952868839903157,
+       41.07749994568322
+      ],
+      [
+       28.95261934800271,
+       41.075525239089885
+      ],
+      [
+       28.951805445338618,
+       41.07549997755184
+      ],
+      [
+       28.949898209216915,
+       41.07708605388089
+      ],
+      [
+       28.96774290214449,
+       41.076071209559736
+      ],
+      [
+       28.96716989934943,
+       41.07104559287316
+      ],
+      [
+       28.968568405088607,
+       41.07052514974534
+      ],
+      [
+       28.966106479459313,
+       41.069045543474054
+      ],
+      [
+       28.96701497736716,
+       41.069152795972215
+      ],
+      [
+       28.963993499314338,
+       41.06602666187711
+      ],
+      [
+       28.956952062325108,
+       41.06503904563818
+      ],
+      [
+       28.958644109402975,
+       41.065525120781544
+      ],
+      [
+       28.956054467489167,
+       41.06308725274413
+      ],
+      [
+       28.94984632097329,
+       41.061956637156136
+      ],
+      [
+       28.948280204503533,
+       41.06704335260714
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "layer": "greenery",
+    "id": "G_Goksu",
+    "name": "Göksu Mesiresi",
+    "kind": "mesire",
+    "species": "cinar",
+    "density_per_m2": 0.01,
+    "tier": "Reconstruction",
+    "area_ha": 67.4,
+    "land_fraction": 0.874,
+    "elev_min_m": -12.0,
+    "elev_max_m": 106.3,
+    "source": "Evliya (17. yy): kayikla gezilen, gul bahceleri ve degirmenlerle cevrili. Goksu ile Kucuksu dereleri arasi 500-600 m; aradaki cayirin iki yani YUKSEK AGAC ve BAG.",
+    "basis": "terrain",
+    "basis_note": "Elimizdeki TEK metrik ipucu: iki dere arasi 500-600 m. Poligonun kisa kenari olculuyor. Olculen dar kenar 635 m.",
+    "status": "draft"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       29.063799999978823,
+       41.078799997395805
+      ],
+      [
+       29.0761999999787,
+       41.07979999739552
+      ],
+      [
+       29.077199999978735,
+       41.08559999739412
+      ],
+      [
+       29.064399999978853,
+       41.0845999973944
+      ],
+      [
+       29.063799999978823,
+       41.078799997395805
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "layer": "greenery",
+    "id": "G_LangaBostani",
+    "name": "Langa Bostanı",
+    "kind": "bostan",
+    "species": "none",
+    "density_per_m2": 0.0,
+    "tier": "Reconstruction",
+    "area_ha": 41.5,
+    "land_fraction": 0.944,
+    "elev_min_m": -12.0,
+    "elev_max_m": 18.8,
+    "source": "Dolmus Theodosius (Eleutherios) limani. Suleymaniye Vakfi 1583-1586 kayitlarinda kiralik bostan (29 290 akce) — 1632'den ONCE belgeli. Konum Yenikapi kazilariyla bilinir. BOSTANDA AGAC YOK: sebze tarhi.",
+    "basis": "terrain",
+    "basis_note": "Dolmus bir liman havzasidir: ALCAK ve SUR ICINDE olmak zorunda. Ikisi de olculuyor (ortalama kot <= 12 m, govde yarimadanin icinde). Ilk cizimde guney kenari Marmara deniz surunun DISINDA, yani denizde kaliyordu; sur cizgisi olculup iceri cekildi.",
+    "status": "draft"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       28.946999999979518,
+       41.002199997414735
+      ],
+      [
+       28.958499999979406,
+       41.003199997414434
+      ],
+      [
+       28.958999999979422,
+       41.00699999741354
+      ],
+      [
+       28.94749999997954,
+       41.006199997413766
+      ],
+      [
+       28.946999999979518,
+       41.002199997414735
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "layer": "greenery",
+    "id": "G_YedikuleBostanlari",
+    "name": "Yedikule Bostanları",
+    "kind": "bostan",
+    "species": "none",
+    "density_per_m2": 0.0,
+    "tier": "Reconstruction",
+    "area_ha": 46.1,
+    "land_fraction": 1.0,
+    "elev_min_m": 13.5,
+    "elev_max_m": 64.7,
+    "source": "'Yedikule ile Topkapi arasinda'; 1719'da 77 vakif ve ozel bostan. Kara surlari boyunca serit. BOSTANDA AGAC YOK.",
+    "basis": "walls",
+    "basis_note": "Sinirin GUZERGAHI belgeli: kara surlari boyunca, Yedikule ile Topkapi KAPILARI arasinda. Artik ayri bir kutu degil, sur cizgisinin kendisinden turetilen bir serit — kapilar da sur verisinden okunuyor. Seridin ENI bilinmiyor ve tahmindir. Sur uzerinde GT_Yedikule ile GT_Topkapi arasi 5 nokta, serit eni 190 m.",
+    "status": "anchored"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       28.923208999979707,
+       40.99303999741705
+      ],
+      [
+       28.922399999979746,
+       40.99769999741593
+      ],
+      [
+       28.924299999979766,
+       41.00369999741445
+      ],
+      [
+       28.927999999979765,
+       41.0091999974131
+      ],
+      [
+       28.929999999979778,
+       41.01429999741189
+      ],
+      [
+       28.932165389562893,
+       41.01381274757301
+      ],
+      [
+       28.93009184040625,
+       41.00855450166685
+      ],
+      [
+       28.92641897309693,
+       41.00310780865816
+      ],
+      [
+       28.924651607411572,
+       40.99756772850787
+      ],
+      [
+       28.925447931741605,
+       40.99326310376666
+      ],
+      [
+       28.923208999979707,
+       40.99303999741705
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "layer": "greenery",
+    "id": "G_Okmeydani_Yasak",
+    "name": "Okmeydanı — ağaçsız talim alanı",
+    "kind": "yasak",
+    "species": "none",
+    "density_per_m2": 0.0,
+    "tier": "Documented",
+    "area_ha": 490.0,
+    "land_fraction": 0.929,
+    "elev_min_m": -12.0,
+    "elev_max_m": 110.2,
+    "source": "II. Bayezid vakfiyesi: meydana 'bir karis tecavuz edilmemesi, YAPI, MEZAR, SU YOLU, BAG VE BAHCE yapilmamasi' kesin olarak yasak. Hezarfen'in talim yaptigi yer (RESEARCH.md). Agac dikmek BELGEYE AYKIRI olur.",
+    "basis": "documented",
+    "basis_note": "17. yuzyilda meydani olcen Abdullah el-Katip alani kabaca 8150 GEZ verir; HUTAD makalesinin hesabiyla ~4,9 km2. Taslak 2,74 km2'ydi — yari yariya kucuktu. Elle cizim 274 ha -> belgeli capaya olceklendi 490 ha.",
+    "status": "anchored"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       28.942413844060855,
+       41.047863050789324
+      ],
+      [
+       28.965148319384664,
+       41.04652564358576
+      ],
+      [
+       28.971835780308076,
+       41.05856172175855
+      ],
+      [
+       28.959799595497078,
+       41.06658627869451
+      ],
+      [
+       28.941075804834778,
+       41.06391146373696
+      ],
+      [
+       28.935726769073053,
+       41.05454970363171
+      ],
+      [
+       28.942413844060855,
+       41.047863050789324
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "layer": "greenery",
+    "id": "G_Surici_Yerlesim",
+    "name": "Suriçi (sur içi)",
+    "kind": "yerlesim",
+    "species": "none",
+    "density_per_m2": 0.0,
+    "tier": "Documented",
+    "area_ha": 1324.3,
+    "land_fraction": 0.997,
+    "elev_min_m": -12.0,
+    "elev_max_m": 81.6,
+    "source": "Sinir SURUN KENDISIDIR: kara surlari + Marmara ve Halic deniz surlari birlikte kapali bir cevre olusturur. Sur icinde yaban agaci serpmek her yerde yanlistir — sehir, bahce ve bostan olsa da yaban ormani degildir.",
+    "basis": "walls",
+    "basis_note": "Onceki taslak 1097 ha'lik ELLE CIZILMIS bir kutuydu ve sur cizgisiyle bagimsizdi; ikisi bir gun ayrisirdi. Artik ayni geometriden geliyorlar. Olculen alan bugunku Fatih ilcesinden (1562 ha) kucuk cikar ve bu BEKLENEN farktir: Marmara ve Halic kiyilari 20. yuzyilda dolduruldu.",
+    "status": "anchored"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       28.922099999979704,
+       40.99059999741763
+      ],
+      [
+       28.923208999979707,
+       40.99303999741705
+      ],
+      [
+       28.922399999979746,
+       40.99769999741593
+      ],
+      [
+       28.924299999979766,
+       41.00369999741445
+      ],
+      [
+       28.927999999979765,
+       41.0091999974131
+      ],
+      [
+       28.929999999979778,
+       41.01429999741189
+      ],
+      [
+       28.932199999979787,
+       41.01859999741084
+      ],
+      [
+       28.9344999999798,
+       41.02449999740941
+      ],
+      [
+       28.93519999997982,
+       41.02919999740826
+      ],
+      [
+       28.937499999979828,
+       41.03399999740709
+      ],
+      [
+       28.9439999999798,
+       41.03919999740582
+      ],
+      [
+       28.94605499997977,
+       41.038283997406026
+      ],
+      [
+       28.94660099997976,
+       41.0371999974063
+      ],
+      [
+       28.94740399997974,
+       41.03629099740651
+      ],
+      [
+       28.94845599997973,
+       41.035595997406666
+      ],
+      [
+       28.948543999979712,
+       41.034249997407
+      ],
+      [
+       28.949507999979694,
+       41.03290199740731
+      ],
+      [
+       28.950445999979678,
+       41.031535997407644
+      ],
+      [
+       28.95191699997966,
+       41.0308249974078
+      ],
+      [
+       28.952596999979647,
+       41.029927997408016
+      ],
+      [
+       28.95443199997962,
+       41.02871699740831
+      ],
+      [
+       28.9560009999796,
+       41.02834099740838
+      ],
+      [
+       28.95746599997958,
+       41.027884997408485
+      ],
+      [
+       28.958500999979563,
+       41.02696799740872
+      ],
+      [
+       28.959443999979545,
+       41.025483997409054
+      ],
+      [
+       28.95947499997954,
+       41.02463799740927
+      ],
+      [
+       28.960296999979526,
+       41.023698997409525
+      ],
+      [
+       28.960846999979513,
+       41.02258999740974
+      ],
+      [
+       28.961852999979495,
+       41.02179299740996
+      ],
+      [
+       28.96285799997948,
+       41.02099699741013
+      ],
+      [
+       28.96386299997946,
+       41.0202009974103
+      ],
+      [
+       28.964867999979447,
+       41.01940399741049
+      ],
+      [
+       28.965998999979426,
+       41.01865999741067
+      ],
+      [
+       28.968019999979404,
+       41.018037997410836
+      ],
+      [
+       28.969624999979388,
+       41.01762099741092
+      ],
+      [
+       28.97159499997936,
+       41.01709399741106
+      ],
+      [
+       28.972813999979344,
+       41.01701499741106
+      ],
+      [
+       28.97415499997933,
+       41.0167699974111
+      ],
+      [
+       28.97538399997931,
+       41.01628899741122
+      ],
+      [
+       28.97718599997929,
+       41.01565199741138
+      ],
+      [
+       28.979355999979266,
+       41.01549099741138
+      ],
+      [
+       28.980883999979252,
+       41.01562399741136
+      ],
+      [
+       28.98221599997924,
+       41.01556399741137
+      ],
+      [
+       28.983380999979232,
+       41.016339997411166
+      ],
+      [
+       28.98693099997918,
+       41.01508999741148
+      ],
+      [
+       28.987120999979172,
+       41.01430099741167
+      ],
+      [
+       28.987540999979167,
+       41.013437997411884
+      ],
+      [
+       28.987935999979157,
+       41.01272999741202
+      ],
+      [
+       28.98789199997915,
+       41.01177099741228
+      ],
+      [
+       28.98761399997915,
+       41.010787997412514
+      ],
+      [
+       28.98707899997914,
+       41.00957899741281
+      ],
+      [
+       28.986543999979144,
+       41.0083689974131
+      ],
+      [
+       28.986008999979134,
+       41.00715799741338
+      ],
+      [
+       28.985391999979136,
+       41.0063519974136
+      ],
+      [
+       28.984409999979142,
+       41.00554999741382
+      ],
+      [
+       28.983199999979153,
+       41.004915997413946
+      ],
+      [
+       28.98184299997916,
+       41.00375099741424
+      ],
+      [
+       28.98107799997916,
+       41.003036997414405
+      ],
+      [
+       28.979688999979174,
+       41.00236799741458
+      ],
+      [
+       28.977979999979187,
+       41.00200099741467
+      ],
+      [
+       28.976388999979207,
+       41.00209099741465
+      ],
+      [
+       28.974797999979224,
+       41.00218099741464
+      ],
+      [
+       28.973206999979244,
+       41.00226999741462
+      ],
+      [
+       28.971699999979254,
+       41.001972997414704
+      ],
+      [
+       28.969965999979273,
+       41.00216499741466
+      ],
+      [
+       28.969057999979288,
+       41.00267299741454
+      ],
+      [
+       28.967090999979316,
+       41.002990997414486
+      ],
+      [
+       28.965056999979335,
+       41.003074997414444
+      ],
+      [
+       28.963864999979346,
+       41.003010997414485
+      ],
+      [
+       28.96198799997936,
+       41.00233199741466
+      ],
+      [
+       28.960678999979372,
+       41.001546997414856
+      ],
+      [
+       28.959106999979383,
+       41.001527997414854
+      ],
+      [
+       28.958314999979386,
+       41.001468997414875
+      ],
+      [
+       28.956057999979418,
+       41.00195699741474
+      ],
+      [
+       28.954166999979435,
+       41.00151799741487
+      ],
+      [
+       28.95243999997945,
+       41.00075299741508
+      ],
+      [
+       28.950795999979466,
+       41.00091099741502
+      ],
+      [
+       28.949091999979487,
+       41.001069997415
+      ],
+      [
+       28.9471999999795,
+       41.00090999741504
+      ],
+      [
+       28.945757999979516,
+       41.00053299741514
+      ],
+      [
+       28.944314999979532,
+       41.000156997415246
+      ],
+      [
+       28.943390999979542,
+       41.0002749974152
+      ],
+      [
+       28.942867999979548,
+       41.000425997415185
+      ],
+      [
+       28.941585999979566,
+       41.001264997414985
+      ],
+      [
+       28.93637799997963,
+       41.00126299741501
+      ],
+      [
+       28.935031999979632,
+       41.00065199741516
+      ],
+      [
+       28.93306999997964,
+       40.997790997415876
+      ],
+      [
+       28.933059999979633,
+       40.99746199741594
+      ],
+      [
+       28.932738999979637,
+       40.9968479974161
+      ],
+      [
+       28.93187099997964,
+       40.995936997416315
+      ],
+      [
+       28.930866999979646,
+       40.99504499741653
+      ],
+      [
+       28.929862999979644,
+       40.99415399741676
+      ],
+      [
+       28.92922599997965,
+       40.99340099741695
+      ],
+      [
+       28.928450999979653,
+       40.992453997417186
+      ],
+      [
+       28.927675999979655,
+       40.991506997417396
+      ],
+      [
+       28.92687299997966,
+       40.990526997417625
+      ],
+      [
+       28.921286999979703,
+       40.988111997418244
+      ],
+      [
+       28.922099999979704,
+       40.99059999741763
+      ],
+      [
+       28.922099999979704,
+       40.99059999741763
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "layer": "greenery",
+    "id": "G_Galata_Yerlesim",
+    "name": "Galata surları içi",
+    "kind": "yerlesim",
+    "species": "none",
+    "density_per_m2": 0.0,
+    "tier": "Documented",
+    "area_ha": 29.7,
+    "land_fraction": 0.966,
+    "elev_min_m": -12.0,
+    "elev_max_m": 53.0,
+    "source": "Ceneviz surlari 1632'de ayaktaydi (1860'larda yikildi). Sinir surun kendisidir.",
+    "basis": "walls",
+    "basis_note": "Onceki taslak 216 ha'ydi; Ceneviz surlarinin cevreledigi alan ~37 ha — yani kutu ALTI KAT buyuktu. Bu, toptan ele almanin gerekcesinin kendisi: bir alanda yaptigim hata (Okmeydani, yarim) baska bir alanda TERS yonde ve cok daha buyuktu.",
+    "status": "anchored"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       28.970499999979424,
+       41.024699997409215
+      ],
+      [
+       28.969999999979425,
+       41.025199997409096
+      ],
+      [
+       28.974016999979387,
+       41.02563699740898
+      ],
+      [
+       28.97929999997933,
+       41.02519999740906
+      ],
+      [
+       28.982199999979294,
+       41.0241999974093
+      ],
+      [
+       28.97611999997934,
+       41.02165699740995
+      ],
+      [
+       28.97567699997935,
+       41.021731997409915
+      ],
+      [
+       28.97489999997936,
+       41.02255499740972
+      ],
+      [
+       28.973546999979373,
+       41.02197099740986
+      ],
+      [
+       28.971413999979394,
+       41.02214299740982
+      ],
+      [
+       28.97044499997941,
+       41.022496997409746
+      ],
+      [
+       28.970499999979424,
+       41.024699997409215
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "layer": "greenery",
+    "id": "G_Uskudar_Yerlesim",
+    "name": "Üsküdar (yapılı)",
+    "kind": "yerlesim",
+    "species": "none",
+    "density_per_m2": 0.0,
+    "tier": "Graybox",
+    "area_ha": 209.0,
+    "land_fraction": 0.77,
+    "elev_min_m": -12.0,
+    "elev_max_m": 95.1,
+    "source": "Iskele ve Dogancilar cevresi.",
+    "basis": "drawn",
+    "basis_note": "CAPA BULUNAMADI. Uskudar'in 1632'deki yapili alani icin ne olcu ne de sur var; sinirsiz bir yerlesimdir. Kaba kutudur ve tarihsel sinir iddiasi TASIMAZ.",
+    "status": "draft"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       29.007999999978995,
+       41.020199997410145
+      ],
+      [
+       29.024999999978814,
+       41.01959999741022
+      ],
+      [
+       29.02919999997883,
+       41.028799997408
+      ],
+      [
+       29.01519999997901,
+       41.03299999740705
+      ],
+      [
+       29.006199999979067,
+       41.02799999740827
+      ],
+      [
+       29.007999999978995,
+       41.020199997410145
+      ]
+     ]
+    ]
+   }
+  }
+ ]
+}

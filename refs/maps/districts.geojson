@@ -1,0 +1,590 @@
+{
+ "type": "FeatureCollection",
+ "name": "districts",
+ "metadata": {
+  "title": "Bölge yayını (streaming) semtleri — 1632 İstanbul",
+  "status": "TASLAK — sınırlar oynanış kararıdır, Caner onayı bekliyor",
+  "NOT_historical": "Bu poligonlar TARİHSEL MAHALLE SINIRI DEĞİLDİR. 1632 mahalleleri kadastral değildi; 1546/1600 Vakıf Tahrir Defterleri mahalle ADLARINI verir, sınır çizgisi vermez (RESEARCH.md). Metrik sınır üretmek uydurmak olurdu. Buradakiler plan Faz 1 madde 6'nın yayın hücreleridir; hepsi tier=Graybox ve historical_claim=none taşır.",
+  "streaming": {
+   "distance_rule": "Yükleme ölçütü poligonun KENARINA uzaklıktır (içerideyken 0), merkezine değil. Merkez+yarıçap uzun/bükük bölgelerde (Haliç şeridi) fena hâlde yanılır.",
+   "hysteresis": "unload_distance = load_distance x 1.3; tek eşik kullanılsaydı sınırda gidip gelen oyuncu sahneyi sürekli yükleyip boşaltırdı",
+   "load_distance_m": 700.0,
+   "unload_distance_m": 910.0,
+   "overlap_ok": "Bölgeler bilerek çakışabilir — aynı anda birden çok bölgenin yüklü olması yükleme ekransız geçişin ta kendisidir. Su bölgeleri (Boğaz, Haliç) kara bölgeleriyle örtüşür."
+  },
+  "measured": {
+   "grid_step_m": 40.0,
+   "exclusive_land_ha_total": 3287.0,
+   "exclusive_land_ha_priority1": 1786.4,
+   "note": "`land_area_ha` bölgenin İÇİNDEKİ tüm karadır ve bölgeler çakıştığı için TOPLANAMAZ. Faz 4 yerleştirme bütçesi için `exclusive_land_area_ha` kullanılır: her kara hücresi, onu içeren en yüksek öncelikli KARA bölgesine tek bir kez sayılır; su bölgeleri kara sahiplenmez.",
+   "corridor_checked": [
+    "LM_GalataKulesi->LM_Dogancilar"
+   ]
+  },
+  "world_origin": {
+   "name": "Galata Kulesi tabani",
+   "lon": 28.974017,
+   "lat": 41.025637,
+   "utm_easting": 665958.1142269672,
+   "utm_northing": 4543479.981161056
+  },
+  "copyright": "Bu bölgeleme bize aittir (oynanış kararı)."
+ },
+ "features": [
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       28.954,
+       41.02
+      ],
+      [
+       28.98,
+       41.018
+      ],
+      [
+       28.99,
+       41.027
+      ],
+      [
+       28.986,
+       41.036
+      ],
+      [
+       28.96,
+       41.04
+      ],
+      [
+       28.952,
+       41.03
+      ],
+      [
+       28.954,
+       41.02
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "layer": "district",
+    "id": "D_Galata",
+    "name": "Galata",
+    "priority": 1,
+    "kind": "land",
+    "summary": "Kule, Galata surlari, Arap Camii, Tophane, Kasimpasa tersanesi. Ucusun KALKIS bolgesi.",
+    "requires_landmarks": [
+     "LM_GalataKulesi",
+     "LM_GalataSurlari",
+     "LM_ArapCamii",
+     "LM_Tophane",
+     "LM_Tersane"
+    ],
+    "tier": "Graybox",
+    "historical_claim": "none — bu bir OYUN bölgesidir, mahalle sınırı değildir",
+    "scene_address": "Districts/D_Galata",
+    "center_unity": {
+     "x": -316.9,
+     "z": 311.0
+    },
+    "radius_m": 1666.7,
+    "load_distance_m": 700.0,
+    "unload_distance_m": 910.0,
+    "distance_measured_to": "polygon edge (0 if inside), NOT centre",
+    "area_ha": 584.3,
+    "land_area_ha": 408.6,
+    "exclusive_land_area_ha": 408.6,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       28.94,
+       41.046
+      ],
+      [
+       28.97,
+       41.045
+      ],
+      [
+       28.978,
+       41.057
+      ],
+      [
+       28.96,
+       41.068
+      ],
+      [
+       28.94,
+       41.062
+      ],
+      [
+       28.94,
+       41.046
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "layer": "district",
+    "id": "D_Okmeydani",
+    "name": "Okmeydanı",
+    "priority": 1,
+    "kind": "land",
+    "summary": "Acik talim alani, namazgah (minaresiz), menzil taslari. Ucus talimlerinin gectigi yer (plan Bolum 8 S-kademe).",
+    "requires_landmarks": [
+     "LM_Okmeydani"
+    ],
+    "tier": "Graybox",
+    "historical_claim": "none — bu bir OYUN bölgesidir, mahalle sınırı değildir",
+    "scene_address": "Districts/D_Okmeydani",
+    "center_unity": {
+     "x": -1454.9,
+     "z": 3295.5
+    },
+    "radius_m": 1823.7,
+    "load_distance_m": 700.0,
+    "unload_distance_m": 910.0,
+    "distance_measured_to": "polygon edge (0 if inside), NOT centre",
+    "area_ha": 607.7,
+    "land_area_ha": 579.7,
+    "exclusive_land_area_ha": 579.7,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       28.96,
+       40.9995
+      ],
+      [
+       28.988,
+       41.001
+      ],
+      [
+       28.992,
+       41.011
+      ],
+      [
+       28.988,
+       41.0175
+      ],
+      [
+       28.97,
+       41.019
+      ],
+      [
+       28.96,
+       41.0225
+      ],
+      [
+       28.96,
+       40.9995
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "layer": "district",
+    "id": "D_Surici_Dogu",
+    "name": "Suriçi — Doğu",
+    "priority": 1,
+    "kind": "land",
+    "summary": "Sarayburnu, Topkapi siluetı, Ayasofya, Sultanahmet, Beyazit, Suleymaniye, Eminonu ve Yeni Cami harabesi.",
+    "requires_landmarks": [
+     "LM_Ayasofya",
+     "LM_Sultanahmet",
+     "LM_TopkapiSiluet",
+     "LM_YeniCamiHarabe",
+     "LM_Beyazit",
+     "LM_Suleymaniye",
+     "LM_EskiSaray",
+     "LM_RustemPasa",
+     "LM_IncliKosk"
+    ],
+    "tier": "Graybox",
+    "historical_claim": "none — bu bir OYUN bölgesidir, mahalle sınırı değildir",
+    "scene_address": "Districts/D_Surici_Dogu",
+    "center_unity": {
+     "x": 229.7,
+     "z": -1537.2
+    },
+    "radius_m": 1933.6,
+    "load_distance_m": 700.0,
+    "unload_distance_m": 910.0,
+    "distance_measured_to": "polygon edge (0 if inside), NOT centre",
+    "area_ha": 525.0,
+    "land_area_ha": 424.5,
+    "exclusive_land_area_ha": 410.2,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       28.918,
+       40.989
+      ],
+      [
+       28.96,
+       40.9995
+      ],
+      [
+       28.96,
+       41.0225
+      ],
+      [
+       28.945,
+       41.04
+      ],
+      [
+       28.933,
+       41.03
+      ],
+      [
+       28.919,
+       41.0
+      ],
+      [
+       28.918,
+       40.989
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "layer": "district",
+    "id": "D_Surici_Bati",
+    "name": "Suriçi — Batı",
+    "priority": 2,
+    "kind": "land",
+    "summary": "Fatih Camii (ozgun sema), Sehzade, Yavuz Selim, kara surlari, Yedikule. Suricinin daha seyrek, bostanli batisi.",
+    "requires_landmarks": [
+     "LM_FatihCamii",
+     "LM_Sehzade",
+     "LM_YavuzSelim",
+     "LM_Yedikule"
+    ],
+    "tier": "Graybox",
+    "historical_claim": "none — bu bir OYUN bölgesidir, mahalle sınırı değildir",
+    "scene_address": "Districts/D_Surici_Bati",
+    "center_unity": {
+     "x": -2900.3,
+     "z": -1413.0
+    },
+    "radius_m": 3251.6,
+    "load_distance_m": 700.0,
+    "unload_distance_m": 910.0,
+    "distance_measured_to": "polygon edge (0 if inside), NOT centre",
+    "area_ha": 1246.1,
+    "land_area_ha": 1111.0,
+    "exclusive_land_area_ha": 1067.5,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       28.998,
+       41.012
+      ],
+      [
+       29.03,
+       41.013
+      ],
+      [
+       29.033,
+       41.033
+      ],
+      [
+       29.01,
+       41.04
+      ],
+      [
+       28.998,
+       41.026
+      ],
+      [
+       28.998,
+       41.012
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "layer": "district",
+    "id": "D_Uskudar",
+    "name": "Üsküdar",
+    "priority": 1,
+    "kind": "land",
+    "summary": "Mihrimah (Iskele) Camii, Dogancilar Meydani, Kiz Kulesi. Ucusun INIS bolgesi.",
+    "requires_landmarks": [
+     "LM_UskudarMihrimah",
+     "LM_Dogancilar",
+     "LM_KizKulesi"
+    ],
+    "tier": "Graybox",
+    "historical_claim": "none — bu bir OYUN bölgesidir, mahalle sınırı değildir",
+    "scene_address": "Districts/D_Uskudar",
+    "center_unity": {
+     "x": 3346.9,
+     "z": -16.4
+    },
+    "radius_m": 1945.9,
+    "load_distance_m": 700.0,
+    "unload_distance_m": 910.0,
+    "distance_measured_to": "polygon edge (0 if inside), NOT centre",
+    "area_ha": 715.8,
+    "land_area_ha": 387.8,
+    "exclusive_land_area_ha": 387.8,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       28.988,
+       41.011
+      ],
+      [
+       29.004,
+       41.017
+      ],
+      [
+       29.011,
+       41.025
+      ],
+      [
+       29.02,
+       41.042
+      ],
+      [
+       29.023,
+       41.053
+      ],
+      [
+       29.01,
+       41.052
+      ],
+      [
+       29.0,
+       41.042
+      ],
+      [
+       28.989,
+       41.035
+      ],
+      [
+       28.983,
+       41.023
+      ],
+      [
+       28.988,
+       41.011
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "layer": "district",
+    "id": "D_Bogaz",
+    "name": "Boğaz",
+    "priority": 1,
+    "kind": "water",
+    "summary": "Galata/Sarayburnu ile Uskudar arasindaki bogaz suyu. Ucusun gectigi ve termiklerin/lodosun okundugu yer; kayik agi.",
+    "requires_landmarks": [],
+    "tier": "Graybox",
+    "historical_claim": "none — bu bir OYUN bölgesidir, mahalle sınırı değildir",
+    "scene_address": "Districts/D_Bogaz",
+    "center_unity": {
+     "x": 2426.3,
+     "z": 910.3
+    },
+    "radius_m": 2786.8,
+    "load_distance_m": 700.0,
+    "unload_distance_m": 910.0,
+    "distance_measured_to": "polygon edge (0 if inside), NOT centre",
+    "area_ha": 793.4,
+    "land_area_ha": 239.7,
+    "exclusive_land_area_ha": 0.0,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       28.988,
+       41.015
+      ],
+      [
+       28.97,
+       41.0185
+      ],
+      [
+       28.961,
+       41.023
+      ],
+      [
+       28.9576,
+       41.0282
+      ],
+      [
+       28.95,
+       41.0325
+      ],
+      [
+       28.946,
+       41.0392
+      ],
+      [
+       28.942,
+       41.045
+      ],
+      [
+       28.945,
+       41.047
+      ],
+      [
+       28.952,
+       41.04
+      ],
+      [
+       28.956,
+       41.0345
+      ],
+      [
+       28.962,
+       41.0325
+      ],
+      [
+       28.9668,
+       41.0292
+      ],
+      [
+       28.9682,
+       41.0252
+      ],
+      [
+       28.977,
+       41.0212
+      ],
+      [
+       28.988,
+       41.015
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "layer": "district",
+    "id": "D_Halic",
+    "name": "Haliç",
+    "priority": 2,
+    "kind": "water",
+    "summary": "Halic suyu ve iki yakanin iskeleleri. 1632'de KOPRU YOK — tum gecis kayikladir (RESEARCH.md; plan Bolum 11.1).",
+    "requires_landmarks": [],
+    "tier": "Graybox",
+    "historical_claim": "none — bu bir OYUN bölgesidir, mahalle sınırı değildir",
+    "scene_address": "Districts/D_Halic",
+    "center_unity": {
+     "x": -1181.6,
+     "z": 545.3
+    },
+    "radius_m": 2927.9,
+    "load_distance_m": 700.0,
+    "unload_distance_m": 910.0,
+    "distance_measured_to": "polygon edge (0 if inside), NOT centre",
+    "area_ha": 246.9,
+    "land_area_ha": 61.9,
+    "exclusive_land_area_ha": 0.0,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       28.92,
+       41.045
+      ],
+      [
+       28.942,
+       41.048
+      ],
+      [
+       28.945,
+       41.062
+      ],
+      [
+       28.925,
+       41.07
+      ],
+      [
+       28.913,
+       41.058
+      ],
+      [
+       28.92,
+       41.045
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "layer": "district",
+    "id": "D_Eyup",
+    "name": "Eyüp",
+    "priority": 3,
+    "kind": "land",
+    "summary": "Eyup Sultan ve cevresi. Plan Faz 1 madde 6: 'sonra Eyup' — dikey dilimde iceriksiz siluet olarak kalir.",
+    "requires_landmarks": [],
+    "tier": "Graybox",
+    "historical_claim": "none — bu bir OYUN bölgesidir, mahalle sınırı değildir",
+    "scene_address": "Districts/D_Eyup",
+    "center_unity": {
+     "x": -3860.9,
+     "z": 3352.9
+    },
+    "radius_m": 1525.5,
+    "load_distance_m": 700.0,
+    "unload_distance_m": 910.0,
+    "distance_measured_to": "polygon edge (0 if inside), NOT centre",
+    "area_ha": 503.8,
+    "land_area_ha": 473.6,
+    "exclusive_land_area_ha": 433.1,
+    "status": "draft"
+   }
+  }
+ ]
+}

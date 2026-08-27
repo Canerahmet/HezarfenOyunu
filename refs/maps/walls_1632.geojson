@@ -1,0 +1,1057 @@
+{
+ "type": "FeatureCollection",
+ "name": "walls_1632",
+ "metadata": {
+  "title": "1632 İstanbul sur hatları ve kapıları",
+  "status": "TASLAK — Caner onayı bekliyor (özellikle wall_galata)",
+  "method": {
+   "wall_land": "elle izlendi (yapı bugün ayakta), DEM ile kuru zemin denetimi",
+   "wall_sea_*": "elle çapa → shoreline_1632'ye yapıştırma → karaya 15 m ofset; kara yönü DEM'den seçildi",
+   "wall_galata": "kaba çevre poligonu — metrik güzergâh iddiası YOK"
+  },
+  "measured_lengths_km": {
+   "wall_land": 5.85,
+   "wall_sea_marmara": 7.51,
+   "wall_sea_halic": 5.25
+  },
+  "junction_gaps_m": {
+   "kara↔Marmara": 311.0,
+   "kara↔Haliç": 107.7
+  },
+  "galata": {
+   "perimeter_km": 2.51,
+   "enclosed_area_ha": 29.7
+  },
+  "two_axes": "'tier' 1632'deki VARLIĞI niteler, 'position_confidence' GEOMETRİ kesinliğini. Deniz surlarının varlığı T1'dir; çizgisi T2'dir çünkü taslak kıyımızdan türer.",
+  "world_origin": {
+   "name": "Galata Kulesi tabani",
+   "lon": 28.974017,
+   "lat": 41.025637,
+   "utm_easting": 665958.1142269672,
+   "utm_northing": 4543479.981161056
+  },
+  "copyright": "Bu çizim bize aittir; güzergâhlar RESEARCH.md ve genel coğrafyadan."
+ },
+ "features": [
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      28.9221,
+      40.9906
+     ],
+     [
+      28.923209,
+      40.99304
+     ],
+     [
+      28.9224,
+      40.9977
+     ],
+     [
+      28.9243,
+      41.0037
+     ],
+     [
+      28.928,
+      41.0092
+     ],
+     [
+      28.93,
+      41.0143
+     ],
+     [
+      28.9322,
+      41.0186
+     ],
+     [
+      28.9345,
+      41.0245
+     ],
+     [
+      28.9352,
+      41.0292
+     ],
+     [
+      28.9375,
+      41.034
+     ],
+     [
+      28.944,
+      41.0392
+     ]
+    ]
+   },
+   "properties": {
+    "layer": "wall_land",
+    "id": "wall_land",
+    "name": "Kara surları (Theodosius)",
+    "tier": "Documented",
+    "position_confidence": "traced (~100 m; yapi BUGUN AYAKTA, cizgi genel cografyadan elle girildi — georeferansli plandan DEGIL)",
+    "note": "1632'de ayakta ve buyuk olcude bakimli (RESEARCH.md §3 'Surlar ve kapilar'). Cizgi elle izlendi; bugun ayakta olan surun genel guzergahidir, burc-burc dogru DEGILDIR.",
+    "length_m": 5852.5,
+    "min_terrain_m": 4.3,
+    "max_terrain_m": 77.6,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      28.9221,
+      40.9906
+     ],
+     [
+      28.921287,
+      40.988112
+     ],
+     [
+      28.926873,
+      40.990527
+     ],
+     [
+      28.927676,
+      40.991507
+     ],
+     [
+      28.928451,
+      40.992454
+     ],
+     [
+      28.929226,
+      40.993401
+     ],
+     [
+      28.929863,
+      40.994154
+     ],
+     [
+      28.930867,
+      40.995045
+     ],
+     [
+      28.931871,
+      40.995937
+     ],
+     [
+      28.932739,
+      40.996848
+     ],
+     [
+      28.93306,
+      40.997462
+     ],
+     [
+      28.93307,
+      40.997791
+     ],
+     [
+      28.935032,
+      41.000652
+     ],
+     [
+      28.936378,
+      41.001263
+     ],
+     [
+      28.941586,
+      41.001265
+     ],
+     [
+      28.942868,
+      41.000426
+     ],
+     [
+      28.943391,
+      41.000275
+     ],
+     [
+      28.944315,
+      41.000157
+     ],
+     [
+      28.945758,
+      41.000533
+     ],
+     [
+      28.9472,
+      41.00091
+     ],
+     [
+      28.949092,
+      41.00107
+     ],
+     [
+      28.950796,
+      41.000911
+     ],
+     [
+      28.95244,
+      41.000753
+     ],
+     [
+      28.954167,
+      41.001518
+     ],
+     [
+      28.956058,
+      41.001957
+     ],
+     [
+      28.958315,
+      41.001469
+     ],
+     [
+      28.959107,
+      41.001528
+     ],
+     [
+      28.960679,
+      41.001547
+     ],
+     [
+      28.961988,
+      41.002332
+     ],
+     [
+      28.963865,
+      41.003011
+     ],
+     [
+      28.965057,
+      41.003075
+     ],
+     [
+      28.967091,
+      41.002991
+     ],
+     [
+      28.969058,
+      41.002673
+     ],
+     [
+      28.969966,
+      41.002165
+     ],
+     [
+      28.9717,
+      41.001973
+     ],
+     [
+      28.973207,
+      41.00227
+     ],
+     [
+      28.974798,
+      41.002181
+     ],
+     [
+      28.976389,
+      41.002091
+     ],
+     [
+      28.97798,
+      41.002001
+     ],
+     [
+      28.979689,
+      41.002368
+     ],
+     [
+      28.981078,
+      41.003037
+     ],
+     [
+      28.981843,
+      41.003751
+     ],
+     [
+      28.9832,
+      41.004916
+     ],
+     [
+      28.98441,
+      41.00555
+     ],
+     [
+      28.985392,
+      41.006352
+     ],
+     [
+      28.986009,
+      41.007158
+     ],
+     [
+      28.986544,
+      41.008369
+     ],
+     [
+      28.987079,
+      41.009579
+     ],
+     [
+      28.987614,
+      41.010788
+     ],
+     [
+      28.987892,
+      41.011771
+     ],
+     [
+      28.987936,
+      41.01273
+     ]
+    ]
+   },
+   "properties": {
+    "layer": "wall_sea_marmara",
+    "id": "wall_sea_marmara",
+    "name": "Marmara deniz surları",
+    "tier": "Reconstruction",
+    "position_confidence": "derived (kendi shoreline_1632 cizgimize yapistirildi + karaya dogru sabit ofset; kiyi taslak oldugu icin bu da taslak)",
+    "note": "1632'de ayakta (T1). CIZGI kendi taslak shoreline_1632'mizden turetildi (T2): her capa kiyinin en yakin noktasina yapistirilip karaya dogru itildi.",
+    "length_m": 7511.3,
+    "min_terrain_m": 0.6,
+    "max_terrain_m": 10.1,
+    "status": "draft",
+    "shore_snap_median_m": 85.8,
+    "shore_snap_max_m": 403.8,
+    "derived_from": "shoreline_1632 (coastline_build.py)"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      28.987936,
+      41.01273
+     ],
+     [
+      28.987541,
+      41.013438
+     ],
+     [
+      28.987121,
+      41.014301
+     ],
+     [
+      28.986931,
+      41.01509
+     ],
+     [
+      28.983381,
+      41.01634
+     ],
+     [
+      28.982216,
+      41.015564
+     ],
+     [
+      28.980884,
+      41.015624
+     ],
+     [
+      28.979356,
+      41.015491
+     ],
+     [
+      28.977186,
+      41.015652
+     ],
+     [
+      28.975384,
+      41.016289
+     ],
+     [
+      28.974155,
+      41.01677
+     ],
+     [
+      28.972814,
+      41.017015
+     ],
+     [
+      28.971595,
+      41.017094
+     ],
+     [
+      28.969625,
+      41.017621
+     ],
+     [
+      28.96802,
+      41.018038
+     ],
+     [
+      28.965999,
+      41.01866
+     ],
+     [
+      28.964868,
+      41.019404
+     ],
+     [
+      28.963863,
+      41.020201
+     ],
+     [
+      28.962858,
+      41.020997
+     ],
+     [
+      28.961853,
+      41.021793
+     ],
+     [
+      28.960847,
+      41.02259
+     ],
+     [
+      28.960297,
+      41.023699
+     ],
+     [
+      28.959475,
+      41.024638
+     ],
+     [
+      28.959444,
+      41.025484
+     ],
+     [
+      28.958501,
+      41.026968
+     ],
+     [
+      28.957466,
+      41.027885
+     ],
+     [
+      28.956001,
+      41.028341
+     ],
+     [
+      28.954432,
+      41.028717
+     ],
+     [
+      28.952597,
+      41.029928
+     ],
+     [
+      28.951917,
+      41.030825
+     ],
+     [
+      28.950446,
+      41.031536
+     ],
+     [
+      28.949508,
+      41.032902
+     ],
+     [
+      28.948544,
+      41.03425
+     ],
+     [
+      28.948456,
+      41.035596
+     ],
+     [
+      28.947404,
+      41.036291
+     ],
+     [
+      28.946601,
+      41.0372
+     ],
+     [
+      28.946055,
+      41.038284
+     ],
+     [
+      28.944,
+      41.0392
+     ]
+    ]
+   },
+   "properties": {
+    "layer": "wall_sea_halic",
+    "id": "wall_sea_halic",
+    "name": "Haliç deniz surları",
+    "tier": "Reconstruction",
+    "position_confidence": "derived (kendi shoreline_1632 cizgimize yapistirildi + karaya dogru sabit ofset; kiyi taslak oldugu icin bu da taslak)",
+    "note": "1632'de ayakta (T1). CIZGI kendi taslak shoreline_1632'mizden turetildi (T2). Bu kiyi ayrica Eminonu/Unkapani dolgu geri-alma duzeltmesinin icindedir — kiyi degisirse sur da degisir.",
+    "length_m": 5245.6,
+    "min_terrain_m": 0.6,
+    "max_terrain_m": 8.8,
+    "status": "draft",
+    "shore_snap_median_m": 35.3,
+    "shore_snap_max_m": 148.1,
+    "derived_from": "shoreline_1632 (coastline_build.py)"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       28.9705,
+       41.0247
+      ],
+      [
+       28.97,
+       41.0252
+      ],
+      [
+       28.974017,
+       41.025637
+      ],
+      [
+       28.9793,
+       41.0252
+      ],
+      [
+       28.9822,
+       41.0242
+      ],
+      [
+       28.97612,
+       41.021657
+      ],
+      [
+       28.975677,
+       41.021732
+      ],
+      [
+       28.9749,
+       41.022555
+      ],
+      [
+       28.973547,
+       41.021971
+      ],
+      [
+       28.971414,
+       41.022143
+      ],
+      [
+       28.970445,
+       41.022497
+      ],
+      [
+       28.9705,
+       41.0247
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "layer": "wall_galata",
+    "id": "wall_galata",
+    "name": "Galata surları (kaba taslak)",
+    "tier": "Reconstruction",
+    "position_confidence": "coarse draft (yikilmis yapi, georeferansli donem plani YOK — kaba cevre poligonu; Caner onayi bekliyor)",
+    "note": "1632'de ayakta; Azapkapi, Kule Kapisi vb. (RESEARCH.md §3 Galata, Eremya Celebi). 1860'larda yikildi ve elimizde georeferansli donem plani YOK. Poligonun BICIMI kabadir ama BUYUKLUGU belgelidir: ~37 ha, cevre ~2800 m. Guzergah iddiasi yok — Caner onayi bekliyor.",
+    "length_m": 2507.0,
+    "min_terrain_m": -12.0,
+    "max_terrain_m": 52.0,
+    "status": "draft",
+    "enclosed_area_ha": 29.7
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     28.923209,
+     40.99304
+    ]
+   },
+   "properties": {
+    "layer": "wall_gate",
+    "id": "GT_Yedikule",
+    "name": "Yedikule",
+    "wall": "wall_land",
+    "tier": "Documented",
+    "position_confidence": "traced (~100 m; yapi BUGUN AYAKTA, cizgi genel cografyadan elle girildi — georeferansli plandan DEGIL)",
+    "note": "Kapi adlari Eremya Celebi + Evliya Celebi kapi listelerinden (RESEARCH.md §3). Eremya suriçini 14 kapi uzerinden anlatir.",
+    "terrain_elevation_m": 16.3,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     28.9224,
+     40.9977
+    ]
+   },
+   "properties": {
+    "layer": "wall_gate",
+    "id": "GT_Belgradkapi",
+    "name": "Belgradkapı",
+    "wall": "wall_land",
+    "tier": "Documented",
+    "position_confidence": "traced (~100 m; yapi BUGUN AYAKTA, cizgi genel cografyadan elle girildi — georeferansli plandan DEGIL)",
+    "note": "Kapi adlari Eremya Celebi + Evliya Celebi kapi listelerinden (RESEARCH.md §3). Eremya suriçini 14 kapi uzerinden anlatir.",
+    "terrain_elevation_m": 19.0,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     28.9243,
+     41.0037
+    ]
+   },
+   "properties": {
+    "layer": "wall_gate",
+    "id": "GT_Silivrikapi",
+    "name": "Silivrikapı",
+    "wall": "wall_land",
+    "tier": "Documented",
+    "position_confidence": "traced (~100 m; yapi BUGUN AYAKTA, cizgi genel cografyadan elle girildi — georeferansli plandan DEGIL)",
+    "note": "Kapi adlari Eremya Celebi + Evliya Celebi kapi listelerinden (RESEARCH.md §3). Eremya suriçini 14 kapi uzerinden anlatir.",
+    "terrain_elevation_m": 28.9,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     28.928,
+     41.0092
+    ]
+   },
+   "properties": {
+    "layer": "wall_gate",
+    "id": "GT_Mevlanakapi",
+    "name": "Mevlanakapı",
+    "wall": "wall_land",
+    "tier": "Documented",
+    "position_confidence": "traced (~100 m; yapi BUGUN AYAKTA, cizgi genel cografyadan elle girildi — georeferansli plandan DEGIL)",
+    "note": "Kapi adlari Eremya Celebi + Evliya Celebi kapi listelerinden (RESEARCH.md §3). Eremya suriçini 14 kapi uzerinden anlatir.",
+    "terrain_elevation_m": 50.2,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     28.93,
+     41.0143
+    ]
+   },
+   "properties": {
+    "layer": "wall_gate",
+    "id": "GT_Topkapi",
+    "name": "Topkapı",
+    "wall": "wall_land",
+    "tier": "Documented",
+    "position_confidence": "traced (~100 m; yapi BUGUN AYAKTA, cizgi genel cografyadan elle girildi — georeferansli plandan DEGIL)",
+    "note": "Kapi adlari Eremya Celebi + Evliya Celebi kapi listelerinden (RESEARCH.md §3). Eremya suriçini 14 kapi uzerinden anlatir.",
+    "terrain_elevation_m": 64.1,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     28.9352,
+     41.0292
+    ]
+   },
+   "properties": {
+    "layer": "wall_gate",
+    "id": "GT_Edirnekapi",
+    "name": "Edirnekapı",
+    "wall": "wall_land",
+    "tier": "Documented",
+    "position_confidence": "traced (~100 m; yapi BUGUN AYAKTA, cizgi genel cografyadan elle girildi — georeferansli plandan DEGIL)",
+    "note": "Kapi adlari Eremya Celebi + Evliya Celebi kapi listelerinden (RESEARCH.md §3). Eremya suriçini 14 kapi uzerinden anlatir.",
+    "terrain_elevation_m": 77.6,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     28.9375,
+     41.034
+    ]
+   },
+   "properties": {
+    "layer": "wall_gate",
+    "id": "GT_Egrikapi",
+    "name": "Eğrikapı",
+    "wall": "wall_land",
+    "tier": "Documented",
+    "position_confidence": "traced (~100 m; yapi BUGUN AYAKTA, cizgi genel cografyadan elle girildi — georeferansli plandan DEGIL)",
+    "note": "Kapi adlari Eremya Celebi + Evliya Celebi kapi listelerinden (RESEARCH.md §3). Eremya suriçini 14 kapi uzerinden anlatir.",
+    "terrain_elevation_m": 55.2,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     28.9245,
+     40.993
+    ]
+   },
+   "properties": {
+    "layer": "wall_gate",
+    "id": "GT_Narlikapi",
+    "name": "Narlıkapı",
+    "wall": "wall_sea_marmara",
+    "tier": "Reconstruction",
+    "position_confidence": "coarse draft (yikilmis yapi, georeferansli donem plani YOK — kaba cevre poligonu; Caner onayi bekliyor)",
+    "note": "Kapi adlari Eremya Celebi + Evliya Celebi kapi listelerinden (RESEARCH.md §3). Eremya suriçini 14 kapi uzerinden anlatir.",
+    "terrain_elevation_m": 15.7,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     28.931,
+     40.9965
+    ]
+   },
+   "properties": {
+    "layer": "wall_gate",
+    "id": "GT_Samatya",
+    "name": "Samatya Kapısı",
+    "wall": "wall_sea_marmara",
+    "tier": "Reconstruction",
+    "position_confidence": "coarse draft (yikilmis yapi, georeferansli donem plani YOK — kaba cevre poligonu; Caner onayi bekliyor)",
+    "note": "Kapi adlari Eremya Celebi + Evliya Celebi kapi listelerinden (RESEARCH.md §3). Eremya suriçini 14 kapi uzerinden anlatir.",
+    "terrain_elevation_m": 11.6,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     28.94,
+     40.999
+    ]
+   },
+   "properties": {
+    "layer": "wall_gate",
+    "id": "GT_Davutpasa",
+    "name": "Davutpaşa Kapısı",
+    "wall": "wall_sea_marmara",
+    "tier": "Reconstruction",
+    "position_confidence": "coarse draft (yikilmis yapi, georeferansli donem plani YOK — kaba cevre poligonu; Caner onayi bekliyor)",
+    "note": "Kapi adlari Eremya Celebi + Evliya Celebi kapi listelerinden (RESEARCH.md §3). Eremya suriçini 14 kapi uzerinden anlatir.",
+    "terrain_elevation_m": -12.0,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     28.956,
+     41.001
+    ]
+   },
+   "properties": {
+    "layer": "wall_gate",
+    "id": "GT_Langa",
+    "name": "Langa Kapısı",
+    "wall": "wall_sea_marmara",
+    "tier": "Reconstruction",
+    "position_confidence": "coarse draft (yikilmis yapi, georeferansli donem plani YOK — kaba cevre poligonu; Caner onayi bekliyor)",
+    "note": "Kapi adlari Eremya Celebi + Evliya Celebi kapi listelerinden (RESEARCH.md §3). Eremya suriçini 14 kapi uzerinden anlatir.",
+    "terrain_elevation_m": -12.0,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     28.97,
+     41.0022
+    ]
+   },
+   "properties": {
+    "layer": "wall_gate",
+    "id": "GT_Kumkapi",
+    "name": "Kumkapı",
+    "wall": "wall_sea_marmara",
+    "tier": "Reconstruction",
+    "position_confidence": "coarse draft (yikilmis yapi, georeferansli donem plani YOK — kaba cevre poligonu; Caner onayi bekliyor)",
+    "note": "Kapi adlari Eremya Celebi + Evliya Celebi kapi listelerinden (RESEARCH.md §3). Eremya suriçini 14 kapi uzerinden anlatir.",
+    "terrain_elevation_m": 5.3,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     28.978,
+     41.0022
+    ]
+   },
+   "properties": {
+    "layer": "wall_gate",
+    "id": "GT_Catladikapi",
+    "name": "Çatladıkapı",
+    "wall": "wall_sea_marmara",
+    "tier": "Reconstruction",
+    "position_confidence": "coarse draft (yikilmis yapi, georeferansli donem plani YOK — kaba cevre poligonu; Caner onayi bekliyor)",
+    "note": "Kapi adlari Eremya Celebi + Evliya Celebi kapi listelerinden (RESEARCH.md §3). Eremya suriçini 14 kapi uzerinden anlatir.",
+    "terrain_elevation_m": 9.0,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     28.9845,
+     41.0035
+    ]
+   },
+   "properties": {
+    "layer": "wall_gate",
+    "id": "GT_Ahirkapi",
+    "name": "Ahırkapı",
+    "wall": "wall_sea_marmara",
+    "tier": "Reconstruction",
+    "position_confidence": "coarse draft (yikilmis yapi, georeferansli donem plani YOK — kaba cevre poligonu; Caner onayi bekliyor)",
+    "note": "Kapi adlari Eremya Celebi + Evliya Celebi kapi listelerinden (RESEARCH.md §3). Eremya suriçini 14 kapi uzerinden anlatir.",
+    "terrain_elevation_m": -12.0,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     28.976,
+     41.0175
+    ]
+   },
+   "properties": {
+    "layer": "wall_gate",
+    "id": "GT_Bahcekapi",
+    "name": "Bahçekapı",
+    "wall": "wall_sea_halic",
+    "tier": "Reconstruction",
+    "position_confidence": "coarse draft (yikilmis yapi, georeferansli donem plani YOK — kaba cevre poligonu; Caner onayi bekliyor)",
+    "note": "Kapi adlari Eremya Celebi + Evliya Celebi kapi listelerinden (RESEARCH.md §3). Eremya suriçini 14 kapi uzerinden anlatir.",
+    "terrain_elevation_m": -12.0,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     28.97,
+     41.018
+    ]
+   },
+   "properties": {
+    "layer": "wall_gate",
+    "id": "GT_CifitKapisi",
+    "name": "Çıfıt Kapısı (Yenicami)",
+    "wall": "wall_sea_halic",
+    "tier": "Reconstruction",
+    "position_confidence": "coarse draft (yikilmis yapi, georeferansli donem plani YOK — kaba cevre poligonu; Caner onayi bekliyor)",
+    "note": "Kapi adlari Eremya Celebi + Evliya Celebi kapi listelerinden (RESEARCH.md §3). Eremya suriçini 14 kapi uzerinden anlatir.",
+    "terrain_elevation_m": 3.4,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     28.964,
+     41.0192
+    ]
+   },
+   "properties": {
+    "layer": "wall_gate",
+    "id": "GT_Odunkapi",
+    "name": "Odunkapı",
+    "wall": "wall_sea_halic",
+    "tier": "Reconstruction",
+    "position_confidence": "coarse draft (yikilmis yapi, georeferansli donem plani YOK — kaba cevre poligonu; Caner onayi bekliyor)",
+    "note": "Kapi adlari Eremya Celebi + Evliya Celebi kapi listelerinden (RESEARCH.md §3). Eremya suriçini 14 kapi uzerinden anlatir.",
+    "terrain_elevation_m": 13.8,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     28.958,
+     41.0205
+    ]
+   },
+   "properties": {
+    "layer": "wall_gate",
+    "id": "GT_Ayazmakapi",
+    "name": "Ayazmakapı (Unkapanı)",
+    "wall": "wall_sea_halic",
+    "tier": "Reconstruction",
+    "position_confidence": "coarse draft (yikilmis yapi, georeferansli donem plani YOK — kaba cevre poligonu; Caner onayi bekliyor)",
+    "note": "Kapi adlari Eremya Celebi + Evliya Celebi kapi listelerinden (RESEARCH.md §3). Eremya suriçini 14 kapi uzerinden anlatir.",
+    "terrain_elevation_m": 33.0,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     28.956,
+     41.0283
+    ]
+   },
+   "properties": {
+    "layer": "wall_gate",
+    "id": "GT_Cibali",
+    "name": "Cibali Kapısı",
+    "wall": "wall_sea_halic",
+    "tier": "Reconstruction",
+    "position_confidence": "coarse draft (yikilmis yapi, georeferansli donem plani YOK — kaba cevre poligonu; Caner onayi bekliyor)",
+    "note": "Kapi adlari Eremya Celebi + Evliya Celebi kapi listelerinden (RESEARCH.md §3). Eremya suriçini 14 kapi uzerinden anlatir.",
+    "terrain_elevation_m": 2.8,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     28.9505,
+     41.0316
+    ]
+   },
+   "properties": {
+    "layer": "wall_gate",
+    "id": "GT_Fener",
+    "name": "Fener Kapısı",
+    "wall": "wall_sea_halic",
+    "tier": "Reconstruction",
+    "position_confidence": "coarse draft (yikilmis yapi, georeferansli donem plani YOK — kaba cevre poligonu; Caner onayi bekliyor)",
+    "note": "Kapi adlari Eremya Celebi + Evliya Celebi kapi listelerinden (RESEARCH.md §3). Eremya suriçini 14 kapi uzerinden anlatir.",
+    "terrain_elevation_m": 0.5,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     28.9487,
+     41.0342
+    ]
+   },
+   "properties": {
+    "layer": "wall_gate",
+    "id": "GT_Balat",
+    "name": "Balat Kapısı",
+    "wall": "wall_sea_halic",
+    "tier": "Reconstruction",
+    "position_confidence": "coarse draft (yikilmis yapi, georeferansli donem plani YOK — kaba cevre poligonu; Caner onayi bekliyor)",
+    "note": "Kapi adlari Eremya Celebi + Evliya Celebi kapi listelerinden (RESEARCH.md §3). Eremya suriçini 14 kapi uzerinden anlatir.",
+    "terrain_elevation_m": 0.5,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     28.9705,
+     41.0247
+    ]
+   },
+   "properties": {
+    "layer": "wall_gate",
+    "id": "GT_Azapkapi",
+    "name": "Azapkapı (Galata)",
+    "wall": "wall_galata",
+    "tier": "Reconstruction",
+    "position_confidence": "coarse draft (yikilmis yapi, georeferansli donem plani YOK — kaba cevre poligonu; Caner onayi bekliyor)",
+    "note": "Kapi adlari Eremya Celebi + Evliya Celebi kapi listelerinden (RESEARCH.md §3). Eremya suriçini 14 kapi uzerinden anlatir.",
+    "terrain_elevation_m": 14.5,
+    "status": "draft"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     28.976,
+     41.0215
+    ]
+   },
+   "properties": {
+    "layer": "wall_gate",
+    "id": "GT_KuleKapisi",
+    "name": "Kule Kapısı (Galata)",
+    "wall": "wall_galata",
+    "tier": "Reconstruction",
+    "position_confidence": "coarse draft (yikilmis yapi, georeferansli donem plani YOK — kaba cevre poligonu; Caner onayi bekliyor)",
+    "note": "Kapi adlari Eremya Celebi + Evliya Celebi kapi listelerinden (RESEARCH.md §3). Eremya suriçini 14 kapi uzerinden anlatir.",
+    "terrain_elevation_m": 1.7,
+    "status": "draft"
+   }
+  }
+ ]
+}
