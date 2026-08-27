@@ -1,6 +1,6 @@
 # Faz 4 — Kapı Paketi
 
-**Durum:** onay bekliyor
+**Durum:** ✅ **ONAYLANDI** (Caner, 2026-08-27)
 **Tarih:** 2026-08-27
 **Ne için:** PLAN'ın kuralı — her faz kapısında kabul kriterlerinin
 karşılandığına dair **kanıt** sunulur. Bu, o kanıt.
@@ -105,11 +105,12 @@ bulundu:
 
 ## 3. Senden gereken
 
-### 3a. Kapı onayı
+### 3a. ✅ Kapı onayı — verildi
 
-```
-OK Faz 4
-```
+Caner, 2026-08-27. Onay sözlü verildi (*"devam et"*, kapı paketi sunulduktan
+ve tek eksiğin imza olduğu söylendikten sonra) ve buraya **Claude tarafından
+kaydedildi** — ADR 0060'ın B seçeneğinde kararlaştırıldığı gibi, onay birimi
+faz kapısıdır. Yanlış okuduysam bu satır silinir ve kapı yeniden açılır.
 
 ### 3b. ✅ Dört tasarım kararı verildi (Caner, 2026-08-27)
 
