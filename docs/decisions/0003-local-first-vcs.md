@@ -1,7 +1,9 @@
 # ADR 0003 — Sürüm Kontrolü: Lokal Önce, Bulut Sonra
 
 **Tarih:** 2026-08-17
-**Durum:** Kabul edildi
+**Durum:** ~~Kabul edildi~~ → **YERİNE GEÇİLDİ** (2026-08-27, [ADR 0059](0059-git-gecisi.md))
+
+> Bu karar amacına ulaştı: Unity projesi kurulmadan `.gitignore` hazırdı, > `Library/` hiç depoya girmedi. Faz 3'ün sonunda git'e geçildi. Aşağıdaki > "aktarım anı için hazır komut dizisi" **kullanılmadı** — `git add .` ile tek > commit yerine, her katmanı kendi gerekçesiyle anlatan 18 commit'lik bir dizi > tercih edildi ve ikili varlık politikası ölçüme dayandırıldı (ADR 0059).
 **Karar veren:** Caner
 
 ## Bağlam

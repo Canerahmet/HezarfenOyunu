@@ -17,9 +17,17 @@ notunu bekle. Notları docs/feedback/<varlık>.md'ye logla. Onay formatı: "OK v
 - GPU: RTX 4070 Laptop, 8 GB VRAM (üst-orta segment — FPS ölçümlerini buna göre yorumla)
 - Ayrıntı ve sürüm kilidi: docs/decisions/0001-versions.md
 
-## Sürüm kontrolü — LOKAL ÖNCE
-Şu an git deposu YOK; bilinçli karar (Caner, 2026-08-17). Lokal çalışıyoruz, bulut aktarımı sonra.
-`.gitignore` ve `.gitattributes` şimdiden hazır; `git init` + LFS kurulumu aktarım anında yapılır.
+## Sürüm kontrolü — GIT + LFS (2026-08-27'den beri)
+Depo: `https://github.com/Canerahmet/HezarfenOyunu.git`, tek dal **`main`**. Sürüm kontrolünü
+Claude yürütür (ADR 0059; ADR 0003'ün yerine geçti). Commit mesajı: **İngilizce, kısa, emir kipi**
+başlık + **gerekçeyi** anlatan gövde — "ne" diff'te zaten var, gövde "niçin"i yazar. Faz kabulleri
+etiketle işaretlenir.
+
+**İkili varlık politikası:** Unity'nin okuduğu her şey depoya girer (GUID'ler `.meta` dosyalarında
+yaşar; varlığı `.meta`sız yeniden üretmek bütün referansları sessizce kırar). Yeniden indirilebilir
+üçüncü taraf kaynakları (`art/textures/polyhaven`, `hdri`) girmez — ama `meta.json` kayıtları girer.
+`data/` ve `renders/` de girmez. Kural: **türetilmiş veri girmez, kaydı girer.**
+
 Bu, "sadece sohbette var olan varlık yasak" kuralını GEVŞETMEZ — her kalıcı çıktı dosyaya yazılır.
 
 ## Araçlar

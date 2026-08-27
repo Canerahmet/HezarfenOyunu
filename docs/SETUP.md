@@ -7,7 +7,14 @@ Hâlihazırda kurulu ve doğrulanmış: **Blender 5.2.0 LTS**, **Python 3.13.14*
 
 ---
 
-## 0. (Opsiyonel ama tavsiye) Git'i şimdi aç
+## 0. Git — ✅ YAPILDI (2026-08-27)
+
+> Bu adım tamamlandı; aşağıdaki komut dizisi **tarihsel kayıt** olarak duruyor,
+> uygulanmadı. Depo `https://github.com/Canerahmet/HezarfenOyunu.git` adresinde,
+> tek dal `main`, LFS kurulu. Ayrıntı ve ikili varlık politikası: **ADR 0059**.
+> Sürüm kontrolünü bundan sonra Claude yürütür.
+
+### (özgün metin) (Opsiyonel ama tavsiye) Git'i şimdi aç
 Unity projesi oluşturulduktan sonra `Library/` klasörü on binlerce dosya olur. `.gitignore` zaten
 hazır, o yüzden şimdi geçmek maliyetsiz — sonra geçmek sancılı. Lokal kalmak istersen atla
 (bkz. ADR 0003); uzak depo gerekmez, sadece lokal geçmiş.
