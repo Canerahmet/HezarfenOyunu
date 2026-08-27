@@ -111,17 +111,14 @@ bulundu:
 OK Faz 4
 ```
 
-### 3b. Hâlâ bekleyen dört tasarım kararı
+### 3b. ✅ Dört tasarım kararı verildi (Caner, 2026-08-27)
 
-Faz 3'ten devrediyorlar ve kapı onayı bunları kapatmıyor. **ADR 0037 artık
-kritik**: Faz 5 (Hezarfen karakteri) uçuşun oynanabilir olmasına bağlı.
-
-| ADR | soru | önerim |
-|---|---|---|
-| **0037** | Doğancılar'a 3336 m için gereken süzülme 64,6:1, gerçek 11,56:1. Rüzgâr çözmüyor (205 km/h gerekir); gereken ortalama yükselen hava ~0,9 m/s | Yükselen havayı **mekanik** yap |
-| **0039** | İncili Köşk örtüsü — TDV kubbe, Eldem ahşap; iki varyant hazır | Kararı sen ver |
-| **0046** | 1632 kıblesi 133,70° | Onayla |
-| **0051** | Beyazıt şadırvan kubbesi | Konmasın |
+| ADR | karar |
+|---|---|
+| **0037** | **Gerçek termik simülasyonu** — önerim mekanikti, Caner gerçeği seçti ve seçim daha iyi çıktı: termik kara üstünde doğar, su üstünde doğmaz; yani "önce Galata yamacında yüksel, sonra geçişe bağlan". 11,56:1 ile 3 336 m için ~289 m gerekiyor, kule 52 m veriyor → ~240 m tırmanış, 2 m/s'de iki dakika. Uçuş şans değil **beceri** oluyor. |
+| **0039** | **Ahşap (Eldem)** — sahneye `PF_IncliKosk_Ahsap` kondu; kubbeli varyant depoda kalır, çünkü çelişki çözülmedi, bir tarafı seçildi. |
+| **0046** | **Onaylandı** — 133,70° kalıyor. |
+| **0051** | **Konmasın** — şadırvan kubbesi yok; bayrak kodda hazır. |
 
 ### 3c. Bilmen gereken taslak sayılar
 
@@ -134,9 +131,12 @@ değişikliği değil.
 
 ## 4. Faz 4'te bilerek yapılmayanlar
 
-- **Çamaşır ipi** — plan sayıyor ama kaynakta yok, ve riskli: müslüman
-  mahallesinde çamaşır **avluya** asılır. Sokak üstü çamaşır daha çok
-  Napoli imgesidir; uydurmadım.
+- ~~Çamaşır ipi~~ — **Caner istedi, yapıldı** (2026-08-27): *"hoş olabilir
+  ya aslında, çok abartmadığımız sürece."* Abartmamanın karşılığı bir
+  **sıklık** ayarı değil, bir **yer** kararı oldu: kit sokak üstü ip
+  ÜRETMEZ, yalnızca avlu içi. Sokağın bir yanından öbürüne gerilmiş
+  çamaşır Napoli imgesidir; Osmanlı konutu avlulu ve hayatlıdır ve
+  mahremiyet avlu duvarının işidir.
 - **Kuş sürüsü** — çalışma zamanı VFX'i, Blender varlığı değil.
 - **Mahalle kuyusu** — `_kuyu` avlu yapısı olarak var; sokak kuyusu için
   kaynak yok ve çeşme + şadırvan zaten kaynaklı su altyapısını veriyor.

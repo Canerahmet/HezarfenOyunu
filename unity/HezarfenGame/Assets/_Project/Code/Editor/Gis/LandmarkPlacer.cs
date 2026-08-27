@@ -61,7 +61,13 @@ namespace Hezarfen.Editor.Gis
                 { "LM_HudayiTurbesi", "PF_HudayiTurbesi" },
                 { "LM_MihrimahMedrese", "PF_MihrimahMedrese" },
                 { "LM_MihrimahMektebi", "PF_MihrimahMektebi" },
-                { "LM_IncliKosk", "PF_IncliKosk" },
+                // AHSAP varyant (Caner, 2026-08-27 — ADR 0039). TDV kubbe
+                // der, Sedad Hakki Eldem ahsap; Eldem Osmanli SIVIL
+                // mimarisi uzmanidir ve kosk sivil bir yapidir. Secim
+                // yapiyi kendi ailesine de yaklastiriyor: Alay Kosku ve
+                // Kiz Kulesi de 1632'de ahsaptir. Kubbeli varyant depoda
+                // KALIR — celiski cozulmedi, yalnizca bir tarafi secildi.
+                { "LM_IncliKosk", "PF_IncliKosk_Ahsap" },
                 { "LM_TopkapiAdaletKulesi", "PF_TopkapiAdaletKulesi" },
                 { "LM_TopkapiBabusselam", "PF_TopkapiBabusselam" },
                 { "LM_OkcularTekkesi", "PF_Tekke_Okcular" },

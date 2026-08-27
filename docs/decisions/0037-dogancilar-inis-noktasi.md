@@ -1,7 +1,40 @@
 # ADR 0037 — Doğancılar: iniş noktasının georeferansı, yapıları ve uçuşun fiziği
 
 - **Tarih**: 2026-08-25
-- **Durum**: Kabul (iki soru Caner'e açık — aşağıda)
+- **Durum**: ✅ **KARARA BAĞLANDI** (Caner, 2026-08-27) — **gerçek termik simülasyonu**
+
+> ## Caner'in kararı: gerçek termik, mekanik kaldıraç değil
+>
+> Ben **mekanik** yükselen hava önermiştim (tasarlanmış, deterministik bir
+> alan) çünkü ölçüm gereken ortalamayı **~0,9 m/s** veriyordu ve bu zayıf
+> termiğin bile altında görünüyordu. Caner gerçek simülasyonu seçti.
+>
+> **Ve seçim benim sunduğumdan daha iyi çıkıyor.** Uyarım düz bir süzülüşü
+> varsayıyordu; oysa fizik başka bir şey söylüyor:
+>
+> **Termik kara üstünde doğar, su üstünde doğmaz.** Uçuş Boğaz'ı geçiyor,
+> yani süzülüş sırasında zaten kaldıraç olmayacak. Doğru model şu:
+> **önce Galata yamacında yüksel, sonra geçişe bağlan.**
+>
+> | | |
+> |---|---:|
+> | süzülme oranı (ölçülen kanat) | 11,56 : 1 |
+> | yatay menzil | 3 336 m |
+> | gereken irtifa | **~289 m** |
+> | kule tepesinin verdiği | 52 m |
+> | tırmanılması gereken | **~240 m** |
+> | 2 m/s termikte süre | **~2 dakika** |
+>
+> Yani uçuş bir *şans* değil bir **beceri** olur: kaldıracı bul, sarmal çiz,
+> yeterli irtifayı topla, sonra karşıya bağlan. Bu hem dürüst fizik hem de
+> oyunun çekirdek mekaniği için daha iyi — düz süzülüş tek tuşluk bir
+> sahneyken, termik okumak öğrenilebilir bir zanaat.
+>
+> **Uygulanacak model:** güneşle ısınan kara yamaçlarında yükselen hava
+> (eğim yönü + günün saati + yüzey tipiyle), su üstünde alçalan hava,
+> yamaç kaldıracı (lodos rüzgârının yamaca çarpması). Kodekse dürüstlük
+> notu: Hezarfen'in gerçekte nasıl uçtuğu bilinmiyor; oyun bunu dönemin
+> havasıyla mümkün kılıyor.
 - **Bağlam**: Faz 3, S-kademe. Hezarfen'in **iniş noktası**; oyunun finali.
 
 ## Karar 1 — Doğancılar'ın koordinatı düzeltildi (771 m)

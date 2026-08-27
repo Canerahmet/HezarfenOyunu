@@ -1,7 +1,19 @@
 # ADR 0051 — Beyazıt: oyunun padişahı bir şantiyenin sahibi
 
 - **Tarih**: 2026-08-27
-- **Durum**: Kabul (Caner onayı bekliyor — `docs/feedback/beyazit.md`)
+- **Durum**: ✅ **KARARA BAĞLANDI** (Caner, 2026-08-27) — **şadırvan kubbesi KONMAZ**
+
+> ## Caner'in kararı: kubbe konmaz
+>
+> TDV, şadırvanın sekiz sütuna oturan kubbesini IV. Murad'a bağlar ve
+> saltanatı 1623-1640'tır; oyunun yılı o aralığın tam ortasıdır. Kaynak ne
+> "var" ne "yok" diyor, yani karar bir tarihlendirme tercihiydi.
+>
+> Konmaz. Gerekçe: IV. Murad gerçek iktidarı **1632'de** aldı (o yıla kadar
+> Kösem Sultan naipti) ve büyük bir hayratın o eşiğin öncesine düşmesi daha
+> az olası.
+>
+> Bayrak (`sadirvan_dome`) kodda duruyor; karar değişirse tek satır.
 - **Bağlam**: Faz 3, A-kademe. 1501-1506; 1632'de 126 yaşında.
 
 ## Bulgu — 1632 bu yapıda bir **an**, bir durum değil

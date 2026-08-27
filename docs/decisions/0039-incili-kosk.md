@@ -1,7 +1,20 @@
 # ADR 0039 — İncili Köşk: konumun kıyıdan türetilmesi ve tartışmalı örtü
 
 - **Tarih**: 2026-08-25
-- **Durum**: Kabul (Caner onayı bekliyor — `docs/feedback/incili_kosk.md`)
+- **Durum**: ✅ **KARARA BAĞLANDI** (Caner, 2026-08-27) — **ahşap (Eldem)**
+
+> ## Caner'in kararı: ahşap
+>
+> Kaynaklar çelişiyordu ve çelişki çözülmedi: TDV kubbe der, **Sedad Hakkı
+> Eldem ahşap**. Caner Eldem'i seçti.
+>
+> Gerekçe kaynağın kendisinde: Eldem Osmanlı **sivil** mimarisi uzmanıdır ve
+> köşk sivil bir yapıdır. Seçim ayrıca yapıyı kendi ailesine yaklaştırıyor —
+> Alay Köşkü ve Kız Kulesi de 1632'de ahşaptır ve üçü de "duvar üstünde,
+> taşan, padişahın seyrettiği yer" tipindedir.
+>
+> Sahneye **`IncliKosk_Ahsap`** konur. Kubbeli varyant depoda kalır ve
+> silinmez: çelişki çözülmedi, yalnızca bir tarafı seçildi.
 - **Bağlam**: Faz 3, S-kademe. **IV. Murad uçuşu buradan izledi** (Evliya).
 
 ## Karar 1 — Konum kıyı çizgisinden **ölçülerek** türetildi (156 m düzeltme)
