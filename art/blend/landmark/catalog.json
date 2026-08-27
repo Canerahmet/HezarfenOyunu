@@ -2,10 +2,10 @@
  "variants": [
   {
    "footprint_x": 17.0,
-   "footprint_y": 13.6,
+   "footprint_y": 13.7,
    "height": 19.1,
    "pivot_min_z": 0.0,
-   "tris_lod0": 284,
+   "tris_lod0": 816,
    "tris_lod1": 24,
    "kind": "kosk",
    "palette": "default",
@@ -251,9 +251,9 @@
   {
    "footprint_x": 7.215,
    "footprint_y": 7.215,
-   "height": 7.189,
+   "height": 9.442,
    "pivot_min_z": 0.0,
-   "tris_lod0": 816,
+   "tris_lod0": 3744,
    "tris_lod1": 24,
    "wall_width": 5.515,
    "wall_depth": 5.515,

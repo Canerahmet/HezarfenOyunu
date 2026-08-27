@@ -40,6 +40,7 @@ import math
 
 import bmesh
 
+import detay_kit as dk
 import hz_blender as hz
 import ottoman_kit as kit
 import street_kit as sk
@@ -379,19 +380,24 @@ def _build_acik_turbe(p, col, asset_name, mats, tex_sizes):
         th = math.pi / 4.0 + 2.0 * math.pi * k / p.sides
         cx, cy = R * math.cos(th), R * math.sin(th)
         pts.append((cx, cy))
-        _put(parts, hz.make_tube(f"{asset_name}_Sutun{k}", col_r, col_r * 0.93,
-                                 H, (cx, cy), z0, segments=12, col=col),
-             mats["marble"])
-        _put(parts, hz.make_box(f"{asset_name}_Baslik{k}",
-                                (col_r * 2.7, col_r * 2.7, col_r * 1.1),
-                                (cx, cy, z0 + H + col_r * 0.55), col),
-             mats["marble"])
-        _put(parts, hz.make_box(f"{asset_name}_Kaide{k}",
-                                (col_r * 2.9, col_r * 2.9, 0.26),
-                                (cx, cy, z0 + 0.13), col), mats["cutstone"])
+        # Kaide + govde + MUKARNAS baslik, tek yerden (`detay_kit.sutun`).
+        # Onceki hali silindir + duz kutu basliktir; baldaken turbede sutun
+        # yapinin GORUNEN her seyidir, duvar yok — basligi kutuyla gecmek
+        # yapinin tek suslu ogesini modellememek demekti.
+        for o in dk.sutun(f"{asset_name}_Sutun{k}", cx, cy, z0, H, col_r,
+                          col, capital="mukarnas", segments=12):
+            _put(parts, o, mats["marble"])
 
-    # HATIL: sutunlari baglayan kusak. Kubbe buna oturur.
-    z_top = z0 + H + col_r * 1.1
+    # KEMERLER: baldaken kubbe duz bir hatila degil KEMERLERE oturur.
+    #
+    # Onceki hali sutunlari duz bir kusakla bagliyordu ve kubbe onun ustune
+    # konuyordu; o zaman yapi bir baldaken degil, dort direge oturtulmus bir
+    # sapka gibi okunuyordu. Kemer yalnizca sus degil, yuku sutuna toplayan
+    # sey. Yukseklik degisir — ve degismesi dogrudur: bicim D3'tur
+    # (tipolojik), yani tipolojinin gerektirdigi neyse odur.
+    z_top = z0 + H + col_r * 1.5
+    _span0 = math.hypot(pts[1][0] - pts[0][0], pts[1][1] - pts[0][1])
+    z_kemer = z_top + _span0 * 0.5 * 0.88 * math.sqrt(1.0 + 2.0 * sk.ARCH_C)
     for k in range(p.sides):
         x0, y0 = pts[k]
         x1, y1 = pts[(k + 1) % p.sides]
@@ -404,19 +410,26 @@ def _build_acik_turbe(p, col, asset_name, mats, tex_sizes):
         # ag olmayabilir.
         u_ax = (math.cos(ang), math.sin(ang))
         n_ax = (math.sin(ang), -math.cos(ang))
-        _put(parts, oriented_box(f"{asset_name}_Hatil{k}", span, 0.30, 0.42,
-                                 (mx, my, z_top + 0.21), u_ax, n_ax, col),
+        for o in dk.kemer(f"{asset_name}_Kemer{k}", mx, my, u_ax[0], u_ax[1],
+                          span * 0.5 * 0.88, z_top, 0.30, 0.34, col,
+                          steps=8):
+            _put(parts, o, mats["marble"])
+        _put(parts, oriented_box(f"{asset_name}_Hatil{k}", span, 0.34, 0.36,
+                                 (mx, my, z_kemer + 0.18), u_ax, n_ax, col),
              mats["cutstone"])
         # KORKULUK: acik turbenin yanlari bos degil, alcak sebekelidir.
         _put(parts, oriented_box(f"{asset_name}_Korkuluk{k}", span, 0.16, 0.95,
                                  (mx, my, z0 + 0.475), u_ax, n_ax, col),
              mats["marble"])
 
-    # KUBBE: kursun, hatilin ustunde.
-    dz = z_top + 0.42
+    # KUBBE: kursun, KEMERLERIN ustunde.
+    dz = z_kemer + 0.36
     dr = R * 1.06
     _put(parts, hz.make_dome(f"{asset_name}_Kubbe", dr, p.dome_h, (0.0, 0.0),
                              dz, segments=20, rings=7, col=col), mats["lead"])
+    for o in dk.kubbe_kaburga(f"{asset_name}_KubbeDikis", 0.0, 0.0, dr, dz,
+                              p.dome_h, col, n=12, w=0.07, steps=5):
+        _put(parts, o, mats["lead"])
     _alem(parts, mats, col, asset_name, 0.0, 0.0, dz + p.dome_h - 0.05)
 
     # SANDUKA + bas tasi: turbeyi turbe yapan sey burasi.
