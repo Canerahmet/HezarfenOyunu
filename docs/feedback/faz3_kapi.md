@@ -28,12 +28,12 @@ D1 (ölçülü çizim) yok ve olmayacak — o çizimlerin çoğu telifli.
 
 | ne | değer |
 |---|---|
-| EditMode testi | **241 / 241 yeşil** |
+| EditMode testi | **242 / 242 yeşil** |
 | `Assets/_Import` | **boş** (test bunu zorluyor) |
 | Sahnedeki anıt | 28 yerleştirildi, koordinat denetimi **0 şikâyet** |
 | İnceleme paketi | 36 varlığın **hepsinde** var (`renders/review/`) |
-| ADR | 59 karar kaydı |
-| Sürüm kontrolü | git + LFS, 24 commit, `faz3-ayrinti` etiketli |
+| ADR | 61 karar kaydı |
+| Sürüm kontrolü | git + LFS, `faz3-ayrinti` etiketli |
 
 Testlerin bir kısmı fonksiyon değil **olgu** koruyor: 1 birim = 1 metre,
 Blender→Unity eksen dönüşümü, Sultanahmet'in altı minaresi ve on altı
@@ -59,6 +59,12 @@ yakalandığı**. Hiçbiri gözle bulunmadı; hepsi ölçümle:
 - **Fâtih 1766 öncesi şemayla** kuruldu: bugünkü barok yapı 1767-71.
 - **Yeni Cami harabe**, Galata Kulesi bugünkünden alçak, Kız Kulesi ahşap,
   Alay Köşkü ise bugünkünden **yüksek** — farkın yönü de soruldu.
+- **Üretilen ayrıntı görüntülenmiyordu.** Ayrıntı geçişi LOD0'ı altı katına
+  çıkardı, LOD1'e dokunmadı; ölçüldü ki Süleymaniye'nin tam mesh'i yalnızca
+  **573 m**'ye kadar çiziliyor, oysa uçuş **3336 m**. Yani bütün ayrıntı,
+  oyunun merkez sahnesinde hiç görünmüyordu. Gözle bulunamazdı — yakından
+  bakınca ayrıntı gerçekten oradaydı; onu bir formül ele verdi. Üç kademeli
+  merdiven kuruldu ve teste bağlandı (ADR 0061).
 - Ayrıntı geçişinde altı ölçüm hatası daha (revak gözü ters yönde, örtü
   duvarı 1,4 m aşıyor, kemer saçağı deliyor, köşe sütunçesi duvarın içinde,
   Yedikule'nin ayak izi 7×13 m büyümüş, `data/` kuralı 28 dosyayı yutmuş).
