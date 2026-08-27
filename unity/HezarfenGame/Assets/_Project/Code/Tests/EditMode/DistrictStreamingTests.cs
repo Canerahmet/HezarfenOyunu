@@ -351,5 +351,150 @@ namespace Hezarfen.Tests
                     "Bu araligin disi, poligonlarin kaydigini gosterir.");
             }
         }
-    }
+    
+        // ------------------------------------------------ Faz 4: yerleşim
+
+        static DistrictDef LandDef()
+        {
+            foreach (var guid in AssetDatabase.FindAssets("t:DistrictDef"))
+            {
+                var d = AssetDatabase.LoadAssetAtPath<DistrictDef>(
+                    AssetDatabase.GUIDToAssetPath(guid));
+                if (d != null && d.districtId == "D_Galata") return d;
+            }
+            return null;
+        }
+
+        const string TerrainScenePath = "Assets/_Project/Scenes/Faz1_Terrain.unity";
+
+        /// <summary>
+        /// Araziyi <b>testin kendisi</b> yükler.
+        ///
+        /// İlk yazımda test açık sahnedeki <c>TR_Istanbul</c>'u arıyor,
+        /// bulamazsa <c>Assert.Ignore</c> ediyordu — ve koşumda ikisi de
+        /// atlandı. Bu projede o hata üç kez yakalandı (ADR 0041, 0043,
+        /// 0044): <b>atlanan test geçen test gibi görünür</b>. Bir
+        /// determinizm testinin, sahnede ne açık olduğuna bağlı olarak
+        /// sessizce kaybolması, hiç yazılmamış olmasından beterdir.
+        ///
+        /// Sahne ek olarak açılır ve testten sonra kapatılır; başka testlerin
+        /// gördüğü sahne durumu değişmez.
+        /// </summary>
+        static Terrain OpenTerrain(out UnityEngine.SceneManagement.Scene acilan)
+        {
+            acilan = default;
+            var go = GameObject.Find("TR_Istanbul");
+            if (go != null) return go.GetComponent<Terrain>();
+
+            if (!File.Exists(TerrainScenePath)) return null;
+            acilan = UnityEditor.SceneManagement.EditorSceneManager.OpenScene(
+                TerrainScenePath,
+                UnityEditor.SceneManagement.OpenSceneMode.Additive);
+            go = GameObject.Find("TR_Istanbul");
+            return go != null ? go.GetComponent<Terrain>() : null;
+        }
+
+        static void CloseTerrain(UnityEngine.SceneManagement.Scene acilan)
+        {
+            if (acilan.IsValid() && acilan.isLoaded)
+                UnityEditor.SceneManagement.EditorSceneManager.CloseScene(acilan, true);
+        }
+
+        /// <summary>
+        /// <b>Aynı tohum aynı şehri verir.</b>
+        ///
+        /// Plan bunu açıkça istiyor: *"Deterministik (seed'li) yerleşim …
+        /// Aynı seed = aynı şehir (test edilebilirlik)"*. Test edilebilirlik
+        /// burada süs değil: yerleşim deterministik değilse bir sonraki
+        /// koşumda başka bir şehir çıkar ve ölçülen hiçbir sayı —bütçe,
+        /// mahalle adedi, uçuş koridoru— bir daha aynı olmaz.
+        ///
+        /// Kolay kırılacak yer, çekirdeklerin ızgara taramasından değil de
+        /// tek bir <c>System.Random</c> akışından türetilmesidir: o zaman
+        /// eleme sırası (su, eğim, landmark) akışı kaydırır ve arazi bir
+        /// piksel değişse bütün şehir kayar. Bu yüzden her ızgara hücresi
+        /// KENDİ tohumundan türer.
+        /// </summary>
+        [Test]
+        public void SameSeedGivesTheSameQuarterCores()
+        {
+            var def = LandDef();
+            Assert.IsNotNull(def, "D_Galata DistrictDef yok — 'GIS/Semtleri "
+                             + "ice aktar' calistirilmamis.");
+            var terrain = OpenTerrain(out var acilan);
+            try
+            {
+                Assert.IsNotNull(terrain, "TR_Istanbul yok — 'GIS/DEM'den "
+                                 + "Terrain uret' calistirilmamis.");
+
+                var bos = new List<Vector2>();
+                var a = DistrictFiller.QuarterOrigins(def, terrain, 1632, bos);
+                var b = DistrictFiller.QuarterOrigins(def, terrain, 1632, bos);
+
+                Assert.Greater(a.Count, 4, "Galata'da anlamli sayida mahalle olmali.");
+                Assert.AreEqual(a.Count, b.Count, "Ayni tohum, farkli mahalle sayisi.");
+                for (int i = 0; i < a.Count; i++)
+                {
+                    Assert.AreEqual(a[i].nokta.x, b[i].nokta.x, 1e-4f,
+                        $"mahalle {i}: x kaydi — yerlesim deterministik degil.");
+                    Assert.AreEqual(a[i].nokta.y, b[i].nokta.y, 1e-4f,
+                        $"mahalle {i}: z kaydi — yerlesim deterministik degil.");
+                    Assert.AreEqual(a[i].yon.x, b[i].yon.x, 1e-4f,
+                        $"mahalle {i}: sokak yonu kaydi.");
+                }
+            }
+            finally { CloseTerrain(acilan); }
+        }
+
+        /// <summary>
+        /// <b>Başka tohum başka sokaklar verir — ama aynı gramerde.</b>
+        ///
+        /// Kabul kriteri: *"iki farklı seed görsel olarak 'aynı şehir
+        /// gramerinde farklı sokaklar' üretiyor"*. İki yarısı da ölçülür:
+        ///
+        /// <list type="bullet">
+        /// <item><b>Farklı</b>: çekirdeklerin çoğu yer değiştirmeli. Aynı
+        ///       kalırlarsa tohum hiçbir şey yapmıyor demektir.</item>
+        /// <item><b>Aynı gramer</b>: mahalle sayısı yakın kalmalı. Çünkü
+        ///       sayıyı belirleyen şey tohum değil, semtin ALANI ve arazinin
+        ///       elemesi — tohum yalnızca hücre içindeki sarsıntıyı seçer.
+        ///       Sayı tohumla oynuyorsa yoğunluk rastlantıya bağlı demektir
+        ///       ve o zaman "aynı şehir" iddiası çöker.</item>
+        /// </list>
+        /// </summary>
+        [Test]
+        public void ADifferentSeedMovesTheStreetsButKeepsTheGrammar()
+        {
+            var def = LandDef();
+            Assert.IsNotNull(def, "D_Galata DistrictDef yok.");
+            var terrain = OpenTerrain(out var acilan);
+            try
+            {
+                Assert.IsNotNull(terrain, "TR_Istanbul yok.");
+
+                var bos = new List<Vector2>();
+                var a = DistrictFiller.QuarterOrigins(def, terrain, 1632, bos);
+                var b = DistrictFiller.QuarterOrigins(def, terrain, 1789, bos);
+
+                Assert.Greater(a.Count, 4, "Galata'da anlamli sayida mahalle olmali.");
+
+                // 1) Gramer: sayi yakin kalmali (alan ve arazi belirliyor).
+                float oran = (float)b.Count / a.Count;
+                Assert.That(oran, Is.InRange(0.75f, 1.33f),
+                    $"mahalle sayisi {a.Count} -> {b.Count}: tohum yogunlugu "
+                    + "degistiriyor. Sayiyi ALAN ve ARAZI belirlemeli, tohum "
+                    + "yalnizca hucre icindeki sarsintiyi.");
+
+                // 2) Farklilik: cekirdeklerin cogu yer degistirmeli.
+                int ayni = 0;
+                foreach (var (n, _) in a)
+                    foreach (var (m, _) in b)
+                        if ((n - m).sqrMagnitude < 1f) { ayni++; break; }
+                Assert.Less(ayni, a.Count * 0.35f,
+                    $"{ayni}/{a.Count} cekirdek ayni yerde — tohum sokaklari "
+                    + "gercekten oynatmiyor.");
+            }
+            finally { CloseTerrain(acilan); }
+        }
+}
 }

@@ -36,6 +36,12 @@ namespace Hezarfen.Editor.Diagnostics
         /// <summary>Faz 4 bütçesi (plan Bölüm 9).</summary>
         public const int TriangleBudget = 2_500_000;
 
+        /// <summary>Faz 4 draw call bütçesi (GPU Resident Drawer ile).</summary>
+        public const int DrawCallBudget = 1500;
+
+        /// <summary>Faz 4 doku belleği bütçesi (bayt).</summary>
+        public const long TextureBudget = 4L * 1024 * 1024 * 1024;
+
         /// <summary>Galata Kulesi'nin tepesi — dünya orijini, kâgir gövde 34,5 m.</summary>
         public static readonly Vector3 TowerTop = new Vector3(0f, 52f, 0f);
 
@@ -48,6 +54,25 @@ namespace Hezarfen.Editor.Diagnostics
             public int directions;
             public float worstPitch;
             public float worstYaw;
+
+            /// <summary>
+            /// Kaç <b>benzersiz (mesh, malzeme) çifti</b> göründüğü.
+            ///
+            /// Gerçek draw call sayısı bunun ÜSTÜNDE başlar ve instancing ile
+            /// buna doğru iner: GPU Resident Drawer aynı mesh + aynı malzemeyi
+            /// tek çağrıda basar, ve şehir binlerce AYNI evden kuruludur. Yani
+            /// bu sayı çalışma zamanı ölçümü değil, çalışma zamanının
+            /// **inebileceği taban**. Tabanın bütçeyi aşması, hiçbir
+            /// optimizasyonun kurtaramayacağı anlamına gelir.
+            /// </summary>
+            public int batches;
+
+            /// <summary>Instancing olmadan çizim çağrısı — üst sınır.</summary>
+            public int rawDrawCalls;
+
+            // NOT: `renderers` alani da artik alt-cizim sayar (bir renderer
+            // birden cok malzemeye sahipse birden cok cizim uretir), o yuzden
+            // ikisi aynidir ve etiket "ham cizim" olarak duzeltildi.
         }
 
         /// <summary>
@@ -69,13 +94,21 @@ namespace Hezarfen.Editor.Diagnostics
         public static void MeasureMenu()
         {
             var r = Measure(TowerTop, 40f, 8);
+            long doku = TextureBytes();
             string durum = r.triangles <= TriangleBudget ? "TUTUYOR" : "ASIYOR";
+            string dDurum = r.batches <= DrawCallBudget ? "TUTUYOR" : "ASIYOR";
+            string tDurum = doku <= TextureBudget ? "TUTUYOR" : "ASIYOR";
             Debug.Log($"[Hezarfen] Kule tepesi 360° ({r.directions} yon x "
                       + $"{Pitches.Length} egim, FOV {r.fov:0}°): en kotu kare "
                       + $"yaw {r.worstYaw:0}° / {r.worstPitch:0}° asagi -> "
-                      + $"{r.triangles:N0} ucgen, {r.renderers} renderer "
+                      + $"{r.triangles:N0} ucgen, {r.renderers} ham cizim "
                       + $"({r.lodGroups} LODGroup tarandi). "
-                      + $"Butce {TriangleBudget:N0} — {durum}.");
+                      + $"Butce {TriangleBudget:N0} — {durum}.\n"
+                      + $"    draw call tabani: {r.batches:N0} benzersiz "
+                      + $"(mesh,malzeme) cifti, {r.rawDrawCalls:N0} ham — "
+                      + $"butce {DrawCallBudget:N0} — {dDurum}.\n"
+                      + $"    doku bellegi: {doku / 1048576.0:N0} MB — butce "
+                      + $"{TextureBudget / 1048576} MB — {tDurum}.");
         }
 
         /// <summary>
@@ -93,7 +126,7 @@ namespace Hezarfen.Editor.Diagnostics
             float bias = QualitySettings.lodBias;
 
             long enKotu = 0;
-            int enKotuRend = 0;
+            int enKotuRend = 0, enKotuBatch = 0;
             float enKotuPitch = 0f, enKotuYaw = 0f;
             for (int d = 0; d < dirs * Pitches.Length; d++)
             {
@@ -106,6 +139,7 @@ namespace Hezarfen.Editor.Diagnostics
 
                 long tri = 0;
                 int rn = 0;
+                var cift = new HashSet<System.ValueTuple<EntityId, EntityId>>();
                 foreach (var g in gruplar)
                 {
                     var lods = g.GetLODs();
@@ -129,7 +163,7 @@ namespace Hezarfen.Editor.Diagnostics
                         if (!GeometryUtility.TestPlanesAABB(duzlem, rend.bounds))
                             continue;
                         tri += Ucgen(rend);
-                        rn++;
+                        rn += Cift(rend, cift);
                     }
                 }
                 foreach (var rend in tekil)
@@ -137,12 +171,13 @@ namespace Hezarfen.Editor.Diagnostics
                     if (rend == null || !rend.enabled) continue;
                     if (!GeometryUtility.TestPlanesAABB(duzlem, rend.bounds)) continue;
                     tri += Ucgen(rend);
-                    rn++;
+                    rn += Cift(rend, cift);
                 }
                 if (tri > enKotu)
                 {
                     enKotu = tri; enKotuRend = rn;
                     enKotuPitch = pitch; enKotuYaw = a;
+                    enKotuBatch = cift.Count;
                 }
             }
 
@@ -155,6 +190,8 @@ namespace Hezarfen.Editor.Diagnostics
                 directions = dirs,
                 worstPitch = enKotuPitch,
                 worstYaw = enKotuYaw,
+                batches = enKotuBatch,
+                rawDrawCalls = enKotuRend,
             };
         }
 
@@ -268,6 +305,61 @@ namespace Hezarfen.Editor.Diagnostics
                     foreach (var r in kok.GetComponentsInChildren<Renderer>(false))
                         if (!lodIcinde.Contains(r)) tekil.Add(r);
             }
+        }
+
+        /// <summary>
+        /// Renderer'ın (mesh, malzeme) çiftlerini kümeye ekler ve kaç ham
+        /// çizim çağrısı ürettiğini döndürür. Aynı çift ikinci kez gelirse
+        /// instancing onu birleştirebilir — küme tam bu yüzden var.
+        /// </summary>
+        static int Cift(Renderer r, HashSet<System.ValueTuple<EntityId, EntityId>> kume)
+        {
+            var mf = r.GetComponent<MeshFilter>();
+            var mesh = mf != null ? mf.sharedMesh : null;
+            if (mesh == null) return 0;
+            var mi = mesh.GetEntityId();
+            var mats = r.sharedMaterials;
+            int n = 0;
+            for (int i = 0; i < mats.Length; i++)
+            {
+                if (mats[i] == null) continue;
+                kume.Add(new System.ValueTuple<EntityId, EntityId>(mi, mats[i].GetEntityId()));
+                n++;
+            }
+            return n;
+        }
+
+        /// <summary>
+        /// Açık sahnelerin kullandığı doku belleği (bayt).
+        ///
+        /// Doku PAYLAŞILIR: on iki bin ev on yedi varyanttan üretildiği için
+        /// bellekte on yedi setlik doku vardır, on iki bin setlik değil. Bu
+        /// yüzden her doku bir kez sayılır.
+        /// </summary>
+        public static long TextureBytes()
+        {
+            var gorulen = new HashSet<EntityId>();
+            long toplam = 0;
+            for (int i = 0; i < EditorSceneManager.sceneCount; i++)
+            {
+                var sc = EditorSceneManager.GetSceneAt(i);
+                if (!sc.isLoaded) continue;
+                foreach (var kok in sc.GetRootGameObjects())
+                    foreach (var r in kok.GetComponentsInChildren<Renderer>(true))
+                        foreach (var m in r.sharedMaterials)
+                        {
+                            if (m == null) continue;
+                            foreach (var pn in m.GetTexturePropertyNames())
+                            {
+                                var t = m.GetTexture(pn);
+                                if (t == null) continue;
+                                if (!gorulen.Add(t.GetEntityId())) continue;
+                                toplam += UnityEngine.Profiling.Profiler
+                                          .GetRuntimeMemorySizeLong(t);
+                            }
+                        }
+            }
+            return toplam;
         }
 
         static long Ucgen(Renderer r)
