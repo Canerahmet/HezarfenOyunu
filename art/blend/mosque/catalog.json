@@ -1,0 +1,58 @@
+{
+ "variants": [
+  {
+   "footprint_x": 13.527,
+   "footprint_y": 15.195,
+   "height": 22.0,
+   "wall_top": 6.9,
+   "pivot_min_z": 0.0,
+   "tris_lod0": 2308,
+   "tris_lod1": 152,
+   "tris_lod2": 70,
+   "hall": 11.0,
+   "roof": "dome",
+   "minaret_h": 22.0,
+   "palette": "default",
+   "name": "Cami_Kubbe",
+   "prefab": "PF_Cami_Kubbe",
+   "tier": "T2",
+   "source": "Orta olcek cami tipolojisi: TEK KUBBE + revakli son cemaat yeri + tek serefeli minare; semt merkezlerinde. Mahalle mescidinden farki ortu ve olcektir. PLAN.md 7.1, ADR 0017. Olculer rekonstruksiyon; belirli bir camiye karsilik gelmez."
+  },
+  {
+   "footprint_x": 16.071,
+   "footprint_y": 18.395,
+   "height": 27.0,
+   "wall_top": 8.9,
+   "pivot_min_z": 0.0,
+   "tris_lod0": 2332,
+   "tris_lod1": 152,
+   "tris_lod2": 70,
+   "hall": 13.0,
+   "roof": "dome",
+   "minaret_h": 27.0,
+   "palette": "default",
+   "name": "Cami_Orta",
+   "prefab": "PF_Cami_Orta",
+   "tier": "T2",
+   "source": "Orta olcek cami tipolojisi: TEK KUBBE + revakli son cemaat yeri + tek serefeli minare; semt merkezlerinde. Mahalle mescidinden farki ortu ve olcektir. PLAN.md 7.1, ADR 0017. Olculer rekonstruksiyon; belirli bir camiye karsilik gelmez."
+  },
+  {
+   "footprint_x": 11.512,
+   "footprint_y": 13.25,
+   "height": 19.0,
+   "wall_top": 6.1,
+   "pivot_min_z": 0.0,
+   "tris_lod0": 4236,
+   "tris_lod1": 52,
+   "tris_lod2": 38,
+   "hall": 9.0,
+   "roof": "timber",
+   "minaret_h": 19.0,
+   "palette": "default",
+   "name": "Mescit_A",
+   "prefab": "PF_Mescit_A",
+   "tier": "T2",
+   "source": "Mahalle mescidi tipolojisi: tek mekan harim + son cemaat yeri + tek serefeli minare, ahsap catili. Mahallenin cekirdegi. PLAN.md 7.1, ADR 0016/0017. Olculer rekonstruksiyon; belirli bir mescide karsilik gelmez."
+  }
+ ]
+}
