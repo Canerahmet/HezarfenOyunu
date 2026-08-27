@@ -58,7 +58,7 @@ dosyasındaki GUID'dir. Bir varlığı `.meta`sı olmadan yeniden üretmek yeni 
 GUID doğurur ve ona yapılan bütün referansları **sessizce** kırar. Boru hattı
 çıktısı ile `.meta` dosyaları birlikte yolculuk etmek zorundadır.
 
-## Geçişte bulunan üç kusur
+## Geçişte bulunan dört kusur
 
 Hepsi ölçülerek bulundu:
 
@@ -74,7 +74,19 @@ Hepsi ölçülerek bulundu:
    `!.../meta.json` asla değerlendirilmez. `git check-ignore` ile görüldü;
    dışlama dosya **tipine** göre yeniden yazıldı, dizinler gezilebilir kaldı.
 
-3. **Depo kökünde başıboş bir `Assets/_Import/tmp.fbx`.** Ayrıntı geçişinde
+3. **`data/` kuralı Unity'nin `_Project/Data`'sını yutuyordu.** GIS türevleri
+   için yazılmış kural köke sabitlenmemişti; git'te baştaki `/` olmayan bir
+   kural **her derinlikte** eşleşir ve Windows'ta `core.ignorecase` açık
+   olduğu için `Data` ile `data` da aynı sayılıyordu. 28 ScriptableObject
+   (ilçe tanımları, rüzgâr profilleri, girdi eylemleri) hiç commit'e girmedi.
+
+   **Sessiz olmasının sebebi:** `git add` yok sayılan bir yolu uyarı vermeden
+   atlar, üstelik klasörün kendi `.meta` dosyası takipteydi — yani ağaç
+   makul görünüyordu. Ortaya çıkaran şey **sayımdı**: commit edilmiş ağaçta
+   `Data` 0 dosya derken diskte 109 KB duruyordu. Düzeltmeden sonra diskle
+   dizin karşılaştırması baştan sona yapıldı; sessizce düşen başka dosya yok.
+
+4. **Depo kökünde başıboş bir `Assets/_Import/tmp.fbx`.** Ayrıntı geçişinde
    göreli bir yol yüzünden oraya düşmüş; planlanan yapıda kökte `Assets/`
    diye bir dizin yok. Silindi.
 
