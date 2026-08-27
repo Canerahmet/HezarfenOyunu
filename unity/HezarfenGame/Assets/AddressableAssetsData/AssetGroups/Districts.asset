@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Districts
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: Districts
+  m_GUID: 84fcded1cf0bb954684b7125911b3484
+  m_SerializeEntries:
+  - m_GUID: 12788ae11ceaa9f4683ee5f1dd956ffb
+    m_Address: Districts/D_Surici_Dogu
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 26ed6d7c29f431949ad98db357d31ca6
+    m_Address: Districts/D_Okmeydani
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 37fce4938672dcc4eba3d9f1acf1b758
+    m_Address: Districts/D_Bogaz
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 44e44d71267113943a187985519ac82d
+    m_Address: Districts/D_Halic
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6c1b15ed85f7e654693f50dc6d5bc8c3
+    m_Address: Districts/D_Eyup
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8b54264db8e6834449fdddc0b81eedc6
+    m_Address: Districts/D_Galata
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 91434be0a2fec6543a7741e240036370
+    m_Address: Districts/D_Uskudar
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c58f016d90452fb4aa5ac315a145eebc
+    m_Address: Districts/D_Surici_Bati
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: a8bc94667cfd2e64982971561ae5eec6, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: ecef86de375d0614692a94ae6b63140b, type: 2}
+    - {fileID: 11400000, guid: 4f5d767dd578b0347871ad60cdf90a18, type: 2}
