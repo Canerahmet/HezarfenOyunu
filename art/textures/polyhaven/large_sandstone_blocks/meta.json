@@ -1,0 +1,25 @@
+{
+ "polyhaven_id": "large_sandstone_blocks",
+ "name": "Large Sandstone Blocks",
+ "resolution": "2k",
+ "size_meters": [
+  3.0,
+  3.0
+ ],
+ "authors": {
+  "Rob Tuytel": "All"
+ },
+ "license": "CC0",
+ "source": "https://polyhaven.com/a/large_sandstone_blocks",
+ "role": "cutstone",
+ "use": "Kesme taş: çeşme gövdesi, ayna taşı, kitabe, mescit duvarı (M_Stone_Cut)",
+ "why": "Moloz taş (old_stone_wall) subasman içindir. Çeşmenin ayna taşı ve kitabesi OYMA taştır; moloz doku oraya konunca yapı 'duvar parçası' gibi okunur. Düzgün derzli kesme blok bu ayrımı verir",
+ "maps": {
+  "BC": "T_large_sandstone_blocks_BC.jpg",
+  "N": "T_large_sandstone_blocks_N.png",
+  "R": "T_large_sandstone_blocks_R.jpg",
+  "AO": "T_large_sandstone_blocks_AO.jpg",
+  "ARM": "T_large_sandstone_blocks_ARM.jpg"
+ },
+ "normal_convention": "OpenGL (Y+) — nor_gl; Blender ve Unity ayni yonu bekler"
+}

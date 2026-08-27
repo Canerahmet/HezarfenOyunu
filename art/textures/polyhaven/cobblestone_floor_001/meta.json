@@ -1,0 +1,24 @@
+{
+ "polyhaven_id": "cobblestone_floor_001",
+ "name": "Cobblestone Floor 001",
+ "resolution": "2k",
+ "size_meters": [
+  2.4,
+  2.4
+ ],
+ "authors": {
+  "Rob Tuytel": "All"
+ },
+ "license": "CC0",
+ "source": "https://polyhaven.com/a/cobblestone_floor_001",
+ "role": "paving",
+ "use": "Sokak kaldırımı (M_Paving_Kaldirim)",
+ "why": "Önizlemeler karşılaştırıldı (2026-08-21): 'cobblestone_05' düzgün derzli Avrupa parke taşı, çok modern; 'brick_pavement_03' tuğla, yanlış malzeme; 'cobblestone_02' yuvarlak dere taşı — arnavut kaldırımına yakın ama 4,6 m sokakta çakıl yolu gibi okunuyor. Seçilen: çamura oturmuş düzensiz yassı taş, 'medieval' etiketli — bakımsız Osmanlı sokağının kendisi",
+ "maps": {
+  "BC": "T_cobblestone_floor_001_BC.jpg",
+  "N": "T_cobblestone_floor_001_N.png",
+  "R": "T_cobblestone_floor_001_R.jpg",
+  "ARM": "T_cobblestone_floor_001_ARM.jpg"
+ },
+ "normal_convention": "OpenGL (Y+) — nor_gl; Blender ve Unity ayni yonu bekler"
+}

@@ -1,0 +1,16 @@
+{
+ "polyhaven_id": "kloofendal_48d_partly_cloudy_puresky",
+ "name": "Kloofendal 48d Partly Cloudy (Pure Sky)",
+ "kind": "hdri",
+ "resolution": "4k",
+ "file": "kloofendal_48d_partly_cloudy_puresky_4k.hdr",
+ "authors": {
+  "Greg Zaal": "Original",
+  "Jarod Guest": "Sky edits"
+ },
+ "license": "CC0",
+ "source": "https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky",
+ "role": "day",
+ "use": "Gündüz inceleme aydınlatması (güneş 48°, hafif bulutlu)",
+ "why": "Gölge verecek kadar güçlü güneş + derin gölgeleri açan gök dolgusu; İstanbul öğle sonrası için makul"
+}

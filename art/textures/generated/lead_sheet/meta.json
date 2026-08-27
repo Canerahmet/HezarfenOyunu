@@ -1,0 +1,31 @@
+{
+ "polyhaven_id": null,
+ "name": "lead_sheet",
+ "resolution": "1024px",
+ "size_meters": [
+  2.0,
+  2.0
+ ],
+ "authors": {
+  "Hezarfen projesi (prosedürel üretim)": "All"
+ },
+ "license": "Kendi eserimiz — üçüncü taraf hakkı yok",
+ "source": "prosedürel; girdi yok",
+ "maps": {
+  "BC": "T_lead_sheet_BC.png",
+  "N": "T_lead_sheet_N.png",
+  "ARM": "T_lead_sheet_ARM.png",
+  "R": "T_lead_sheet_R.png",
+  "AO": "T_lead_sheet_AO.png"
+ },
+ "normal_convention": "OpenGL (Y+) — Poly Haven nor_gl ile ayni",
+ "generated_by": "tools/textures/gen_lead_texture.py",
+ "role": "lead",
+ "use": "Kubbe ve konik kulah kursun ortusu (M_Lead_Sheet)",
+ "why": "Poly Haven'da kursun ortu yok; lisanssiz gorsel indirmek yasak (CLAUDE.md). Kubbe ustu, ucus oyununda en cok bakilan yuzeydir — duz gri renk birakilamazdi.",
+ "sheet_meters": [
+  0.5,
+  1.0
+ ],
+ "metallic_note": "Maske R kanali OKSIT ORTUSUNU tasir; malzemede _Metallic = 1,0 carpan olarak durur."
+}

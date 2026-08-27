@@ -1,0 +1,25 @@
+{
+ "polyhaven_id": "clay_roof_tiles_02",
+ "name": "Clay Roof Tiles 02",
+ "resolution": "2k",
+ "size_meters": [
+  2.5,
+  2.5
+ ],
+ "authors": {
+  "Amal Kumar": "All"
+ },
+ "license": "CC0",
+ "source": "https://polyhaven.com/a/clay_roof_tiles_02",
+ "role": "roof",
+ "use": "Alaturka kiremit (M_Roof_Alaturka)",
+ "why": "Oluklu/beşik profil — alaturka kiremidin kendisi",
+ "maps": {
+  "BC": "T_clay_roof_tiles_02_BC.jpg",
+  "N": "T_clay_roof_tiles_02_N.png",
+  "R": "T_clay_roof_tiles_02_R.jpg",
+  "AO": "T_clay_roof_tiles_02_AO.jpg",
+  "ARM": "T_clay_roof_tiles_02_ARM.jpg"
+ },
+ "normal_convention": "OpenGL (Y+) — nor_gl; Blender ve Unity ayni yonu bekler"
+}

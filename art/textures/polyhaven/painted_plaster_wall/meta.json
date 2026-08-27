@@ -1,0 +1,25 @@
+{
+ "polyhaven_id": "painted_plaster_wall",
+ "name": "Painted Plaster Wall",
+ "resolution": "2k",
+ "size_meters": [
+  2.0,
+  2.0
+ ],
+ "authors": {
+  "Amal Kumar": "All"
+ },
+ "license": "CC0",
+ "source": "https://polyhaven.com/a/painted_plaster_wall",
+ "role": "plaster",
+ "use": "Kireç badanalı kâgir kat (M_Plaster_Lime)",
+ "why": "Açık, sıcak, pürüzsüz badana — Müslüman mahalle konutunun alt katı",
+ "maps": {
+  "BC": "T_painted_plaster_wall_BC.jpg",
+  "N": "T_painted_plaster_wall_N.png",
+  "R": "T_painted_plaster_wall_R.jpg",
+  "AO": "T_painted_plaster_wall_AO.jpg",
+  "ARM": "T_painted_plaster_wall_ARM.jpg"
+ },
+ "normal_convention": "OpenGL (Y+) — nor_gl; Blender ve Unity ayni yonu bekler"
+}

@@ -1,0 +1,25 @@
+{
+ "polyhaven_id": "grey_plaster",
+ "name": "Grey Plaster",
+ "resolution": "2k",
+ "size_meters": [
+  1.0,
+  1.0
+ ],
+ "authors": {
+  "Rob Tuytel": "All"
+ },
+ "license": "CC0",
+ "source": "https://polyhaven.com/a/grey_plaster",
+ "role": "plaster_dark",
+ "use": "Gayrimüslim mahalle varyantı (M_Plaster_Grey)",
+ "why": "RESEARCH.md: bu evler 'daha koyu ve alçak'; T2 kural",
+ "maps": {
+  "BC": "T_grey_plaster_BC.jpg",
+  "N": "T_grey_plaster_N.png",
+  "R": "T_grey_plaster_R.jpg",
+  "AO": "T_grey_plaster_AO.jpg",
+  "ARM": "T_grey_plaster_ARM.jpg"
+ },
+ "normal_convention": "OpenGL (Y+) — nor_gl; Blender ve Unity ayni yonu bekler"
+}

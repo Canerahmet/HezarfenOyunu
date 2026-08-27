@@ -1,0 +1,33 @@
+{
+ "polyhaven_id": null,
+ "name": "brick_band",
+ "resolution": "1024px",
+ "size_meters": [
+  0.75,
+  0.75
+ ],
+ "authors": {
+  "Hezarfen projesi (prosedürel üretim)": "All"
+ },
+ "license": "Kendi eserimiz — üçüncü taraf hakkı yok",
+ "source": "prosedürel; girdi yok",
+ "maps": {
+  "BC": "T_brick_band_BC.png",
+  "N": "T_brick_band_N.png",
+  "ARM": "T_brick_band_ARM.png",
+  "R": "T_brick_band_R.png",
+  "AO": "T_brick_band_AO.png"
+ },
+ "normal_convention": "OpenGL (Y+) — Poly Haven nor_gl ile ayni",
+ "generated_by": "tools/textures/gen_brick_texture.py",
+ "role": "brick",
+ "use": "Tugla kusagi — Galata Kulesi govdesi 13,20 ve 17,17 m (M_Brick_Band); tugla-tas almasik orgu",
+ "why": "Kusaklar cutstone ile uretilmisti ve render'da tugla olarak degil govdeye dolanmis ince bir GOLGE CIZGISI olarak okunuyordu — kusagin anlami rengindedir. Poly Haven'da tugla indirilmedi, lisanssiz gorsel indirmek yasak (CLAUDE.md).",
+ "dimensions_note": "Karo boyu SECILMEDI, hesaplandi: tugla 35x35x4,5 cm, derz 2,5-3,0 cm (Osmanli almasik orgu literaturu). Sira adimi 7,5 cm, tugla adimi 37,5 cm; 0,75 m ikisine de tam bolunur ve iki derz de belgeli araliktadir.",
+ "measured": {
+  "delta_e_vs_old_stone_wall": 21.1,
+  "course_period_m": 0.075,
+  "fine": 1.31,
+  "coarse": 4.22
+ }
+}

@@ -1,0 +1,26 @@
+{
+ "polyhaven_id": "weathered_planks",
+ "name": "Weathered Planks",
+ "resolution": "2k",
+ "size_meters": [
+  2.0,
+  2.0
+ ],
+ "authors": {
+  "Dario Barresi": "Processing",
+  "Dimitrios Savva": "Photography"
+ },
+ "license": "CC0",
+ "source": "https://polyhaven.com/a/weathered_planks",
+ "role": "timber",
+ "use": "Ahşap karkas üst kat / cumba (M_Timber_AsiRed)",
+ "why": "Yıpranmış ahşap; aşı boyası tonu malzemede renk karışımıyla verilir",
+ "maps": {
+  "BC": "T_weathered_planks_BC.jpg",
+  "N": "T_weathered_planks_N.png",
+  "R": "T_weathered_planks_R.jpg",
+  "AO": "T_weathered_planks_AO.jpg",
+  "ARM": "T_weathered_planks_ARM.jpg"
+ },
+ "normal_convention": "OpenGL (Y+) — nor_gl; Blender ve Unity ayni yonu bekler"
+}

@@ -1,0 +1,25 @@
+{
+ "polyhaven_id": "ceramic_roof_01",
+ "name": "Ceramic Roof 01",
+ "resolution": "2k",
+ "size_meters": [
+  3.5,
+  3.5
+ ],
+ "authors": {
+  "Rob Tuytel": "All"
+ },
+ "license": "CC0",
+ "source": "https://polyhaven.com/a/ceramic_roof_01",
+ "role": "roof_aged",
+ "use": "Yaşlanmış çatı varyantı (M_Roof_Alaturka_Aged)",
+ "why": "Yosunlu, soluk; eski/yoksul evlerde çeşitlilik için",
+ "maps": {
+  "BC": "T_ceramic_roof_01_BC.jpg",
+  "N": "T_ceramic_roof_01_N.png",
+  "R": "T_ceramic_roof_01_R.jpg",
+  "AO": "T_ceramic_roof_01_AO.jpg",
+  "ARM": "T_ceramic_roof_01_ARM.jpg"
+ },
+ "normal_convention": "OpenGL (Y+) — nor_gl; Blender ve Unity ayni yonu bekler"
+}

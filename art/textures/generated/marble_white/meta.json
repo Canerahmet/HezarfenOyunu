@@ -1,0 +1,33 @@
+{
+ "polyhaven_id": null,
+ "name": "marble_white",
+ "resolution": "1024px",
+ "size_meters": [
+  0.9,
+  0.9
+ ],
+ "authors": {
+  "Hezarfen projesi (prosedürel üretim)": "All"
+ },
+ "license": "Kendi eserimiz — üçüncü taraf hakkı yok",
+ "source": "prosedürel; girdi yok",
+ "maps": {
+  "BC": "T_marble_white_BC.png",
+  "N": "T_marble_white_N.png",
+  "ARM": "T_marble_white_ARM.png",
+  "R": "T_marble_white_R.png",
+  "AO": "T_marble_white_AO.png"
+ },
+ "normal_convention": "OpenGL (Y+) — Poly Haven nor_gl ile ayni",
+ "generated_by": "tools/textures/gen_marble_texture.py",
+ "role": "marble",
+ "use": "Menzil tasi, mezar tasi ve mihrap tasi mermeri (M_Marble_White)",
+ "why": "Menzil taslari kaynakta 'tek parca MERMER sutun'dur; kesme tas dokusu sutuna TAS SIRASI koyuyordu (olculen dikey periyot 0,95 m) ve tasi cayirdan 4,4 kat koyu birakiyordu (36,7 / 162,5). Poly Haven'da lisansli mermer yok, lisanssiz gorsel indirmek yasak (CLAUDE.md).",
+ "vein_note": "Damar bir es seviye egrisidir; yon anizotropiden (kx frekanslari x'te 3,4 kat) gelir, sabit bir aci degil.",
+ "measured": {
+  "luminance": 216.1,
+  "band_ratio": 58.68,
+  "fine": 1.47,
+  "coarse": 1.55
+ }
+}

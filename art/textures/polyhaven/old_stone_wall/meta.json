@@ -1,0 +1,25 @@
+{
+ "polyhaven_id": "old_stone_wall",
+ "name": "Old Stone Wall",
+ "resolution": "2k",
+ "size_meters": [
+  2.0,
+  2.0
+ ],
+ "authors": {
+  "Charlotte Baglioni": "All"
+ },
+ "license": "CC0",
+ "source": "https://polyhaven.com/a/old_stone_wall",
+ "role": "stone",
+ "use": "Taş subasman ve avlu duvarı (M_Stone_Rubble)",
+ "why": "Düzensiz moloz taş + harç dolgusu — dönem subasmanının dokusu",
+ "maps": {
+  "BC": "T_old_stone_wall_BC.jpg",
+  "N": "T_old_stone_wall_N.png",
+  "R": "T_old_stone_wall_R.jpg",
+  "AO": "T_old_stone_wall_AO.jpg",
+  "ARM": "T_old_stone_wall_ARM.jpg"
+ },
+ "normal_convention": "OpenGL (Y+) — nor_gl; Blender ve Unity ayni yonu bekler"
+}

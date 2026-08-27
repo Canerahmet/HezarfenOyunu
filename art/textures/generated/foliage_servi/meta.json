@@ -1,0 +1,24 @@
+{
+ "polyhaven_id": null,
+ "generated_by": "tools/textures/gen_foliage_texture.py",
+ "name": "foliage_servi",
+ "resolution": "1024px",
+ "size_meters": [
+  1.6,
+  1.6
+ ],
+ "authors": {
+  "Hezarfen projesi (prosedürel üretim)": "All"
+ },
+ "license": "Kendi eserimiz — üçüncü taraf hakkı yok",
+ "source": "prosedürel; girdi yok",
+ "role": "foliage_servi",
+ "use": "Ağaç tacı yaprak kütlesi",
+ "why": "Poly Haven'da yaprak alfa atlasi yok; lisanssiz gorsel indirmek yasak (CLAUDE.md). Prosedurel uretim kisiti kaldirir.",
+ "maps": {
+  "BC": "T_foliage_servi_BC.png",
+  "N": "T_foliage_servi_N.png",
+  "ARM": "T_foliage_servi_ARM.png"
+ },
+ "normal_convention": "OpenGL (Y+) — Poly Haven nor_gl ile ayni"
+}

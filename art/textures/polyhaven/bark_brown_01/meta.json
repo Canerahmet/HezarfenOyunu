@@ -1,0 +1,25 @@
+{
+ "polyhaven_id": "bark_brown_01",
+ "name": "Bark Brown 01",
+ "resolution": "2k",
+ "size_meters": [
+  1.0,
+  1.0
+ ],
+ "authors": {
+  "Rob Tuytel": "All"
+ },
+ "license": "CC0",
+ "source": "https://polyhaven.com/a/bark_brown_01",
+ "role": "bark",
+ "use": "Servi gövdesi (M_Bark)",
+ "why": "Dikey lifli, kızıl-kahve kabuk — servinin gövdesi",
+ "maps": {
+  "BC": "T_bark_brown_01_BC.jpg",
+  "N": "T_bark_brown_01_N.png",
+  "R": "T_bark_brown_01_R.jpg",
+  "AO": "T_bark_brown_01_AO.jpg",
+  "ARM": "T_bark_brown_01_ARM.jpg"
+ },
+ "normal_convention": "OpenGL (Y+) — nor_gl; Blender ve Unity ayni yonu bekler"
+}

@@ -1,0 +1,25 @@
+{
+ "polyhaven_id": "bark_platanus",
+ "name": "Bark Platanus",
+ "resolution": "2k",
+ "size_meters": [
+  1.5,
+  1.5
+ ],
+ "authors": {
+  "Dimitrios Savva": "All"
+ },
+ "license": "CC0",
+ "source": "https://polyhaven.com/a/bark_platanus",
+ "role": "bark_cinar",
+ "use": "Çınar gövdesi (M_Bark_Cinar)",
+ "why": "Doğrudan PLATANUS kabuğu: çınarın alacalı, pul pul dökülen kabuğu ağacın tanınma işaretlerinden biri; genel kabukla değiştirilemez",
+ "maps": {
+  "BC": "T_bark_platanus_BC.jpg",
+  "N": "T_bark_platanus_N.png",
+  "R": "T_bark_platanus_R.jpg",
+  "AO": "T_bark_platanus_AO.jpg",
+  "ARM": "T_bark_platanus_ARM.jpg"
+ },
+ "normal_convention": "OpenGL (Y+) — nor_gl; Blender ve Unity ayni yonu bekler"
+}
