@@ -28,6 +28,13 @@ yaşar; varlığı `.meta`sız yeniden üretmek bütün referansları sessizce k
 üçüncü taraf kaynakları (`art/textures/polyhaven`, `hdri`) girmez — ama `meta.json` kayıtları girer.
 `data/` ve `renders/` de girmez. Kural: **türetilmiş veri girmez, kaydı girer.**
 
+**Commit'lemeden önce ölç — yeniden üretim gürültüsü LFS'e KALICI yazılır.** Bir üreteci yeniden
+koşmak `.blend`/`.fbx` dosyasını geometri hiç değişmese bile bayt olarak değiştirir (Blender ve FBX
+oturum verisi/zaman damgası yazar). LFS'te bu, aynı içeriğin ikinci bir kopyası demektir ve eski
+nesne kalıcı olarak durur. Kural: `git status` ikili bir dosyayı değişmiş gösteriyorsa **önce
+`catalog.json` diff'ine bak** — üçgen sayısı ve ölçüler değişmediyse o dosya `git checkout --` ile
+geri alınır. (İlk gerçek örnek: bir turda 4 dosya, ~440 KB, sıfır içerik değişikliği.)
+
 Bu, "sadece sohbette var olan varlık yasak" kuralını GEVŞETMEZ — her kalıcı çıktı dosyaya yazılır.
 
 ## Araçlar
