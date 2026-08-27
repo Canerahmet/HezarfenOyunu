@@ -454,31 +454,69 @@ def build_alay_kosku(p, col, asset_name, textured=False):
 
     # AHSAP GOVDE — sokaga (-Y) tasar.
     cy = -p.jut * 0.5
+    # Malzeme `timber_bare` — BOYASIZ. Govde asi kirmizisiyla kurulmustu ama
+    # asi boyasi EV boyasidir (ADR 0035); Alay Kosku Sur-i Sultani'nin
+    # ustundedir, yani bir SARAY yapisidir ve ADR 0055 bu yapinin ahsabi icin
+    # zaten `timber_bare` diyor. Cevresindeki her parca (konsol, kayit, kiris)
+    # dogru maldemedeydi; yalniz govde ile LOD1 gozden kacmisti.
     parts.append(hz.assign(hz.make_box(f"Govde_{asset_name}",
                                        (W, D + p.jut, p.body_h),
                                        (0.0, cy, p.wall_h + p.body_h * 0.5),
-                                       col), mats["timber"]))
-    # KONSOLLAR: tasmayi tasiyan sey.
+                                       col), mats["timber_bare"]))
+    # KONSOLLAR (elibogrunde): tasmayi tasiyan sey.
+    #
+    # Kutu degil UCGEN prizma. Konsolun isi yuku duvara aktarmaktir ve o isi
+    # okutan sey egik alt yuzudur; kutu koymak "kalin bir raf" gibi
+    # goruunuyordu. Ev kitindeki cumba payandasinin ta kendisi
+    # (`ottoman_kit._corbel_bracket`) — ayni ahsap isciligi surun ustunde de
+    # gecerlidir ve ikinci bir nusha yazmak zamanla iki farkli payanda demek.
     for i in range(5):
         ux = -W * 0.5 + W * (i + 0.5) / 5.0
-        parts.append(hz.assign(
-            hz.make_box(f"Konsol_{i}", (0.26, p.jut + 0.7, 0.34),
-                        (ux, -D * 0.5 - p.jut * 0.5 + 0.2,
-                         p.wall_h - 0.25), col), mats["timber_bare"]))
+        parts.append(hz.assign(kit._corbel_bracket(
+            f"Konsol_{i}", 0.26, p.jut + 0.7, 0.52,
+            (ux, -D * 0.5 - p.jut * 0.5 + 0.2, p.wall_h - 0.34), col),
+            mats["timber_bare"]))
 
     # PENCERE KUSAGI: kosk SEYIR yeridir, cephesi camdir.
+    #
+    # Cerceve ve dikme EKLENDI. Onceki hali cepheye kesilmis koyu
+    # dikdortgenlerdi; oysa ahsap bir cephede acikligi okutan sey camin
+    # kendisi degil, onu tutan KAYITTIR. Kafes DEGIL kayit: kafes mahremiyet
+    # icindir, burasi ise padisahin alayi SEYRETTIGI yer — bakisi kesen bir
+    # ogeyi buraya koymak yapinin islevini yanlis anlatirdi.
+    pw, ph = W / 6.0 * 0.66, p.body_h * 0.46
+    # Denizlik GOVDENIN ON YUZUNDEN turer, `-D/2 - jut` gibi bir ifadeden
+    # DEGIL: govde `cy = -jut/2`'de merkezlidir, yani on yuzu
+    # `cy - (D+jut)/2`. Elle yazilan ifade 0,25 m sapiyordu; derinlik 0,50
+    # iken bu gorunmuyordu (kutu yuzeye yetisiyordu), 0,18'e indirilince
+    # pencereler ahsabin ICINE gomulup tumuyle kayboldu. Kot bagli oldugu
+    # seyden okunmali.
+    py = cy - (D + p.jut) * 0.5
+    pz = p.wall_h + p.body_h * 0.52
     for i in range(6):
         ux = -W * 0.5 + W * (i + 0.5) / 6.0
+        # Sira onemli ve derinlik daha da onemli: bosluk SIG (0,18) olmali,
+        # cerceve ve dikme onun ONUNDE durmali. Ilk yazimda bosluk 0,50
+        # derinlikteydi ve cerceveyi de dikmeleri de icine aliyordu; renderda
+        # cephe duzgun bir pencere sirasi degil, kirik kamalardan olusan bir
+        # doku gibi okundu.
         parts.append(hz.assign(
-            hz.make_box(f"Pencere_{i}", (W / 6.0 * 0.66, 0.5, p.body_h * 0.46),
-                        (ux, -D * 0.5 - p.jut + 0.25,
-                         p.wall_h + p.body_h * 0.52), col), mats["shadow"]))
+            hz.make_box(f"Pencere_{i}", (pw, 0.18, ph), (ux, py, pz), col),
+            mats["shadow"]))
+        parts.append(hz.assign(
+            hz.make_box(f"PencCerceve_{i}", (pw + 0.30, 0.14, ph + 0.30),
+                        (ux, py - 0.16, pz), col), mats["timber_bare"]))
+        for k in (-1, 1):           # ikiye bolen dusey kayit
+            parts.append(hz.assign(hz.make_box(
+                f"PencDikme_{i}_{k}", (0.075, 0.14, ph),
+                (ux + k * pw * 0.25, py - 0.16, pz), col),
+                mats["timber_bare"]))
     for sx in (-1, 1):
         for i in range(3):
             parts.append(hz.assign(
-                hz.make_box(f"YanPencere_{sx}{i}", (0.5, D / 3.0 * 0.6,
+                hz.make_box(f"YanPencere_{sx}{i}", (0.18, D / 3.0 * 0.6,
                                                     p.body_h * 0.42),
-                            (sx * (W * 0.5 - 0.25),
+                            (sx * W * 0.5,
                              cy - (D + p.jut) * 0.5 + (D + p.jut) * (i + 0.5) / 3.0,
                              p.wall_h + p.body_h * 0.52), col),
                 mats["shadow"]))
@@ -489,6 +527,25 @@ def build_alay_kosku(p, col, asset_name, textured=False):
     hz.assign(roof, mats["lead"])
     parts.append(roof)
 
+    # SACAK ALTI KIRISLEME: sacak her yandan 1,2 m tasiyor ve altinda hicbir
+    # sey yoktu — kursun ortu havada duruyor gibi okunuyordu. Ahsap catida
+    # tasmayi kirisler tasir ve uzaktan okunan sey onlarin BIRAKTIGI GOLGE
+    # RITMIDIR, kirisin kendisi degil.
+    ez = p.wall_h + p.body_h - 0.11
+    for i in range(9):
+        ux = -(W + 2.0) * 0.5 + (W + 2.0) * (i + 0.5) / 9.0
+        for sy in (-1, 1):
+            parts.append(hz.assign(hz.make_box(
+                f"Kiris_{i}_{sy}", (0.11, 1.5, 0.22),
+                (ux, cy + sy * ((D + p.jut) * 0.5 + 0.5), ez), col),
+                mats["timber_bare"]))
+    for j in range(5):
+        uy = cy - (D + p.jut) * 0.5 + (D + p.jut) * (j + 0.5) / 5.0
+        for sx in (-1, 1):
+            parts.append(hz.assign(hz.make_box(
+                f"KirisYan_{j}_{sx}", (1.5, 0.11, 0.22),
+                (sx * (W * 0.5 + 0.5), uy, ez), col), mats["timber_bare"]))
+
     l1.append(hz.assign(hz.make_box(f"L1_Sur_{asset_name}",
                                     (W + 6.0, D, p.wall_h),
                                     (0.0, 0.0, p.wall_h * 0.5), col),
@@ -497,7 +554,7 @@ def build_alay_kosku(p, col, asset_name, textured=False):
                                     (W, D + p.jut, p.body_h + 2.6),
                                     (0.0, cy,
                                      p.wall_h + (p.body_h + 2.6) * 0.5), col),
-                        mats["timber"]))
+                        mats["timber_bare"]))
 
     lod0 = kit.join_parts(parts, f"SM_{asset_name}_LOD0", col)
     lod1 = kit.join_parts(l1, f"SM_{asset_name}_LOD1", col)
