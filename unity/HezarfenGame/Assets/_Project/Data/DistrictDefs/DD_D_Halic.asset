@@ -41,3 +41,12 @@ MonoBehaviour:
   unloadDistanceMeters: 910
   landAreaHectares: 61.9
   exclusiveLandAreaHectares: 0
+  housePalette: default
+  coreKind: mescit
+  churchPrefabs: []
+  hasHan: 0
+  quarterSpacingMeters: 320
+  settlementDensity: 0
+  maxSlopeDegrees: 22
+  minElevationMeters: 3
+  landmarkClearanceMeters: 70

@@ -56,6 +56,88 @@ namespace Hezarfen.Streaming
         [Tooltip("Yalnızca bu bölgeye sayılan kara (ha). Faz 4 yerleştirme bütçesi budur.")]
         public float exclusiveLandAreaHectares;
 
+        // ------------------------------------------------ Faz 4: semt karakteri
+        //
+        // BU ALANLAR GIS'TEN GELMEZ ve `DistrictImporter` onlara DOKUNMAZ.
+        // Importer yalnızca kendi yazdığı alanları set eder; varlığı yeniden
+        // yüklediği için buradakiler yeniden içe aktarımda korunur. Yeni bir
+        // alan eklerken kural şudur: **ölçülen GIS'ten gelir, seçilen buraya
+        // yazılır.** Sınır poligonu ölçülür; mahallenin hangi cemaate ait
+        // olduğu seçilir.
+
+        [Header("Faz 4 — semt karakteri (elle yazılır, GIS'ten GELMEZ)")]
+        [Tooltip("Ev paleti: 'default' (müslüman mahalle) ya da 'nonmuslim'.")]
+        public string housePalette = "default";
+
+        [Tooltip("Mahalle çekirdeği: 'mescit' ya da 'sinagog'. Sıbyan mektebi " +
+                 "ve türbe bundan TÜREr — ikisi de müslüman vakfın parçasıdır.")]
+        public string coreKind = "mescit";
+
+        [Tooltip("İkinci cemaatin ibadet yapısı. Galata'da Latin, Balat'ta Rum.")]
+        public string[] churchPrefabs = new string[0];
+
+        [Tooltip("Han ticarî semte aittir; her mahallede bulunmaz.")]
+        public bool hasHan = false;
+
+        [Header("Faz 4 — yerleşim yoğunluğu")]
+        [Tooltip("İki mahalle çekirdeği arası hedef uzaklık (m). Mahalle birkaç " +
+                 "yüz metredir; küçültmek semti kalabalıklaştırır.")]
+        [Range(120f, 700f)] public float quarterSpacingMeters = 320f;
+
+        [Tooltip("Kurulacak mahalle sayısına çarpan. 0 = semt boş kalır " +
+                 "(henüz sırası gelmemiş semtler için).")]
+        [Range(0f, 1.5f)] public float settlementDensity = 1f;
+
+        [Header("Faz 4 — nadir kurum bütçesi (SEMT başına, mahalle başına DEĞİL)")]
+        //
+        // Neden burada: tek örnek sokak sahnesinde hamam, medrese ve kilise
+        // koşulsuz konuyordu — o mahalle semtin tamamını temsil ettiği için
+        // doğruydu. Semt 34 mahalleye bölününce aynı kod 22 hamam, 22 medrese
+        // ve 22 Latin kilisesi üretti (ölçüldü). Sayı artık semtin kendisine
+        // aittir ve mahallelere deterministik olarak dağıtılır.
+        //
+        // BU SAYILAR TASLAKTIR (T2). Kaynaklarda 1632 Galata'sının hamam ya da
+        // medrese sayısı yok; buradakiler yapı tipinin şehirdeki yaygınlığına
+        // göre seçilmiş, ölçülmemiş değerlerdir. Kaynak bulunursa değişir.
+
+        [Tooltip("Semtteki ikinci cemaat ibadet yapısı sayısı (taslak).")]
+        public int churchCount = 6;
+
+        [Tooltip("Semtteki hamam sayısı (taslak).")]
+        public int hamamCount = 5;
+
+        [Tooltip("Semtteki medrese sayısı (taslak). Vakıf yapısıdır; " +
+                 "coreKind 'mescit' değilse yok sayılır.")]
+        public int medreseCount = 2;
+
+        [Tooltip("Semtteki han sayısı (taslak). hasHan kapalıysa yok sayılır.")]
+        public int hanCount = 1;
+
+        [Tooltip("Semtteki fırın sayısı (taslak). Fırın mahalle ölçeğinde " +
+                 "yaygındır; hamamdan çok olur.")]
+        public int firinCount = 10;
+
+        [Tooltip("Semtteki kahvehane sayısı (taslak). 1632'de kahvehaneler " +
+                 "AÇIKTIR — IV. Murad'ın yasağı 1633'tür.")]
+        public int kahvehaneCount = 8;
+
+        [Tooltip("Semtteki bozahane sayısı (taslak).")]
+        public int bozahaneCount = 3;
+
+        [Header("Faz 4 — nereye kurulmaz")]
+        [Tooltip("Bu eğimin üstünde mahalle kurulmaz (derece). İstanbul'un " +
+                 "yamaçlarında sokak yokuşu yanlamasına tarar; dikleştiği " +
+                 "yerde yerleşim seyrelir.")]
+        [Range(5f, 45f)] public float maxSlopeDegrees = 22f;
+
+        [Tooltip("Bu kotun altına mahalle kurulmaz (m). y=0 deniz seviyesidir; " +
+                 "pay kıyı şeridi ve gelgit için.")]
+        public float minElevationMeters = 3f;
+
+        [Tooltip("Bir landmark'a bu mesafeden yakın çekirdek kurulmaz (m) — " +
+                 "külliyenin kendi alanı vardır.")]
+        public float landmarkClearanceMeters = 70f;
+
         /// <summary>Nokta poligonun içinde mi? (y yok sayılır — bölgeler düşeyde sonsuzdur.)</summary>
         public bool Contains(Vector3 worldPosition)
         {

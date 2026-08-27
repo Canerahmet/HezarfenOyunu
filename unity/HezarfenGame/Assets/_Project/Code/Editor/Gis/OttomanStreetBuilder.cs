@@ -101,6 +101,28 @@ namespace Hezarfen.Editor.Gis
             public bool HasHan = false;
 
             /// <summary>
+            /// <b>Nadir kurumlar mahalle başına DEĞİL, semt başına sayılır.</b>
+            ///
+            /// Tek örnek sokak sahnesinde hamam, medrese ve kilise koşulsuz
+            /// konuyordu ve bu doğruydu: o mahalle semtin tamamını temsil
+            /// ediyordu. Semt gerçekten 34 mahalleye bölününce aynı kod
+            /// <b>22 hamam, 22 medrese ve 22 Latin kilisesi</b> üretti —
+            /// ölçüldü. Galata'da o kadar hamam yoktu; mahalle sayısı kadar
+            /// medrese hiç yoktu.
+            ///
+            /// Kural artık şu: <b>mahalle ne söylenirse onu kurar; kaç tane
+            /// olacağına semt karar verir</b> (<c>DistrictFiller</c>). Tek
+            /// mahalle kuran eski menüler bayrakları açık bırakır ve
+            /// davranışları değişmez.
+            /// </summary>
+            public bool HasChurch = true;
+            public bool HasHamam = true;
+            public bool HasMedrese = true;
+            public bool HasFirin = true;
+            public bool HasKahvehane = true;
+            public bool HasBozahane = true;
+
+            /// <summary>
             /// Sıbyan mektebi ve türbe **vakıf** kurumlarıdır: ikisi de bir
             /// müslüman vakfın parçasıdır ve mescitle birlikte kurulur. Balat'a
             /// sıbyan mektebi koymak dönem hatası olurdu — oradaki karşılığı
@@ -177,6 +199,49 @@ namespace Hezarfen.Editor.Gis
             var old = GameObject.Find(q.RootName);
             if (old != null) UnityEngine.Object.DestroyImmediate(old);
             var root = new GameObject(q.RootName);
+            ResetQuarterState();
+            BuildInto(root.transform, terrain, q, seed);
+
+            SettlementMask.Write(q.Name, taken);
+            var kutu = SettlementBounds(taken);
+            if (kutu.HasValue) TerrainCoverBuilder.RepaintSettlement(kutu.Value);
+            EnsureFolder(Path.GetDirectoryName(q.ScenePath).Replace('\\', '/'));
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene, q.ScenePath);
+            return scene;
+        }
+
+        /// <summary>
+        /// Mahalle kurulumundan önce ortak durumu sıfırlar.
+        ///
+        /// <c>taken</c> (çakışma daireleri), <c>podiums</c> ve
+        /// <c>pavingStrips</c> sınıf düzeyindedir. Tek mahalle kurarken bunu
+        /// <c>Build</c> yapardı; bir semte onlarca mahalle kurulurken
+        /// <b>semtin başında bir kez</b> yapılmalı, yoksa ikinci mahalle
+        /// birincinin üstüne kurulur.
+        /// </summary>
+        public static void ResetQuarterState()
+        {
+            taken.Clear();
+            podiums.Clear();
+            pavingStrips.Clear();
+        }
+
+        /// <summary>
+        /// Bir mahalleyi <b>verilen ebeveynin altına</b>, açık sahneye kurar.
+        ///
+        /// <c>Build</c> tek mahalle için sahneyi açar, kurar ve kaydeder —
+        /// Faz 2'nin örnek sokak sahneleri böyle üretildi. Faz 4 ise bir semte
+        /// ONLARCA mahalle koyar; her biri için sahne açmak öncekini silerdi.
+        /// Bu yüzden kurulum sahne yönetiminden ayrıldı: <c>BuildInto</c>
+        /// yalnızca geometriyi kurar, sahneyi ne açar ne kaydeder.
+        ///
+        /// Çakışma listesini temizlemez — bkz. <see cref="ResetQuarterState"/>.
+        /// Döndürdüğü sayı yerleştirilen ev adedidir.
+        /// </summary>
+        public static int BuildInto(Transform root, Terrain terrain,
+                                    QuarterSpec q, int seed)
+        {
 
             var all = LoadCatalog();
             if (all.Count == 0) throw new Exception($"{CatalogPath} bos/yok.");
@@ -190,12 +255,9 @@ namespace Hezarfen.Editor.Gis
             if (variants.Count < 6)
                 Debug.LogWarning($"[Hezarfen] {q.Name}: yalnizca {variants.Count} ev "
                                  + "varyanti — sokak tekrarli gorunecek.");
-            podiums.Clear();
 
             var rng = new System.Random(seed);
             int placed = 0, skipped = 0, stepCount = 0;
-            taken.Clear();
-            pavingStrips.Clear();
 
             // --- KURAL 1: ana sokak, es yukselti egrisini izler ---
             var spine = TraceContour(terrain, new Vector3(q.Origin.x, 0f, q.Origin.y),
@@ -216,14 +278,14 @@ namespace Hezarfen.Editor.Gis
             // evlerden ONCE yerini alir, yoksa doku onu disari iter.
             var churchGo = new GameObject("Cekirdek_Kilise");
             churchGo.transform.SetParent(root.transform, false);
-            int churchCount = PlaceChurch(q.ChurchPrefabs, spine, terrain,
+            int churchCount = !q.HasChurch ? 0 : PlaceChurch(q.ChurchPrefabs, spine, terrain,
                                           churchGo.transform, coreS);
 
             // Hamam her mahallenin ihtiyacidir; han TICARI cekirdege aittir
             // (Galata liman semtidir, Balat konut mahallesi).
             var civicGo = new GameObject("Cekirdek_Kamusal");
             civicGo.transform.SetParent(root.transform, false);
-            int civicCount = PlaceBig(new[] { "PF_Hamam_A", "PF_Hamam_B" },
+            int civicCount = !q.HasHamam ? 0 : PlaceBig(new[] { "PF_Hamam_A", "PF_Hamam_B" },
                                       spine, terrain, civicGo.transform, coreS,
                                       eastFacing: false);
             if (q.HasHan)
@@ -241,20 +303,20 @@ namespace Hezarfen.Editor.Gis
                                        eastFacing: false, nearCore: true);
                 // Medrese: vakfın en büyük yapısı. Büyükten küçüğe denenir —
                 // arazi 28 m'lik avluyu kaldırmıyorsa 22 m'lik kurulur.
-                civicCount += PlaceBig(new[] { "PF_Medrese_A", "PF_Medrese_B" },
+                if (q.HasMedrese) civicCount += PlaceBig(new[] { "PF_Medrese_A", "PF_Medrese_B" },
                                        spine, terrain, civicGo.transform, coreS,
                                        eastFacing: false, nearCore: true);
             }
 
             // FIRIN her mahallededir — ekmek cemaate göre değişmez.
-            civicCount += PlaceBig(new[] { "PF_Firin_A", "PF_Firin_B" }, spine,
+            if (q.HasFirin) civicCount += PlaceBig(new[] { "PF_Firin_A", "PF_Firin_B" }, spine,
                                    terrain, civicGo.transform, coreS,
                                    eastFacing: false, nearCore: true);
 
             // KAHVEHANE ÇARŞI UCUNDA: dükkân sırasının ve hanın yanında.
             // 1632'de açıktır; Eylül 1633'ten sonra bu prefab sahneden
             // KALDIRILMALIDIR (ADR 0021 §5) — oyunun tek zaman işareti.
-            civicCount += PlaceBig(new[] { "PF_Kahvehane_A", "PF_Kahvehane_B" },
+            if (q.HasKahvehane) civicCount += PlaceBig(new[] { "PF_Kahvehane_A", "PF_Kahvehane_B" },
                                    spine, terrain, civicGo.transform, coreS,
                                    eastFacing: false, nearCore: true);
             // Kahvehanenin CINARI: gölge, kahvehanenin ikinci odasıdır.
@@ -273,7 +335,7 @@ namespace Hezarfen.Editor.Gis
             // değirmeni dere, su terazisi ise Kırkçeşme hattı ister — ikisi
             // de GIS işi. Elde var diye koymak, her birinin kendi tezini
             // bozardı.
-            civicCount += PlaceBig(new[] { "PF_Bozahane_A" }, spine, terrain,
+            if (q.HasBozahane) civicCount += PlaceBig(new[] { "PF_Bozahane_A" }, spine, terrain,
                                    civicGo.transform, coreS,
                                    eastFacing: false, nearCore: true);
 
@@ -321,26 +383,19 @@ namespace Hezarfen.Editor.Gis
             // Burada çağrılıyor çünkü zemin ve üstündeki yapı AYNI TURDA
             // güncellenmezse biri unutulur; iki ayrı menü komutu, bir gün
             // ayrışan iki gerçek demektir.
-            SettlementMask.Write(q.Name, taken);
-            var box = SettlementBounds(taken);
-            if (box.HasValue) TerrainCoverBuilder.RepaintSettlement(box.Value);
-
-            var tag = root.GetComponent<HistoricalTag>() ?? root.AddComponent<HistoricalTag>();
+            var tag = root.GetComponent<HistoricalTag>()
+                      ?? root.gameObject.AddComponent<HistoricalTag>();
             tag.tier = HistoricalTier.Reconstruction;   // T2
             tag.sourceNote = "Sokak dokusu RESEARCH.md 4.1'den cikarim (T2): organik eksen, "
                            + "es yukselti takibi, cikmaz kollar, duvar sokak cizgisinde. "
                            + "Konum ve ev-ev yerlesim TASLAK.";
-
-            EnsureFolder(Path.GetDirectoryName(q.ScenePath).Replace('\\', '/'));
-            EditorSceneManager.MarkSceneDirty(scene);
-            EditorSceneManager.SaveScene(scene, q.ScenePath);
 
             Debug.Log($"[Hezarfen] {q.Name}: {placed} ev ({variants.Count} varyant, "
                       + $"{q.HousePalette}), {coreCount} cekirdek yapisi "
                       + $"({q.CoreKind}/cesme/dukkan), {churchCount} kilise, {civicCount} hamam/han, {alleyCount} cikmaz, {stepCount} basamak, "
                       + $"{podiumCount} tas kaide, {skipped} yerlesim elendi "
                       + $"(su/cakisma). Ana sokak {spine.Count} dugum, tohum {seed}.");
-            return scene;
+            return placed;
         }
 
         // ------------------------------------------------------- sokak ekseni
