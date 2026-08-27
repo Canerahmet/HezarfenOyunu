@@ -1,0 +1,315 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1664465109477700726
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7769299260308259877}
+  - component: {fileID: 6472853907362708893}
+  - component: {fileID: 8986787877672917098}
+  m_Layer: 0
+  m_Name: SM_Sultanahmet_LOD1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7769299260308259877
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1664465109477700726}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2970356851574301746}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &6472853907362708893
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1664465109477700726}
+  m_Mesh: {fileID: 6576806709216801444, guid: 70ade69891f3e904e841575121ae4eae, type: 3}
+--- !u!23 &8986787877672917098
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1664465109477700726}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: f55c305bde3902f439e6ad117704150a, type: 2}
+  - {fileID: 2100000, guid: 76899a01d6677a84e816fb5482d295e9, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &5609249740896145213
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1442369526136675638}
+  - component: {fileID: 2709866855713827557}
+  - component: {fileID: 955934248684012945}
+  m_Layer: 0
+  m_Name: SM_Sultanahmet_LOD0
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1442369526136675638
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5609249740896145213}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2970356851574301746}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &2709866855713827557
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5609249740896145213}
+  m_Mesh: {fileID: -1833290199858569128, guid: 70ade69891f3e904e841575121ae4eae, type: 3}
+--- !u!23 &955934248684012945
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5609249740896145213}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: f55c305bde3902f439e6ad117704150a, type: 2}
+  - {fileID: 2100000, guid: e6550f3277eecae47a383a32e9ba63a9, type: 2}
+  - {fileID: 2100000, guid: ad9017182e06f65458c4d529a6fdfe45, type: 2}
+  - {fileID: 2100000, guid: d1a2a41ac21fe4740b0ad794a3bb0944, type: 2}
+  - {fileID: 2100000, guid: 76899a01d6677a84e816fb5482d295e9, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &6538064378934053054
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2970356851574301746}
+  - component: {fileID: 2806633216296856658}
+  - component: {fileID: 3451544971532907111}
+  - component: {fileID: 7898717020041874842}
+  m_Layer: 0
+  m_Name: PF_Sultanahmet
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2970356851574301746
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6538064378934053054}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1442369526136675638}
+  - {fileID: 7769299260308259877}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!205 &2806633216296856658
+LODGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6538064378934053054}
+  serializedVersion: 3
+  m_LocalReferencePoint: {x: 0, y: 33, z: 27.649998}
+  m_Size: 120.299995
+  m_FadeMode: 0
+  m_AnimateCrossFading: 0
+  m_LastLODIsBillboard: 0
+  m_LODs:
+  - screenRelativeHeight: 0.25
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 955934248684012945}
+  - screenRelativeHeight: 0.01
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 8986787877672917098}
+  m_Enabled: 1
+  m_GlobalIlluminationLOD: 0
+--- !u!64 &3451544971532907111
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6538064378934053054}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -7150701571041354880, guid: 70ade69891f3e904e841575121ae4eae, type: 3}
+--- !u!114 &7898717020041874842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6538064378934053054}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e60ea5c86c339049bcad6a3d68c5042, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Core.HistoricalTag
+  tier: 1
+  sourceNote: "Sultan Ahmed Camii, 1609-1616 (kulliye 1620), Sedefkar Mehmed Aga;
+    bani I. Ahmed. **1632'DE ON ALTI YASINDA** \u2014 Suleymaniye'de 'degismedi'
+    demistim, burada daha keskin: IV. Murad'in Istanbul'unda bu yapi YENIDIR. Sehrin
+    en taninan silueti, oyunun gectigi yil daha bir kusak eskimemistir. 1632'DE TAMAM:
+    cami (1616), arasta ve hamam (1617), SULTAN AHMED TURBESI (1619, II. Osman tamamlatti),
+    medrese-darussifa-imaret (1620). Kulliye butunuyle ayakta. 1632'DE YOK: III.
+    Selim'in su haznesi (1802 sonrasi). Bu yapida 'sonradan eklendi' listesi KISADIR.
+    DOGRULUK BASAMAGI **D2**: kubbe acikligi ve butun kutle basamaklari olculu plandan
+    turedi; olculmeyenler asagida ayrica D3 diye isaretli. OLCULER: kubbe acikligi
+    **23,50 m** \u2014 bu sayi PLANDAN CIKARILDI, kaynaktan kopyalanmadi: ayak duvarlarinin
+    ekseni 30,75 m arali, duvar 3,65 m kalin, ic yuzler arasi 23,45 m; yayimlanan
+    23,5 tam olarak budur. Ayni kubbenin UC sayisi var ve ucu de dogru: TDV 'icten'
+    **22,40 m**, aciklik **23,50 m**, plandan okunan kursun izi (kasnak + sacak)
+    **27,7 m**. Ayasofya'da (5.11) yalnizca IKI sayi vardi cunku Bizans kubbesinde
+    kasnak yok \u2014 ucuncu sayiyi kasnak doguruyor, yani bu bir muhasebe sikintisi
+    degil MIMARI bir farktir. Kilit **43 m**. SAYILAN: **DORT** yarim kubbe (dort
+    yonde birer \u2014 Ayasofya ve Suleymaniye'de IKI, Uskudar Mihrimah'ta UC idi);
+    her yarim kubbede **UC** eksedra, toplam **ON IKI**; **DORT** fil ayagi, capi
+    **5 m**; **ALTI** minare ve **ON ALTI** serefe (harim kosesindeki dordu ucer,
+    avlu kosesindeki ikisi ikiser) \u2014 o gune kadar denenmemis bir duzen; avlu
+    revakinda **YIRMI ALTI** sutun ve **OTUZ** kubbeli birim; altigen planli kubbeli
+    sadirvan. EKSEDRALAR BU MESH'TE VAR: Ayasofya'da girmemislerdi cunku orada IC
+    MEKAN ogesidirler (ADR 0045); burada yarim kubbelerin eteginden disa tasarlar
+    ve siluetin basamakli kaskadini onlar yapar. Ayni sozcuk, iki yapida iki ayri
+    sey. KIBLE: eksen plandan YEDI bagimsiz yolla 133,6 derece olculdu ve bu olcum
+    1632 kiblesinin (133,7) ta kendisini verdi \u2014 ADR 0046'nin cikis noktasi
+    bu yapidir. OLCULMEDI: minare boylari (plan izinde 64 / 54 m yaziyor ama ayni
+    izin kubbe yuksekligi 62 m diyor ve o yayimlanan 43 m ile catisiyor) \u2014 plan
+    GEOMETRISI guvenilir, plan YUKSEKLIKLERI degil; boylar **D3**. Yayimlanan 'harim
+    64 x 72 m' yapinin NERESINI anlattigini soylemiyor (Ayasofya'daki tuzagin ucuncu
+    tekrari); olculen 61 x 55 kullanildi. Kaynaklar: TDV Islam Ansiklopedisi 'Sultan
+    Ahmed Camii ve Kulliyesi'; Vikipedi. Plan geometrisi OpenStreetMap izlerinden
+    olculdu (ODbL; atif refs/LICENSES.md). RESEARCH.md 5.13, ADR 0047"

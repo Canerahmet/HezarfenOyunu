@@ -1,0 +1,312 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &421365352100823797
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7514378709129785495}
+  - component: {fileID: 4865815841969622037}
+  - component: {fileID: 5192337556262934049}
+  m_Layer: 0
+  m_Name: SM_FatihCamii_LOD0
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7514378709129785495
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 421365352100823797}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2742983884984456861}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &4865815841969622037
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 421365352100823797}
+  m_Mesh: {fileID: -4170007010571925389, guid: 0dd71270ebce29b47874855350a3faf2, type: 3}
+--- !u!23 &5192337556262934049
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 421365352100823797}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: f55c305bde3902f439e6ad117704150a, type: 2}
+  - {fileID: 2100000, guid: e6550f3277eecae47a383a32e9ba63a9, type: 2}
+  - {fileID: 2100000, guid: d1a2a41ac21fe4740b0ad794a3bb0944, type: 2}
+  - {fileID: 2100000, guid: 76899a01d6677a84e816fb5482d295e9, type: 2}
+  - {fileID: 2100000, guid: ad9017182e06f65458c4d529a6fdfe45, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &3647856503247571338
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2742983884984456861}
+  - component: {fileID: 3827168071445708261}
+  - component: {fileID: 6686114387220895462}
+  - component: {fileID: 146883430180705218}
+  m_Layer: 0
+  m_Name: PF_FatihCamii
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2742983884984456861
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3647856503247571338}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7514378709129785495}
+  - {fileID: 7598728619362455994}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!205 &3827168071445708261
+LODGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3647856503247571338}
+  serializedVersion: 3
+  m_LocalReferencePoint: {x: 0, y: 29.365, z: 18.27}
+  m_Size: 86.46
+  m_FadeMode: 0
+  m_AnimateCrossFading: 0
+  m_LastLODIsBillboard: 0
+  m_LODs:
+  - screenRelativeHeight: 0.25
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 5192337556262934049}
+  - screenRelativeHeight: 0.01
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 104329599951297250}
+  m_Enabled: 1
+  m_GlobalIlluminationLOD: 0
+--- !u!64 &6686114387220895462
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3647856503247571338}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 1252140717654923614, guid: 0dd71270ebce29b47874855350a3faf2, type: 3}
+--- !u!114 &146883430180705218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3647856503247571338}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e60ea5c86c339049bcad6a3d68c5042, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Core.HistoricalTag
+  tier: 1
+  sourceNote: "Fatih Camii, 1463-1470, mimar ATIK SINAN (Sinaneddin Yusuf); bani
+    Fatih Sultan Mehmed. 1632'de 162 yasinda. **BUGUN GORULEN YAPI 1632'DE YOKTUR**
+    \u2014 Faz 3'un en buyuk farki budur. 1766 depremi camiyi yikti ve 'caminin geri
+    kalan kismi ZEMINE KADAR yiktirildi'; bugunku barok yapi 1767-71, mimar MEHMED
+    TAHIR AGA'dir. 1632'DEKI SEMA (TDV, eski resimlerden): ortada BIR buyuk kubbe,
+    MIHRAP tarafinda **BIR** yarim kubbe, yanlarda daha alcak **UCER** kucuk kubbeli
+    bolum. Kubbe 'duvarlar ve **IKI AYAK** uzerine' oturur (Vikipedi) \u2014 bugunku
+    DORT fil ayagi ve DORT yarim kubbe 1767-71'dir. Yani plan bugunku gibi merkezi
+    degil UZUNLAMASINA'dir ve disaridan Edirne Uc Serefeli'ye benzeyen erken klasik
+    bir kutledir. MINARE: **IKI**, her biri **BIRER** serefeli ('simdiki minarelerin
+    yerinde birer serefeli iki minare'); bugunkuler IKISER serefelidir. OLCU: ana
+    kubbe **26 m** \u2014 **yuz yil boyunca Istanbul'un en buyuk kubbesi** kaldi,
+    1470'ten Suleymaniye'ye (1557, 26,5 m) kadar; 87 yil, 'bir yuzyil' tarifine oturur.
+    1767-71 bu capi korudu, gerisini korumadi. 1632'DE KESINLIKLE VAR OLAN GERCEK
+    PARCALAR \u2014 ilk yapidan bugune kalanlar sunlardir: **sadirvan avlusunun UC
+    DUVARI**, **avlunun ortasindaki SADIRVAN**, **TACKAPI**, **MIHRAP**, ve **minarelerin
+    serefe altina kadar kaide, pabuc ve govdeleri**. Avlunun sayilari o yuzden dogrudan
+    1632'yi baglar: **ON SEKIZ sutun**, **YIRMI IKI kubbe**, **UC kapi** (ikisi yanlarda).
+    DOGRULUK: kubbe capi **D2**; sema ve sayilar **D3** (TDV bunlari 'eski resimlerinden
+    anlasilmaktadir' diye verir \u2014 olculu cizim degil, tasvir); kilit kotu **D3**
+    ve TURETILMISTIR: yan neflerin ucer kucuk kubbesi sacagin altinda kalmak zorunda,
+    bu sacagi ~22 m'ye koyuyor ve Osmanli zinciri oradan 50,5 m veriyor. Harim olculeri
+    de sayilan degerden turedi (26 + 2x8,7 = 43,4 genislik) ve kaynagin 'kareye yakin
+    planli' tarifiyle tutuyor. 1632'DE AYRICA VAR: Fatih Sultan Mehmed turbesi (1481;
+    1766'da yikildi, yeniden yapildi), Gulbahar Hatun turbesi (depremi ATLATTI, 1767-68'de
+    onarildi), SAHN-I SEMAN medreseleri. SALT Research'te 1766 oncesi plan-kesit
+    fotograflari var ama CC BY-NC-ND: yalnizca bakilir, kopyalanmaz \u2014 bu model
+    onlardan degil METIN kaynaklarindan kuruldu. Kaynaklar: TDV Islam Ansiklopedisi
+    'Fatih Camii ve Kulliyesi'; Vikipedi 'Fatih Camii'; fatih.gov.tr. RESEARCH.md
+    5.14, ADR 0048"
+--- !u!1 &4595533977168515012
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7598728619362455994}
+  - component: {fileID: 7967501284071981581}
+  - component: {fileID: 104329599951297250}
+  m_Layer: 0
+  m_Name: SM_FatihCamii_LOD1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7598728619362455994
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4595533977168515012}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2742983884984456861}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &7967501284071981581
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4595533977168515012}
+  m_Mesh: {fileID: -4035174100715870957, guid: 0dd71270ebce29b47874855350a3faf2, type: 3}
+--- !u!23 &104329599951297250
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4595533977168515012}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: f55c305bde3902f439e6ad117704150a, type: 2}
+  - {fileID: 2100000, guid: 76899a01d6677a84e816fb5482d295e9, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
