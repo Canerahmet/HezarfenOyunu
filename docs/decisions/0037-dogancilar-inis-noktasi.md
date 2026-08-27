@@ -35,6 +35,55 @@
 > yamaç kaldıracı (lodos rüzgârının yamaca çarpması). Kodekse dürüstlük
 > notu: Hezarfen'in gerçekte nasıl uçtuğu bilinmiyor; oyun bunu dönemin
 > havasıyla mümkün kılıyor.
+>
+> ---
+>
+> ## Uygulandı ve ölçüldü (2026-08-27)
+>
+> `TerrainThermal` araziden dört terim türetir ve hiçbiri elle konmaz:
+> güneşe bakan yamacın termiği (bakı + eğim + güneş yüksekliği), **su
+> üstünde çökelme**, rüzgârın yamaca çarpmasından doğan yamaç kaldıracı, ve
+> bulut tabanı tavanı. `WindField` bunu elle konan hacimlerin *üstüne*
+> ekler — hacimler artık istisna aracı.
+>
+> `ThermalFlightSim` uçuşu **adım adım** simüle eder. Kapalı formül
+> yazmadım çünkü yanlış olurdu: koridorun bir kısmı su, bir kısmı kara ve
+> ortalama almak suyun eksisini karaya yayarak gizlerdi.
+>
+> **Ölçülen koridor** (kule → Doğancılar, 200 m kotta):
+>
+> | yol | zemin | dikey hava |
+> |---|---:|---:|
+> | %0 (kule) | 52 m | **+0,30** m/s |
+> | %20–%80 (Boğaz) | −12 m | **−0,49** m/s |
+> | %90 (Üsküdar kıyısı) | 7 m | **+1,07** m/s |
+>
+> Model doğru davranıyor: kaldıraç karada, çökelme suda. Koridorun **%70'i
+> inen hava** — yani süzülüş sırasında yardım yok, tırmanış geçişten önce
+> bitmeli.
+>
+> **Sınav sonucu** (9 m/s rüzgâr, süzülme 11,48:1, alçalma 1,08 m/s):
+>
+> | | |
+> |---|---:|
+> | en iyi kaldıraç | **1,79 m/s**, kuleden 380 m |
+> | net tırmanış | 0,71 m/s |
+> | gereken irtifa | **246 m** |
+> | tırmanış | **298 s (5,0 dk)** |
+> | geçiş | **163 s (2,7 dk)** |
+> | varış kotu | 50,3 m (hedef 46,1 m) |
+>
+> **Uçuş yapılabiliyor.** Ama pay ince: asgari tırmanışla yalnızca **4,2 m**.
+> Bu bir kusur değil, simülasyonun kendini sınırlaması — tam gerekene kadar
+> tırmanıp duruyor. Gerçek oyuncu tavana yakın çıkar: tavan **570 m**,
+> gereken 246 m, yani 324 m fazladan irtifa ≈ **3 700 m fazladan menzil**.
+> Yani "yeterince yüksel" öğrenilebilir bir beceri, "şans" değil.
+>
+> **Açık kalan ayar:** 5 dakikalık tırmanış oyunun açılışı için uzun
+> olabilir. Tek düğme `peakLift` (şu an 2,6 m/s — yaz öğleden sonrası
+> İstanbul'unda 3-4 m/s savunulabilir); 3,5'e çıkarsa net tırmanış 0,71 →
+> 1,6 m/s ve süre 5 dakikadan ~2,5 dakikaya iner. Yapıyı değiştirmez, bir
+> alan değiştirir. **Caner'e sorulacak: tırmanış ne kadar sürmeli?**
 - **Bağlam**: Faz 3, S-kademe. Hezarfen'in **iniş noktası**; oyunun finali.
 
 ## Karar 1 — Doğancılar'ın koordinatı düzeltildi (771 m)

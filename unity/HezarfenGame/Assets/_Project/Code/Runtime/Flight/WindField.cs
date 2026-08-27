@@ -22,6 +22,12 @@ namespace Hezarfen.Flight
         [Tooltip("Açıksa Awake'te sahnedeki tüm WindVolume'lar toplanır.")]
         public bool autoCollectVolumes = true;
 
+        [Tooltip("Araziden tureyen termik/cokelme kaynagi. Bos birakilirsa " +
+                 "sahnede aranir.")]
+        public TerrainThermal terrainThermal;
+
+        bool autoFindThermal = true;
+
         private void Awake()
         {
             if (autoCollectVolumes) CollectVolumes();
@@ -45,6 +51,19 @@ namespace Hezarfen.Flight
                 if (v == null || !v.isActiveAndEnabled) continue;
                 wind += v.SampleWind(worldPos);
             }
+
+            // ARAZIDEN TUREYEN kaldirac (ADR 0037: gercek termik simulasyonu).
+            // Elle konan hacimlerin USTUNE eklenir, yerine gecmez: hacim hala
+            // tasarimcinin ozel bir yere koyabilecegi arac, bu ise arazinin
+            // kendi cevabi. Ikisi ayni havayi iki kez saymaz — hacimler artik
+            // yalnizca istisna icin kullanilir.
+            if (terrainThermal == null && autoFindThermal)
+            {
+                terrainThermal = FindFirstObjectByType<TerrainThermal>();
+                autoFindThermal = terrainThermal != null;
+            }
+            if (terrainThermal != null && terrainThermal.isActiveAndEnabled)
+                wind.y += terrainThermal.SampleVertical(worldPos, wind);
 
             return wind;
         }
