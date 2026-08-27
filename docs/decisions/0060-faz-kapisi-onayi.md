@@ -1,7 +1,7 @@
 # ADR 0060 — Faz kapısı onayı: tek tek mi, kapıda mı?
 
 **Tarih:** 2026-08-27
-**Durum:** **Caner'e soruldu** — karar bekliyor
+**Durum:** **B seçildi** (Caner, 2026-08-27 — fiilen)
 **Konu:** Geri bildirim protokolünün ölçülen sonucu
 
 ## Bağlam
@@ -75,9 +75,19 @@ tek tek soruluyor.
 
 ## Karar
 
-Caner'e soruldu. Cevap gelene kadar **mevcut protokol yürürlükte** —
-notlar yazılmaya devam ediyor, kapı paketi de A seçeneğinde işe yarar
-(36 notu okumadan önce bakılacak özet olur).
+**B.** Caner, Faz 3 kapı paketini okuduktan sonra 36 notu tek tek imzalamadan
+*"faz 4'e devam edelim"* dedi — yani onay birimi fiilen **kapı** oldu.
+
+Bu, açıkça yazılmış bir "B'yi seçiyorum" değil; bir davranıştan okunmuş bir
+karar. Öyle kaydediyorum ki yanlışsa düzeltilebilsin. Bundan sonra:
+
+- Her faz kapısında `docs/feedback/fazN_kapi.md` üretilir ve **tek imza**
+  beklenir.
+- Varlık notları yazılmaya **devam eder** (üretim kaydıdır), ama imza
+  istisnadır: yalnızca Caner'in işaretlediği varlıklar için.
+- Tartışmalı **tasarım** kararları kapının dışındadır ve tek tek sorulmaya
+  devam eder. Faz 3'ten devredenler: ADR 0037, 0039, 0046, 0051 — **dördü de
+  hâlâ açık** ve kapı onayı bunları kapatmaz.
 
 İlgili: `docs/feedback/faz3_kapi.md`, `docs/feedback/denetim_turu.md`,
 PLAN Bölüm 4 (Geri Bildirim Protokolü)

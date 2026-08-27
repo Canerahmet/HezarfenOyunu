@@ -1,6 +1,6 @@
 # Faz 3 — Kapı Paketi
 
-**Durum:** onay bekliyor
+**Durum:** ✅ **ONAYLANDI** (Caner, 2026-08-27)
 **Tarih:** 2026-08-27
 **Ne için:** PLAN'ın kuralı — *"her faz kapısında Claude Code, kabul
 kriterleri karşılandığına dair kanıt (test çıktısı + inceleme paketi) sunar;
@@ -112,7 +112,18 @@ ikincisi — çünkü birincisi denendi ve çalışmadı.
 
 ## 6. Onay
 
-Bu kapı için beklediğim tek satır:
+✅ **OK Faz 3** — Caner, 2026-08-27.
+
+> Onay sözlü verildi (*"faz 4'e devam edelim"*) ve buraya **Claude tarafından
+> kaydedildi**. Protokolün kuralı onayın dosyada yaşamasıdır; sohbette kalan
+> bir onay sonradan denetlenemez. Caner'in kendi yazdığı bir imza değildir —
+> yanlış okuduysam bu satır silinir ve kapı yeniden açılır.
+>
+> Aynı mesajla **ADR 0060'ın B seçeneği** de fiilen seçilmiş oldu: 36 not tek
+> tek imzalanmadan kapı geçildi. Bunu da öyle kaydettim; itiraz varsa ADR
+> 0060 yeniden açılır.
+
+Beklenen özgün satır şuydu:
 
 ```
 OK Faz 3
