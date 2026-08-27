@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ca5d15fe9753c34baf08bf4775a3653, type: 3}
+  m_Name: DD_D_Galata
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Streaming.DistrictDef
+  districtId: D_Galata
+  displayName: Galata
+  priority: 1
+  kind: 0
+  summary: "Kule, Galata surlari, Arap Camii, Tophane, Kasimpasa tersanesi. Ucusun
+    KALKIS bolgesi. | tekil kara 409 ha | yukle 700 m / bosalt 910 m (kenara uzaklik)
+    | OYUN bolgesi \u2014 tarihsel mahalle siniri DEGIL"
+  sceneAddress: Districts/D_Galata
+  boundary:
+  - {x: -1668.93, y: -663.7}
+  - {x: 522.26, y: -836.46}
+  - {x: 1340.34, y: 181.84}
+  - {x: 981.29, y: 1173.36}
+  - {x: -1214.32, y: 1568}
+  - {x: -1861.93, y: 442.73}
+  center: {x: -316.88, y: 310.96}
+  radiusMeters: 1666.73
+  loadDistanceMeters: 700
+  unloadDistanceMeters: 910
+  landAreaHectares: 408.6
+  exclusiveLandAreaHectares: 408.6

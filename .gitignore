@@ -56,7 +56,14 @@ tools/gis/_cache/
 # DEM türevleri: heightmap + önizlemeler. TÜRETİLMİŞ veridir — dem_fetch.py ile
 # birebir yeniden üretilir (kaynak sabit, sürümler pinli). Kalıcı varlık, Unity'deki
 # TerrainData'dır ve o depoya girer. Bkz. ADR 0007.
-data/
+#
+# KÖKE SABİT (baştaki `/`) olmak ZORUNDA. Git'te baştaki eğik çizgi olmayan bir
+# kural HER DERİNLİKTE eşleşir; `data/` yazınca Unity'nin
+# `Assets/_Project/Data/` klasörünü de yuttu ve 28 ScriptableObject sessizce
+# dışarıda kaldı. Sessiz olmasının sebebi: `git add` yok sayılan bir yolu
+# uyarı vermeden atlar. Windows'ta `core.ignorecase` açık olduğu için
+# `Data` ile `data` da aynı sayılıyordu.
+/data/
 *.tif
 *.tiff
 !refs/maps/*.tif

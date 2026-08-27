@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8af49dad059c292499d936c8699b2df1, type: 3}
+  m_Name: WT_Faz0_Default
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Flight.WindTuning
+  airDensity: 1.225
+  wingArea: 15
+  mass: 100
+  cl0: 0.15
+  clPerRadian: 5
+  stallAngleDeg: 15
+  postStallClFalloff: 0.06
+  cd0: 0.03
+  inducedDragK: 0.0624
+  postStallCdRise: 0.02
+  minCommandAlphaDeg: 1
+  maxCommandAlphaDeg: 24
+  pitchStability: 0.8
+  stallBreakMoment: 1.5
+  minStabilityAuthority: 0.45
+  pitchAuthority: 2.2
+  rollAuthority: 1.6
+  maxBankAngleDeg: 55
+  yawStability: 2
+  angularDamping: 1.8
+  maxLandingSinkSpeed: 6
+  maxLandingTiltDeg: 40
+  globalWind: {x: 9, y: 0, z: 0}

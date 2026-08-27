@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ca5d15fe9753c34baf08bf4775a3653, type: 3}
+  m_Name: DD_D_Eyup
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Streaming.DistrictDef
+  districtId: D_Eyup
+  displayName: "Ey\xFCp"
+  priority: 3
+  kind: 0
+  summary: "Eyup Sultan ve cevresi. Plan Faz 1 madde 6: 'sonra Eyup' \u2014 dikey
+    dilimde iceriksiz siluet olarak kalir. | tekil kara 433 ha | yukle 700 m / bosalt
+    910 m (kenara uzaklik) | OYUN bolgesi \u2014 tarihsel mahalle siniri DEGIL"
+  sceneAddress: Districts/D_Eyup
+  boundary:
+  - {x: -4588.83, y: 2048.32}
+  - {x: -2747.12, y: 2422.31}
+  - {x: -2529.65, y: 3982.21}
+  - {x: -4229.85, y: 4833.06}
+  - {x: -5208.84, y: 3478.64}
+  center: {x: -3860.86, y: 3352.91}
+  radiusMeters: 1525.46
+  loadDistanceMeters: 700
+  unloadDistanceMeters: 910
+  landAreaHectares: 473.6
+  exclusiveLandAreaHectares: 433.1

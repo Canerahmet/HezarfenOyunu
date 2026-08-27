@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98b890c5ec5448944a3f92b409edabf6, type: 3}
+  m_Name: DistrictRegistry
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Streaming.DistrictRegistry
+  districts:
+  - {fileID: 11400000, guid: b2f845f9967d2b34ca3e47943f57ce25, type: 2}
+  - {fileID: 11400000, guid: 8b2cfaba16d077f40a433cb86e6e7e8c, type: 2}
+  - {fileID: 11400000, guid: 0e1150511dfc4eb40ac226beb5fcd8af, type: 2}
+  - {fileID: 11400000, guid: 6a8af60c2f91b964985d98b1c833249e, type: 2}
+  - {fileID: 11400000, guid: 756dc57e12131c44c90d1243e4a016b4, type: 2}
+  - {fileID: 11400000, guid: 15ef3a264e72d6047a038fd4580e3eac, type: 2}
+  - {fileID: 11400000, guid: 4c96782354e700a41a38ff5b8f9e5015, type: 2}
+  - {fileID: 11400000, guid: 500e23567d0afa44a856e1777079c01a, type: 2}

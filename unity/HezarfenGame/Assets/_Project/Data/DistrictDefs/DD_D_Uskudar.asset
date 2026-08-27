@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ca5d15fe9753c34baf08bf4775a3653, type: 3}
+  m_Name: DD_D_Uskudar
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Streaming.DistrictDef
+  districtId: D_Uskudar
+  displayName: "\xDCsk\xFCdar"
+  priority: 1
+  kind: 0
+  summary: "Mihrimah (Iskele) Camii, Dogancilar Meydani, Kiz Kulesi. Ucusun INIS
+    bolgesi. | tekil kara 388 ha | yukle 700 m / bosalt 910 m (kenara uzaklik) |
+    OYUN bolgesi \u2014 tarihsel mahalle siniri DEGIL"
+  sceneAddress: Districts/D_Uskudar
+  boundary:
+  - {x: 2051.06, y: -1468.07}
+  - {x: 4739.47, y: -1294.96}
+  - {x: 4940.01, y: 931.31}
+  - {x: 2988.57, y: 1663.64}
+  - {x: 2015.47, y: 86.2}
+  center: {x: 3346.92, y: -16.38}
+  radiusMeters: 1945.94
+  loadDistanceMeters: 700
+  unloadDistanceMeters: 910
+  landAreaHectares: 387.8
+  exclusiveLandAreaHectares: 387.8
