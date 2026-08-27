@@ -123,6 +123,16 @@ namespace Hezarfen.Editor.Gis
             public bool HasBozahane = true;
 
             /// <summary>
+            /// Sebil de <b>semt başına</b> sayılır. Vakıf kurumudur ama
+            /// çeşmeden farklıdır: çeşme mahallenin suyudur ve her mahallede
+            /// bulunur; sebil bir <b>hayır</b> kurumudur — birinin parasıyla
+            /// kurulur, bir görevli durur ve su dağıtır. Her mahallede sebil
+            /// olması, her mahallede bir hayır sahibi olması demekti.
+            /// Ölçüldü: 34 mahallelik Galata'da 34 sebil çıkıyordu.
+            /// </summary>
+            public bool HasSebil = true;
+
+            /// <summary>
             /// Sıbyan mektebi ve türbe **vakıf** kurumlarıdır: ikisi de bir
             /// müslüman vakfın parçasıdır ve mescitle birlikte kurulur. Balat'a
             /// sıbyan mektebi koymak dönem hatası olurdu — oradaki karşılığı
@@ -1453,7 +1463,7 @@ namespace Hezarfen.Editor.Gis
             //
             // Vakıf kurumudur (su vakfı), yani türbe ve mektep gibi yalnız
             // müslüman mahallesinde.
-            if (q.HasVakif)
+            if (q.HasVakif && q.HasSebil)
             {
                 var sebil = LoadMahalleCatalog().FindAll(v => v.name.StartsWith("Sebil"));
                 int sebilCount = 0;

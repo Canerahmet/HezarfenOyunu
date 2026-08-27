@@ -149,6 +149,7 @@ namespace Hezarfen.Editor.Gis
             var firin = Dagit(n, def.firinCount, seed ^ 0x55);
             var kahve = Dagit(n, def.kahvehaneCount, seed ^ 0x66);
             var boza = Dagit(n, def.bozahaneCount, seed ^ 0x77);
+            var sebil = Dagit(n, def.sebilCount, seed ^ 0x88);
 
             OttomanStreetBuilder.ResetQuarterState();
             toplamEv = 0;
@@ -164,6 +165,7 @@ namespace Hezarfen.Editor.Gis
                 q.HasFirin = firin.Contains(i);
                 q.HasKahvehane = kahve.Contains(i);
                 q.HasBozahane = boza.Contains(i);
+                q.HasSebil = sebil.Contains(i);
 
                 var qGo = new GameObject($"Mahalle_{i:00}");
                 qGo.transform.SetParent(root.transform, false);
@@ -318,6 +320,7 @@ namespace Hezarfen.Editor.Gis
                 HasFirin = false,
                 HasKahvehane = false,
                 HasBozahane = false,
+                HasSebil = false,
             };
         }
 

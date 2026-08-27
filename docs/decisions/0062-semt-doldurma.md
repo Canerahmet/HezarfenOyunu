@@ -72,12 +72,12 @@ fazla değil **eksik** üretsin.
 yeniden kurulacak — her kurulum 15 MB'lık bambaşka bir YAML üretecekti.
 ADR 0059'un yeniden üretim gürültüsü, sahne ölçeğinde.
 
-## Ölçülen sonuç — Galata
+## Ölçülen sonuç — Galata ve Üsküdar
 
 | ne | değer |
 |---|---:|
-| mahalle | 34 |
-| ev | 2 855 |
+| mahalle | 34 (Galata) + 30 (Üsküdar) |
+| ev | 2 892 + 2 632 = **5 524** |
 | mescit / mektep / çeşme / şadırvan | 34 (mahalle başına) |
 | kilise / hamam / medrese / han | 6 / 5 / 2 / 1 (semt bütçesi) |
 | fırın / kahvehane / bozahane | 10 / 8 / 3 |
@@ -94,15 +94,50 @@ göre seçilmiş, **ölçülmemiş** değerlerdir. Kaynak bulunursa değişir. S
 `DistrictDef` üzerinde durur, kodda değil — yani düzeltmek bir alan
 değiştirmektir.
 
+## Ölçüm — kule tepesinden 360°
+
+Kabul kriteri *"kule tepesinden 360° bakışta FPS hedefi tutuyor"* diyor.
+**FPS ölçülmedi, üçgen sayıldı** ve bu bilinçli: FPS tekrarlanabilir değildir
+(editörün yükü, arka plandaki içe aktarım, pencere boyutu sayıya karışır).
+`CityBudget` analitik sayar — her LODGroup için kameranın uzaklığına göre
+hangi kademenin etkin olacağı Unity'nin kendi formülüyle bulunur, sonra
+frustum içindekiler toplanır. Aynı sahne + aynı bakış = aynı sayı.
+
+Sekiz yön × beş eğim taranır ve **en pahalı kare** bütçeyi belirler.
+
+| | |
+|---|---:|
+| en kötü kare | yaw 45°, yatay |
+| üçgen | **173 217** |
+| renderer | 726 |
+| taranan LODGroup | 9 930 |
+| bütçe | 2 500 000 |
+| kullanım | **%7** |
+
+İki şey ölçümü düzeltti. **Yalnız yatay bakmak** yetmiyordu: kule
+tepesindeki oyuncu şehre aşağı bakar, o yüzden eğim taraması eklendi. Ve
+eğim işareti terstiydi — Unity'de pozitif X aşağı baktırır, benim
+değerlerim negatifti, yani kamerayı gökyüzüne çeviriyordum.
+
+En pahalı karenin **yatayda** çıkması ilk bakışta şüpheliydi ama doğru:
+aşağı bakan kamera yere yakın küçük bir alan görür, ufka bakan şehrin
+tamamını.
+
+**Bütçenin yalnızca %7'sinin kullanılması bir başarı değil, bir bulgudur:**
+LOD merdiveni (ADR 0061) selâtin camileri için ayarlandı ve eşik ekran
+yüksekliği oranı olduğu için 10 m'lik bir eve uygulandığında çok daha kısa
+mesafelere denk geliyor — ev 458 m'de orta kademeye, 800 m'de bloğa düşüyor.
+Kule tepesinden bakınca şehrin çoğu blok. Bütçe tutuyor ama **kalite
+bırakılmış olabilir**; bir sonraki tur bunu ölçmeli.
+
 ## Bitmeyenler
 
-- **Sebil mahalle başına** konuyor (34 tane). Çeşme mahalle başına doğrudur;
-  sebil hayır kurumudur ve her mahallede olmaz. Bütçeye alınmalı.
-- **Üsküdar** doldurulmadı (30 mahalle adayı ölçüldü, kurulmadı).
-- **Performans ölçülmedi.** Faz 4 bütçesi ekranda ≤2,5 M üçgen; semtin
-  LOD0 toplamı 6,9 M ama bu sahnedeki toplam, ekrandaki değil. Kule
-  tepesinden 360° ölçüm yapılmalı — kabul kriteri bunu istiyor.
-- Donatı geçişi (kayıklar, çamaşır ipleri, kuş sürüleri) yapılmadı.
+- ~~Sebil mahalle başına~~ — **düzeltildi**, semt bütçesine alındı (4).
+- **Draw call ölçülmedi.** Bütçenin ikinci yarısı (≤1500 draw call) GPU
+  Resident Drawer'a bağlı ve çalışma zamanı ölçümü ister.
+- **Ev LOD'ları fazla agresif olabilir** — yukarıdaki %7 bulgusu.
+- Donatı geçişinden **kayık ve pereme yapıldı**; kuyu, dükkân kepengi,
+  çamaşır ipi ve kuş sürüsü kaldı.
 
 İlgili: [ADR 0011](0011-walls-districts-streaming.md),
 [ADR 0024](0024-arazi-ortusu.md), [ADR 0059](0059-git-gecisi.md)

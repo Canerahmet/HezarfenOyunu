@@ -124,6 +124,11 @@ namespace Hezarfen.Streaming
         [Tooltip("Semtteki bozahane sayısı (taslak).")]
         public int bozahaneCount = 3;
 
+        [Tooltip("Semtteki sebil sayısı (taslak). Çeşme mahallenin " +
+                 "suyudur ve her mahallede bulunur; sebil HAYIR " +
+                 "kurumudur — birinin parasıyla kurulur.")]
+        public int sebilCount = 4;
+
         [Header("Faz 4 — nereye kurulmaz")]
         [Tooltip("Bu eğimin üstünde mahalle kurulmaz (derece). İstanbul'un " +
                  "yamaçlarında sokak yokuşu yanlamasına tarar; dikleştiği " +
