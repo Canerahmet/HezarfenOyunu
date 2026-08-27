@@ -1,0 +1,40 @@
+{
+ "generated_by": "tools/textures/gen_terrain_textures.py",
+ "license": "Kendi eserimiz — ucuncu taraf hakki yok",
+ "mask_layout": "R=Metallic G=AO B=Height A=Smoothness (HDRP TerrainLit)",
+ "resolution": 1024,
+ "layers": [
+  {
+   "name": "Earth",
+   "sizeMeters": 6.0,
+   "baseColorFile": "T_TerrainEarth_BC.png",
+   "normalFile": "T_TerrainEarth_N.png",
+   "maskFile": "T_TerrainEarth_MASK.png",
+   "note": "Islenmis/cignenmis duzluk; mahalle ve bostan zemini."
+  },
+  {
+   "name": "Grass",
+   "sizeMeters": 5.0,
+   "baseColorFile": "T_TerrainGrass_BC.png",
+   "normalFile": "T_TerrainGrass_N.png",
+   "maskFile": "T_TerrainGrass_MASK.png",
+   "note": "Yamacin varsayilan ortusu; ilkbaharda taze ot + maki."
+  },
+  {
+   "name": "Rock",
+   "sizeMeters": 9.0,
+   "baseColorFile": "T_TerrainRock_BC.png",
+   "normalFile": "T_TerrainRock_N.png",
+   "maskFile": "T_TerrainRock_MASK.png",
+   "note": "Dik yamacta cikan anakaya."
+  },
+  {
+   "name": "Shore",
+   "sizeMeters": 4.0,
+   "baseColorFile": "T_TerrainShore_BC.png",
+   "normalFile": "T_TerrainShore_N.png",
+   "maskFile": "T_TerrainShore_MASK.png",
+   "note": "Deniz seviyesi bandi ve deniz tabani; kum-cakil."
+  }
+ ]
+}

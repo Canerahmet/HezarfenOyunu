@@ -1,0 +1,319 @@
+{
+ "materials": [
+  {
+   "name": "M_Bark",
+   "kind": "pbr",
+   "asset": "bark_brown_01",
+   "sizeMeters": [
+    1.0,
+    1.0
+   ],
+   "roughness": 0.92,
+   "metallic": 0.0,
+   "baked": false,
+   "maskFile": "T_BarkBrown01_MASK.png",
+   "normalFile": "T_BarkBrown01_N.png",
+   "baseColorFile": "T_BarkBrown01_BC.jpg"
+  },
+  {
+   "name": "M_Bark_Cinar",
+   "kind": "pbr",
+   "asset": "bark_platanus",
+   "sizeMeters": [
+    1.5,
+    1.5
+   ],
+   "roughness": 0.88,
+   "metallic": 0.0,
+   "baked": false,
+   "maskFile": "T_BarkPlatanus_MASK.png",
+   "normalFile": "T_BarkPlatanus_N.png",
+   "baseColorFile": "T_BarkPlatanus_BC.jpg"
+  },
+  {
+   "name": "M_Brick_Band",
+   "kind": "pbr",
+   "asset": "brick_band",
+   "sizeMeters": [
+    0.75,
+    0.75
+   ],
+   "roughness": 0.8,
+   "metallic": 0.0,
+   "baked": false,
+   "maskFile": "T_BrickBand_MASK.png",
+   "normalFile": "T_BrickBand_N.png",
+   "baseColorFile": "T_BrickBand_BC.png"
+  },
+  {
+   "name": "M_Foliage_Cinar",
+   "kind": "pbr",
+   "asset": "foliage_cinar",
+   "sizeMeters": [
+    2.4,
+    2.4
+   ],
+   "roughness": 0.82,
+   "metallic": 0.0,
+   "baked": false,
+   "maskFile": "T_FoliageCinar_MASK.png",
+   "normalFile": "T_FoliageCinar_N.png",
+   "baseColorFile": "T_FoliageCinar_BC.png"
+  },
+  {
+   "name": "M_Foliage_Servi",
+   "kind": "pbr",
+   "asset": "foliage_servi",
+   "sizeMeters": [
+    1.6,
+    1.6
+   ],
+   "roughness": 0.78,
+   "metallic": 0.0,
+   "baked": false,
+   "maskFile": "T_FoliageServi_MASK.png",
+   "normalFile": "T_FoliageServi_N.png",
+   "baseColorFile": "T_FoliageServi_BC.png"
+  },
+  {
+   "name": "M_Glass_Filgozu",
+   "kind": "untextured",
+   "baseColor": [
+    0.42,
+    0.5,
+    0.52
+   ],
+   "roughness": 0.12
+  },
+  {
+   "name": "M_Lead_Sheet",
+   "kind": "pbr",
+   "asset": "lead_sheet",
+   "sizeMeters": [
+    2.0,
+    2.0
+   ],
+   "roughness": 0.42,
+   "metallic": 1.0,
+   "baked": false,
+   "maskFile": "T_LeadSheet_MASK.png",
+   "normalFile": "T_LeadSheet_N.png",
+   "baseColorFile": "T_LeadSheet_BC.png"
+  },
+  {
+   "name": "M_Marble_Kitabe",
+   "kind": "untextured",
+   "baseColor": [
+    0.4,
+    0.386,
+    0.356
+   ],
+   "roughness": 0.62
+  },
+  {
+   "name": "M_Marble_White",
+   "kind": "pbr",
+   "asset": "marble_white",
+   "sizeMeters": [
+    0.9,
+    0.9
+   ],
+   "roughness": 0.45,
+   "metallic": 0.0,
+   "baked": false,
+   "maskFile": "T_MarbleWhite_MASK.png",
+   "normalFile": "T_MarbleWhite_N.png",
+   "baseColorFile": "T_MarbleWhite_BC.png"
+  },
+  {
+   "name": "M_Opening_Shadow",
+   "kind": "untextured",
+   "baseColor": [
+    0.08,
+    0.07,
+    0.06
+   ],
+   "roughness": 0.95
+  },
+  {
+   "name": "M_Paving_Kaldirim",
+   "kind": "pbr",
+   "asset": "cobblestone_floor_001",
+   "sizeMeters": [
+    2.4,
+    2.4
+   ],
+   "roughness": 0.88,
+   "metallic": 0.0,
+   "baked": false,
+   "maskFile": "T_CobblestoneFloor001_MASK.png",
+   "normalFile": "T_CobblestoneFloor001_N.png",
+   "baseColorFile": "T_CobblestoneFloor001_BC.jpg"
+  },
+  {
+   "name": "M_Plaster_Grey",
+   "kind": "pbr",
+   "asset": "grey_plaster",
+   "sizeMeters": [
+    1.0,
+    1.0
+   ],
+   "roughness": 0.88,
+   "metallic": 0.0,
+   "baked": false,
+   "maskFile": "T_GreyPlaster_MASK.png",
+   "normalFile": "T_GreyPlaster_N.png",
+   "baseColorFile": "T_GreyPlaster_BC.jpg"
+  },
+  {
+   "name": "M_Plaster_Lime",
+   "kind": "pbr",
+   "asset": "painted_plaster_wall",
+   "sizeMeters": [
+    2.0,
+    2.0
+   ],
+   "roughness": 0.85,
+   "metallic": 0.0,
+   "baked": false,
+   "maskFile": "T_PaintedPlasterWall_MASK.png",
+   "normalFile": "T_PaintedPlasterWall_N.png",
+   "baseColorFile": "T_PaintedPlasterWall_BC.jpg"
+  },
+  {
+   "name": "M_Roof_Alaturka",
+   "kind": "pbr",
+   "asset": "clay_roof_tiles_02",
+   "sizeMeters": [
+    2.5,
+    2.5
+   ],
+   "roughness": 0.75,
+   "metallic": 0.0,
+   "baked": false,
+   "maskFile": "T_ClayRoofTiles02_MASK.png",
+   "normalFile": "T_ClayRoofTiles02_N.png",
+   "baseColorFile": "T_ClayRoofTiles02_BC.jpg"
+  },
+  {
+   "name": "M_Roof_Ceramic",
+   "kind": "pbr",
+   "asset": "ceramic_roof_01",
+   "sizeMeters": [
+    3.5,
+    3.5
+   ],
+   "roughness": 0.78,
+   "metallic": 0.0,
+   "baked": true,
+   "maskFile": "T_CeramicRoof01_MASK.png",
+   "normalFile": "T_CeramicRoof01_N.png",
+   "baseColorFile": "T_Roof_Ceramic_BC.png"
+  },
+  {
+   "name": "M_Stone_Cut",
+   "kind": "pbr",
+   "asset": "large_sandstone_blocks",
+   "sizeMeters": [
+    3.0,
+    3.0
+   ],
+   "roughness": 0.82,
+   "metallic": 0.0,
+   "baked": false,
+   "maskFile": "T_LargeSandstoneBlocks_MASK.png",
+   "normalFile": "T_LargeSandstoneBlocks_N.png",
+   "baseColorFile": "T_LargeSandstoneBlocks_BC.jpg"
+  },
+  {
+   "name": "M_Stone_Rubble",
+   "kind": "pbr",
+   "asset": "old_stone_wall",
+   "sizeMeters": [
+    2.0,
+    2.0
+   ],
+   "roughness": 0.9,
+   "metallic": 0.0,
+   "baked": false,
+   "maskFile": "T_OldStoneWall_MASK.png",
+   "normalFile": "T_OldStoneWall_N.png",
+   "baseColorFile": "T_OldStoneWall_BC.jpg"
+  },
+  {
+   "name": "M_Timber_AsiRed",
+   "kind": "pbr",
+   "asset": "weathered_planks",
+   "sizeMeters": [
+    2.0,
+    2.0
+   ],
+   "roughness": 0.8,
+   "metallic": 0.0,
+   "baked": true,
+   "maskFile": "T_WeatheredPlanks_MASK.png",
+   "normalFile": "T_WeatheredPlanks_N.png",
+   "baseColorFile": "T_Timber_AsiRed_BC.png"
+  },
+  {
+   "name": "M_Timber_Dark",
+   "kind": "pbr",
+   "asset": "weathered_planks",
+   "sizeMeters": [
+    2.0,
+    2.0
+   ],
+   "roughness": 0.82,
+   "metallic": 0.0,
+   "baked": true,
+   "maskFile": "T_WeatheredPlanks_MASK.png",
+   "normalFile": "T_WeatheredPlanks_N.png",
+   "baseColorFile": "T_Timber_Dark_BC.png"
+  },
+  {
+   "name": "M_Timber_Trim",
+   "kind": "pbr",
+   "asset": "weathered_planks",
+   "sizeMeters": [
+    2.0,
+    2.0
+   ],
+   "roughness": 0.8,
+   "metallic": 0.0,
+   "baked": true,
+   "maskFile": "T_WeatheredPlanks_MASK.png",
+   "normalFile": "T_WeatheredPlanks_N.png",
+   "baseColorFile": "T_Timber_Trim_BC.png"
+  },
+  {
+   "name": "M_Timber_TrimDark",
+   "kind": "pbr",
+   "asset": "weathered_planks",
+   "sizeMeters": [
+    2.0,
+    2.0
+   ],
+   "roughness": 0.82,
+   "metallic": 0.0,
+   "baked": true,
+   "maskFile": "T_WeatheredPlanks_MASK.png",
+   "normalFile": "T_WeatheredPlanks_N.png",
+   "baseColorFile": "T_Timber_TrimDark_BC.png"
+  },
+  {
+   "name": "M_Timber_Weathered",
+   "kind": "pbr",
+   "asset": "weathered_planks",
+   "sizeMeters": [
+    2.0,
+    2.0
+   ],
+   "roughness": 0.88,
+   "metallic": 0.0,
+   "baked": true,
+   "maskFile": "T_WeatheredPlanks_MASK.png",
+   "normalFile": "T_WeatheredPlanks_N.png",
+   "baseColorFile": "T_Timber_Weathered_BC.png"
+  }
+ ]
+}
