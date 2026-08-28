@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ea55f83962735f449d1f4d1c5b2f184, type: 3}
+  m_Name: NM_Esnaf
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.NPCMeslek
+  tip: 0
+  pay: 0.3
+  cizelge:
+  - vakit: 0
+    hedef: 1
+    olasilik: 0.55
+    disarida: 1
+  - vakit: 0
+    hedef: 2
+    olasilik: 0.45
+    disarida: 0
+  - vakit: 1
+    hedef: 5
+    olasilik: 0.9
+    disarida: 0
+  - vakit: 1
+    hedef: 4
+    olasilik: 0.1
+    disarida: 1
+  - vakit: 2
+    hedef: 1
+    olasilik: 0.45
+    disarida: 1
+  - vakit: 2
+    hedef: 5
+    olasilik: 0.55
+    disarida: 0
+  - vakit: 3
+    hedef: 5
+    olasilik: 0.85
+    disarida: 0
+  - vakit: 3
+    hedef: 3
+    olasilik: 0.15
+    disarida: 1
+  - vakit: 4
+    hedef: 6
+    olasilik: 0.35
+    disarida: 0
+  - vakit: 4
+    hedef: 1
+    olasilik: 0.35
+    disarida: 1
+  - vakit: 4
+    hedef: 2
+    olasilik: 0.3
+    disarida: 0
+  - vakit: 5
+    hedef: 2
+    olasilik: 1
+    disarida: 0
