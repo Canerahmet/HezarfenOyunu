@@ -82,6 +82,19 @@ namespace Hezarfen.Sehir
         {
             public int a, b;
             public float uzunluk;
+
+            /// <summary>
+            /// Bu kenar <b>kayıkla</b> geçilir — yürünmez.
+            ///
+            /// 1632'de Haliç'te köprü yok ve Boğaz'ı yürüyerek geçemezsin;
+            /// karşıya kayık ve peremeyle gidilir ve iskeleler tarifelidir
+            /// (RESEARCH §6). Bu yüzden ayrım bir bayrak değil bir
+            /// <b>mekanik</b>: kayık kenarı akçe ister, iskelede beklemek
+            /// ister, ve gece işlemeyebilir.
+            ///
+            /// Yol arama bunu bilmeden çalışırsa NPC suyun üstünde yürür.
+            /// </summary>
+            public bool kayik;
         }
 
         public List<Dugum> dugumler = new();
@@ -95,13 +108,18 @@ namespace Hezarfen.Sehir
             return n;
         }
 
-        /// <summary>Komşuluk listesi (düğüm başına komşu indeksleri).</summary>
-        public List<int>[] Komsuluk()
+        /// <summary>
+        /// Komşuluk listesi. `kayikVar=false` ise <b>yalnız yürünen</b>
+        /// kenarlar sayılır — kara parçalarının kendi içindeki bağlılığı
+        /// ölçmek için.
+        /// </summary>
+        public List<int>[] Komsuluk(bool kayikVar = true)
         {
             var k = new List<int>[dugumler.Count];
             for (int i = 0; i < k.Length; i++) k[i] = new List<int>();
             foreach (var e in kenarlar)
             {
+                if (!kayikVar && e.kayik) continue;
                 if (e.a < 0 || e.b < 0 || e.a >= k.Length || e.b >= k.Length)
                     continue;
                 k[e.a].Add(e.b);
@@ -117,10 +135,10 @@ namespace Hezarfen.Sehir
         /// yerinde döner ve "yapay zekâ bozuk" gibi görünür. Oysa bozuk
         /// olan haritadır.
         /// </summary>
-        public int EnBuyukBilesen()
+        public int EnBuyukBilesen(bool kayikVar = true)
         {
             if (dugumler.Count == 0) return 0;
-            var kom = Komsuluk();
+            var kom = Komsuluk(kayikVar);
             var gorildi = new bool[dugumler.Count];
             int enIyi = 0;
             var yigin = new Stack<int>();
@@ -164,14 +182,14 @@ namespace Hezarfen.Sehir
         /// Sezgisel gerçek maliyeti asla aşmaz (kenarlar en az kuş uçuşu
         /// kadar uzundur), yani bulunan yol en kısadır.
         /// </summary>
-        public List<int> Yol(int bas, int son)
+        public List<int> Yol(int bas, int son, bool kayikVar = true)
         {
             var yol = new List<int>();
             if (bas < 0 || son < 0 || bas >= dugumler.Count
                 || son >= dugumler.Count) return yol;
             if (bas == son) { yol.Add(bas); return yol; }
 
-            var kom = Komsuluk();
+            var kom = Komsuluk(kayikVar);
             int n = dugumler.Count;
             var g = new float[n];
             var f = new float[n];

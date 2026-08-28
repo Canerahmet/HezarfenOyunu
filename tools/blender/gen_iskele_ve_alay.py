@@ -104,6 +104,49 @@ def main():
         export_fbx(os.path.join(a.out_dir, "SM_UskudarIskelesi.fbx"),
                    collection_name=COLLECTION)
 
+    # --- Genel iskele (mahalle iskelesi) ----------------------------------
+    #
+    # Uskudar'inki ANA iskeledir ve camiye adini vermistir; Halic ile
+    # Bogaz'in obur agizlarindaki iskeleler daha kucuktur. Ayni prefab'i
+    # her yere koymak, Uskudar'in belgeli ozelligini (buyukluk, kayikhane)
+    # belgesi olmayan yerlere tasimak olurdu.
+    #
+    # Bu iskelenin KONUMU degil VARLIGI belgelidir: Evliya Unkapani ve
+    # Balikpazari iskelelerini faal sayar, Kasimpasa Tersanesi calisir,
+    # Karakoy Kapisi kiyiya acilir. Konum ayrica turetilir (kiyi cizgisine
+    # en yakin nokta + denize acilma) — Uskudar icin kullanilan yontemin
+    # ayni.
+    hz.reset_scene()
+    col = hz.collection(COLLECTION)
+    gp = wk.IskeleParams(length=wk.ISK_LEN * 0.68, width=wk.ISK_W * 0.80,
+                         piles=max(3, int(wk.IskeleParams().piles * 0.7)),
+                         kayikhane=False, palette=a.palette)
+    lod0, lod1, ucx, info = wk.build_iskele(gp, col, "Iskele",
+                                            textured=a.textured)
+    if info["material"] != "ahsap":
+        raise SystemExit("[HZ] HATA: 1632'de iskele AHSAPTIR.")
+    hz.log(f"Iskele (genel): {gp.length:.1f} x {gp.width:.1f} m, "
+           f"{gp.piles} kazik cifti")
+    info.update(name="Iskele", prefab="PF_Iskele", tier="T2",
+                status="draft",
+                source=("MAHALLE ISKELESI, 1632 — AHSAP. VARLIGI belgeli, "
+                        "KONUMU turetilmis. Evliya Unkapani ve Balikpazari "
+                        "iskelelerini faal sayar; Kasimpasa Tersanesi "
+                        "calisir; Karakoy Kapisi kiyiya acilir. Ama hicbiri "
+                        "metrik konum vermez. Konum, Uskudar iskelesi icin "
+                        "kullanilan YONTEMLE turetildi: capadan (cami, kule, "
+                        "mahalle merkezi) kendi 1632 kiyi cizgimize en yakin "
+                        "nokta, oradan denize acilma; yon kiyinin yerel "
+                        "normalinden — iskele kiyiya DIKTIR. Olcusu "
+                        "Uskudar'inkinden kucuk: o ana iskeledir ve camiye "
+                        "adini vermistir, otekilerin oyle bir kaydi yok."))
+    infos.append(info)
+    if a.blend_dir:
+        hz.save_blend(os.path.join(a.blend_dir, "Iskele.blend"))
+    if a.out_dir:
+        export_fbx(os.path.join(a.out_dir, "SM_Iskele.fbx"),
+                   collection_name=COLLECTION)
+
     # --- Alay Kosku -------------------------------------------------------
     hz.reset_scene()
     col = hz.collection(COLLECTION)
@@ -129,22 +172,53 @@ def main():
                    collection_name=COLLECTION)
 
     for i in infos:
-        if abs(i["pivot_min_z"]) > 0.01 and i["name"] != "UskudarIskelesi":
-            raise SystemExit(f"[HZ] HATA pivot {i['pivot_min_z']:.3f}")
+        # Muafiyet TURE gore, ADA gore degil.
+        #
+        # Once `!= "UskudarIskelesi"` yaziliydi ve tek iskele varken
+        # dogru calisiyordu. Ikinci iskele gelince muafiyet yalan
+        # soyledi: ayni tur, ayni gerekce, farkli ad. Bir kuralin
+        # gerekcesi "bu varlik" degil "bu tur varlik" ise, kural da
+        # ture bakmali.
+        #
+        # Iskelenin pivotu KIYI UCUNDADIR ve kaziklari suyun icinde
+        # asagi iner; sifir pivot beklemek onu havada birakirdi.
+        if abs(i["pivot_min_z"]) > 0.01 and i.get("kind") != "iskele":
+            raise SystemExit(
+                f"[HZ] HATA {i['name']} pivot {i['pivot_min_z']:.3f} — "
+                "yapinin tabani z=0'da olmali.")
+
+    def katalog_yaz(yol, kayitlar):
+        os.makedirs(os.path.dirname(os.path.abspath(yol)), exist_ok=True)
+        cat = {"variants": []}
+        if os.path.exists(yol):
+            with open(yol, encoding="utf-8") as fh:
+                cat = json.load(fh)
+        names = {i["name"] for i in kayitlar}
+        rest = [v for v in cat.get("variants", []) if v.get("name") not in names]
+        rest += kayitlar
+        rest.sort(key=lambda v: v["name"])
+        with open(yol, "w", encoding="utf-8") as fh:
+            json.dump({"variants": rest}, fh, ensure_ascii=False, indent=1)
+        hz.log(f"katalog: {yol} ({len(rest)} kayit)")
 
     if a.catalog:
-        os.makedirs(os.path.dirname(os.path.abspath(a.catalog)), exist_ok=True)
-        cat = {"variants": []}
-        if os.path.exists(a.catalog):
-            with open(a.catalog, encoding="utf-8") as fh:
-                cat = json.load(fh)
-        names = {i["name"] for i in infos}
-        rest = [v for v in cat.get("variants", []) if v.get("name") not in names]
-        rest += infos
-        rest.sort(key=lambda v: v["name"])
-        with open(a.catalog, "w", encoding="utf-8") as fh:
-            json.dump({"variants": rest}, fh, ensure_ascii=False, indent=1)
-        hz.log(f"katalog: {a.catalog} ({len(rest)} kayit)")
+        # LANDMARK KATALOGU BELGELI YAPILAR ICINDIR.
+        #
+        # Genel mahalle iskelesi landmark degil: adi yok, kaynagi yok,
+        # KONUMU turetilmis. Onu landmark katalogena yazinca var olan bir
+        # test hakli olarak itiraz etti — "her landmark T1 olmali" kurali
+        # o katalogun ne oldugunu soyluyordu ve ben oraya baska bir sey
+        # koymustum.
+        #
+        # Sehir donatisi `works` katalogunda yasar (arasta, bozahane,
+        # degirmen ile ayni yerde).
+        lm = [i for i in infos if i["name"] != "Iskele"]
+        donati = [i for i in infos if i["name"] == "Iskele"]
+        if lm:
+            katalog_yaz(a.catalog, lm)
+        if donati:
+            katalog_yaz(os.path.join("art", "blend", "works", "catalog.json"),
+                        donati)
 
     hz.log("gen_iskele_ve_alay OK")
 

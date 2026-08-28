@@ -51,6 +51,29 @@ namespace Hezarfen.Editor.Gis
         private const float MaxUzakKenar = 1200f;
 
         /// <summary>
+        /// İskeleye giden kenarın en uzak adayı (m).
+        ///
+        /// İskele kıyıdadır ve en yakın mahalle uzakta olabilir — Eyüp'ün
+        /// iskelesi semtin düğüm merkezinden 928 m, Üsküdar'ınki daha da
+        /// tenha bir noktada. 1200 m sınırıyla ikisi de <b>yalnız kayıkla</b>
+        /// erişilebilir kaldı; yani NPC iskeleye yürüyemiyor ama kayığa
+        /// binebiliyor, ki bu saçmadır.
+        ///
+        /// Ayrı bir sınır, çünkü ayrı bir şey: mahalleler arası geçit ile
+        /// kıyıya inen yol aynı ölçüyle sınırlanmaz.
+        /// </summary>
+        private const float MaxIskeleKenar = 2400f;
+
+        /// <summary>
+        /// İskele kenarında geçilebilen en geniş su açıklığı (m).
+        ///
+        /// Bir iskele güvertesi en çok ~34 m'dir (Üsküdar'ınki). Haliç
+        /// ağzı 700 m. Bu sayı ikisini ayırır: iskeleye uzanan tahtayı
+        /// geçmek serbest, boğazı geçmek değil.
+        /// </summary>
+        private const float MaxSuAcikligi = 50f;
+
+        /// <summary>
         /// Yürünebilir en dik eğim (derece).
         ///
         /// `CharacterController.slopeLimit` 55° ama o **tırmanılabilir**
@@ -95,7 +118,13 @@ namespace Hezarfen.Editor.Gis
         /// 1632'de Haliç'te köprü yok ve bu bir eksik değil ulaşım
         /// mekaniğidir (RESEARCH §6) — karşıya kayıkla geçilir.
         /// </summary>
-        private const float KaraKotu = 0.6f;
+        /// Değer 0,6 m'den 0,15 m'ye indirildi: aradaki fark **kıyı
+        /// şeridi**. Deniz seviyesiyle 0,6 m arasında kalan düz kumsal ve
+        /// rıhtım önü, 0,6 eşiğinde "su" sayılıyordu ve iskeleye giden
+        /// kenarlar oradan geçtiği için reddediliyordu — iskeleler
+        /// yürünemez kaldı. Karayı denizden ayıran şey deniz seviyesidir;
+        /// yarım metrelik pay, kıyıyı denize katıyordu.
+        private const float KaraKotu = 0.15f;
 
         private static readonly (string onek, SokakGrafi.Tur tur)[] Eslesme =
         {
@@ -159,6 +188,8 @@ namespace Hezarfen.Editor.Gis
             sb.AppendLine($"  arazi sahnesi: {graf.dugumler.Count - oncekiSayi} dugum");
 
             var (red, uzun) = Bagla(graf, terrain);
+            int kayik = KayikBagla(graf);
+            sb.AppendLine($"  {kayik} kayik kenari (iskeleler arasi)");
             sb.AppendLine($"  {graf.dugumler.Count} dugum, {graf.kenarlar.Count} "
                           + $"kenar ({uzun} mahalleler arasi, {red} aday "
                           + "egimden reddedildi)");
@@ -182,7 +213,7 @@ namespace Hezarfen.Editor.Gis
             // KENDI ICINDE bagli mi". Ilk yazimda toplam orana bakiyordum
             // ve o sayi iki ayri seyi -- gercek kopukluk ile denizi --
             // tek bir yuzdede karistiriyordu.
-            var kom = graf.Komsuluk();
+            var kom = graf.Komsuluk(kayikVar: false);
             var etiket = new int[graf.dugumler.Count];
             for (int i = 0; i < etiket.Length; i++) etiket[i] = -1;
             int bilesenSayisi = 0;
@@ -293,6 +324,38 @@ namespace Hezarfen.Editor.Gis
             else Debug.Log("[Hezarfen] " + sb);
         }
 
+        /// <summary>
+        /// İskeleleri birbirine <b>kayık</b> kenarlarıyla bağlar.
+        ///
+        /// Haliç ve Boğaz tek bir su kütlesidir, yani her iskeleden her
+        /// iskeleye kayık gider. Ama kenar yürüyen kenardan AYRI
+        /// işaretlenir: kayık akçe ister, iskelede beklemek ister, ve
+        /// bunu bilmeyen bir yol arama NPC'yi suyun üstünde yürütür.
+        ///
+        /// 1632'de Haliç'te köprü yoktur ve bu bir eksik değil ulaşım
+        /// mekaniğidir (RESEARCH BOLUM 6).
+        /// </summary>
+        private static int KayikBagla(SokakGrafi graf)
+        {
+            var iskeleler = new List<int>();
+            for (int i = 0; i < graf.dugumler.Count; i++)
+                if (graf.dugumler[i].tur == SokakGrafi.Tur.Iskele)
+                    iskeleler.Add(i);
+
+            int n = 0;
+            for (int a = 0; a < iskeleler.Count; a++)
+                for (int b = a + 1; b < iskeleler.Count; b++)
+                {
+                    int i = iskeleler[a], j = iskeleler[b];
+                    float d = Vector3.Distance(graf.dugumler[i].konum,
+                                               graf.dugumler[j].konum);
+                    graf.kenarlar.Add(new SokakGrafi.Kenar
+                    { a = i, b = j, uzunluk = d, kayik = true });
+                    n++;
+                }
+            return n;
+        }
+
         private static void Topla(Scene sahne, string semt, SokakGrafi graf)
         {
             if (!sahne.IsValid() || !sahne.isLoaded) return;
@@ -378,7 +441,8 @@ namespace Hezarfen.Editor.Gis
                     if (eklendi >= KomsuSayisi) break;
                     var anahtar = i < j ? (i, j) : (j, i);
                     if (kenar.Contains(anahtar)) { eklendi++; continue; }
-                    if (!Yurunebilir(terrain, n[i].konum, n[j].konum))
+                    if (!Yurunebilir(terrain, n[i].konum, n[j].konum,
+                                     Iskele(n[i], n[j])))
                     { red++; continue; }
                     Ekle(i, j, d);
                     eklendi++;
@@ -395,7 +459,9 @@ namespace Hezarfen.Editor.Gis
                 for (int j = i + 1; j < n.Count; j++)
                 {
                     float d = Vector3.Distance(n[i].konum, n[j].konum);
-                    if (d > MaxKenar && d <= MaxUzakKenar)
+                    float sinir = Iskele(n[i], n[j]) ? MaxIskeleKenar
+                                                     : MaxUzakKenar;
+                    if (d > MaxKenar && d <= sinir)
                         uzak.Add((i, j, d));
                 }
             uzak.Sort((a, b) => a.d.CompareTo(b.d));
@@ -404,7 +470,8 @@ namespace Hezarfen.Editor.Gis
             foreach (var (i, j, d) in uzak)
             {
                 if (Kok(i) == Kok(j)) continue;
-                if (!Yurunebilir(terrain, n[i].konum, n[j].konum))
+                if (!Yurunebilir(terrain, n[i].konum, n[j].konum,
+                                 Iskele(n[i], n[j])))
                 { red++; continue; }
                 Ekle(i, j, d);
                 uzunEklendi++;
@@ -413,13 +480,29 @@ namespace Hezarfen.Editor.Gis
         }
 
         /// <summary>
+        /// Uçlardan biri iskele mi — su kuralı orada geçerli değildir.
+        ///
+        /// Bir iskele <b>tanım gereği</b> karayla suyun sınırındadır ve
+        /// güvertesi suyun üstüne uzanır. Su kuralını ona da uygulamak
+        /// iskeleye giden HER kenarı reddetmek demekti — graf bunu
+        /// gösterdi: altı iskelenin altısı da kendi başına bir bileşendi,
+        /// yani <b>hiçbirine yürünemiyordu</b>. Faz 3'ten beri sahnede
+        /// duran Üsküdar iskelesi dahil.
+        ///
+        /// Kural doğruydu, kapsamı yanlıştı.
+        /// </summary>
+        private static bool Iskele(SokakGrafi.Dugum a, SokakGrafi.Dugum b)
+            => a.tur == SokakGrafi.Tur.Iskele || b.tur == SokakGrafi.Tur.Iskele;
+
+        /// <summary>
         /// İki nokta arası yürünebilir mi — <b>su</b> ve <b>eğim</b> ölçülür.
         ///
         /// Örnek sayısı uzunlukla artar. Sabit sayıda örnek almak uzun
         /// kenarlarda aldatıcıydı: 1 km'lik bir kenarda sekiz örnek 125
         /// metrede bir bakmak demek ve arada koca bir koy sığar.
         /// </summary>
-        private static bool Yurunebilir(Terrain terrain, Vector3 a, Vector3 b)
+        private static bool Yurunebilir(Terrain terrain, Vector3 a, Vector3 b,
+                                        bool suyaIzin = false)
         {
             float toplam = Vector3.Distance(a, b);
             if (toplam < 0.1f) return true;
@@ -429,11 +512,33 @@ namespace Hezarfen.Editor.Gis
             Vector3 o = terrain.transform.position;
             float once = terrain.SampleHeight(a) + o.y;
             float yatay = toplam / ornek;
+            float suAcikligi = 0f;
             for (int i = 1; i <= ornek; i++)
             {
                 Vector3 p = Vector3.Lerp(a, b, i / (float)ornek);
                 float h = terrain.SampleHeight(p) + o.y;
-                if (h < KaraKotu) return false;          // su
+                // Iskele kenarinda ARAZI olculmez: yurunen sey guvertedir.
+                // Ama SU ACIKLIGI olculur — ve bu sinir olmadan muafiyet
+                // Halic'in uzerinde bir yaya koprusu acti.
+                //
+                // Once muafiyeti kosulsuz yazdim: iskeleye giden kenar
+                // her seyden muaf. Sonuc, Eminonu iskelesinin hem
+                // Surici'ne hem Galata'ya baglanmasi ve NPC'lerin
+                // Halic'i YURUYEREK gecmesi oldu — tam da su kuralinin
+                // engellemek icin var oldugu sey. Bilesen sayisi ucten
+                // ikiye dustu ve bu bir iyilesme gibi GORUNDU.
+                //
+                // Dogru sinir mesafe degil, ustunden gecilen SU: bir
+                // iskele guvertesi en cok 34 m'dir; Halic agzi 700 m.
+                if (h < KaraKotu)
+                {
+                    if (!suyaIzin) return false;
+                    suAcikligi += yatay;
+                    if (suAcikligi > MaxSuAcikligi) return false;
+                    once = h;
+                    continue;
+                }
+                suAcikligi = 0f;
                 float egim = Mathf.Atan2(Mathf.Abs(h - once),
                                          Mathf.Max(0.01f, yatay))
                              * Mathf.Rad2Deg;

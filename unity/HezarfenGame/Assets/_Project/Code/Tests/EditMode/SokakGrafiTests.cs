@@ -172,6 +172,58 @@ namespace Hezarfen.Tests
                     $"Yolun {i}. adimi komsu degil — arama grafi atliyor.");
         }
 
+        /// <summary>
+        /// Kayık ağı var ve iskeleleri birbirine bağlıyor.
+        ///
+        /// 1632'de Haliç'te köprü yok; karşıya kayık ve peremeyle gidilir
+        /// ve iskeleler tarifelidir (RESEARCH §6). Bu yüzden kayık bir
+        /// süs değil <b>ulaşımın kendisi</b>.
+        /// </summary>
+        [Test]
+        public void TheBoatNetworkJoinsThePiers()
+        {
+            var g = Graf();
+            int iskele = g.Say(SokakGrafi.Tur.Iskele);
+            Assert.GreaterOrEqual(iskele, 4,
+                $"Yalnizca {iskele} iskele — Halic'in iki yakasi ve "
+                + "Uskudar en az dort iskele ister.");
+
+            int kayik = g.kenarlar.Count(e => e.kayik);
+            Assert.AreEqual(iskele * (iskele - 1) / 2, kayik,
+                "Her iskeleden her iskeleye kayik gitmeli: Halic ve Bogaz "
+                + "tek su kutlesidir.");
+
+            // Kayik kenarinin IKI ucu da iskele olmali.
+            foreach (var e in g.kenarlar.Where(x => x.kayik))
+            {
+                Assert.AreEqual(SokakGrafi.Tur.Iskele, g.dugumler[e.a].tur);
+                Assert.AreEqual(SokakGrafi.Tur.Iskele, g.dugumler[e.b].tur);
+            }
+        }
+
+        /// <summary>
+        /// Kayıkla şehrin tamamı gezilebilir; <b>yürüyerek değil</b>.
+        ///
+        /// Bu iki sayının farkı oyunun ulaşım mekaniğidir. Yürüyen graf
+        /// kara parçalarına bölünmüş olmalı — birleşikse suyun üstünde
+        /// bir yol var demektir.
+        ///
+        /// Bu test bir hatanın anısı: iskeleye giden kenarı her denetimden
+        /// muaf tutmuştum ve Eminönü iskelesi hem Suriçi'ne hem Galata'ya
+        /// bağlanınca <b>Haliç'in üstünde yaya köprüsü</b> oluştu. Bileşen
+        /// sayısı düştü ve bu bir iyileşme gibi göründü.
+        /// </summary>
+        [Test]
+        public void BoatsUniteTheCityButFeetDoNot()
+        {
+            var g = Graf();
+            Assert.AreEqual(g.dugumler.Count, g.EnBuyukBilesen(kayikVar: true),
+                "Kayikla bile sehrin tamami gezilemiyor.");
+            Assert.Less(g.EnBuyukBilesen(kayikVar: false), g.dugumler.Count,
+                "YURUYEREK sehrin tamami geziliyor — yani suyun ustunden "
+                + "bir yol var. 1632'de Halic'te kopru yoktur.");
+        }
+
         /// <summary>En yakın düğüm araması türe göre süzebiliyor.</summary>
         [Test]
         public void TheNearestSearchCanFilterByKind()
