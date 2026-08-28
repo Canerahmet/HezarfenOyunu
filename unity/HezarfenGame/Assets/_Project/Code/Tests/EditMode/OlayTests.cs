@@ -3,6 +3,7 @@ using Hezarfen.Sehir;
 using Hezarfen.Zaman;
 using NUnit.Framework;
 using UnityEditor;
+using UnityEngine;
 
 namespace Hezarfen.Tests
 {
@@ -291,21 +292,33 @@ namespace Hezarfen.Tests
                                               out int n) ? n : 0;
             }
 
-            // Temel pay: cizelgenin kendi payi (olaysiz).
-            float temel = 0f;
+            // BEKLENEN, `temel * katsayi` DEGILDIR.
+            //
+            // Ilk yazimda oyleydi ve test patladi (446 olculdu, 542
+            // bekleniyordu). Sebep veri degil aritmetik: cizelgesinde
+            // gunes vakti dukkan payi ZATEN 1 olan bir meslek daha fazla
+            // gonderemez. `p*k > 1` fiziksel olarak imkansizdir; doymus
+            // meslekler icin beklenen deger 1'de durur.
+            //
+            // Yani dogru olcu kisi basina `min(1, p*k)` toplamidir.
+            float temel = 0f, beklenen = 0f;
             foreach (var s in sakinler)
-                if (s.meslek != null)
-                    temel += s.meslek.Olasilik(VakitHesabi.Vakit.Gunes,
-                                               SokakGrafi.Tur.Dukkan);
+            {
+                if (s.meslek == null) continue;
+                float p = s.meslek.Olasilik(VakitHesabi.Vakit.Gunes,
+                                            SokakGrafi.Tur.Dukkan);
+                temel += p;
+                beklenen += Mathf.Min(1f, p * Olaylar.PazarKatsayisi);
+            }
 
             int olculen = Dukkan(VakitHesabi.Vakit.Gunes);
             Assert.Greater(temel, 0f, "Gunes vaktinde dukkan adimi yok.");
-
-            float beklenen = temel * Olaylar.PazarKatsayisi;
+            Assert.Greater(beklenen, temel,
+                "Carsi sabahi hic kimseyi fazladan cekmiyor.");
             Assert.That(olculen, Is.EqualTo(beklenen).Within(beklenen * 0.15f),
                 $"Carsi sabahi {olculen} kisi dukkanda; temel pay {temel:F0}, "
-                + $"katsayi {Olaylar.PazarKatsayisi} ise {beklenen:F0} "
-                + "bekleniyordu.");
+                + $"katsayi {Olaylar.PazarKatsayisi}, doyma sonrasi "
+                + $"beklenen {beklenen:F0}.");
         }
 
         /// <summary>
