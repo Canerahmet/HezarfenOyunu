@@ -593,6 +593,18 @@ namespace Hezarfen.Editor.Gis
                 t.treeBillboardDistance = 3000f;
                 t.treeCrossFadeLength = 40f;
                 t.treeMaximumFullLODCount = 150;
+
+                // GPU ORNEKLEME: gorsel bedeli YOK, o yuzden burada.
+                //
+                // Bir tur boyunca bu mesafeleri kisaltmayi denedim
+                // (billboard 180 m) ve olcum "iyilesti" — cunku orman
+                // 180 m'nin otesinde CIZILMIYORDU. Ustteki not zaten
+                // soyluyordu: bizim agaclar SpeedTree degil, Unity onlar
+                // icin billboard uretmez, mesafenin otesinde tamamen
+                // KAYBOLURLAR. Geri alindiginda sayilar kimildamadi
+                // (bos arazi 1440p 10,05 -> 10,03) — yani kazanc hic
+                // orada degilmis; SSGI'yi kapatan kademe gecisindenmis.
+                t.drawInstanced = true;
                 EditorUtility.SetDirty(t);
             }
         }
