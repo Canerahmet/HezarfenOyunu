@@ -1,6 +1,7 @@
 using System;
 using Hezarfen.Flight;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Hezarfen.Player
 {
@@ -73,8 +74,19 @@ namespace Hezarfen.Player
         public float temasMesafesi = 0.35f;
 
         [Header("Girdi")]
-        public KeyCode kusanTusu = KeyCode.E;
-        public KeyCode atlaTusu = KeyCode.Space;
+        /// <summary>
+        /// Girdi **yeni Input System**'den okunur, `UnityEngine.Input`'tan
+        /// değil.
+        ///
+        /// İlk yazımda `KeyCode` + `Input.GetKeyDown` kullanmıştım. Proje
+        /// Player Settings'te Input System paketine geçmiş durumda ve o
+        /// kipte eski API **çalışma anında istisna atar** — derleme
+        /// sessizdir, hata ancak oyun koşarken çıkar. PlayMode testi
+        /// yazılmasaydı bu, ilk oynayışta ortaya çıkardı.
+        /// </summary>
+        public Key kusanTusu = Key.E;
+
+        public Key atlaTusu = Key.Space;
 
         /// <summary>Şu anki durum — HUD ve test okur.</summary>
         public Durum Simdiki { get; private set; } = Durum.Yerde;
@@ -100,7 +112,7 @@ namespace Hezarfen.Player
             switch (Simdiki)
             {
                 case Durum.Yerde:
-                    if (Input.GetKeyDown(kusanTusu)) Kusan();
+                    if (Basildi(kusanTusu)) Kusan();
                     break;
 
                 case Durum.Kusaniyor:
@@ -109,7 +121,7 @@ namespace Hezarfen.Player
                     break;
 
                 case Durum.Hazir:
-                    if (Input.GetKeyDown(atlaTusu)) Atla();
+                    if (Basildi(atlaTusu)) Atla();
                     break;
 
                 case Durum.Ucuyor:
@@ -122,6 +134,13 @@ namespace Hezarfen.Player
                     if (_sayac <= 0f) { YereGec(); Gec(Durum.Yerde); }
                     break;
             }
+        }
+
+        /// <summary>Klavye yoksa (test, sunucu) sessizce false döner.</summary>
+        private static bool Basildi(Key k)
+        {
+            var kb = Keyboard.current;
+            return kb != null && kb[k].wasPressedThisFrame;
         }
 
         /// <summary>Kanadı kuşan — girdi bu süre boyunca kilitli.</summary>
