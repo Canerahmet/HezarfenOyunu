@@ -149,5 +149,16 @@ değişikliği değil.
 
 - EditMode **244 / 244 yeşil**, **sıfır atlanan**
 - `Assets/_Import` boş
-- git + LFS, `main` güncel
+- ~~git + LFS, `main` güncel~~ → **bu satır yanlıştı, 2026-08-28'de
+  düzeltildi.** Kod, ADR'ler ve kapı paketi girmişti; **içerik girmemişti**:
+  577 dosya, 1,51 milyon satır — 292 birleşik mesh varlığı (97 MB), beş
+  semt sahnesinin gerçek içeriği (142 mahalle, 12 248 ev) ve
+  `D_Tekneler.unity` (371 tekne). Taze bir klon semt sahnelerini **292
+  eksik mesh referansıyla** açardı, çünkü GUID'ler `.meta` dosyalarında
+  yaşar ve yeniden üretim yeni GUID basar.
+
+  Bunu buraya yazıyorum çünkü hata satırın kendisinde değil, **nasıl
+  yazıldığındaydı**: o satır bir ölçüm değil bir varsayımdı. `git status`
+  kaydırıp geçilecek kadar sakin görünüyordu. Aynı sınıf hata bu projede
+  daha önce `.gitignore` bağlamasında çıkmıştı.
 - 63 ADR
