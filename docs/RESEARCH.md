@@ -2209,6 +2209,24 @@ muvakkithane bir **mahalle mescidine değil, selâtin camisine** aittir. Biçim:
 - **Fiyat/para**: akçe temel birim, kuruş/altın üst birimler; narh defterleri ekmek/et/pirinç fiyatlarını verir. Evliya "40 akçe yevmiye ile sipahi", Lagari için "70 akça ile sipahi yazıldı" gibi referanslar verir. Kayıkçı/ırgat yevmiyeleri narh ve sicil kayıtlarından çıkarılmalı.
 - **Ulaşım**: kayık ve pereme (deniz taksisi) ana ulaşım; iskeleler tarifeli; at/katır karada; tekerlekli araba nadir. Boğaz ve Haliç geçişleri kayıkla.
 - **Kolluk/gece**: subaşı, asesbaşı, yeniçeri kolluğu; mahalle imamı kayıt/kefalet sorumlusu; geceleri fenersiz dolaşmak yasak.
+- **SAAT: alaturka (ezanî/gurûbî) — gün GÜN BATIMINDA başlar (T1)**. Osmanlı
+  günü eşit 12'şer saatlik iki yarıma bölünür ve **akşam ezanı okununda saat
+  12:00'ye kurulur**. Gün uzunluğu değiştikçe saatler her gün kaydırılır; öğle
+  ve gece yarısını 12:00 sayan Avrupa düzeni ayrı bir addadır (*zevalî* /
+  *alafranga*) ve ikisi geç Osmanlı'ya kadar **yan yana** kullanılmıştır.
+  Vakitleri hesaplayan ve saatleri kuran kişi **muvakkit**tir: matematik ve
+  astronomi eğitimli devlet görevlisi, muvakkithanede oturur (§4.6f — 1632'de
+  var ama yalnız selâtin camilerinde).
+  *Oyun karşılığı:* saat göstergesi ezanî olmalı; oyuncunun "gece yarısı"
+  dediği an ezanî saatte 5-6 civarındadır ve bu yabancılık kasıtlıdır. Vakitler
+  tablodan değil güneşten hesaplanır (`VakitHesabi`), çünkü İstanbul'da gün
+  uzunluğu 9,2 ile 15,1 saat arasında gider ve oyun üç yıllık takvim taşır.
+  **İkindi Hanefî ölçüsüyle** (gölge iki kat + öğle gölgesi) — Osmanlı
+  İstanbul'u Hanefî'dir; Şâfiî ölçüsü ikindiyi ~yarım saat erkene alır ve
+  bütün öğleden sonra rutinini kaydırırdı.
+  *Kaynak:* [Vikipedi, "Alaturka saat"](https://tr.wikipedia.org/wiki/Alaturka_saat);
+  [Wishnitzer, "Our Time: On the Durability of the Alaturka Hour System in the Late Ottoman Empire"](https://www.researchgate.net/publication/328554827);
+  [Osmanlı Dönemi İstanbul Muvakkithaneleri](https://www.academia.edu/20125826/).
 - **Eğlence**: meddah, Karagöz, kahvehane sohbeti — ama 1633 sonrası kahvehaneler yasaklı; boza/şerbet satıcıları, meyhaneler (gayrimüslim işletmeli, dönem dönem yasak).
 
 ### 7) SİYASİ VE ENTELEKTÜEL BAĞLAM
