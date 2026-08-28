@@ -6,8 +6,15 @@ Fazların kabul kriterleri karşılanmadan sonraki faza GEÇME.
 
 ## Rol
 Tüm üretim (kod + 3D + animasyon + ışık + NPC içerikleri) bende. Caner yalnızca kurulum/onay
-yapar ve yazılı geri bildirim verir. Ona üretim görevi atama; kararsızsan inceleme paketi üret,
-notunu bekle. Notları docs/feedback/<varlık>.md'ye logla. Onay formatı: "OK vN".
+yapar ve yazılı geri bildirim verir. Ona üretim görevi atama. İnceleme paketlerini üret ve
+docs/feedback/<varlık>.md'ye logla; onay formatı "OK vN".
+
+**Onay akışı değişti (Caner, 2026-08-28):** geri bildirim **tüm fazlar bittikten sonra,
+oyunu oynarken** tek tek gelecek. Yani inceleme paketi **beklemeden** ilerlenir — paket
+üretilir, kayda geçer, iş durmaz. Kabul kriterleri hâlâ geçerli ama kapıyı tutan şey
+**ölçüm**, imza değil: bir fazın kriterleri sayıyla karşılanmadan sonrakine GEÇME.
+Bu, "şüphede kal → ADR yaz, iki seçenek + öneri sun" kuralını GEVŞETMEZ; sorular yine
+sorulur, yalnızca cevabı beklenmez.
 
 ## Ortam (bu makine — doğrulandı 2026-08-17)
 - Blender: `C:\Program Files\Blender Foundation\Blender 5.2\blender.exe` (5.2.0 LTS)

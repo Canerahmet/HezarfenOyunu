@@ -1,0 +1,263 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEditor;
+using UnityEditor.Animations;
+using UnityEngine;
+
+namespace Hezarfen.Editor.Pipeline
+{
+    /// <summary>
+    /// <b>Animator kontrolcüsü — elle değil, ÜRETİLEREK.</b>
+    ///
+    /// Bir Animator grafiğini Unity penceresinde kurmak mümkün ve
+    /// çoğu proje öyle yapar. Bu projede yapamayız: CLAUDE.md'nin
+    /// kuralı "sadece sohbette var olan varlık yasak"tır ve elle
+    /// kurulmuş bir durum makinesi de aynı şeydir — kimse onu yeniden
+    /// üretemez, diff'i okunamaz, neden öyle olduğu bir yerde yazmaz.
+    ///
+    /// Bu araç grafiği <b>klip kataloğundan</b> kurar. Klip eklenince
+    /// yeniden koşulur ve grafik kendini günceller.
+    ///
+    /// ## Grafiğin şekli neden bu
+    ///
+    /// Uçuş oyunu iki ayrı dünyada geçer ve ikisi arasındaki geçiş
+    /// oyunun kendisidir:
+    ///
+    /// <list type="bullet">
+    /// <item><b>Yer</b> — locomotion (hız karışımı) ve merdiven. Burada
+    ///       ayak yere basar, kayma ölçülür (ADR 0067).</item>
+    /// <item><b>Hava</b> — süzülüş, iki eksenli karışım (pitch/roll).
+    ///       Burada ayak yoktur; okunacak şey gövdenin havayı nasıl
+    ///       kestiğidir.</item>
+    /// </list>
+    ///
+    /// Aradaki köprü <b>tek yönlü</b>: kuşanma → kalkış → süzülüş →
+    /// iniş. Çakılma her yerden erişilir çünkü her yerden düşülebilir.
+    /// </summary>
+    public static class AnimatorKur
+    {
+        private const string ModelDir = "Assets/_Project/Art/Models/Karakter";
+        private const string Cikti =
+            "Assets/_Project/Art/Animation/AC_Hezarfen.controller";
+
+        // Parametre adlari TEK YERDE: `HezarfenAnimator` bunlari okur.
+        public const string PHiz = "hiz";
+        public const string PTirmaniyor = "tirmaniyor";
+        public const string PUcuyor = "ucuyor";
+        public const string PPitch = "pitch";
+        public const string PRoll = "roll";
+        public const string TKusan = "kusan";
+        public const string TAtla = "atla";
+        public const string TIn = "in";
+        public const string TCakil = "cakil";
+
+        /// <summary>Locomotion karışımının hız düğümleri (m/s).</summary>
+        /// <remarks>
+        /// Sayılar klip kataloğundan gelir, buradan değil — ama düğüm
+        /// YERLERİ burada: duruş 0, yürüme 1,4, koşma 3,6. Bunlar
+        /// <c>WalkController.walkSpeed</c> / <c>runSpeed</c> ile aynı
+        /// olmak zorunda, yoksa oyuncu 1,4 m/s giderken karakter koşar.
+        /// </remarks>
+        private static readonly (string ad, float hiz)[] Locomotion =
+        {
+            ("Durus", 0f), ("Yurume", 1.4f), ("Kosma", 3.6f),
+        };
+
+        [MenuItem("Hezarfen/Boru Hatti/Animator kontrolcusunu uret")]
+        public static void Uret()
+        {
+            var klip = Klipler();
+            if (klip.Count == 0)
+            {
+                Debug.LogError("[Hezarfen] Klip yok. Once: "
+                    + "gen_animasyon.py -- --export, sonra "
+                    + "Hezarfen/Boru Hatti/Karakteri yerlestir.");
+                return;
+            }
+
+            string dizin = System.IO.Path.GetDirectoryName(Cikti);
+            if (!AssetDatabase.IsValidFolder(dizin))
+                AssetDatabase.CreateFolder(
+                    System.IO.Path.GetDirectoryName(dizin),
+                    System.IO.Path.GetFileName(dizin));
+
+            // Var olan varliğin USTUNE yazilir: yolu koruyarak yeniden
+            // uretmek GUID'i korur ve prefab/sahne referanslari kirilmaz.
+            var ac = AssetDatabase.LoadAssetAtPath<AnimatorController>(Cikti);
+            if (ac == null)
+                ac = AnimatorController.CreateAnimatorControllerAtPath(Cikti);
+            else
+                Temizle(ac);
+
+            ac.AddParameter(PHiz, AnimatorControllerParameterType.Float);
+            ac.AddParameter(PTirmaniyor, AnimatorControllerParameterType.Bool);
+            ac.AddParameter(PUcuyor, AnimatorControllerParameterType.Bool);
+            ac.AddParameter(PPitch, AnimatorControllerParameterType.Float);
+            ac.AddParameter(PRoll, AnimatorControllerParameterType.Float);
+            foreach (string t in new[] { TKusan, TAtla, TIn, TCakil })
+                ac.AddParameter(t, AnimatorControllerParameterType.Trigger);
+
+            var sm = ac.layers[0].stateMachine;
+            var sb = new StringBuilder("ANIMATOR");
+
+            // --- YER: locomotion karisimi ---------------------------------
+            var locoTree = new BlendTree
+            {
+                name = "Locomotion",
+                blendType = BlendTreeType.Simple1D,
+                blendParameter = PHiz,
+                useAutomaticThresholds = false,
+            };
+            AssetDatabase.AddObjectToAsset(locoTree, ac);
+            foreach (var (ad, hiz) in Locomotion)
+            {
+                if (!klip.TryGetValue(ad, out var c)) continue;
+                locoTree.AddChild(c, hiz);
+            }
+            var loco = sm.AddState("Locomotion");
+            loco.motion = locoTree;
+            sm.defaultState = loco;
+            sb.AppendLine($"  Locomotion: {locoTree.children.Length} dugum");
+
+            var merdiven = Durum(sm, klip, "Merdiven");
+
+            // --- HAVA: suzulus karisimi -----------------------------------
+            // 2D Freeform Cartesian: pitch YATAY eksen degil, ikisi de
+            // bagimsiz. Basit 1D olsaydi burun asagi ile sola yatis ayni
+            // eksende yarisirdi ve ikisi ayni anda yapilamazdi — oysa
+            // suzulusun tamami o ikisinin bilesimi.
+            var glideTree = new BlendTree
+            {
+                name = "Suzulme",
+                blendType = BlendTreeType.FreeformCartesian2D,
+                blendParameter = PPitch,
+                blendParameterY = PRoll,
+            };
+            AssetDatabase.AddObjectToAsset(glideTree, ac);
+            foreach (var (ad, x, y) in new[]
+            {
+                ("Suzulme", 0f, 0f),
+                ("Suzulme_Burun", -1f, 0f),
+                ("Suzulme_Kuyruk", 1f, 0f),
+                ("Suzulme_Sol", 0f, -1f),
+                ("Suzulme_Sag", 0f, 1f),
+            })
+            {
+                if (!klip.TryGetValue(ad, out var c)) continue;
+                glideTree.AddChild(c, new Vector2(x, y));
+            }
+            var suzulme = sm.AddState("Suzulme");
+            suzulme.motion = glideTree;
+            sb.AppendLine($"  Suzulme: {glideTree.children.Length} dugum "
+                          + "(2D pitch/roll)");
+
+            var kusanma = Durum(sm, klip, "Kusanma");
+            var kalkis = Durum(sm, klip, "Kalkis");
+            var inis = Durum(sm, klip, "Inis");
+            var cakilma = Durum(sm, klip, "Cakilma");
+
+            // --- GECISLER ---------------------------------------------------
+            // Merdiven: bool ile gider gelir (tirmanma bir DURUMDUR).
+            Gecis(loco, merdiven, 0.15f, (PTirmaniyor, true));
+            Gecis(merdiven, loco, 0.15f, (PTirmaniyor, false));
+
+            // Kusanma → Kalkis → Suzulme: TEK YONLU zincir. Kusanma
+            // bitmeden atlanamaz; kalkis bitmeden suzulunemez.
+            Tetik(loco, kusanma, 0.10f, TKusan);
+            Tetik(kusanma, kalkis, 0.12f, TAtla);
+            Cikis(kalkis, suzulme, 0.20f);
+
+            Tetik(suzulme, inis, 0.18f, TIn);
+            Cikis(inis, loco, 0.20f);
+
+            // Cakilma HER YERDEN erisilir: her yerden dusulebilir.
+            foreach (var s in new[] { loco, merdiven, kusanma, kalkis,
+                                      suzulme, inis })
+                Tetik(s, cakilma, 0.06f, TCakil);
+            Cikis(cakilma, loco, 0.35f);
+
+            EditorUtility.SetDirty(ac);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+
+            sb.AppendLine($"  {sm.states.Length} durum, "
+                          + $"{ac.parameters.Length} parametre");
+            sb.AppendLine($"  -> {Cikti}");
+            Debug.Log("[Hezarfen] " + sb);
+        }
+
+        /// <summary>Klipleri model klasöründen adlarıyla toplar.</summary>
+        private static Dictionary<string, AnimationClip> Klipler()
+        {
+            var d = new Dictionary<string, AnimationClip>();
+            foreach (string guid in AssetDatabase.FindAssets(
+                         "t:Model", new[] { ModelDir }))
+            {
+                string yol = AssetDatabase.GUIDToAssetPath(guid);
+                int at = yol.IndexOf('@');
+                if (at < 0) continue;
+                foreach (var c in AssetDatabase.LoadAllAssetsAtPath(yol)
+                             .OfType<AnimationClip>())
+                {
+                    if (c.name.StartsWith("__preview__")) continue;
+                    d[c.name] = c;
+                }
+            }
+            return d;
+        }
+
+        private static AnimatorState Durum(AnimatorStateMachine sm,
+            Dictionary<string, AnimationClip> klip, string ad)
+        {
+            var s = sm.AddState(ad);
+            if (klip.TryGetValue(ad, out var c)) s.motion = c;
+            else Debug.LogWarning($"[Hezarfen] '{ad}' klibi yok — durum bos.");
+            return s;
+        }
+
+        private static void Gecis(AnimatorState a, AnimatorState b,
+                                  float sure, (string ad, bool deger) kosul)
+        {
+            var t = a.AddTransition(b);
+            t.hasExitTime = false;
+            t.duration = sure;
+            t.AddCondition(kosul.deger ? AnimatorConditionMode.If
+                                       : AnimatorConditionMode.IfNot,
+                           0f, kosul.ad);
+        }
+
+        private static void Tetik(AnimatorState a, AnimatorState b,
+                                  float sure, string tetik)
+        {
+            var t = a.AddTransition(b);
+            t.hasExitTime = false;
+            t.duration = sure;
+            t.AddCondition(AnimatorConditionMode.If, 0f, tetik);
+        }
+
+        /// <summary>Klip bitince geçer — tek atımlık klipler için.</summary>
+        private static void Cikis(AnimatorState a, AnimatorState b, float sure)
+        {
+            var t = a.AddTransition(b);
+            t.hasExitTime = true;
+            t.exitTime = 0.92f;
+            t.duration = sure;
+        }
+
+        /// <summary>Yeniden üretimde eski grafiği siler; GUID kalır.</summary>
+        private static void Temizle(AnimatorController ac)
+        {
+            var sm = ac.layers[0].stateMachine;
+            foreach (var s in sm.states.ToArray())
+                sm.RemoveState(s.state);
+            foreach (var p in ac.parameters.ToArray())
+                ac.RemoveParameter(p);
+            // Blend tree'ler varliga gomulu alt nesnelerdir; durum
+            // silinince sahipsiz kalirlar ve dosyayi sisirirler.
+            foreach (var o in AssetDatabase.LoadAllAssetsAtPath(
+                         AssetDatabase.GetAssetPath(ac)))
+                if (o is BlendTree bt) Object.DestroyImmediate(bt, true);
+        }
+    }
+}
