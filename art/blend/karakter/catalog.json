@@ -1,0 +1,33 @@
+{
+ "variants": [
+  {
+   "name": "Hezarfen_Govde",
+   "prefab": null,
+   "kind": "karakter",
+   "state": "base",
+   "prefab_notu": "Rig ve kiyafet tamamlanmadan prefab uretilmez.",
+   "status": "draft",
+   "accuracy": "D3",
+   "tier": "T3",
+   "source": "HEZARFEN AHMED CELEBI'nin GOVDESI. Portresi YOKTUR — ne minyaturu, ne tarifi. RESEARCH.md: sahsi hakkinda bilinen tek sey Evliya'nin birkac cumlesidir. Bu yuzden govde bir BENZERLIK iddiasi tasimaz; donemin ve yerin genel yetiskin erkek anatomisidir. Taban geometri Blender Studio Human Base Meshes v1.4.1 (CC0, kayit: art/base/blender-studio/meta.json). Boy 1,70 m ve bu sayi keyfi degil: bu projenin butun inceleme paketleri 1,70 m'lik olcek figurune gore yargilandi; karakter baska boyda olsaydi sehir yanlis olcekte kurulmus olurdu. Yuz hedefi plan Bolum 10: stilize-gercekci, portre-fotogercekcilik DEGIL — zaten kopyalanacak bir portre yok.",
+   "taban_paket": "human-base-meshes-bundle-v1.4.1",
+   "taban_obje": "GEO-body_male_realistic",
+   "taban_lisans": "CC0-1.0",
+   "yon_duzeltme_derece": -180.0,
+   "olcek_carpani": 1.00594,
+   "tris_lod0": 21160,
+   "tris_lod1": 7406,
+   "uv_var": true,
+   "boy": 1.7,
+   "bas_boy": 0.2209,
+   "bas_orani": 7.7,
+   "en_genis": 0.8859,
+   "derinlik": 0.2922,
+   "boyun_genisligi": 0.1224,
+   "boyun_kotu": 1.479,
+   "omuz_genisligi": 0.4718,
+   "vertex": 10582,
+   "ucgen": 21160
+  }
+ ]
+}
