@@ -1,0 +1,136 @@
+{
+ "fps": 30,
+ "kaynak": "SK_Hezarfen_Ucus",
+ "klipler": [
+  {
+   "ad": "Durus",
+   "tur": "dongu",
+   "kare": 60,
+   "tempo": null,
+   "sure": 1.967,
+   "hiz": 0.0,
+   "dongu": true,
+   "kayma_cm": null
+  },
+  {
+   "ad": "Yurume",
+   "tur": "dongu",
+   "kare": 34,
+   "tempo": 109.1,
+   "sure": 1.1,
+   "hiz": 1.4,
+   "dongu": true,
+   "kayma_cm": 0.67
+  },
+  {
+   "ad": "Kosma",
+   "tur": "dongu",
+   "kare": 23,
+   "tempo": 163.6,
+   "sure": 0.733,
+   "hiz": 3.6,
+   "dongu": true,
+   "kayma_cm": 1.78
+  },
+  {
+   "ad": "Merdiven",
+   "tur": "dongu",
+   "kare": 39,
+   "tempo": 94.7,
+   "sure": 1.267,
+   "hiz": 0.41600000000000004,
+   "dongu": true,
+   "kayma_cm": 0.41
+  },
+  {
+   "ad": "Kusanma",
+   "tur": "tek",
+   "kare": 76,
+   "tempo": null,
+   "sure": 2.5,
+   "hiz": 0.0,
+   "dongu": false,
+   "kayma_cm": null
+  },
+  {
+   "ad": "Kalkis",
+   "tur": "tek",
+   "kare": 34,
+   "tempo": null,
+   "sure": 1.1,
+   "hiz": 0.0,
+   "dongu": false,
+   "kayma_cm": null
+  },
+  {
+   "ad": "Suzulme",
+   "tur": "poz",
+   "kare": 24,
+   "tempo": null,
+   "sure": 0.767,
+   "hiz": 0.0,
+   "dongu": true,
+   "kayma_cm": null
+  },
+  {
+   "ad": "Suzulme_Burun",
+   "tur": "poz",
+   "kare": 24,
+   "tempo": null,
+   "sure": 0.767,
+   "hiz": 0.0,
+   "dongu": true,
+   "kayma_cm": null
+  },
+  {
+   "ad": "Suzulme_Kuyruk",
+   "tur": "poz",
+   "kare": 24,
+   "tempo": null,
+   "sure": 0.767,
+   "hiz": 0.0,
+   "dongu": true,
+   "kayma_cm": null
+  },
+  {
+   "ad": "Suzulme_Sol",
+   "tur": "poz",
+   "kare": 24,
+   "tempo": null,
+   "sure": 0.767,
+   "hiz": 0.0,
+   "dongu": true,
+   "kayma_cm": null
+  },
+  {
+   "ad": "Suzulme_Sag",
+   "tur": "poz",
+   "kare": 24,
+   "tempo": null,
+   "sure": 0.767,
+   "hiz": 0.0,
+   "dongu": true,
+   "kayma_cm": null
+  },
+  {
+   "ad": "Inis",
+   "tur": "tek",
+   "kare": 46,
+   "tempo": null,
+   "sure": 1.5,
+   "hiz": 0.0,
+   "dongu": false,
+   "kayma_cm": null
+  },
+  {
+   "ad": "Cakilma",
+   "tur": "tek",
+   "kare": 30,
+   "tempo": null,
+   "sure": 0.967,
+   "hiz": 0.0,
+   "dongu": false,
+   "kayma_cm": null
+  }
+ ]
+}

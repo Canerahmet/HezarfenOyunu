@@ -319,5 +319,94 @@ namespace Hezarfen.Tests
                     $"{ad}: sol/sag x aynalanmiyor.");
             }
         }
+
+        // ---------------------------------------------------------- animasyon
+
+        [Serializable] private class AnimFile { public List<AnimKlip> klipler; }
+
+        [Serializable]
+        private class AnimKlip
+        {
+            public string ad;
+            public string tur;
+            public int kare;
+            public float sure;
+            public float hiz;
+            public bool dongu;
+            public float kayma_cm;
+        }
+
+        private static List<AnimKlip> Klipler()
+        {
+            string yol = Path.Combine(AssetCatalog.RepoRoot,
+                                      "art/blend/karakter/animasyon.json");
+            Assert.IsTrue(File.Exists(yol), $"Animasyon katalogu yok: {yol}");
+            var f = JsonUtility.FromJson<AnimFile>(File.ReadAllText(yol));
+            Assert.IsNotNull(f?.klipler, "Animasyon katalogu okunamadi.");
+            Assert.IsNotEmpty(f.klipler, "Katalogda hic klip yok.");
+            return f.klipler;
+        }
+
+        /// <summary>
+        /// Yere basan ayak kaymıyor.
+        ///
+        /// Bir yürüyüş döngüsünün "iyi göründüğü" bir görüştür; <b>yanlış
+        /// olduğu</b> bir ölçümdür ve tek sayıya iner. Adım uzunluğu ile
+        /// hız tutmuyorsa ayaklar paten kayar — oyun animasyonundaki en
+        /// görünür kusur, ve gözle bakınca "biraz tuhaf" diye geçiştirilir.
+        /// </summary>
+        [Test]
+        public void PlantedFeetDoNotSkate()
+        {
+            foreach (var k in Klipler())
+            {
+                if (k.tur != "dongu" || k.hiz < 0.01f) continue;
+                Assert.Less(k.kayma_cm, 5.0f,
+                    $"{k.ad}: ayak kaymasi {k.kayma_cm:0.0} cm. Adim "
+                    + $"uzunlugu {k.hiz:0.0} m/s hiziyla tutmuyor.");
+            }
+        }
+
+        /// <summary>
+        /// Yürüyüş temposu bir insana ait.
+        ///
+        /// Kaymayı sıfırlamak tek başına yetmez: adım uzunluğunu serbest
+        /// bırakıp süreyi uzatarak da sıfırlanır, ve o zaman karakter
+        /// 74 adım/dakika ile bir cenaze temposunda yürür. Gerçekten oldu.
+        /// </summary>
+        [Test]
+        public void TheWalkCadenceIsHuman()
+        {
+            foreach (var k in Klipler())
+            {
+                if (k.tur != "dongu" || k.hiz < 0.01f || k.sure < 0.01f)
+                    continue;
+                float tempo = 120f / k.sure;      // dongu = iki adim
+                Assert.That(tempo, Is.InRange(85f, 185f),
+                    $"{k.ad}: {tempo:0} adim/dk — insan 90-170 arasindadir.");
+            }
+        }
+
+        /// <summary>Planın istediği klipler eksiksiz.</summary>
+        [Test]
+        public void EveryClipThePlanAsksForExists()
+        {
+            var var_ = new HashSet<string>();
+            foreach (var k in Klipler()) var_.Add(k.ad);
+            // Plan Bolum 10: locomotion, tirmanma, kusanma, kalkis,
+            // suzulus (blend agaci), inis/yuvarlanma, cakilma.
+            string[] zorunlu =
+            {
+                "Durus", "Yurume", "Kosma", "Merdiven", "Kusanma",
+                "Kalkis", "Suzulme", "Inis", "Cakilma",
+            };
+            foreach (string z in zorunlu)
+                Assert.IsTrue(var_.Contains(z), $"'{z}' klibi yok.");
+            // Suzulus blend agaci: pitch ve roll uc pozlari.
+            foreach (string z in new[] { "Suzulme_Burun", "Suzulme_Kuyruk",
+                                         "Suzulme_Sol", "Suzulme_Sag" })
+                Assert.IsTrue(var_.Contains(z),
+                    $"'{z}' yok — pitch/roll blend agaci kurulamaz.");
+        }
     }
 }

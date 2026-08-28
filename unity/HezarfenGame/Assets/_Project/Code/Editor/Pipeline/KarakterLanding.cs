@@ -70,14 +70,49 @@ namespace Hezarfen.Editor.Pipeline
                     continue;
                 }
                 mi.animationType = ModelImporterAnimationType.Human;
-                mi.avatarSetup = ModelImporterAvatarSetup.CreateFromThisModel;
                 mi.importAnimation = true;
+                // `model@klip.fbx` bir ANIMASYON dosyasidir, model degil.
+                //
+                // Kendi avatarini kurdurursak her klip ayri bir avatar
+                // uretir; Unity onlari "ayni iskelet" saymaz ve klip
+                // modele takilmaz. Avatar MODELDEN kopyalanir.
+                int at = ad.IndexOf('@');
+                if (at > 0)
+                {
+                    string modelYol = $"{ModelDir}/{ad.Substring(0, at)}.fbx";
+                    var kaynak = AssetDatabase.LoadAllAssetsAtPath(modelYol)
+                        .OfType<Avatar>().FirstOrDefault();
+                    if (kaynak == null)
+                    {
+                        sb.AppendLine($"  {ad}: kaynak avatar yok ({modelYol}) "
+                                      + "— once modeli yerlestir.");
+                        continue;
+                    }
+                    mi.avatarSetup = ModelImporterAvatarSetup.CopyFromOther;
+                    mi.sourceAvatar = kaynak;
+                    // Dongu bayragi SaveAndReimport'tan ONCE yazilmali.
+                    // Ilk yazimda sonra cagiriyordum: ayar bellekte
+                    // duruyor, diske hic gitmiyordu ve butun klipler
+                    // "tek" kaliyordu. Sessiz bir hataydi — klipler
+                    // vardi, yalnizca donmuyorlardi.
+                    DonguBayragi(mi, ad.Substring(at + 1));
+                }
+                else
+                {
+                    mi.avatarSetup =
+                        ModelImporterAvatarSetup.CreateFromThisModel;
+                }
                 // 1 birim = 1 metre; Blender zaten metre yaziyor.
                 mi.globalScale = 1f;
                 mi.useFileScale = true;
                 mi.importNormals = ModelImporterNormals.Import;
                 mi.SaveAndReimport();
 
+                if (at > 0)
+                {
+                    sb.AppendLine(KlipRapor(ad, hedef, ref ok));
+                    continue;      // animasyon dosyasindan prefab uretilmez
+                }
                 sb.AppendLine(Rapor(ad, hedef, ref ok));
                 sb.AppendLine(Prefab(ad, hedef));
             }
@@ -86,6 +121,108 @@ namespace Hezarfen.Editor.Pipeline
             if (ok == fbx.Length) Debug.Log("[Hezarfen] " + sb);
             else Debug.LogError("[Hezarfen] " + sb);
             AssetDatabase.Refresh();
+        }
+
+        /// <summary>
+        /// Döngü bayrağını **katalogdan** okur, isim listesinden değil.
+        ///
+        /// Hangi klibin döngü olduğunu üreten taraf bilir
+        /// (`art/blend/karakter/animasyon.json`). Burada bir isim listesi
+        /// tutmak, listeye eklenmesi unutulan ilk klipte yalan söylerdi —
+        /// ve yalanı fark etmenin tek yolu oyunda ayakların takılmasını
+        /// izlemek olurdu.
+        ///
+        /// Döngü bayrağı olmayan bir yürüyüş klibi her tekrarda sıçrar.
+        /// </summary>
+        private static void DonguBayragi(ModelImporter mi, string klipAdi)
+        {
+            string yol = Path.Combine(AssetCatalog.RepoRoot,
+                                      "art/blend/karakter/animasyon.json");
+            if (!File.Exists(yol)) return;
+            var kat = JsonUtility.FromJson<AnimKatalog>(File.ReadAllText(yol));
+            if (kat?.klipler == null) return;
+            bool dongu = false, bulundu = false;
+            foreach (var k in kat.klipler)
+                if (k.ad == klipAdi) { dongu = k.dongu; bulundu = true; break; }
+            if (!bulundu) return;
+
+            var c = new ModelImporterClipAnimation
+            {
+                name = klipAdi,
+                takeName = klipAdi,
+                firstFrame = 0f,
+                lastFrame = Mathf.Max(1f, k_Kare(kat, klipAdi) - 1f),
+                loopTime = dongu,
+                loop = dongu,
+            };
+            mi.clipAnimations = new[] { c };
+        }
+
+        private static float k_Kare(AnimKatalog kat, string ad)
+        {
+            foreach (var k in kat.klipler) if (k.ad == ad) return k.kare;
+            return 2f;
+        }
+
+        [System.Serializable]
+        private class AnimKatalog { public List<AnimKlip> klipler; }
+
+        [System.Serializable]
+        private class AnimKlip
+        {
+            public string ad;
+            public bool dongu;
+            public int kare;
+        }
+
+        /// <summary>
+        /// Klipler gerçekten geldi mi — **kalıcı denetim**.
+        ///
+        /// Boru hattı bir kez koşar; bu her zaman koşulabilir. Bir
+        /// animasyon dosyasının Unity'de klip üretmemesi sessiz bir
+        /// hatadır: dosya orada durur, importer ayarları doğru görünür,
+        /// ve Animator'a bağlayana kadar hiçbir şey şikâyet etmez.
+        /// </summary>
+        [MenuItem("Hezarfen/Olcum/Karakter kliplerini denetle")]
+        public static void KlipleriDenetle()
+        {
+            var sb = new StringBuilder("KARAKTER KLIPLERI");
+            int toplam = 0, bos = 0;
+            foreach (string guid in AssetDatabase.FindAssets(
+                         "t:Model", new[] { ModelDir }))
+            {
+                string yol = AssetDatabase.GUIDToAssetPath(guid);
+                string ad = Path.GetFileNameWithoutExtension(yol);
+                if (!ad.Contains("@")) continue;
+                var kl = AssetDatabase.LoadAllAssetsAtPath(yol)
+                    .OfType<AnimationClip>()
+                    .Where(c => !c.name.StartsWith("__preview__")).ToArray();
+                toplam++;
+                if (kl.Length == 0) { bos++; sb.AppendLine($"  {ad}: KLIP YOK"); }
+                else
+                    sb.AppendLine($"  {ad}: {kl[0].name} {kl[0].length:0.00} s"
+                                  + $" {(kl[0].isLooping ? "dongu" : "tek")}"
+                                  + $" ({kl[0].frameRate:0} fps)");
+            }
+            sb.AppendLine($"{toplam - bos}/{toplam} dosyada klip var.");
+
+
+            if (bos == 0 && toplam > 0) Debug.Log("[Hezarfen] " + sb);
+            else Debug.LogError("[Hezarfen] " + sb);
+        }
+
+        /// <summary>Animasyon dosyasının kaç klip getirdiğini söyler.</summary>
+        private static string KlipRapor(string ad, string yol, ref int ok)
+        {
+            var klipler = AssetDatabase.LoadAllAssetsAtPath(yol)
+                .OfType<AnimationClip>()
+                .Where(c => !c.name.StartsWith("__preview__")).ToArray();
+            if (klipler.Length == 0)
+                return $"  {ad}: KLIP YOK — importAnimation kapali olabilir.";
+            ok++;
+            var k = klipler[0];
+            return $"  {ad}: {klipler.Length} klip, {k.length:0.00} s, "
+                   + $"{(k.isLooping ? "dongu" : "tek")}";
         }
 
         private static string Rapor(string ad, string yol, ref int ok)

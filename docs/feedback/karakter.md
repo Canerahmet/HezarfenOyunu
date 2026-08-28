@@ -122,11 +122,43 @@ Eklem yerleri tablodan değil **gövdeden ölçüldü**: dirsek %63,7, diz
 yakaladı — bir keresinde kol çizgisi **ayakları** kola sayıyordu ve
 bilek ayak bileği hizasına düşmüştü.
 
+## Animasyon — 13 klip, ölçülmüş
+
+Plan Bölüm 10'un istediği set hazır ve Unity'de: duruş, yürüme, koşma,
+merdiven, kuşanma, kalkış, süzülüş (+ pitch/roll blend ağacının dört uç
+pozu), iniş, çakılma.
+
+Animasyon bu projenin ölçemediği ilk şey gibi görünüyordu. Değilmiş —
+**yere basan ayak kaymamalı**, ve bu bir sayı:
+
+| klip | süre | tempo | ayak kayması |
+|---|---:|---:|---:|
+| Yürüme | 1,10 s | 110 adım/dk | **0,7 cm** |
+| Koşma | 0,73 s | 165 adım/dk | **1,8 cm** |
+| Merdiven | 1,27 s | 96 adım/dk | **0,4 cm** |
+
+Tempoyu da ölçüyorum, çünkü tek başına kaymayı sıfırlamak yetmiyor:
+adımı uzatıp süreyi de uzatarak sıfırlanır ve karakter **74 adım/dakika**
+ile cenaze temposunda yürür. Gerçekten oldu, sonra düzeltildi.
+
+Merdiven ayrı bir iş çıktı: tırmanan adamın gövdesi yükselir, ayağı
+basamakta durur. Düz zemin ölçütünü oraya uygulamak yanlış şeyi
+ölçmekti. Şimdi ayak yolu merdivenin geometrisinden türüyor (rıht
+0,19 m, basamak 0,26 m — **bunlar T2/taslak, Galata'nın merdiven ölçüsü
+kaynakta yok**) ve açılar IK ile çözülüyor.
+
+**Bu turda yedi hata buldum ve yedisi de ölçüm aletindeydi**, animasyonda
+değil. Bunu yazıyorum çünkü bir ders: bozuk olan çoğu zaman ölçtüğün şey
+değil, ölçtüğün şeyi ölçme biçimin.
+
 ## Bilerek yapılmayanlar
 
 - **Saç ve sakal** — hair cards, ayrı tur. Şu an gövde saçsız ve bu
   eksiklik render'da görünüyor.
-- **Animasyon** — sıradaki tur. Rig hazır, klipler yok.
+- **Animator kontrolcüsü ve blend ağacı** — klipler var, geçişleri
+  kuran durum makinesi yok. Sıradaki tur; Faz 5'in kabul ölçütü
+  ("kesintisiz oynanabiliyor") onu gerektiriyor.
+- **Üçüncü şahıs kamerası** (omuz-üstü ↔ geniş geçişi) — aynı tur.
 - **Yüz detayı** — taban ağın yüzü genel; Hezarfen'e ait bir yüz
   yapılmayacak, çünkü ait olduğu bir yüz yok.
 - **Animator ve kontrolcü** — prefab'larda Animator YOK. Boş bir
