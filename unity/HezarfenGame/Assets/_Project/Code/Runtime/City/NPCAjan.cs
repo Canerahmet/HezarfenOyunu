@@ -42,6 +42,17 @@ namespace Hezarfen.Sehir
         /// <summary>Yürüyüş hızı; kişiden kişiye biraz değişir.</summary>
         public float yurumeHizi = 1.4f;
 
+        /// <summary>
+        /// Bu vakit ne söylüyor — <see cref="BarkKorpusu"/>'ndan seçilmiş
+        /// replik. Vakit değişince yenilenir.
+        ///
+        /// Ajanda durmasının sebebi görünürlükten bağımsız olması: sakin
+        /// her zaman yaşar, yalnızca çizilmesi kademelidir. Repliği
+        /// gövdeye bağlasaydık, oyuncu yaklaşınca herkes aynı anda
+        /// konuşmaya başlardı.
+        /// </summary>
+        public Replik replik;
+
         /// <summary>Yolun sonuna geldi mi.</summary>
         public bool Vardi => yol.Count == 0 || adim >= yol.Count;
 

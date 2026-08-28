@@ -47,6 +47,9 @@ namespace Hezarfen.Sehir
         [Tooltip("Kamerayı/oyuncuyu izler. Boşsa ana kamera aranır.")]
         public Transform oyuncu;
 
+        [Tooltip("Aranma sistemi — replik seçimi buna bakar (Katman 2).")]
+        public AranmaSistemi aranma;
+
         [Header("Kademe")]
         [Tooltip("Şehirdeki toplam sakin sayısı.")]
         public int sakinSayisi = 1200;
@@ -156,6 +159,12 @@ namespace Hezarfen.Sehir
                 // Canli sehir ve simulasyon AYNI islevi cagirir; takvim
                 // ve olaylar yalniz orada uygulanir (ADR 0071).
                 var tur = Rutin.Hedef(a.meslek, _sonVakit, a.tohum, yil, gun);
+
+                // NE SOYLEYECEGI de vakitle birlikte secilir (Katman 2).
+                // Aranma durumu kolluk sisteminden gelir; yoksa temiz.
+                a.replik = BarkKorpusu.Sec(
+                    a.meslek.tip, _sonVakit, yil, gun,
+                    aranma != null && aranma.Seviye > 0f, a.tohum);
 
                 int bas = graf.EnYakin(a.konum);
                 int hedef = tur == SokakGrafi.Tur.Ev

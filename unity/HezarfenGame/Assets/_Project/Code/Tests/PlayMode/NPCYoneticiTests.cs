@@ -113,9 +113,77 @@ namespace Hezarfen.Tests
                          FindObjectsInactive.Include))
                 if (go != null && (go.name.Contains("yonetici")
                     || go.name.Contains("oyuncu") || go.name.Contains("zaman")
+                    || go.name.Contains("gosterici")
                     || go.name.Contains("Capsule")))
                     Object.DestroyImmediate(go);
             _kok = null;
+        }
+
+        /// <summary>
+        /// <b>Şehir gerçekten konuşuyor.</b>
+        ///
+        /// Beş bin replik üretmek şehri konuşturmaz; korpus bir dosyada
+        /// dururken oyuncu için hiç yoktur. Ölçü basit: yakındaki
+        /// sakinlerin başının üstünde <b>okunacak bir şey var mı</b>.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator TheCityActuallySpeaks()
+        {
+            var y = Kur();
+            var gGo = new GameObject("gosterici");
+            var g = gGo.AddComponent<BarkGosterici>();
+            g.yonetici = y;
+            g.oyuncu = y.oyuncu;
+            g.duyulmaMesafesi = 40f;
+            g.ayniAndaEnCok = 4;
+
+            yield return null;
+            yield return null;
+
+            int repligiOlan = y.Sakinler.Count(a => a.replik != null);
+            Assert.AreEqual(y.Sakinler.Count, repligiOlan,
+                $"{y.Sakinler.Count} sakinin {repligiOlan} tanesinin "
+                + "repligi var — kalani sessiz.");
+
+            foreach (var a in y.Sakinler)
+                Assert.IsFalse(string.IsNullOrWhiteSpace(a.replik.metin),
+                    "Bos replik atandi.");
+
+            Assert.Greater(g.GorunurReplik, 0,
+                "Oyuncunun yaninda kimse konusmuyor.");
+            Assert.LessOrEqual(g.GorunurReplik, g.ayniAndaEnCok,
+                $"{g.GorunurReplik} replik ayni anda gorunuyor — kalabalikta "
+                + "okunacak bir sey kalmaz.");
+        }
+
+        /// <summary>
+        /// <b>Uzaktaki kimse duyulmuyor.</b>
+        ///
+        /// Duyma mesafesi gerçek bir insan sesinin mesafesi kadar olmazsa
+        /// bütün şehir aynı anda kulağına konuşur.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator NobodyIsHeardFromAcrossTheCity()
+        {
+            var y = Kur();
+            var gGo = new GameObject("gosterici");
+            var g = gGo.AddComponent<BarkGosterici>();
+            g.yonetici = y;
+            g.oyuncu = y.oyuncu;
+            g.duyulmaMesafesi = 8f;
+
+            // OYUNCUYU SEHIRDEN UZAKLASTIR.
+            //
+            // Ilk yazimda oyuncu (0,0,0)'daydi ve test patladi: orasi
+            // 0 numarali EV dugumu, yani sakinlerin bir kismi tam
+            // oyuncunun ustunde duruyordu. Uc kisinin duyulmasi dogruydu;
+            // yanlis olan olcunun kurulusuydu.
+            y.oyuncu.position = new Vector3(1000f, 0f, 1000f);
+            yield return null;
+            yield return null;
+
+            Assert.AreEqual(0, g.GorunurReplik,
+                $"Sehirden 1 km uzakta {g.GorunurReplik} kisi duyuluyor.");
         }
 
         /// <summary>Sakinler dağıtıldı ve hepsinin bir mesleği var.</summary>
