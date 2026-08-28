@@ -1,0 +1,252 @@
+using System.Collections.Generic;
+using Hezarfen.Zaman;
+using UnityEngine;
+
+namespace Hezarfen.Sehir
+{
+    /// <summary>
+    /// <b>Şehrin sakinlerini yaşatır — ve ancak görülecek olanları çizer.</b>
+    ///
+    /// Faz 6'nın kabul ölçütü *"Galata'da 30 dk kesintisiz serbest
+    /// dolaşım"* diyor. İki bin sakini her karede canlandırmak o ölçütü
+    /// baştan kaybettirirdi. Bu yüzden iki kademe var:
+    ///
+    /// <list type="bullet">
+    /// <item><b>Sanal</b> — konumu ilerler, gövdesi yoktur. Bütün şehir
+    ///       her zaman böyle yaşar.</item>
+    /// <item><b>Görünür</b> — oyuncunun yakınındakiler bir gövde alır ve
+    ///       animasyonu oynar.</item>
+    /// </list>
+    ///
+    /// Ayrım <b>yaşamak</b> ile <b>görünmek</b> arasında, "var olmak" ile
+    /// "yok olmak" arasında değil. Oyuncu bir mahalleye girdiğinde insanlar
+    /// orada belirmez; zaten oradadırlar, artık çiziliyorlardır. Tersi,
+    /// dünyayı oyuncunun etrafında dönen bir sahneye çevirirdi ve
+    /// mahalleden çıkıp dönünce herkes başka bir hayat yaşıyor olurdu.
+    ///
+    /// ## Sanal sakinler seyrek güncellenir
+    ///
+    /// İki bin sakini her karede ilerletmek gereksiz: kimse bakmıyor.
+    /// Güncelleme <b>dilimlenir</b> — her karede listenin bir bölümü.
+    /// Hareket süreye bağlı olduğu için (`NPCAjan.Ilerle(dt)`) seyrek
+    /// güncellenen sakin yavaşlamaz, sadece daha büyük adımlarla yürür.
+    /// </summary>
+    [DisallowMultipleComponent]
+    public class NPCYonetici : MonoBehaviour
+    {
+        [Header("Veri")]
+        public SokakGrafi graf;
+        public List<NPCMeslek> meslekler = new();
+        public ZamanSistemi zaman;
+
+        [Header("Görsel")]
+        [Tooltip("NPC gövdesi. Şimdilik karakter prefabı — gövde " +
+                 "varyantları ayrı tur (ADR 0068).")]
+        public GameObject govdePrefab;
+
+        [Tooltip("Kamerayı/oyuncuyu izler. Boşsa ana kamera aranır.")]
+        public Transform oyuncu;
+
+        [Header("Kademe")]
+        [Tooltip("Şehirdeki toplam sakin sayısı.")]
+        public int sakinSayisi = 1200;
+
+        [Tooltip("Bu mesafeden yakındakiler gövde alır (m).")]
+        public float gorunurMesafe = 90f;
+
+        [Tooltip("Aynı anda en fazla kaç gövde. Bütçe: 30 dk kesintisiz " +
+                 "dolaşım bunu aşarsa kaybedilir.")]
+        public int govdeButcesi = 60;
+
+        [Tooltip("Her karede sanal sakinlerin kaçta biri güncellensin.")]
+        [Range(1, 60)] public int dilim = 12;
+
+        /// <summary>Şu an gövdesi olan sakin sayısı — tanı ve test okur.</summary>
+        public int GorunurSayisi { get; private set; }
+
+        /// <summary>Bütün sakinler (görünür olsun olmasın).</summary>
+        public IReadOnlyList<NPCAjan> Sakinler => _sakinler;
+
+        private readonly List<NPCAjan> _sakinler = new();
+        private readonly Stack<Transform> _havuz = new();
+        private int _dilimSayaci;
+        private float _sonGuncelleme;
+        private VakitHesabi.Vakit _sonVakit = (VakitHesabi.Vakit)(-1);
+
+        private void Start()
+        {
+            if (oyuncu == null && Camera.main != null)
+                oyuncu = Camera.main.transform;
+            Kur();
+        }
+
+        /// <summary>Sakinleri dağıtır ve ilk hedeflerini verir.</summary>
+        public void Kur()
+        {
+            _sakinler.Clear();
+            if (graf == null || meslekler.Count == 0) return;
+
+            foreach (var s in SehirGunu.Sakinler(graf, meslekler, sakinSayisi))
+            {
+                var a = new NPCAjan
+                {
+                    meslek = s.meslek,
+                    evDugum = s.evDugum,
+                    tohum = s.tohum,
+                    konum = graf.dugumler[s.evDugum].konum,
+                    // Herkes ayni hizda yurumez; %15'lik bir yayilim
+                    // kalabaligi "tek vucut" olmaktan cikarir.
+                    yurumeHizi = 1.4f * (0.85f + 0.30f
+                        * Mathf.Abs(Mathf.Sin(s.tohum * 0.618f))),
+                };
+                _sakinler.Add(a);
+            }
+            _sonVakit = (VakitHesabi.Vakit)(-1);
+            _sonGuncelleme = Time.time;
+        }
+
+        private void Update()
+        {
+            if (graf == null || _sakinler.Count == 0) return;
+
+            // --- VAKIT DEGISTI MI: herkese yeni hedef ------------------
+            if (zaman != null && zaman.Vakit != _sonVakit)
+            {
+                _sonVakit = zaman.Vakit;
+                HedefleriYenile();
+            }
+
+            // --- SANAL: dilimlenmis ilerleme ---------------------------
+            float simdi = Time.time;
+            float dt = simdi - _sonGuncelleme;
+            _sonGuncelleme = simdi;
+
+            // GECEN SUREYI SINIRLA.
+            //
+            // Iki sebep, ikisi de yasandi:
+            //
+            //  * `_sonGuncelleme` sifirdan baslarsa ilk karedeki `dt`
+            //    oyunun basindan beri gecen suredir. Sehrin tamami
+            //    hedefine ISINLANIR ve sonra hic kimildamaz — test
+            //    "30 sakinin 2'si yurudu" dedi.
+            //  * Yukleme ya da duraksama sonrasi buyuk bir `dt` ayni
+            //    seyi yapar. Sinir olmadan her takilma sehri bir anda
+            //    ileri sariyor.
+            dt = Mathf.Clamp(dt, 0f, 0.5f);
+
+            int bas = _dilimSayaci;
+            _dilimSayaci = (_dilimSayaci + 1) % dilim;
+            // Dilimlenen sakin `dilim` kare bekledi; gectigi sure o kadar.
+            float dilimDt = dt * dilim;
+            for (int i = bas; i < _sakinler.Count; i += dilim)
+                _sakinler[i].Ilerle(graf, dilimDt);
+
+            // --- GORUNUR KADEME ----------------------------------------
+            KademeYenile();
+        }
+
+        private void HedefleriYenile()
+        {
+            int yil = zaman != null ? zaman.yil : 1632;
+            int gun = zaman != null ? zaman.yilinGunu : 121;
+
+            foreach (var a in _sakinler)
+            {
+                if (a.meslek == null) continue;
+                var tur = a.meslek.Hedef(_sonVakit, a.tohum);
+
+                // Kapali bir binaya kimse gitmez (ADR 0070).
+                if (tur == SokakGrafi.Tur.Kahvehane
+                    && !Kronoloji.KahvehaneAcik(yil, gun))
+                    tur = SokakGrafi.Tur.Ev;
+
+                int bas = graf.EnYakin(a.konum);
+                int hedef = tur == SokakGrafi.Tur.Ev
+                    ? a.evDugum
+                    : graf.EnYakin(a.konum, tur);
+                if (hedef < 0) hedef = a.evDugum;
+
+                // Kayik KULLANILMAZ: rutin gundelik hayattir ve kimse
+                // her ogle namazi icin Bogaz'i gecmez. Kayik yolculugu
+                // bir GOREVDIR, rutin degil.
+                a.YolaKoy(graf.Yol(bas, hedef, kayikVar: false), hedef);
+            }
+        }
+
+        private void KademeYenile()
+        {
+            Vector3 merkez = oyuncu != null ? oyuncu.position : Vector3.zero;
+            float d2 = gorunurMesafe * gorunurMesafe;
+            int gorunur = 0;
+
+            foreach (var a in _sakinler)
+            {
+                bool yakin = (a.konum - merkez).sqrMagnitude <= d2
+                             && gorunur < govdeButcesi;
+                if (yakin)
+                {
+                    if (a.govde == null) a.govde = GovdeAl();
+                    if (a.govde != null)
+                    {
+                        a.govde.position = a.konum;
+                        if (a.hiz > 0.05f)
+                        {
+                            var yon = a.YonBul(graf);
+                            if (yon.sqrMagnitude > 1e-4f)
+                                a.govde.rotation = Quaternion.LookRotation(yon);
+                        }
+                        var an = a.govde.GetComponentInChildren<Animator>();
+                        if (an != null) an.SetFloat("hiz", a.hiz);
+                        gorunur++;
+                    }
+                }
+                else if (a.govde != null)
+                {
+                    GovdeBirak(a.govde);
+                    a.govde = null;
+                }
+            }
+            GorunurSayisi = gorunur;
+        }
+
+        /// <summary>
+        /// Gövde havuzu — <b>Instantiate/Destroy yok</b>.
+        ///
+        /// Oyuncu yürüdükçe sakinler sürekli menzile girip çıkar. Her
+        /// girişte yaratıp her çıkışta yok etmek, otuz dakikalık bir
+        /// dolaşımda binlerce tahsis ve düzenli çöp toplama duraksaması
+        /// demekti — yani tam olarak kabul ölçütünün kaybedildiği yer.
+        /// </summary>
+        private Transform GovdeAl()
+        {
+            if (_havuz.Count > 0)
+            {
+                var t = _havuz.Pop();
+                t.gameObject.SetActive(true);
+                return t;
+            }
+            if (govdePrefab == null) return null;
+            var go = Instantiate(govdePrefab, transform);
+            return go.transform;
+        }
+
+        private void GovdeBirak(Transform t)
+        {
+            t.gameObject.SetActive(false);
+            _havuz.Push(t);
+        }
+    }
+
+    /// <summary>Ajanın bakış yönü — yolun bir sonraki adımına doğru.</summary>
+    public static class NPCAjanUzanti
+    {
+        public static Vector3 YonBul(this NPCAjan a, SokakGrafi graf)
+        {
+            if (graf == null || a.Vardi) return Vector3.zero;
+            var hedef = graf.dugumler[a.yol[a.adim]].konum;
+            var d = hedef - a.konum;
+            d.y = 0f;
+            return d;
+        }
+    }
+}
