@@ -17,6 +17,19 @@
 | Veri | Kaynak | Lisans | Durum | Tarih |
 |---|---|---|---|---|
 | Copernicus DEM GLO-30 (4 karo: N40/N41 × E028/E029) | `copernicus-dem-30m.s3.amazonaws.com` (AWS Open Data) | Serbest kullanım, **atıf zorunlu** | Kullanımda — `data/gis/istanbul/` | 2026-08-18 |
+| Blender Studio **Human Base Meshes** bundle v1.4.1 | `download.blender.org/demo/asset-bundles/human-base-meshes/human-base-meshes-bundle-v1.4.1.zip` | **CC0** (kamu malına bırakılmış; atıf zorunlu değil, ticari kullanım serbest) | Faz 5 taban geometrisi — `art/base/blender-studio/` (depoya girmez, `meta.json` girer) | 2026-08-28 |
+
+### Human Base Meshes hakkında not
+
+Plan Bölüm 10 taban geometriyi bu kaynağa bağlıyor. **CC0 olduğu için
+atıf hukuken zorunlu değil** — ama künyeye yine de yazılacak, çünkü bu
+proje kullandığı her şeyin nereden geldiğini söylemeyi kural edindi ve
+"zorunlu değil" ile "söylemeye değmez" aynı şey değil.
+
+`.blend` dosyası depoya **girmez** (yeniden indirilebilir üçüncü taraf
+kaynağı); ondan türeyen Hezarfen gövdesi girer. Kayıt `meta.json`da:
+sürüm, SHA-256 ve indirme tarihi. Sürüm değişirse tabanın değiştiğini
+o dosyadan anlarız.
 
 ### ⚠️ Copernicus DEM — ZORUNLU ATIF METNİ
 

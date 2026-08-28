@@ -96,3 +96,18 @@ art/textures/hdri/**/*.jpg
 
 # Claude Code makineye özel izinler (paylaşılan ayar .claude/settings.json'da)
 .claude/settings.local.json
+
+# --- Blender Studio Human Base Meshes (CC0) ------------------------------
+# Yeniden indirilebilir ucuncu taraf kaynagi: dosya girmez, KAYIT girer.
+# Dosya turuyle dislaniyor, DIZINLE degil — dizini dislarsan git icine hic
+# inmez ve `!meta.json` geri-dahil kurali asla calismaz (bu hata polyhaven
+# yolunda bir kez yasandi, .gitignore satir 86).
+# Indirilen paketin KLASORUNU tumden disla: icinde .blend disinda
+# blender_assets.cats.txt gibi dosyalar da var ve dosya turuyle saymak
+# birini kacirir (ilk yazimda kacirdi). `meta.json` bir ust duzeyde
+# durdugu icin bu kural ona dokunmaz — polyhaven'daki "dizini disladin,
+# geri-dahil calismiyor" tuzagi burada YOK.
+art/base/**/*-bundle-*/
+art/base/**/*.zip
+art/base/**/*.blend
+art/base/**/*.fbx

@@ -1,0 +1,26 @@
+{
+ "kaynak": "Blender Studio — Human Base Meshes bundle",
+ "surum": "v1.4.1",
+ "url": "https://download.blender.org/demo/asset-bundles/human-base-meshes/human-base-meshes-bundle-v1.4.1.zip",
+ "lisans": "CC0-1.0",
+ "lisans_notu": "Kamu malına bırakılmış. Atıf hukuken zorunlu değil; künyeye yine de yazılıyor — bu proje kullandığı her şeyin nereden geldiğini söylemeyi kural edindi ve 'zorunlu değil' ile 'söylemeye değmez' aynı şey değil.",
+ "indirme_tarihi": "2026-08-28",
+ "sha256": "811f43accbb31a88266d932f8f5563b2d13586fca0ba2693aad1f5fe582b3515",
+ "boyut_bayt": 51380224,
+ "depoya_girer": false,
+ "depoya_girmeme_gerekcesi": "Yeniden indirilebilir üçüncü taraf kaynağı (CLAUDE.md sürüm kontrolü bölümü). Bu kayıt girer; dosya girmez. Türetilen Hezarfen gövdesi girer.",
+
+ "secilen_taban": "GEO-body_male_realistic",
+ "secim_gerekcesi": "Pakette dört tam gövde var. Seçim ÖLÇÜMLE yapıldı, üslupla değil: bu projenin bütün inceleme paketleri (renders/review/**) 1,70 m'lik bir ölçek figürüne göre yargılandı — 36 landmark, 142 mahalle, 12 248 ev. 'body_male_realistic' 1,69 m; 'body_male_stylized' 1,80 m. Stilize gövdeyi seçmek şimdiye kadar verilmiş her ölçek kararını sessizce %6 kaydırırdı. Plan Bölüm 10 'stilize-gerçekçi' diyor ve bu projede stilizasyon ORANDAN değil malzeme/gölgeleme dilinden gelir.",
+
+ "govdeler": [
+  {"ad": "GEO-body_male_realistic",   "vertex": 10582, "yukseklik_m": 1.69},
+  {"ad": "GEO-body_male_stylized",    "vertex": 12502, "yukseklik_m": 1.80},
+  {"ad": "GEO-body_female_realistic", "vertex": 10582, "yukseklik_m": 1.64},
+  {"ad": "GEO-body_female_stylized",  "vertex": 12502, "yukseklik_m": 1.62}
+ ],
+ "armature_var_mi": false,
+ "armature_notu": "Pakette rig yok — Rigify ile kurulacak (plan Bölüm 10).",
+
+ "faz6_notu": "NPC gövde varyantları aynı tabandan türetilecek; kadın gövdeleri de bu yüzden burada kayıtlı."
+}
