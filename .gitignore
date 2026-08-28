@@ -111,3 +111,17 @@ art/base/**/*-bundle-*/
 art/base/**/*.zip
 art/base/**/*.blend
 art/base/**/*.fbx
+
+# APV prob verisi — TURETILMIS ve BUYUK.
+#
+# Bir sahnenin prob pisirmesi 26 MB tutuyor ve Faz 7 boyunca isik
+# ayarlandikca defalarca yeniden pisecek. Her pisirme LFS'e KALICI yeni
+# bir kopya yazardi (CLAUDE.md: "yeniden uretim gurultusu LFS'e KALICI
+# yazilir"). Kural zaten yazili: turetilmis veri girmez, KAYDI girer —
+# pisirme ayarlari ADR 0072'de, komut menude.
+#
+# Faz 8'de (paketleme) isik kesinlestiginde yeniden degerlendirilecek.
+**/LightingData-*.asset
+**/LightingData-*.asset.meta
+**/*Baking Set*.bytes
+**/*Baking Set*.bytes.meta
