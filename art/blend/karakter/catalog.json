@@ -46,9 +46,9 @@
    "derinlik": 0.5456,
    "etek_kotu": 0.093,
    "dizlik": false,
-   "giysi_parca": 8,
-   "tris_lod0": 60068,
-   "tris_lod1": 18020,
+   "giysi_parca": 67,
+   "tris_lod0": 61720,
+   "tris_lod1": 18516,
    "kemik": 22,
    "kemikler": [
     {
@@ -290,9 +290,9 @@
    "derinlik": 0.6179,
    "etek_kotu": 0.535,
    "dizlik": true,
-   "giysi_parca": 10,
-   "tris_lod0": 60388,
-   "tris_lod1": 18116,
+   "giysi_parca": 69,
+   "tris_lod0": 62040,
+   "tris_lod1": 18612,
    "kemik": 22,
    "kemikler": [
     {

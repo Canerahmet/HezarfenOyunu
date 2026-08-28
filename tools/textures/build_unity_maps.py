@@ -181,8 +181,28 @@ def verify_mask(arm_path, mask_path):
 
 
 # -------------------------------------------------------------------- ana
+#: Paletin DISINDA kalan malzemeler.
+#:
+#: `ottoman_kit.PALETTES` opak yuzeyler icindir ve Unity hatti onu tarar.
+#: Sac oraya giremez: alfa kesme ister ve Blender tarafinda ayri dugumlerle
+#: kuruluyor (`sac_kit.hair_material`). Palete zorlamak, 30'dan fazla var
+#: olan malzemenin harman kipini sac icin riske atmak olurdu.
+#:
+#: Istisna GORUNUR olsun diye burada, acikca listeleniyor — ozel durum
+#: kodun icine gomulmuyor.
+EK_MALZEME = [
+    dict(name="M_Hair", asset="hair_card",
+         root=os.path.join("art", "textures", "generated"),
+         roughness=0.46, metallic=0.0,
+         alphaClip=True, alphaCutoff=0.45,
+         baseColor=[0.12, 0.08, 0.055]),
+]
+
+
 
 def main():
+
+
     hz.log(f"Unity doku hatti -> {OUT_DIR}")
     os.makedirs(OUT_DIR, exist_ok=True)
     written, manifest = [], {}
@@ -279,6 +299,60 @@ def main():
             entry["baseColorFile"] = os.path.basename(bc_out)
             manifest[mat_name] = entry
             hz.log(f"  {mat_name:22s} <- {role['asset']}")
+
+    # --- PALET DISI: alfa kesmeli malzemeler --------------------------------
+    #
+    # HDRP alfayi BASE MAP'IN ALFA KANALINDAN okur; Blender ise ayri dosya
+    # ister (BC sRGB, alfa Non-Color — ayni dosya iki renk uzayi tasiyamaz).
+    # Iki motor iki bicim istiyor ve dogru yer bu: kaynak ayri kalir, Unity
+    # icin BIRLESTIRILIR. Blender'i HDRP'nin bicimine zorlamak alfayi sRGB
+    # egrisinden gecirirdi ve tel kenarlari sismanlardi.
+    for ek in EK_MALZEME:
+        meta = mtl.load_meta(ek["asset"], root=ek["root"])
+        if meta is None:
+            hz.log(f"UYARI {ek['name']}: {ek['asset']} uretilmemis, atlandi")
+            continue
+        d, maps = meta["_dir"], meta.get("maps", {})
+        s_ad = slug(ek["asset"])
+        entry = dict(name=ek["name"], kind="pbr", asset=ek["asset"],
+                     sizeMeters=[float(x) for x in meta.get("size_meters",
+                                                            [1.0, 1.0])],
+                     roughness=ek["roughness"], metallic=ek["metallic"],
+                     baked=False, baseColor=ek["baseColor"],
+                     alphaClip=bool(ek.get("alphaClip")),
+                     alphaCutoff=float(ek.get("alphaCutoff", 0.5)))
+
+        bc_out = os.path.join(OUT_DIR, f"T_{s_ad}_BC.png")
+        if bc_out not in written:
+            # BC zaten sRGB kodlu; `read_raw` ham okur ve `write(srgb=False)`
+            # oldugu gibi geri yazar. Yeniden kodlamak sRGB egrisini iki kez
+            # uygulamak olurdu.
+            bc = read_raw(os.path.join(d, maps["BC"]))
+            if "A" in maps:
+                bc[..., 3] = read_raw(os.path.join(d, maps["A"]))[..., 0]
+            else:
+                bc[..., 3] = 1.0
+            write(bc_out, bc, srgb=False)
+            written.append(bc_out)
+        entry["baseColorFile"] = os.path.basename(bc_out)
+
+        if "ARM" in maps:
+            mask_out = os.path.join(OUT_DIR, f"T_{s_ad}_MASK.png")
+            if mask_out not in written:
+                write(mask_out, build_mask(os.path.join(d, maps["ARM"])),
+                      srgb=False)
+                written.append(mask_out)
+            entry["maskFile"] = os.path.basename(mask_out)
+
+        if "N" in maps:
+            n_out = os.path.join(OUT_DIR, f"T_{s_ad}_N.png")
+            if n_out not in written:
+                shutil.copyfile(os.path.join(d, maps["N"]), n_out)
+                written.append(n_out)
+            entry["normalFile"] = os.path.basename(n_out)
+
+        manifest[ek["name"]] = entry
+        hz.log(f"  {ek['name']:22s} <- {ek['asset']} (alfa kesme)")
 
     # Unity tarafi bu bildirimden malzeme uretir; ad-dosya eslesmesi TEK yerde
     # yasar, iki tarafta elle tekrarlanmaz. Bicim `JsonUtility`nin okuyabildigi

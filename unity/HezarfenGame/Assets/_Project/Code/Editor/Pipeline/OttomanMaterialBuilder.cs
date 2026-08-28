@@ -39,6 +39,12 @@ namespace Hezarfen.Editor.Pipeline
             public string maskFile;
             public string normalFile;
             public float[] baseColor;
+
+            /// <summary>Alfa kesme — saç kartı gibi delikli yüzeyler.</summary>
+            public bool alphaClip;
+
+            /// <summary>Kesme eşiği; alfa bunun altındaysa piksel çizilmez.</summary>
+            public float alphaCutoff = 0.5f;
         }
 
         [Serializable]
@@ -193,6 +199,28 @@ namespace Hezarfen.Editor.Pipeline
                 mat.SetFloat("_Metallic", 0f);
                 mat.SetFloat("_Smoothness", Mathf.Clamp01(1f - e.roughness));
                 return;
+            }
+
+            // ALFA KESME: HDRP alfayi BASE MAP'IN ALFA KANALINDAN okur.
+            //
+            // Blender tarafinda alfa AYRI dosyadir ve olmak zorundadir: BC
+            // sRGB, alfa Non-Color okunur ve ayni dosya iki renk uzayi
+            // tasiyamaz. Iki motor iki bicim istiyor; birlestirme
+            // `build_unity_maps.py`de yapiliyor.
+            //
+            // `_AlphaCutoffEnable` yazmadan sadece dokuyu vermek yetmez —
+            // HDRP alfa kanalini gormezden gelir ve sac karti DUZ BIR
+            // LEVHA olur. Bu sessiz bir hatadir: doku yuklenmis gorunur.
+            if (e.alphaClip)
+            {
+                mat.SetFloat("_AlphaCutoffEnable", 1f);
+                mat.SetFloat("_AlphaCutoff", Mathf.Clamp01(e.alphaCutoff));
+                mat.SetFloat("_SurfaceType", 0f);          // Opaque + cutoff
+                mat.SetFloat("_DoubleSidedEnable", 1f);    // kart iki yuzlu
+                mat.SetFloat("_DoubleSidedNormalMode", 1f);
+                mat.EnableKeyword("_ALPHATEST_ON");
+                mat.EnableKeyword("_DOUBLESIDED_ON");
+                mat.renderQueue = 2450;                    // AlphaTest
             }
 
             mat.SetTexture("_BaseColorMap", LoadTex(e.baseColorFile, e.name, problems));

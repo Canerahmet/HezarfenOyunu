@@ -278,7 +278,7 @@ def _u8(a):
 
 
 def write_texture_set(tex_id, res, size_m, bc, nrm, arm, meta_extra,
-                      rough=None, ao=None, out_root=OUT_ROOT):
+                      rough=None, ao=None, out_root=OUT_ROOT, extra=None):
     """
     Poly Haven düzeninde bir doku klasörü yazar: `T_<id>_<HARITA>.png` + meta.
 
@@ -296,6 +296,14 @@ def write_texture_set(tex_id, res, size_m, bc, nrm, arm, meta_extra,
         arrays.append(("R", np.repeat(_u8(rough)[..., None], 3, axis=-1)))
     if ao is not None:
         arrays.append(("AO", np.repeat(_u8(ao)[..., None], 3, axis=-1)))
+    # `extra`: bu dokunun kendine ait haritalari. Ilk kullanan SAC oldu —
+    # sac karti alfa ister ve alfa BC'nin dorduncu kanalina gomulemez,
+    # cunku Blender tarafi BC'yi sRGB, alfayi Non-Color okumali. Ayri
+    # dosya bu ayrimi acik tutar.
+    for key, arr in (extra or {}).items():
+        a = np.asarray(arr)
+        arrays.append((key, a if a.ndim == 3
+                       else np.repeat(_u8(a)[..., None], 3, axis=-1)))
 
     maps = {}
     for key, arr in arrays:

@@ -46,6 +46,81 @@
    "baseColorFile": "T_BrickBand_BC.png"
   },
   {
+   "name": "M_Cloth_Entari",
+   "kind": "untextured",
+   "baseColor": [
+    0.105,
+    0.255,
+    0.295
+   ],
+   "roughness": 0.8
+  },
+  {
+   "name": "M_Cloth_Gomlek",
+   "kind": "untextured",
+   "baseColor": [
+    0.79,
+    0.76,
+    0.68
+   ],
+   "roughness": 0.86
+  },
+  {
+   "name": "M_Cloth_Kavuk",
+   "kind": "untextured",
+   "baseColor": [
+    0.36,
+    0.075,
+    0.09
+   ],
+   "roughness": 0.8
+  },
+  {
+   "name": "M_Cloth_Kusak",
+   "kind": "untextured",
+   "baseColor": [
+    0.45,
+    0.085,
+    0.15
+   ],
+   "roughness": 0.78
+  },
+  {
+   "name": "M_Cloth_Salvar",
+   "kind": "untextured",
+   "baseColor": [
+    0.48,
+    0.105,
+    0.085
+   ],
+   "roughness": 0.82
+  },
+  {
+   "name": "M_Cloth_Sarik",
+   "kind": "untextured",
+   "baseColor": [
+    0.845,
+    0.83,
+    0.78
+   ],
+   "roughness": 0.84
+  },
+  {
+   "name": "M_Feather",
+   "kind": "pbr",
+   "asset": "weathered_planks",
+   "sizeMeters": [
+    2.0,
+    2.0
+   ],
+   "roughness": 0.62,
+   "metallic": 0.0,
+   "baked": true,
+   "maskFile": "T_WeatheredPlanks_MASK.png",
+   "normalFile": "T_WeatheredPlanks_N.png",
+   "baseColorFile": "T_Feather_BC.png"
+  },
+  {
    "name": "M_Foliage_Cinar",
    "kind": "pbr",
    "asset": "foliage_cinar",
@@ -86,6 +161,28 @@
    "roughness": 0.12
   },
   {
+   "name": "M_Hair",
+   "kind": "pbr",
+   "asset": "hair_card",
+   "sizeMeters": [
+    0.28,
+    0.28
+   ],
+   "roughness": 0.46,
+   "metallic": 0.0,
+   "baked": false,
+   "baseColor": [
+    0.12,
+    0.08,
+    0.055
+   ],
+   "alphaClip": true,
+   "alphaCutoff": 0.45,
+   "baseColorFile": "T_HairCard_BC.png",
+   "maskFile": "T_HairCard_MASK.png",
+   "normalFile": "T_HairCard_N.png"
+  },
+  {
    "name": "M_Lead_Sheet",
    "kind": "pbr",
    "asset": "lead_sheet",
@@ -99,6 +196,31 @@
    "maskFile": "T_LeadSheet_MASK.png",
    "normalFile": "T_LeadSheet_N.png",
    "baseColorFile": "T_LeadSheet_BC.png"
+  },
+  {
+   "name": "M_Leather",
+   "kind": "pbr",
+   "asset": "weathered_planks",
+   "sizeMeters": [
+    2.0,
+    2.0
+   ],
+   "roughness": 0.74,
+   "metallic": 0.0,
+   "baked": true,
+   "maskFile": "T_WeatheredPlanks_MASK.png",
+   "normalFile": "T_WeatheredPlanks_N.png",
+   "baseColorFile": "T_Leather_BC.png"
+  },
+  {
+   "name": "M_Leather_Mest",
+   "kind": "untextured",
+   "baseColor": [
+    0.56,
+    0.395,
+    0.115
+   ],
+   "roughness": 0.66
   },
   {
    "name": "M_Marble_Kitabe",
@@ -209,6 +331,16 @@
    "maskFile": "T_CeramicRoof01_MASK.png",
    "normalFile": "T_CeramicRoof01_N.png",
    "baseColorFile": "T_Roof_Ceramic_BC.png"
+  },
+  {
+   "name": "M_Skin",
+   "kind": "untextured",
+   "baseColor": [
+    0.56,
+    0.395,
+    0.305
+   ],
+   "roughness": 0.58
   },
   {
    "name": "M_Stone_Cut",

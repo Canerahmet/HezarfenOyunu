@@ -1,0 +1,30 @@
+{
+ "polyhaven_id": null,
+ "name": "hair_card",
+ "resolution": "1024px",
+ "size_meters": [
+  0.28,
+  0.28
+ ],
+ "authors": {
+  "Hezarfen projesi (prosedürel üretim)": "All"
+ },
+ "license": "Kendi eserimiz — üçüncü taraf hakkı yok",
+ "source": "prosedürel; girdi yok",
+ "maps": {
+  "BC": "T_hair_card_BC.png",
+  "N": "T_hair_card_N.png",
+  "ARM": "T_hair_card_ARM.png",
+  "R": "T_hair_card_R.png",
+  "AO": "T_hair_card_AO.png",
+  "A": "T_hair_card_A.png"
+ },
+ "normal_convention": "OpenGL (Y+) — Poly Haven nor_gl ile ayni",
+ "kind": "hair_card",
+ "strips": 4,
+ "note": "Sac/sakal karti alfa atlasi. Alfa AYRI dosyada (T_hair_card_A.png): BC sRGB, alfa Non-Color okunmali ve ayni dosya iki renk uzayi tasiyamaz.",
+ "strip_meters": [
+  0.07,
+  0.28
+ ]
+}

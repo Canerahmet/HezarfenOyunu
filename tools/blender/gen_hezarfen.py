@@ -32,6 +32,7 @@ import karakter_kit as kar          # noqa: E402
 import kiyafet_kit as kiy           # noqa: E402
 import ottoman_kit as kit           # noqa: E402
 import rig_kit as rk                # noqa: E402
+import sac_kit as sk                # noqa: E402
 from export_fbx import export_fbx   # noqa: E402
 
 COLLECTION = "Export"
@@ -195,6 +196,61 @@ def giydir(govde, col, mats, etek_orani, dizlik_var):
     parts.append(hz.assign(kiy.sarik(
         "Sarik", col, boy * 0.948, boy * 1.052, bas_r), mats["sarik"]))
 
+    # --- SAKAL ve SAC ----------------------------------------------------------
+    #
+    # AZ kart, cunku Hezarfen sarikli: sarik sacin cogunu orter ve
+    # gorunen sey sakal, sakak, ense. Kafanin tamamini kaplamak hic
+    # gorunmeyecek 40 kartin bedelini odemek olurdu.
+    sac_mat = sk.hair_material()
+    hat = sk.cene_hatti(govde, boy)
+    # UC KATMAN. Ilk yazimda tek siraydi ve sakal render'da neredeyse
+    # gorunmuyordu — kartlar dogru yerdeydi (olculdu), ama bir sakal
+    # birkac tel degil bir KUTLEDIR. Alfa kapsamasi %24; tek katman
+    # yuzeyin dortte birini doldurur. Uc katman ust uste binince kutle
+    # okunur, ve bindirme zaten sac kartlarinin calisma bicimidir.
+    #
+    # Katmanlar farkli SERIT kullanir: hepsi ayni desen olsaydi
+    # bindirme bir tekrar deseni uretirdi ve o tekrar okunurdu.
+    # KATMAN OFSETI mutlak mesafedir, oran degil. Ilk yazimda konumu
+    # 0,986/1,008/1,028 ile olcekliyordum; y ~ -0,06 oldugu icin bu
+    # katmanlari 1,7 mm ayiriyordu — hicbir sey. Giysi kabuklarinda
+    # ogrendigimiz sey burada da gecerli: dis katman ic katmandan
+    # OLCULEBILIR kadar disarida olmali.
+    for kat, (pay, ser, uz) in enumerate((
+            (0.008, 0, 0.058), (0.016, 2, 0.082), (0.024, 1, 0.104))):
+        for i, (p, yon) in enumerate(hat):
+            for sx in (-1, 1):
+                if sx > 0 and abs(p.x) < boy * 0.004:
+                    continue              # on ortadaki kart tek
+                k = sk.kart(f"Sakal_{kat}_{sx}_{i}",
+                            (p.x * sx + yon.x * sx * pay,
+                             p.y + yon.y * pay, p.z),
+                            # Sakal asagi ve hafifce disari sarkar.
+                            (yon.x * sx * 0.42, yon.y * 0.42, -1.0),
+                            (yon.x * sx, yon.y, 0.30),
+                            boy * uz, boy * 0.034, col,
+                            serit=ser, egim=0.20 + 0.06 * kat)
+                parts.append(hz.assign(k, sac_mat))
+
+    # BIYIK: ust dudak. Plaka 20 ve 35'te sakalla birlikte var.
+    for sx in (-1, 1):
+        b = sk.kart(f"Biyik_{sx}", (sx * boy * 0.010, -boy * 0.052,
+                                    boy * 0.905),
+                    (sx * 0.85, -0.30, -0.42), (0.0, -1.0, 0.25),
+                    boy * 0.026, boy * 0.020, col, serit=2, egim=0.10)
+        parts.append(hz.assign(b, sac_mat))
+
+    # Sakak ve ense: sarigin altindan cikan tutamlar.
+    for sx in (-1, 1):
+        for i, (dy, dz, ser) in enumerate((
+                (0.30, 0.905, 0), (0.10, 0.895, 3), (-0.34, 0.900, 1))):
+            kesit = kiy.kesit(govde, boy * dz) or (boy * 0.05, boy * 0.06)
+            k = sk.kart(f"Sac_{sx}_{i}",
+                        (sx * kesit[0] * 0.94, dy * kesit[1], boy * dz),
+                        (sx * 0.35, dy * 0.3, -1.0), (sx, dy * 0.4, 0.25),
+                        boy * 0.060, boy * 0.034, col, serit=ser, egim=0.30)
+            parts.append(hz.assign(k, sac_mat))
+
     # --- MEST ------------------------------------------------------------------
     mest = kiy.kopya_kabuk(
         govde, "Mest", col,
@@ -348,7 +404,7 @@ def main():
                 f"{kar.HEDEF_BOY} m'nin %10'undan fazla ustunde.")
         # Bir kabuk secimi bos donerse giysi sessizce eksik kalir ve
         # karakter yari ciplak cikar; sayi onu yakalar.
-        beklenen = 8 if dizlik_var else 6
+        beklenen = 50 if dizlik_var else 48
         if bilgi["giysi_parca"] < beklenen:
             raise SystemExit(
                 f"[HZ] HATA {ad}: {bilgi['giysi_parca']} giysi parcasi "

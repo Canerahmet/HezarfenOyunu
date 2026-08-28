@@ -151,10 +151,35 @@ kaynakta yok**) ve açılar IK ile çözülüyor.
 değil. Bunu yazıyorum çünkü bir ders: bozuk olan çoğu zaman ölçtüğün şey
 değil, ölçtüğün şeyi ölçme biçimin.
 
+## Saç ve sakal
+
+Kartlarla yapıldı, kabukla değil: kumaş bedene **oturur** (o yüzden giysi
+gövdeden kabuk çıkarılarak yapıldı), saç **sarkar** ve sarkanın
+siluetinde boşluk vardır. Katı kabuk saçı kask yapardı.
+
+Doku prosedürel, **kendi telifimiz** — saç kartı bir alfa atlasıdır ve
+Poly Haven onu vermiyor. Dört şerit: sık düz, seyrek dağınık, kısa kalın
+(sakal), uzun ince. Tek şerit olsaydı bütün saç aynı desende tekrar
+ederdi ve o tekrar uzaktan bile okunur.
+
+**Sakal gözlenmiş bir seçim, üslup değil.** Plaka 20 (sivil) ve 35
+(saray hizmetlisi) sakallı; plaka 50 (baltalı muhafız) yalnızca bıyıklı.
+Sakal olgunluk ve mevki işareti. Hezarfen ne asker ne genç.
+
+Saç **az**: Hezarfen sarıklı ve sarık saçın çoğunu örter. Görünen şey
+şakak, ense, sakal. Kafanın tamamını kaplamak hiç görünmeyecek 40 kartın
+bedelini ödemek olurdu.
+
+Bu turda üç şey yanlış çıktı ve üçü de ölçümle bulundu: sakal kartları
+**kafanın içinde** kalıyordu (çene tek bir kot değil bir bölge, ve en
+öne çıkan nokta o bölgenin içinde bir yerde), katmanlar **1,7 mm**
+aralıklıydı (oranla ölçekliyordum, mutlak mesafe olmalıydı), ve tek
+katman bir sakal değil birkaç tel veriyordu — alfa kapsaması %24, üç
+katman bindirince kütle okunuyor.
+
 ## Bilerek yapılmayanlar
 
-- **Saç ve sakal** — hair cards, ayrı tur. Şu an gövde saçsız ve bu
-  eksiklik render'da görünüyor.
+- **Kaş ve kirpik** — yüz detayı bu turda yapılmadı.
 - **Animator kontrolcüsü ve blend ağacı** — klipler var, geçişleri
   kuran durum makinesi yok. Sıradaki tur; Faz 5'in kabul ölçütü
   ("kesintisiz oynanabiliyor") onu gerektiriyor.
