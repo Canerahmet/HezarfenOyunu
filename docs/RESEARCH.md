@@ -86,6 +86,40 @@ Kıyafet albümleri:
 | **Codex Vindobonensis** | 16.–17. yy | Viyana ÖNB | dijital |
 | **Nicolas de Nicolay, *Navigations*** | 1567/1568 | erken kıyafet gravürleri | kamu malı |
 
+#### Rålamb plakalarından OKUNAN giyim dilbilgisi (2026-08-28)
+
+Dört plaka indirildi (`refs/ralamb/`, kamu malı, kayıt `refs/LICENSES.md`).
+Minyatür **kopyalanmadı**; okunan şey oranlar ve katman düzenidir — mimaride
+uygulanan "fotoğraftaki gibi değil, fotoğraftaki dil kadar" kuralının kıyafet
+karşılığı.
+
+| plaka | kim | ne giyiyor |
+|---|---|---|
+| **20** | *"Armenien"* — sivil, oturan sınıf | Ayak bileğine inen koyu mavi-yeşil **entari**; göğüste küçük düğme sırası; geniş kollar, ağzı kıvrılmış **pembe astar**; kırmızı çorap; hacimli **sarık**, çekirdeği koyu mavi |
+| **35** | saray hizmetlisi | **Baldıra kadar** (kısa) entari — hareketli adamın entarisi kısadır; belde dar **kırmızı kuşak**; altında **kırmızı çakşır**; sarı **mest**; sıkı beyaz sarık, tepesi kırmızı |
+| **50** | *"Chatery"* — baltalı muhafız | Kırmızı üst kaftan; açık mavi şalvar **dizde toplanmış**, siyah **dizlik** bandı; beyaz tozluk; sarı mest; beyaz sarık, tepesi kırmızı |
+| **5** | *"La Regine"* | (kadın — Faz 6 için; erkek kıyafetine dahil değil) |
+
+**Türetilen kurallar** (Hezarfen'in kıyafeti bunlardan kurulur):
+
+1. **Entarinin boyu işi söyler.** Oturan adam ayak bileğine, çalışan adam
+   baldıra giyer. Hezarfen'in **uçuş varyantı kısa** olmalı — bu bir tasarım
+   tercihi değil, plakaların söylediği şey.
+2. **Kuşak doğal belde**, dar ve kontrast renkte. Kaftanın kendisi değil,
+   onu tutan şey.
+3. **Şalvar/çakşır her zaman görünür** — entari onu örtmez, ortaya çıkarır.
+4. **Kol ağzı astarı ters çevrilir**; kontrast astar bir süs değil, kolu
+   sıvamanın kalıcı hali.
+5. **Dizlik gerçek bir öğedir** (plaka 50) — plan Bölüm 10'un uçuş varyantı
+   için istediği "dizlik" uydurma değil, gözlenmiş.
+6. **Başlık rütbe göstergesidir**: hacim ve çekirdek rengi değişir. Hezarfen
+   ne paşa ne asker; **orta hacimli sarık, sade çekirdek**.
+
+**T2, taslak.** Sebep: albüm **1657–58**, oyun **1632** — yirmi beş yıl fark.
+Ana hatlar (şalvar–gömlek–entari–kuşak–sarık) bu aralıkta değişmedi ama
+ayrıntı değişebilir. Peter Mundy (1618) öbür yandan yaklaşıyor; **1632'nin
+tam ortasında bir kaynak yok** ve bu boşluk kapatılamaz, ancak söylenebilir.
+
 ### 3) YAPI-YAPI TARİHSEL ENVANTER (1632'DEKİ DURUM)
 
 #### Selatin camileri ve büyük yapılar

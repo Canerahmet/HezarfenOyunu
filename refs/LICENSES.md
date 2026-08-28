@@ -3,14 +3,29 @@
 > **KURAL (plan Bölüm 14):** Bu listede kaydı olmayan hiçbir dosya `refs/` altına giremez.
 > İhlal = görev reddi. Her indirmede önce buraya satır eklenir, sonra dosya indirilir.
 
-**Durum:** Henüz hiçbir referans **görseli** indirilmedi. Bir **veri** kümesi indirildi
-(Copernicus DEM — aşağıda). (2026-08-18)
+**Durum:** İlk referans **görselleri** indirildi (Rålamb kıyafet albümü, kamu malı —
+aşağıda). Bir **veri** kümesi ve bir **CC0 taban geometri** de kayıtlı. (2026-08-28)
 
 ## Kayıt formatı
 
 | Dosya | Kaynak (URL) | Eser / Tarih | Lisans | Oyunda kullanım | İndirme tarihi |
 |---|---|---|---|---|---|
-| — | — | — | — | — | — |
+| `refs/ralamb/Ralamb-*.jpg` (12 plaka) | Wikimedia Commons, `Category:Rålamb Costume Book` — `upload.wikimedia.org/wikipedia/commons/...` | Claes Rålamb, *Rålambska dräktboken*, **1657** | **Kamu malı** (PD-US; eser 1657) | Faz 5 kıyafet **referansı** — çizim kopyalanmaz, giyim dilbilgisi (katman, boy, kuşak yeri, başlık) okunur | 2026-08-28 |
+
+### Rålamb hakkında iki uyarı
+
+**1. Tarih.** Albüm **1657–58**, oyun **1632**. Yirmi beş yıl. Osmanlı erkek
+kıyafetinin ana hatları (şalvar–gömlek–entari–kuşak–kavuk) bu aralıkta
+değişmedi, ama ayrıntı — kavuk biçimi, kaftan kesimi — değişebilir. Bu yüzden
+kıyafet **T2 (yeniden kurgu)**, T1 değil. Peter Mundy albümü (1618) öbür
+yandan yaklaşıyor; 1632 ikisinin arasında kalıyor ve **tam ortasında bir
+kaynak yok.**
+
+**2. Ne kopyalanır, ne kopyalanmaz.** Bu proje mimaride "fotoğraftaki gibi
+değil, fotoğraftaki dil kadar" kuralını izledi. Kıyafette de aynısı: minyatür
+**kopyalanmaz**, okunan şey oranlardır — entari nerede biter, kuşak nereye
+oturur, kavuk başa göre ne kadar büyüktür. Eser kamu malı olduğu için kopyalamak
+hukuken serbest olurdu; kural hukuki değil, yöntemsel.
 
 ## İndirilen veri kümeleri
 

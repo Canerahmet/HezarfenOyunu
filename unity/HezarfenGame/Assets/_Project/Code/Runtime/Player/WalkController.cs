@@ -38,9 +38,22 @@ namespace Hezarfen.Player
     [RequireComponent(typeof(CharacterController))]
     public class WalkController : MonoBehaviour
     {
-        [Header("Ölçüler (m) — inceleme paketleriyle aynı")]
-        [Tooltip("Göz yüksekliği. 1,70 m: ölçü figürüyle aynı.")]
-        public float eyeHeight = 1.70f;
+        [Header("Ölçüler (m) — karakter modeliyle aynı")]
+        /// <summary>
+        /// Göz yüksekliği. <b>1,59 m — 1,70 değil.</b>
+        ///
+        /// Eski değer 1,70'ti ve yanındaki not "ölçü figürüyle aynı"
+        /// diyordu. Nota bakınca doğru görünüyor; sayıya bakınca değil:
+        /// 1,70 m o figürün <b>boyu</b>, gözü değil. Yani gezgin,
+        /// 1,81 m boyunda bir adamın gözünden bakıyordu ve şehir 1,70 m'lik
+        /// bir figüre göre onaylanmıştı.
+        ///
+        /// Yeni sayı karakter modelinden TÜRETİLDİ, kitaptan değil:
+        /// göz, tepe ile çene arasının ortasındadır ve model 1,700 m boy,
+        /// 0,221 m baş veriyor → 1,700 − 0,221/2 = <b>1,59 m</b>.
+        /// (`art/blend/karakter/catalog.json`; `KarakterTests` bağlar.)
+        /// </summary>
+        public float eyeHeight = 1.59f;
 
         [Header("Hız (m/s)")]
         public float walkSpeed = 1.4f;         // insan yuruyusu

@@ -87,8 +87,12 @@ namespace Hezarfen.Editor.PlayerTools
             // 2,70 m'lik sur kapisinda sikismadan gecmeli.
             var cc = go.AddComponent<CharacterController>();
             cc.radius = 0.30f;
-            cc.height = 1.80f;
-            cc.center = new Vector3(0f, 0.90f, 0f);
+            // 1,70 m — karakter modelinin boyu. Eskiden 1,80'di ve model
+            // 1,70; yani carpisma kapsulu oyuncunun gordugu adamdan 10 cm
+            // uzundu. Sarik 9 cm daha ekliyor ama kapsule GIRMIYOR: insan
+            // sapkasiyla carpismaz, carpissaydi gectigi kapidan gecemezdi.
+            cc.height = 1.70f;
+            cc.center = new Vector3(0f, 0.85f, 0f);
             // Basamak: kaldirim rihti 0,17 m (ADR 0016) — gezgin merdiveni
             // TIRMANABILMELI, yoksa mahallenin yarisi kapali kalir.
             cc.stepOffset = 0.45f;
@@ -97,7 +101,8 @@ namespace Hezarfen.Editor.PlayerTools
 
             var camGo = new GameObject("Goz");
             camGo.transform.SetParent(go.transform, false);
-            camGo.transform.localPosition = new Vector3(0f, 1.70f, 0f);
+            // Goz kotu: WalkController.eyeHeight ile AYNI sayi olmali.
+            camGo.transform.localPosition = new Vector3(0f, 1.59f, 0f);
             var cam = camGo.AddComponent<Camera>();
             camGo.AddComponent<HDAdditionalCameraData>();
             cam.nearClipPlane = 0.08f;      // 0,3 m yaricapta duvara burnunu sokabilsin

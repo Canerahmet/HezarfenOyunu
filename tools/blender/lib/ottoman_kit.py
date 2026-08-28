@@ -73,6 +73,20 @@ WEATHERED_TIMBER = (0.285, 0.262, 0.228)
 #: tutmak yerine tek rol.
 LEATHER = (0.226, 0.132, 0.074)
 
+#: --- KARAKTER RENKLERI (Faz 5) ------------------------------------------
+#: Rålamb plakalarindan OKUNDU, uydurulmadi — hangi plakadan geldigi
+#: yaninda yazili. Kumas rolleri bilerek TEXTURE_ROLES'a girmiyor: bu
+#: rollerin dokusu yok ve `build_materials` dokusuz rolu duz renge dusurur.
+#: Tahta dokusunu kumasa giydirmek yanlis olurdu.
+SKIN = (0.560, 0.395, 0.305)
+CLOTH_ENTARI = (0.105, 0.255, 0.295)   # plaka 20 ve 35: mavi-yesil entari
+CLOTH_SALVAR = (0.480, 0.105, 0.085)   # plaka 35: kirmizi caksir
+CLOTH_GOMLEK = (0.790, 0.760, 0.680)   # keten ic gomlek
+CLOTH_KUSAK = (0.450, 0.085, 0.150)    # plaka 35: dar kirmizi kusak
+CLOTH_SARIK = (0.845, 0.830, 0.780)    # plaka 35 ve 50: beyaz sarik
+CLOTH_KAVUK = (0.360, 0.075, 0.090)    # plaka 35/50: sarigin altindaki kirmizi tepe
+MEST = (0.560, 0.395, 0.115)           # plaka 35 ve 50: sari mest
+
 #: **Kartal tüyü** — kanat yüzeyi. Koyu kahve gövde, uçlarda soluk.
 #: Tek bir renkle verilir; kanadın alacalığı GEOMETRIDEN gelir
 #: (üst üste binen tüy dizileri), dokudan değil.
@@ -266,6 +280,14 @@ PALETTES = {
         # DEGISMEZ — deri deridir. Deri parlak degil ama tastan pürüzsüz;
         # tuy daha da pürüzsüz cunku yagli.
         "leather": (LEATHER, 0.74, "M_Leather"),
+        "skin":    (SKIN, 0.58, "M_Skin"),
+        "entari":  (CLOTH_ENTARI, 0.80, "M_Cloth_Entari"),
+        "salvar":  (CLOTH_SALVAR, 0.82, "M_Cloth_Salvar"),
+        "gomlek":  (CLOTH_GOMLEK, 0.86, "M_Cloth_Gomlek"),
+        "kusak":   (CLOTH_KUSAK, 0.78, "M_Cloth_Kusak"),
+        "sarik":   (CLOTH_SARIK, 0.84, "M_Cloth_Sarik"),
+        "kavuk":   (CLOTH_KAVUK, 0.80, "M_Cloth_Kavuk"),
+        "mest":    (MEST, 0.66, "M_Leather_Mest"),
         "feather": (FEATHER, 0.62, "M_Feather"),
         "foliage_servi": ((0.038, 0.068, 0.034), 0.78, "M_Foliage_Servi"),
         "foliage_cinar": ((0.086, 0.125, 0.048), 0.82, "M_Foliage_Cinar"),
@@ -310,6 +332,14 @@ PALETTES = {
         # DEGISMEZ — deri deridir. Deri parlak degil ama tastan pürüzsüz;
         # tuy daha da pürüzsüz cunku yagli.
         "leather": (LEATHER, 0.74, "M_Leather"),
+        "skin":    (SKIN, 0.58, "M_Skin"),
+        "entari":  (CLOTH_ENTARI, 0.80, "M_Cloth_Entari"),
+        "salvar":  (CLOTH_SALVAR, 0.82, "M_Cloth_Salvar"),
+        "gomlek":  (CLOTH_GOMLEK, 0.86, "M_Cloth_Gomlek"),
+        "kusak":   (CLOTH_KUSAK, 0.78, "M_Cloth_Kusak"),
+        "sarik":   (CLOTH_SARIK, 0.84, "M_Cloth_Sarik"),
+        "kavuk":   (CLOTH_KAVUK, 0.80, "M_Cloth_Kavuk"),
+        "mest":    (MEST, 0.66, "M_Leather_Mest"),
         "feather": (FEATHER, 0.62, "M_Feather"),
         "foliage_servi": ((0.038, 0.068, 0.034), 0.78, "M_Foliage_Servi"),
         "foliage_cinar": ((0.086, 0.125, 0.048), 0.82, "M_Foliage_Cinar"),

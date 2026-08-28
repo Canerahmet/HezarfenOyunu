@@ -41,7 +41,7 @@ import os
 
 import bmesh
 import bpy
-from mathutils import Vector
+from mathutils import Matrix, Vector
 
 import hz_blender as hz
 
@@ -101,6 +101,15 @@ def taban_getir(blend_path=None, obje=TABAN_OBJE, col=None):
     # hali degil: hepsi silinir.
     o.modifiers.clear()
     o.animation_data_clear()
+
+    # Pakette nesneler bir sirada YAN YANA dizilidir; getirilen govdenin
+    # kendi konumu vardir (bu paket icin x ~ -2,26). Boru hattinin geri
+    # kalani KIMLIK donusumu bekler ve butun olcum kodum yerel koordinat
+    # yaziyor — ikisi karisinca govde giysilerden 2 metre uzakta duruyordu.
+    # Donusum aga yazilir ve transform sifirlanir.
+    o.data.transform(o.matrix_world)
+    o.matrix_world = Matrix.Identity(4)
+    o.data.update()
     return o
 
 
