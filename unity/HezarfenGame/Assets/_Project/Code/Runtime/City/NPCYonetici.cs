@@ -185,6 +185,21 @@ namespace Hezarfen.Sehir
             float d2 = gorunurMesafe * gorunurMesafe;
             int gorunur = 0;
 
+            // ONCE BIRAK, SONRA AL — iki ayri gecis.
+            //
+            // Tek gecisteyken havuz butceyi ASIYORDU: listede once gelen
+            // uzak bir sakin govdesini henuz birakmamisken, sonra gelen
+            // yakin bir sakin govde istiyordu; havuz bos oluyor ve YENI
+            // bir govde yaratiliyordu. Olcum bunu gosterdi — butce 40
+            // iken 70 govde nesnesi. Uzun oturumda tam da kacinilmak
+            // istenen sey: sessizce buyuyen bellek.
+            foreach (var a in _sakinler)
+            {
+                if (a.govde == null) continue;
+                if ((a.konum - merkez).sqrMagnitude > d2)
+                { GovdeBirak(a.govde); a.govde = null; }
+            }
+
             foreach (var a in _sakinler)
             {
                 bool yakin = (a.konum - merkez).sqrMagnitude <= d2
@@ -208,6 +223,7 @@ namespace Hezarfen.Sehir
                 }
                 else if (a.govde != null)
                 {
+                    // Menzilde ama BUTCE doldu: govdesini birak.
                     GovdeBirak(a.govde);
                     a.govde = null;
                 }
