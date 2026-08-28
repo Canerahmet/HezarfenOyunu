@@ -39,6 +39,20 @@ TIERS = {
                         "tek ahsap besik cati altinda, can kulesi YOK, sokaktan "
                         "alcak. Zimmi kisiti. RESEARCH.md 4.2. Olculer "
                         "rekonstruksiyon; belirli bir yapiya karsilik gelmez."),
+    # ARAP CAMII — TIPOLOJI DEGIL, ADI OLAN BIR YAPI.
+    #
+    # Digerleri "Galata kilisesi nasil olurdu" sorusunun cevabidir (T2,
+    # rekonstruksiyon). Bu degil: San Domenico ayakta duruyor, olculeri
+    # kaynakta yazili ve yapinin 1632'deki hali BILINIYOR — 1475'ten beri
+    # camidir. O yuzden T1.
+    "arap_camii": ("T1",
+                   "San Domenico (~1323-37), 1475'ten beri Arap Camii. "
+                   "Uc nefli bazilika, 40 x 15 m, moloz tas ve tugla "
+                   "almasik orgu, sivri kemerli pencereler, ahsap cati; "
+                   "orta nef yan neflerden yuksek; KARE PLANLI CAN KULESI "
+                   "(RESEARCH.md 4.2(a): 'sonradan minareye cevrilen kule "
+                   "budur'). Kaynak: Koc U. Istanbul Surlari, Arap Camii / "
+                   "San Domenico; Mitler, The Genoese in Galata 1453-1682."),
     "sinagog": ("T2",
                 "Balat/Haskoy sinagogu tipolojisi: dikdortgen kagir+ahsap salon, "
                 "kendine ozgu dis mimarisi yok, yuksek duvarli avlu icinde; "
@@ -67,6 +81,20 @@ VARIANTS = [
           aisle_h=5.0, nave_h=5.0, sink=1.2, apse_r=2.4,
           window_sill=2.80, window_spring=3.75, window_w=0.68,
           portal_w=1.45, portal_spring=2.15)),
+    # Olculer kaynaktan: 40 x 15 m DIS olcu.
+    #   outer_l = length + 2*wall_t = 38.5 + 1.5 = 40.0
+    #   outer_w = nave_w + 2*aisle_w + 2*wall_t = 6.5 + 7.0 + 1.5 = 15.0
+    # Uydurulan tek sey yukseklikler ve pencere ritmi; kutle olculu.
+    ("ArapCamii", "kilise",
+     "San Domenico / Arap Camii — cami olmus Ceneviz bazilikasi, "
+     "kare kule minare",
+     dict(kind="latin", nave_w=6.5, aisle_w=3.5, length=38.5, bays=8,
+          aisle_h=7.0, nave_h=11.5, apse_r=4.2,
+          tower=True, tower_h=22.0, tower_w=4.20,
+          # Hac inik, serefe kurulu: kule artik minare.
+          cross=False, serefe=True),
+     "arap_camii"),
+
     ("Sinagog_A", "sinagog",
      "Balat sinagogu — avluya bakan, kadinlar mahfilli",
      dict()),
@@ -91,7 +119,11 @@ def main():
     os.makedirs(args.blend_dir, exist_ok=True)
     catalog = []
 
-    for name, kind, why, params in VARIANTS:
+    for varyant in VARIANTS:
+        # Bes elemanli varyant kendi TIERS anahtarini soyler: adi olan bir
+        # yapi (Arap Camii) tipolojinin kaydini tasiyamaz.
+        name, kind, why, params = varyant[:4]
+        tier_key = varyant[4] if len(varyant) > 4 else None
         hz.reset_scene()
         col = hz.collection(COLLECTION)
         tex = not args.no_textures
@@ -113,7 +145,7 @@ def main():
         export_fbx(os.path.join(args.out_dir, f"SM_{name}.fbx"),
                    collection_name=COLLECTION)
 
-        tier, source = TIERS[info["kind"]]
+        tier, source = TIERS[tier_key or info["kind"]]
         info.update(name=name, why=why, prefab=f"PF_{name}",
                     tier=tier, source=source)
         catalog.append(info)

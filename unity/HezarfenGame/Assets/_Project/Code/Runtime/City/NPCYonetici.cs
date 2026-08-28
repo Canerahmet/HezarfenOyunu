@@ -153,12 +153,9 @@ namespace Hezarfen.Sehir
             foreach (var a in _sakinler)
             {
                 if (a.meslek == null) continue;
-                var tur = a.meslek.Hedef(_sonVakit, a.tohum);
-
-                // Kapali bir binaya kimse gitmez (ADR 0070).
-                if (tur == SokakGrafi.Tur.Kahvehane
-                    && !Kronoloji.KahvehaneAcik(yil, gun))
-                    tur = SokakGrafi.Tur.Ev;
+                // Canli sehir ve simulasyon AYNI islevi cagirir; takvim
+                // ve olaylar yalniz orada uygulanir (ADR 0071).
+                var tur = Rutin.Hedef(a.meslek, _sonVakit, a.tohum, yil, gun);
 
                 int bas = graf.EnYakin(a.konum);
                 int hedef = tur == SokakGrafi.Tur.Ev

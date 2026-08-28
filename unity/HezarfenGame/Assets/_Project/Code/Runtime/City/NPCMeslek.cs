@@ -83,6 +83,21 @@ namespace Hezarfen.Sehir
             return SokakGrafi.Tur.Ev;
         }
 
+        /// <summary>
+        /// Bu vakitte bu hedefe gitme olasılığı — çizelgedeki payların
+        /// toplamı.
+        ///
+        /// <see cref="Rutin"/> Cuma kalabalığını buradan türetir: pay
+        /// elle yazılsaydı çizelge değişince sessizce yanlış kalırdı.
+        /// </summary>
+        public float Olasilik(VakitHesabi.Vakit v, SokakGrafi.Tur tur)
+        {
+            float p = 0f;
+            foreach (var a in cizelge)
+                if (a.vakit == v && a.hedef == tur) p += a.olasilik;
+            return Mathf.Clamp01(p);
+        }
+
         /// <summary>Bu vakitte dışarıda mı olur (gece ölçümü için).</summary>
         public bool Disarida(VakitHesabi.Vakit v, int tohum)
         {

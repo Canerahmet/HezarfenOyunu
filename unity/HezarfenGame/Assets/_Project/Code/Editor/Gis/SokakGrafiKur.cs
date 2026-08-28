@@ -145,6 +145,24 @@ namespace Hezarfen.Editor.Gis
             ("PF_Turbe", SokakGrafi.Tur.Turbe),
             ("PF_Iskele", SokakGrafi.Tur.Iskele),
             ("PF_UskudarIskelesi", SokakGrafi.Tur.Iskele),
+
+            // CUMA CAMILERI (ADR 0071).
+            //
+            // Bunlar mahalle dokusundan gelmez; landmark olarak DUNYAYA
+            // ZATEN YERLESTIRILMIS, konumu katalogdan gelen selatin
+            // camileridir. Graf onlari yalnizca TANIR.
+            //
+            // `PF_YeniCamiHarabe` bu listede YOKTUR: 1632'de yarim kalmis
+            // bir harabedir ("Zulmiyye"), cemaati yoktur.
+            ("PF_Suleymaniye", SokakGrafi.Tur.Cami),
+            ("PF_Ayasofya", SokakGrafi.Tur.Cami),
+            ("PF_Sultanahmet", SokakGrafi.Tur.Cami),
+            ("PF_FatihCamii", SokakGrafi.Tur.Cami),
+            ("PF_Beyazit", SokakGrafi.Tur.Cami),
+            ("PF_UskudarMihrimah", SokakGrafi.Tur.Cami),
+            ("PF_DogancilarCamii", SokakGrafi.Tur.Cami),
+            ("PF_HudayiTekkesi", SokakGrafi.Tur.Cami),
+            ("PF_ArapCamii", SokakGrafi.Tur.Cami),
         };
 
         [MenuItem("Hezarfen/GIS/Sokak grafini kur")]

@@ -114,16 +114,11 @@ namespace Hezarfen.Sehir
                 if (s.meslek == null) continue;
                 o.toplam++;
 
-                var hedef = s.meslek.Hedef(v, s.tohum);
-                bool disarida = s.meslek.Disarida(v, s.tohum);
-
-                // KRONOLOJI: kapali bir binaya kimse gitmez.
-                if (hedef == SokakGrafi.Tur.Kahvehane
-                    && !Kronoloji.KahvehaneAcik(yil, gun))
-                {
-                    hedef = SokakGrafi.Tur.Ev;
-                    disarida = false;
-                }
+                // Takvim RUTININ ICINDE uygulanir (ADR 0071). Burada
+                // ikinci bir kopyasi YOKTUR: simulasyonun olctugu gun,
+                // oyuncunun yurudugu gun olsun diye.
+                var hedef = Rutin.Hedef(s.meslek, v, s.tohum, yil, gun);
+                bool disarida = Rutin.Disarida(s.meslek, v, s.tohum, yil, gun);
 
                 if (!o.hedefler.ContainsKey(hedef)) o.hedefler[hedef] = 0;
                 o.hedefler[hedef]++;

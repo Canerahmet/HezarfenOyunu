@@ -164,6 +164,15 @@ class KiliseParams(object):
         # belge çıkarsa karar geri alınabilir olmalı — ama artık ONU İSTEMEK
         # gerekir, sessizce gelmez.
         self.cross = kw.get("cross", False)
+        # ŞEREFE — kule minareye çevrildiğinde eklenen ezan balkonu.
+        #
+        # Arap Camii'nin minaresi yeni bir yapı değildir: San Domenico'nun
+        # KARE PLANLI ÇAN KULESİDİR (RESEARCH §4.2(a): "sonradan minareye
+        # çevrilen kule budur"). Yani dönüşüm kuleyi yıkıp yerine silindir
+        # dikmek değil; haçı indirmek, şerefe eklemek, külahı kurşunlamak.
+        # İstanbul'un en tanınır siluetlerinden biri tam bu yüzden: bir
+        # İtalyan çan kulesi, minare olarak.
+        self.serefe = kw.get("serefe", False)
         self.apse = kw.get("apse", True)
         self.apse_r = kw.get("apse_r", 3.40)
         self.palette = kw.get("palette", None)       # None -> tipe gore
@@ -193,6 +202,11 @@ class KiliseParams(object):
             if self.nave_h < self.aisle_h + 2.0:
                 errs.append(f"latin bazilikada orta nef yan neften en az 2 m "
                             f"yuksek olmali ({self.nave_h} vs {self.aisle_h})")
+        if self.serefe and not self.tower:
+            errs.append("serefe kulesiz olamaz — serefe kulenin balkonudur")
+        if self.serefe and self.cross:
+            errs.append("serefe ve hac ayni kulede olamaz: kule ya can "
+                        "kulesidir ya minare")
         pitch = self.length / max(1, self.bays)
         if self.window_w > pitch - 1.0:
             errs.append(f"window_w={self.window_w} bu ritimde ({pitch:.2f} m) "
@@ -369,6 +383,33 @@ def _tower(p, mats, col, name, parts):
     # Can kati: dort kemerli panel bir kutu olusturur.
     t = 0.50
     z0 = shaft_h + 0.22
+
+    # SEREFE — kule minare olduysa (bkz. KiliseParams.serefe).
+    if getattr(p, "serefe", False):
+        # Kademeli bilezik: govdeden tasan iki silme, ustunde doseme,
+        # cevresinde korkuluk. Mukarnas soyutlanmistir; okunmasi gereken
+        # sey balkonun KENDISI, isciligi degil.
+        for i, (buyume, kalinlik) in enumerate(((0.30, 0.16), (0.62, 0.18))):
+            _put(parts, hz.make_box(f"{name}_SerefeBilezik{i}",
+                                    (s + buyume, s + buyume, kalinlik),
+                                    (x, y, shaft_h - 0.34 + i * 0.17), col),
+                 mats["cutstone"])
+        gen = s + 1.10
+        _put(parts, hz.make_box(f"{name}_SerefeDoseme", (gen, gen, 0.16),
+                                (x, y, shaft_h + 0.08), col), mats["cutstone"])
+        kh, kt = 0.92, 0.14
+        for sx in (-1, 1):
+            _put(parts, hz.make_box(f"{name}_SerefeKorkulukX",
+                                    (kt, gen, kh),
+                                    (x + sx * (gen * 0.5 - kt * 0.5), y,
+                                     shaft_h + 0.16 + kh * 0.5), col),
+                 mats["cutstone"])
+        for sy in (-1, 1):
+            _put(parts, hz.make_box(f"{name}_SerefeKorkulukY",
+                                    (gen - 2.0 * kt, kt, kh),
+                                    (x, y + sy * (gen * 0.5 - kt * 0.5),
+                                     shaft_h + 0.16 + kh * 0.5), col),
+                 mats["cutstone"])
     ow = s * 0.42
     spring = belfry_h * 0.55
     sill = belfry_h * 0.16

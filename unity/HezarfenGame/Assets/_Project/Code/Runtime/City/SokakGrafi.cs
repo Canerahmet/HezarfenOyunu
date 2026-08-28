@@ -67,6 +67,19 @@ namespace Hezarfen.Sehir
             Turbe = 13,
             /// <summary>İskele — kayık ağının düğümü.</summary>
             Iskele = 14,
+
+            /// <summary>
+            /// <b>Selâtin camisi — Cuma namazının kılındığı yer.</b>
+            ///
+            /// <see cref="Mescit"/>'ten ayrıdır ve ayrılığı bir kolaylık
+            /// değil: mahalle mescidinin minberi yoktur, Cuma namazı orada
+            /// kılınmaz. Cuma günü öğle vakti şehir mahalleye değil
+            /// <b>buraya</b> akar (ADR 0071).
+            ///
+            /// Bu düğümler uydurulmaz: dünyada zaten duran, konumu
+            /// katalogdan gelen selâtin camileridir.
+            /// </summary>
+            Cami = 15,
         }
 
         [Serializable]

@@ -106,6 +106,19 @@ namespace Hezarfen.Editor.Gis
                 { "LM_TurbeSultanAhmed", "PF_TurbeSultanAhmed" },
                 // Iskele `ShoreKinds` uyesidir: SUYA doner ve arazi 0,5 m'nin
                 // altindaysa su duzlemine oturur (Kiz Kulesi kurali).
+                // ARAP CAMII — Galata'nin CUMA camisi (ADR 0071).
+                //
+                // Uretilmesinin sebebi estetik degil olcum: Cuma namazi
+                // mescitte kilinmaz ve Galata'nin camisi yoktu, yani
+                // oyuncunun fiilen dolastigi semtte Cuma HICBIR SEY
+                // yapmiyordu. Uretilen ama gorunmeyen bir oge, olmayan bir
+                // ogedir.
+                //
+                // Yapi bir KILISEDIR ve kibleye donuk DEGILDIR (San
+                // Domenico, ~1323-37; 1475'ten beri cami). Ayasofya
+                // kurali burada da isler: yon katalogdan `face_deg` ile
+                // gelir ve kiblenin onune gecer (ADR 0045).
+                { "LM_ArapCamii", "PF_ArapCamii" },
                 { "LM_UskudarIskele", "PF_UskudarIskelesi" },
                 { "LM_AlayKosku", "PF_AlayKosku" },
             };

@@ -22,7 +22,16 @@ namespace Hezarfen.Tests
     public class SehirGunuTests
     {
         private const int Sakin = 1200;
-        private const int BirMayis1632Gun = 121;
+        /// <summary>
+        /// 1 Mayıs 1632 — <b>122. gün</b>, çünkü 1632 artık yıldır.
+        ///
+        /// Önce 121 yazıyordu ve o gün aslında 30 Nisan'dır. Takvim
+        /// hafta gününü de bilmeye başlayınca bu sessiz kayma bir sonuç
+        /// doğurdu: 30 Nisan 1632 <b>Cuma</b>dır. Yani bütün gün ölçümü
+        /// farkında olmadan Cuma gününü ölçüyor olacaktı (ADR 0071).
+        /// 1 Mayıs 1632 ise Cumartesi — sıradan bir gün.
+        /// </summary>
+        private const int BirMayis1632Gun = 122;
 
         private static SokakGrafi Graf()
         {

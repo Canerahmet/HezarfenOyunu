@@ -81,6 +81,26 @@
    "source": "Surici/Fener-Balat Rum-Ermeni kilisesi tipolojisi: uc nef tek ahsap besik cati altinda, can kulesi YOK, sokaktan alcak. Zimmi kisiti. RESEARCH.md 4.2. Olculer rekonstruksiyon; belirli bir yapiya karsilik gelmez."
   },
   {
+   "footprint_x": 19.85,
+   "footprint_y": 44.754,
+   "height": 24.79,
+   "pivot_min_z": 0.0,
+   "tris_lod0": 10036,
+   "tris_lod1": 36,
+   "wall_width": 15.0,
+   "wall_depth": 40.0,
+   "kind": "kilise_latin",
+   "palette": "default",
+   "tower": true,
+   "sink": 0.0,
+   "bays": 8,
+   "name": "ArapCamii",
+   "why": "San Domenico / Arap Camii — cami olmus Ceneviz bazilikasi, kare kule minare",
+   "prefab": "PF_ArapCamii",
+   "tier": "T1",
+   "source": "San Domenico (~1323-37), 1475'ten beri Arap Camii. Uc nefli bazilika, 40 x 15 m, moloz tas ve tugla almasik orgu, sivri kemerli pencereler, ahsap cati; orta nef yan neflerden yuksek; KARE PLANLI CAN KULESI (RESEARCH.md 4.2(a): 'sonradan minareye cevrilen kule budur'). Kaynak: Koc U. Istanbul Surlari, Arap Camii / San Domenico; Mitler, The Genoese in Galata 1453-1682."
+  },
+  {
    "footprint_x": 12.9,
    "footprint_y": 17.355,
    "height": 10.47,
