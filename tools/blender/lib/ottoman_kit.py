@@ -68,6 +68,16 @@ ASI_DARK = (0.181, 0.055, 0.035)        # gayrimuslim varyanti: daha koyu
 #: ailesinin dışındadır ve doygunluğu düşüktür.
 WEATHERED_TIMBER = (0.285, 0.262, 0.228)
 
+#: **Ham deri** — kayış, kuşak, ayakkabı. Faz 5'te hem kanat aygıtının
+#: bağlarında hem kıyafette gerekiyor; iki yerde iki ayrı kahverengi
+#: tutmak yerine tek rol.
+LEATHER = (0.226, 0.132, 0.074)
+
+#: **Kartal tüyü** — kanat yüzeyi. Koyu kahve gövde, uçlarda soluk.
+#: Tek bir renkle verilir; kanadın alacalığı GEOMETRIDEN gelir
+#: (üst üste binen tüy dizileri), dokudan değil.
+FEATHER = (0.238, 0.183, 0.128)
+
 # Kiremit tonu. Kesme tas gibi, KIREMIT DE MAHALLEYE GORE DEGISMEZ: aynı
 # ocaktan, aynı fırından çıkar. Boya kısıtı zimmînin DUVARINA konur, çatısına
 # değil. Ama iki paletin çatı dokuları farklı varlıklardı ve ölçüm ikisinin
@@ -118,6 +128,16 @@ TEXTURE_ROLES = {
         "paving": dict(asset="cobblestone_floor_001"),
         "bark":   dict(asset="bark_brown_01"),
         "bark_cinar": dict(asset="bark_platanus"),
+        # DERI ve TUY: Faz 5 (kanat aygiti + kiyafet) icin. Ikisi de
+        # cemaate gore degismez — deri deridir. Doku olarak asinmis
+        # kereste kullanilir cunku elde CC0 deri/tuy dokusu yok; rengi
+        # tint tasir, yuzey dokusunu lif yonu verir.
+        "leather": dict(asset="weathered_planks", tint=LEATHER,
+                        tint_factor=0.82, tint_blend="COLOR",
+                        value_gamma=0.78),
+        "feather": dict(asset="weathered_planks", tint=FEATHER,
+                        tint_factor=0.86, tint_blend="COLOR",
+                        value_gamma=0.88),
         "foliage_servi": dict(asset="foliage_servi",
                               root=os.path.join("art", "textures", "generated")),
         "foliage_cinar": dict(asset="foliage_cinar",
@@ -173,6 +193,16 @@ TEXTURE_ROLES = {
         "paving": dict(asset="cobblestone_floor_001"),
         "bark":   dict(asset="bark_brown_01"),
         "bark_cinar": dict(asset="bark_platanus"),
+        # DERI ve TUY: Faz 5 (kanat aygiti + kiyafet) icin. Ikisi de
+        # cemaate gore degismez — deri deridir. Doku olarak asinmis
+        # kereste kullanilir cunku elde CC0 deri/tuy dokusu yok; rengi
+        # tint tasir, yuzey dokusunu lif yonu verir.
+        "leather": dict(asset="weathered_planks", tint=LEATHER,
+                        tint_factor=0.82, tint_blend="COLOR",
+                        value_gamma=0.78),
+        "feather": dict(asset="weathered_planks", tint=FEATHER,
+                        tint_factor=0.86, tint_blend="COLOR",
+                        value_gamma=0.88),
         "foliage_servi": dict(asset="foliage_servi",
                               root=os.path.join("art", "textures", "generated")),
         "foliage_cinar": dict(asset="foliage_cinar",
@@ -232,6 +262,11 @@ PALETTES = {
         "paving":  ((0.30, 0.29, 0.27), 0.88, "M_Paving_Kaldirim"),
         "bark":    ((0.115, 0.092, 0.070), 0.92, "M_Bark"),
         "bark_cinar": ((0.175, 0.160, 0.130), 0.88, "M_Bark_Cinar"),
+        # Deri ve tuy: Faz 5 (kanat aygiti + kiyafet). Cemaate gore
+        # DEGISMEZ — deri deridir. Deri parlak degil ama tastan pürüzsüz;
+        # tuy daha da pürüzsüz cunku yagli.
+        "leather": (LEATHER, 0.74, "M_Leather"),
+        "feather": (FEATHER, 0.62, "M_Feather"),
         "foliage_servi": ((0.038, 0.068, 0.034), 0.78, "M_Foliage_Servi"),
         "foliage_cinar": ((0.086, 0.125, 0.048), 0.82, "M_Foliage_Cinar"),
         # Kursunun dokusu artik VAR (prosedurel — ADR 0021); buradaki renk
@@ -271,6 +306,11 @@ PALETTES = {
         "paving":  ((0.30, 0.29, 0.27), 0.88, "M_Paving_Kaldirim"),
         "bark":    ((0.115, 0.092, 0.070), 0.92, "M_Bark"),
         "bark_cinar": ((0.175, 0.160, 0.130), 0.88, "M_Bark_Cinar"),
+        # Deri ve tuy: Faz 5 (kanat aygiti + kiyafet). Cemaate gore
+        # DEGISMEZ — deri deridir. Deri parlak degil ama tastan pürüzsüz;
+        # tuy daha da pürüzsüz cunku yagli.
+        "leather": (LEATHER, 0.74, "M_Leather"),
+        "feather": (FEATHER, 0.62, "M_Feather"),
         "foliage_servi": ((0.038, 0.068, 0.034), 0.78, "M_Foliage_Servi"),
         "foliage_cinar": ((0.086, 0.125, 0.048), 0.82, "M_Foliage_Cinar"),
         # Kursunun dokusu artik VAR (prosedurel — ADR 0021); buradaki renk
