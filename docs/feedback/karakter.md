@@ -99,14 +99,37 @@ görünüyor** — ve doğrusu bu, çünkü şehri onaylarken baktığın figür
    Kuleden atlayacak adam için daha da kısa (uyluk ortası) yapabilirim
    ama plakalarda o boy yok; uydurma olur.
 
+## Rig — ve plandan bir sapma
+
+Karakter artık **rig'li ve Unity'de**: 22 kemikli Humanoid iskelet, iki
+prefab (`PF_Hezarfen_Sivil`, `PF_Hezarfen_Ucus`), avatar **2/2 geçerli**.
+
+Ama plandan saptım ve bunu sana sormam gerekiyor
+([ADR 0066](../decisions/0066-rig-rigify-degil.md)):
+
+Plan **Rigify** diyor. Rigify'ın verdiği şey elle poz vermek için
+IK/FK kontrol iskeletidir — yüzden fazla kemik. Animasyonları scriptle
+üreteceğim için o kontrollerin hiçbirini kullanmayacağım; geriye
+kalan tek iş kemik adlarını Unity'ninkilere çevirmek olurdu. Onun
+yerine Unity Humanoid'in tam istediği 22 kemiği doğrudan kurdum.
+
+**Kaybettiğimiz tek şey:** Blender'da elle poz vermek zorlaşır (IK yok).
+Gerekirse Rigify'ı sonradan bu iskeletin üstüne takabilirim — tersi
+daha zor.
+
+Eklem yerleri tablodan değil **gövdeden ölçüldü**: dirsek %63,7, diz
+%29,4 kotta. Bu ölçüm iki kez yanlış yeri buldu ve ikisini de sayı
+yakaladı — bir keresinde kol çizgisi **ayakları** kola sayıyordu ve
+bilek ayak bileği hizasına düşmüştü.
+
 ## Bilerek yapılmayanlar
 
 - **Saç ve sakal** — hair cards, ayrı tur. Şu an gövde saçsız ve bu
   eksiklik render'da görünüyor.
-- **Rig ve animasyon** — sıradaki tur (Rigify → Unity Humanoid).
+- **Animasyon** — sıradaki tur. Rig hazır, klipler yok.
 - **Yüz detayı** — taban ağın yüzü genel; Hezarfen'e ait bir yüz
   yapılmayacak, çünkü ait olduğu bir yüz yok.
-- **FBX ve prefab** — bilerek üretilmedi. Rig'siz bir karakter oyun
-  varlığı değil; `_Import` boş.
+- **Animator ve kontrolcü** — prefab'larda Animator YOK. Boş bir
+  Animator "animasyon var" gibi görünürdü.
 - **Kanat kayışlarının vücuda oturması** — kanat kayışları kanadın kendi
   parçası; karakterle buluşmaları rig turunda.

@@ -31,6 +31,7 @@ import hz_blender as hz             # noqa: E402
 import karakter_kit as kar          # noqa: E402
 import kiyafet_kit as kiy           # noqa: E402
 import ottoman_kit as kit           # noqa: E402
+import rig_kit as rk                # noqa: E402
 from export_fbx import export_fbx   # noqa: E402
 
 COLLECTION = "Export"
@@ -203,7 +204,7 @@ def giydir(govde, col, mats, etek_orani, dizlik_var):
         kiy.zemine_otur(mest)
         parts.append(hz.assign(mest, mats["mest"]))
 
-    return parts
+    return parts, kol_esik
 
 
 def taban_kur(args, mats):
@@ -287,12 +288,24 @@ def main():
                                               textured=not args.no_textures)
         asset = f"SK_{ad}"
         govde, _, _ = taban_kur(args, mats)
-        giysi = giydir(govde, col, mats, etek_orani, dizlik_var)
-        govde.name = f"{asset}_ten"
+        giysi, kol_esik = giydir(govde, col, mats, etek_orani, dizlik_var)
 
+        # Eklemler CIPLAK govdeden olculur, giyinikten degil: entari
+        # omzu 3,4 cm kalinlastirir ve omuz eklemini o kadar disari
+        # atardi. Rig tenin altindadir.
+        eklem = rk.eklemleri_olc(govde, kol_esik)
+        rig_hata = rk.uzuv_denetimi(eklem, kar.HEDEF_BOY)
+        if rig_hata:
+            raise SystemExit(f"[HZ] HATA {ad} rig: " + "; ".join(rig_hata))
+
+        govde.name = f"{asset}_ten"
         lod0 = kit.join_parts([govde] + giysi, f"{asset}_LOD0", col)
         lod1 = kar.desimasyon(lod0, 0.30, f"{asset}_LOD1")
         hz.link(lod1, col)
+
+        arm = rk.iskelet_kur(f"AR_{ad}", eklem, col)
+        for m in (lod0, lod1):
+            rk.deri_bagla(m, arm)
 
         mn, mx = hz.bounds(lod0)
         bilgi = dict(
@@ -308,7 +321,9 @@ def main():
             derinlik=round(mx[1] - mn[1], 4),
             etek_kotu=round(kar.HEDEF_BOY * etek_orani, 3),
             dizlik=dizlik_var, giysi_parca=len(giysi),
-            tris_lod0=kar.hz_tri(lod0), tris_lod1=kar.hz_tri(lod1))
+            tris_lod0=kar.hz_tri(lod0), tris_lod1=kar.hz_tri(lod1),
+            kemik=len(arm.data.bones),
+            kemikler=rk.kemik_raporu(arm, kar.HEDEF_BOY))
 
         # Genislik denetimi: giyinik adam ciplaktan en fazla ~%25 genis
         # olur (kollar entariyle kalinlasir, etek acilir). Ilk turda 3,29 m
@@ -320,6 +335,12 @@ def main():
                 f"[HZ] HATA {ad}: giyinik genislik {bilgi['en_genis']:.3f} m, "
                 f"ciplak {olcu['en_genis']:.3f} m — bir parca govdeden "
                 "kopmus olmali.")
+        # Unity Humanoid eksik kemikle avatar kurmaz ve hata mesaji
+        # hangi kemigin eksik oldugunu soylemez; burada soyluyoruz.
+        eksik = [b for b, _ in rk.HUMANOID if b not in arm.data.bones]
+        if eksik:
+            raise SystemExit(
+                f"[HZ] HATA {ad}: Humanoid kemikleri eksik: {eksik}")
         # Sarik boyu artirir ama 1,70 + sarik hala insan boyudur.
         if bilgi["boy"] > kar.HEDEF_BOY * 1.10:
             raise SystemExit(
@@ -336,13 +357,13 @@ def main():
 
         catalog.append(bilgi)
         hz.log(f"{ad:16s} boy {bilgi['boy']:.3f} m, etek {bilgi['etek_kotu']:.2f} m, "
-               f"{bilgi['giysi_parca']} parca, {bilgi['tris_lod0']:6d} / "
-               f"{bilgi['tris_lod1']:5d} ucgen  {why}")
+               f"{bilgi['giysi_parca']} parca, {bilgi['kemik']} kemik, "
+               f"{bilgi['tris_lod0']:6d} / {bilgi['tris_lod1']:5d} ucgen")
 
         hz.save_blend(os.path.join(args.blend_dir, f"{asset}.blend"))
         if args.export:
             export_fbx(os.path.join(args.out_dir, f"{asset}.fbx"),
-                       collection_name=COLLECTION)
+                       collection_name=COLLECTION, skinned=True)
 
     if not args.export:
         hz.log("FBX yazilmadi (--export ile): karakter rig'siz Unity'ye gitmez.")

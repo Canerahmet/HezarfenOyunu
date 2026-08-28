@@ -273,7 +273,54 @@ namespace Hezarfen.Editor.Pipeline
         static readonly float[] BuyukUc = { 0.25f, 0.03f, 0.004f };
         static readonly float[] BuyukIki = { 0.25f, 0.004f };
 
-        static void SetLodThresholds(LODGroup group)
+        //  KARAKTER — boyu kucuk ama davranisi baska.
+        //
+        //  Bir ev uzaktan bakilan bir seydir; karakter UCUNCU SAHIS
+        //  KAMERASINDA surekli 3-5 m otededir. Kucuk nesne merdiveni
+        //  (0,08) ilk kademeyi ~20 m'de dusururdu ve oyuncu kendi
+        //  karakterinin basitlestigini gorurdu. Ote yandan kul esigi
+        //  0,0015 bir insani ~1 km'ye kadar cizmeye devam ederdi; oysa
+        //  bir insan o mesafede zaten birkac pikseldir.
+        //
+        //  Yani karakterin merdiveni ters yonde ayarlanir: ilk kademe
+        //  GEC duser (0,22 ~ 7 m), kul esigi ERKEN gelir (0,010 ~ 156 m).
+        //  Faz 6'nin NPC kalabaligi da bu merdiveni kullanacak.
+        static readonly float[] KarakterUc = { 0.22f, 0.04f, 0.010f };
+        static readonly float[] KarakterIki = { 0.22f, 0.010f };
+
+        /// <summary>
+        /// Bu LODGroup için geçerli eşik merdiveni.
+        ///
+        /// <b>Tek kaynak.</b> Sayılar hem boru hattında hem testte
+        /// gerekiyor ve testte KOPYALANMIŞLARDI — bu projenin defalarca
+        /// yakaladığı "aynı sayı iki yerde" hatası. İkisi de artık burayı
+        /// okur; merdiven değişince test kendiliğinden yeni sayıyı bekler.
+        ///
+        /// Karakter ayrımı bir LİSTEYE değil <b>yapıya</b> dayanır: deri
+        /// bağlı (skinned) renderer taşıyan grup karakterdir. Bakımı
+        /// gereken bir isim listesi, eklenmeyi unutulan ilk varlıkta yalan
+        /// söylerdi.
+        /// </summary>
+        public static float[] Merdiven(LODGroup group)
+        {
+            var lods = group.GetLODs();
+            bool ucKademe = lods.Length >= 3;
+            if (Karakter(group))
+                return ucKademe ? KarakterUc : KarakterIki;
+            bool kucuk = group.size < SmallObjectSize;
+            return ucKademe ? (kucuk ? KucukUc : BuyukUc)
+                            : (kucuk ? KucukIki : BuyukIki);
+        }
+
+        /// <summary>Deri bağlı renderer taşıyorsa karakterdir.</summary>
+        public static bool Karakter(LODGroup group)
+        {
+            return group != null
+                && group.GetComponentsInChildren<SkinnedMeshRenderer>(true)
+                        .Length > 0;
+        }
+
+        public static void SetLodThresholds(LODGroup group)
         {
             var lods = group.GetLODs();
             if (lods.Length == 0) return;
@@ -292,10 +339,7 @@ namespace Hezarfen.Editor.Pipeline
             // okunuyordu, oysa yokluktu. Ayni bakista cizilen nesne sayisi
             // 472'ydi; kucuk merdivenle 3 194 oluyor — yani sehrin coğu
             // gorunmuyordu. Maliyeti %6,7'den %8,6'ya cikiyor.
-            bool kucuk = group.size < SmallObjectSize;
-            float[] esik = lods.Length >= 3
-                ? (kucuk ? KucukUc : BuyukUc)
-                : (kucuk ? KucukIki : BuyukIki);
+            float[] esik = Merdiven(group);
 
             for (int i = 0; i < lods.Length; i++)
             {

@@ -55,6 +55,42 @@ namespace Hezarfen.Tests
             public bool dizlik;
             public int tris_lod0;
             public int tris_lod1;
+            public int kemik;
+            public List<Kemik_> kemikler;
+        }
+
+        [Serializable]
+        private class Kemik_
+        {
+            public string ad;
+            public List<float> bas;
+            public float uzunluk;
+            public float kot_orani;
+        }
+
+        /// <summary>Unity Humanoid'in zorunlu saydığı kemikler.</summary>
+        private static readonly string[] Zorunlu =
+        {
+            "Hips", "Spine", "Chest", "Neck", "Head",
+            "LeftUpperArm", "LeftLowerArm", "LeftHand",
+            "RightUpperArm", "RightLowerArm", "RightHand",
+            "LeftUpperLeg", "LeftLowerLeg", "LeftFoot",
+            "RightUpperLeg", "RightLowerLeg", "RightFoot",
+        };
+
+        private static Kemik_ Kemik(Entry_ v, string ad)
+        {
+            if (v.kemikler == null) return null;
+            foreach (var k in v.kemikler) if (k.ad == ad) return k;
+            return null;
+        }
+
+        private static Entry_ Rigli()
+        {
+            foreach (var v in Katalog())
+                if (v.kemikler != null && v.kemikler.Count > 0) return v;
+            Assert.Fail("Katalogda kemik raporu tasiyan varyant yok.");
+            return null;
         }
 
         private static List<Entry_> Katalog()
@@ -182,6 +218,105 @@ namespace Hezarfen.Tests
                 Assert.Less(v.boy, taban.boy * 1.10f,
                     $"{v.name}: {v.boy:0.000} m — bir sarik 17 cm'den fazla "
                     + "eklemez; bir parca govdeden kopmus olmali.");
+            }
+        }
+        /// <summary>Humanoid'in istediği her kemik var.</summary>
+        [Test]
+        public void TheSkeletonHasEveryBoneUnityHumanoidRequires()
+        {
+            var v = Rigli();
+            foreach (string ad in Zorunlu)
+                Assert.IsNotNull(Kemik(v, ad),
+                    $"'{ad}' kemigi yok — Unity avatari kurmaz ve hata "
+                    + "mesaji hangi kemigin eksik oldugunu SOYLEMEZ.");
+        }
+
+        /// <summary>
+        /// Eklemler doğru sırada ve doğru kotta.
+        ///
+        /// Bu test bir hatanın anısıdır. Kol merkez çizgisi, gövde
+        /// ekseninden uzak noktaları arıyordu ve o filtre parmak uçlarının
+        /// 55 cm altında <b>ayakları</b> da yakalıyordu. Çizgi omuzdan
+        /// ayağa iniyor, %82'sine yürüyünce bilek <b>ayak bileği
+        /// hizasında</b> çıkıyordu: dirsek %42,7, bilek %14,6. İskelet
+        /// kurulmuş, hiçbir şey hata vermemişti.
+        /// </summary>
+        [Test]
+        public void TheJointsSitWhereHumanJointsSit()
+        {
+            var v = Rigli();
+            foreach (string yan in new[] { "Left", "Right" })
+            {
+                var omuz = Kemik(v, yan + "UpperArm");
+                var dirsek = Kemik(v, yan + "LowerArm");
+                var bilek = Kemik(v, yan + "Hand");
+                Assert.IsNotNull(omuz); Assert.IsNotNull(dirsek);
+                Assert.IsNotNull(bilek);
+                Assert.Greater(omuz.kot_orani, dirsek.kot_orani,
+                    $"{yan}: omuz dirsekten yukarida olmali.");
+                Assert.Greater(dirsek.kot_orani, bilek.kot_orani,
+                    $"{yan}: dirsek bilekten yukarida olmali.");
+                Assert.That(dirsek.kot_orani, Is.InRange(0.56f, 0.70f),
+                    $"{yan} dirsek %{dirsek.kot_orani * 100:0.0} kotta — "
+                    + "A-pozunda %58-68 arasinda olur.");
+                Assert.Greater(bilek.kot_orani, 0.35f,
+                    $"{yan} bilek %{bilek.kot_orani * 100:0.0} kotta — bu "
+                    + "kadar asagisi ayak bilegi hizasidir, el degil.");
+
+                var kalca = Kemik(v, yan + "UpperLeg");
+                var diz = Kemik(v, yan + "LowerLeg");
+                var ayak = Kemik(v, yan + "Foot");
+                Assert.Greater(kalca.kot_orani, diz.kot_orani);
+                Assert.Greater(diz.kot_orani, ayak.kot_orani);
+                Assert.That(diz.kot_orani, Is.InRange(0.24f, 0.32f),
+                    $"{yan} diz %{diz.kot_orani * 100:0.0} kotta.");
+            }
+        }
+
+        /// <summary>
+        /// Omurga pürüzsüz: baş, boyunun tam üstünde durur.
+        ///
+        /// Boyun ve baş eklemleri "gövde" filtresiyle ölçülürken o filtre
+        /// <b>trapez kasını</b> da sayıyordu ve dilim boyun değil omuz
+        /// platosu oluyordu. Sonuç: boyun 2,5 cm önde, kafatası 5,9 cm
+        /// arkada — 15 cm kotta 8,4 cm'lik bir kırık.
+        /// </summary>
+        [Test]
+        public void TheSpineIsSmoothFromHipsToHead()
+        {
+            var v = Rigli();
+            float en = float.MaxValue, boy = float.MinValue;
+            foreach (string ad in new[] { "Hips", "Spine", "Chest",
+                                          "UpperChest", "Neck", "Head" })
+            {
+                var k = Kemik(v, ad);
+                if (k == null || k.bas == null || k.bas.Count < 3) continue;
+                en = Mathf.Min(en, k.bas[1]);
+                boy = Mathf.Max(boy, k.bas[1]);
+                Assert.Less(Mathf.Abs(k.bas[0]), 0.005f,
+                    $"{ad} gövde ekseninde degil (x={k.bas[0]:0.000}).");
+            }
+            Assert.Less(boy - en, 0.030f,
+                $"Omurga zincirinin on-arka sapmasi {(boy - en) * 100f:0.0} cm "
+                + "— 3 cm'den fazlasi bir kirik demektir.");
+        }
+
+        /// <summary>Sol ve sağ simetrik.</summary>
+        [Test]
+        public void TheSkeletonIsSymmetric()
+        {
+            var v = Rigli();
+            foreach (string ad in new[] { "UpperArm", "LowerArm", "Hand",
+                                          "UpperLeg", "LowerLeg", "Foot" })
+            {
+                var l = Kemik(v, "Left" + ad);
+                var r = Kemik(v, "Right" + ad);
+                if (l == null || r == null) continue;
+                Assert.AreEqual(l.kot_orani, r.kot_orani, 0.01f,
+                    $"{ad}: sol %{l.kot_orani * 100:0.0}, sag "
+                    + $"%{r.kot_orani * 100:0.0} — govde simetriktir.");
+                Assert.AreEqual(l.bas[0], -r.bas[0], 0.02f,
+                    $"{ad}: sol/sag x aynalanmiyor.");
             }
         }
     }

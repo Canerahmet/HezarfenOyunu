@@ -374,15 +374,14 @@ namespace Hezarfen.Tests
                 if (tris > 20000 && lods.Length < 3)
                     eksik.Add($"{pf.name} ({tris} ucgen, {lods.Length} kademe)");
 
-                // Merdiven nesnenin BOYUNA gore secilir: kucuk olanlar
-                // (ev, dukkan) daha uzun mesafede ayrintili kalir. Gerekcesi
-                // olculdu — bkz. ADR 0063.
-                bool kucuk = grup.size < ImportLanding.SmallObjectSize;
-                float[] merdiven = lods.Length >= 3
-                    ? (kucuk ? new[] { 0.08f, 0.012f, 0.0015f }
-                             : new[] { 0.25f, 0.03f, 0.004f })
-                    : (kucuk ? new[] { 0.08f, 0.0015f }
-                             : new[] { 0.25f, 0.004f });
+                // Merdiven `ImportLanding`den OKUNUR, burada kopyalanmaz.
+                //
+                // Eskiden sayilar burada da yaziliydi ve iki kopya bir
+                // sure ayni kaldi. Karakter merdiveni eklenince ayristilar:
+                // boru hatti dogru sayiyi yaziyordu, test eski sayiyi
+                // bekliyordu ve KIRMIZI YANAN test dogru olan taraftı degil.
+                // Bir sayinin iki sahibi varsa er ya da gec iki degeri olur.
+                float[] merdiven = ImportLanding.Merdiven(grup);
                 for (int i = 0; i < lods.Length && i < merdiven.Length; i++)
                 {
                     float e = lods[i].screenRelativeTransitionHeight;

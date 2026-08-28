@@ -117,7 +117,7 @@ namespace Hezarfen.Editor.PlayerTools
             // hangisinin gorundugu Unity'nin depth sirasina kalir ve
             // "oynattim ama hicbir sey degismedi" diye gorunur.
             int off = 0;
-            foreach (var c in Object.FindObjectsByType<Camera>(FindObjectsSortMode.None))
+            foreach (var c in Object.FindObjectsByType<Camera>())
                 if (c != cam && c.enabled) { c.enabled = false; off++; }
 
             report = $"Gezgin kuruldu: {where} @ {start.ToString("F1")}"
@@ -136,8 +136,7 @@ namespace Hezarfen.Editor.PlayerTools
             {
                 // Mahallede: avlu kapisinin onu — mescidi ve carsiyi bir arada
                 // goren nokta (01_cekirdek karesiyle ayni yer).
-                foreach (var t in Object.FindObjectsByType<Transform>(
-                             FindObjectsSortMode.None))
+                foreach (var t in Object.FindObjectsByType<Transform>())
                     if (t.name.StartsWith("PF_AvluKapi")) { anchor = t; break; }
                 if (anchor != null)
                 {
@@ -147,8 +146,7 @@ namespace Hezarfen.Editor.PlayerTools
             }
             if (anchor == null)
             {
-                foreach (var t in Object.FindObjectsByType<Transform>(
-                             FindObjectsSortMode.None))
+                foreach (var t in Object.FindObjectsByType<Transform>())
                     if (t.name.StartsWith("PF_GalataKulesi")) { anchor = t; break; }
                 if (anchor != null)
                 {
