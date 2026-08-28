@@ -106,7 +106,13 @@ namespace Hezarfen.Editor.Lighting
         public static int Kur(out string rapor)
         {
             Kaldir();
-            bool geciciVardi = InterimLighting.Uninstall();
+
+            // Gecici takim ARTIK YOK (ADR 0072, PLAN Bolum 12). Eski
+            // sahnelerde kok nesnesi kalmis olabilir; adiyla temizlenir.
+            // Sinifa bagimlilik birakmiyoruz — takim silindi.
+            var gecici = GameObject.Find("GECICI_Aydinlatma");
+            bool geciciVardi = gecici != null;
+            if (geciciVardi) Object.DestroyImmediate(gecici);
 
             var kok = new GameObject(RigName);
             int n = 0;
@@ -198,6 +204,56 @@ namespace Hezarfen.Editor.Lighting
             return kutu;
         }
 
+        /// <summary>
+        /// Bileşeni bulur ya da kurar — <b>ve diske yazar</b>.
+        ///
+        /// `VolumeProfile.Add&lt;T&gt;()` bileşeni yalnızca bellekte kurar;
+        /// `AddObjectToAsset` olmadan profil dosyası BOŞ kalır. Bir kez
+        /// öyle oldu ve sonuç sessizdi: menü "kuruldu" dedi, sahne üç
+        /// durak karardı, ölçüm 2,62'den 0,55'e düştü. Bu deyim zaten
+        /// geçici takımda vardı; yeniden yazarken kullanmadım.
+        /// </summary>
+        private static T Ensure<T>(VolumeProfile profil) where T : VolumeComponent
+        {
+            if (profil.TryGet(out T mevcut) && mevcut != null) return mevcut;
+            var c = profil.Add<T>(true);
+            c.hideFlags = HideFlags.HideInHierarchy;
+            if (AssetDatabase.Contains(profil))
+                AssetDatabase.AddObjectToAsset(c, profil);
+            return c;
+        }
+
+        /// <summary>
+        /// Pozu <b>sabitler</b> — yalnız çevrimdışı kare yakalama için.
+        ///
+        /// Oyunda poz otomatiktir ve doğrusu odur. Ama inceleme paketi tek
+        /// bir kare render eder ve otomatik poz uyum sağlamaya vakit
+        /// bulamaz: aynı sahne iki koşumda iki farklı parlaklık verirdi.
+        /// Ölçüm tekrarlanabilir olmalı, o yüzden yakalama sırasında poz
+        /// çivilenir — ve iş bitince <see cref="OtomatikPoz"/> ile geri
+        /// alınır.
+        /// </summary>
+        public static void SabitPoz(float ev)
+        {
+            var poz = Ensure<Exposure>(Profil());
+            poz.mode.overrideState = true;
+            poz.mode.value = ExposureMode.Fixed;
+            poz.fixedExposure.overrideState = true;
+            poz.fixedExposure.value = ev;
+            EditorUtility.SetDirty(poz);
+            AssetDatabase.SaveAssets();
+        }
+
+        /// <summary>Pozu oyundaki hâline — otomatiğe — döndürür.</summary>
+        public static void OtomatikPoz()
+        {
+            var poz = Ensure<Exposure>(Profil());
+            poz.mode.overrideState = true;
+            poz.mode.value = ExposureMode.AutomaticHistogram;
+            EditorUtility.SetDirty(poz);
+            AssetDatabase.SaveAssets();
+        }
+
         /// <summary>Kalıcı Volume profili — yoksa üretilir.</summary>
         public static VolumeProfile Profil()
         {
@@ -227,8 +283,7 @@ namespace Hezarfen.Editor.Lighting
             // Sabit bir EV, gun boyu donen bir gunesle calismaz: ogleyin
             // dogru olan deger alacakaranlikta sahneyi karartir. Goz de
             // uyum saglar; kamera da saglasin.
-            var poz = profil.Add<Exposure>(true);
-            AssetDatabase.AddObjectToAsset(poz, profil);
+            var poz = Ensure<Exposure>(profil);
             poz.mode.overrideState = true;
             poz.mode.value = ExposureMode.AutomaticHistogram;
             poz.limitMin.overrideState = true;
@@ -246,8 +301,7 @@ namespace Hezarfen.Editor.Lighting
             poz.adaptationSpeedLightToDark.value = 0.6f;
 
             // --- SIS: Halic sabahi -------------------------------------
-            var sis = profil.Add<Fog>(true);
-            AssetDatabase.AddObjectToAsset(sis, profil);
+            var sis = Ensure<Fog>(profil);
             sis.enabled.overrideState = true;
             sis.enabled.value = true;
             sis.meanFreePath.overrideState = true;
@@ -260,8 +314,7 @@ namespace Hezarfen.Editor.Lighting
             sis.enableVolumetricFog.value = true;
 
             // --- SSGI: sicramanin ustune, kademeli ---------------------
-            var ssgi = profil.Add<GlobalIllumination>(true);
-            AssetDatabase.AddObjectToAsset(ssgi, profil);
+            var ssgi = Ensure<GlobalIllumination>(profil);
             ssgi.enable.overrideState = true;
             ssgi.enable.value = true;
 

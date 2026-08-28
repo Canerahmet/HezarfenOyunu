@@ -107,7 +107,7 @@ namespace Hezarfen.Editor.Gis
             {
                 // Poz DISKTE yasiyor: birakilirsa sonraki olcum (LightingTests)
                 // sessizce bu turun pozunda calisirdi.
-                InterimLighting.ApplyExposure(InterimLighting.DefaultExposureEV);
+                KaliciAydinlatma.OtomatikPoz();
                 // Sahne kirli kaldi (gunes dondu, takim degisti) — KAYDETMEDEN
                 // yeniden ac. Inceleme paketi sahneyi degistirmez.
                 EditorSceneManager.OpenScene(q.ScenePath, OpenSceneMode.Single);
@@ -132,11 +132,14 @@ namespace Hezarfen.Editor.Gis
                                out double alt, out double azi);
             SunPlacement.Apply(sun, alt, azi);
 
-            // Dolgu YONU gunesten turer; gunes dondugune gore takim yeniden
-            // kurulmak zorunda. Sadece pozu degistirip dolguyu birakmak,
-            // gun batimi karesini "yanlis yerden gelen ogle isigi" yapardi.
-            float scale = InterimLighting.FillScaleForAltitude((float)alt);
-            InterimLighting.Install(out string rig, scale);
+            // KALICI PAS: dolgu olcegi diye bir sey YOK artik.
+            //
+            // Gecici takimda iki sahte dolgu isigi vardi ve gunes dondukce
+            // onlarin siddeti elle olceklenmek zorundaydi. Sicrama gercek
+            // olunca bu kendiliginden cozuluyor: problar ve SSGI gunesin
+            // nerede oldugunu zaten biliyor. Yeniden kurmanin tek sebebi
+            // sahnenin pasi tasidigindan emin olmak.
+            KaliciAydinlatma.Kur(out string rig);
 
             // Pozometre: SOKAK KORIDORU karesi uzerinde — mahallenin en
             // temsili kadraji (yer, cephe, gokyuzu birlikte). Kurulamadiysa
@@ -144,7 +147,7 @@ namespace Hezarfen.Editor.Gis
             Shot meter = shots[shots.Count - 2];
             foreach (var s in shots) if (s.Name == "07_sokak") { meter = s; break; }
             float ev = PickExposure(meter, out FrameMetric.Stats mst, out string sweep);
-            InterimLighting.ApplyExposure(ev);
+            KaliciAydinlatma.SabitPoz(ev);
 
             lines.Add($"--- {label}: gunes saati {solarHour:F2}, yukseklik "
                       + $"{alt:F1} derece, azimut {azi:F1} derece");
@@ -194,14 +197,14 @@ namespace Hezarfen.Editor.Gis
         private static float PickExposure(Shot meter, out FrameMetric.Stats best,
                                           out string sweep)
         {
-            float bestEv = InterimLighting.DefaultExposureEV;
+            float bestEv = KaliciAydinlatma.OgleEV;
             best = default;
             float bestDetail = -1f;
             var parts = new List<string>();
 
             foreach (float ev in EvLadder)
             {
-                InterimLighting.ApplyExposure(ev);
+                KaliciAydinlatma.SabitPoz(ev);
                 var st = FrameMetric.Capture(meter.Eye, meter.Look, meter.Fov,
                                              null, 320, 180);
                 parts.Add($"{ev:F1}:{st.Detail:F2}/{st.BlownPct * 100f:F1}%");
@@ -218,7 +221,7 @@ namespace Hezarfen.Editor.Gis
                                  + $"patlamadan gecemedi (tavan %{MaxBlown * 100f:F1}). "
                                  + "En karanlik basamak kullanildi.");
                 bestEv = EvLadder[EvLadder.Length - 1];
-                InterimLighting.ApplyExposure(bestEv);
+                KaliciAydinlatma.SabitPoz(bestEv);
                 best = FrameMetric.Capture(meter.Eye, meter.Look, meter.Fov,
                                            null, 320, 180);
             }

@@ -13,7 +13,7 @@ namespace Hezarfen.Tests
     /// ## Neden bu test bir uygulamayı değil bir GEREKLİLİĞİ ölçüyor
     ///
     /// Şu an okunabilirliği sağlayan şey geçici bir aydınlatma takımıdır
-    /// (<see cref="InterimLighting"/>) ve o takım **silinecek**. Test onun
+    /// (<see cref="KaliciAydinlatma"/>) ve geçici takım **silindi**. Test onun
     /// varlığını sınasaydı, kalıcı ışık pası geldiğinde yanlış yere düşerdi.
     /// Sınanan şey şu: kim sağlarsa sağlasın, göz hizasından bakıldığında
     /// kare okunabilir olmalı.
@@ -56,7 +56,7 @@ namespace Hezarfen.Tests
             float detail;
             try
             {
-                report = InterimLighting.Measure(out detail);
+                report = SokakOkunabilirligi.Measure(out detail);
             }
             finally
             {
@@ -70,8 +70,7 @@ namespace Hezarfen.Tests
             }
             Assert.Greater(detail, 1.2f,
                 $"Golgedeki cephe OKUNMUYOR (doku deseni ayirt edilemiyor).\n{report}\n"
-                + "Aydinlatma: Hezarfen -> Aydinlatma -> Gecici aydinlatmayi kur "
-                + "(ya da kalici isik pasi).");
+                + "Aydinlatma: Hezarfen -> Aydinlatma -> Kalici isik pasini kur, sonra Problari pisir.");
         }
 
         /// <summary>
