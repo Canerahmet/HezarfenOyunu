@@ -165,7 +165,12 @@ namespace Hezarfen.Sehir
                 ihlal = Ihlal.Yok;
 
             // --- ALGI: goren var mi ------------------------------------
+            // GECE DEVRIYESI: karanlik saklar ama yatsidan sonra sokakta
+            // daha cok goz vardir. Iki etki zit yonde ve ikisi de gercek;
+            // net sonuc yine gunduzden dusuk (0,55 x 1,4 = 0,77).
             float menzil = gorusMesafesi * (gece ? geceGorusCarpani : 1f);
+            if (zaman != null && Olaylar.DevriyeVar(zaman.Vakit))
+                menzil *= Olaylar.DevriyeKatsayisi;
             EnYakinAses = EnYakinAsesMesafesi(menzil * 3f);
             YakindakiKalabalik = KalabalikSay();
 

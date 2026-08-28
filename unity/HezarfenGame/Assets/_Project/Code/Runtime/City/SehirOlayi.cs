@@ -120,6 +120,34 @@ namespace Hezarfen.Sehir
         /// <summary>Gece devriyesinde ases görüşü bu kadar artar.</summary>
         public const float DevriyeKatsayisi = 1.4f;
 
+        /// <summary>
+        /// Şu an gece devriyesi yürüyor mu — <b>ases sayısı</b> artıyor mu.
+        ///
+        /// Karanlık saklar (<c>geceGorusCarpani</c>) ama yatsıdan sonra
+        /// sokakta daha çok göz vardır: subaşı, asesbaşı ve yeniçeri
+        /// kolluğu gece devriyesi yürütür (RESEARCH §6). İki etki zıt
+        /// yönde ve ikisi de gerçek; net sonuç yine gündüzden düşük.
+        /// </summary>
+        public static bool DevriyeVar(VakitHesabi.Vakit v)
+            => v == VakitHesabi.Vakit.Yatsi;
+
+        /// <summary>
+        /// Şu an çarşı kuruluyor mu.
+        ///
+        /// Güneş vakti: kepenkler açılır, yük iskeleden çarşıya akar.
+        /// Esnafın günü burada başlar.
+        /// </summary>
+        public static bool PazarVar(VakitHesabi.Vakit v)
+            => v == VakitHesabi.Vakit.Gunes;
+
+        /// <summary>
+        /// Çarşı sabahı dükkâna/hana gitme olasılığı bu kadar artar.
+        ///
+        /// <see cref="CumaKatsayisi"/> ile aynı mantık, aynı formül; ikisi
+        /// de <b>T2</b>: kurulumun olduğu belgeli, oranı değil.
+        /// </summary>
+        public const float PazarKatsayisi = 1.35f;
+
         /// <summary>Yangın hangi mahallede — Cibali, Haliç kıyısı.</summary>
         public static bool YanginBugun(int yil, int gun)
             => yil == Kronoloji.CibaliYanginiYil

@@ -266,6 +266,77 @@ namespace Hezarfen.Tests
                 + "gunu cemaat yerinde doner (ADR 0071).");
         }
 
+        /// <summary>
+        /// <b>Çarşı sabahı da ölçülebilir bir fark yapıyor.</b>
+        ///
+        /// Güneş vakti kepenkler açılır; dükkâna akış sıradan bir vakitten
+        /// çok olmalı. Cuma ile aynı formül, aynı disiplin: katsayı tek
+        /// yerde yazılı ve ölçüm onu doğruluyor.
+        /// </summary>
+        [Test]
+        public void TheMarketMorningFillsTheShops()
+        {
+            var g = AssetDatabase.LoadAssetAtPath<SokakGrafi>(
+                "Assets/_Project/Data/SG_Sehir.asset");
+            var meslekler = AssetDatabase.FindAssets("t:NPCMeslek")
+                .Select(AssetDatabase.GUIDToAssetPath)
+                .Select(AssetDatabase.LoadAssetAtPath<NPCMeslek>)
+                .Where(m => m != null).ToList();
+            var sakinler = SehirGunu.Sakinler(g, meslekler, 1500);
+
+            int Dukkan(VakitHesabi.Vakit v)
+            {
+                var o = SehirGunu.Olc(g, sakinler, v, 1632, 122);
+                return o.hedefler.TryGetValue(SokakGrafi.Tur.Dukkan,
+                                              out int n) ? n : 0;
+            }
+
+            // Temel pay: cizelgenin kendi payi (olaysiz).
+            float temel = 0f;
+            foreach (var s in sakinler)
+                if (s.meslek != null)
+                    temel += s.meslek.Olasilik(VakitHesabi.Vakit.Gunes,
+                                               SokakGrafi.Tur.Dukkan);
+
+            int olculen = Dukkan(VakitHesabi.Vakit.Gunes);
+            Assert.Greater(temel, 0f, "Gunes vaktinde dukkan adimi yok.");
+
+            float beklenen = temel * Olaylar.PazarKatsayisi;
+            Assert.That(olculen, Is.EqualTo(beklenen).Within(beklenen * 0.15f),
+                $"Carsi sabahi {olculen} kisi dukkanda; temel pay {temel:F0}, "
+                + $"katsayi {Olaylar.PazarKatsayisi} ise {beklenen:F0} "
+                + "bekleniyordu.");
+        }
+
+        /// <summary>
+        /// <b>Gece devriyesi görüşü artırır ama geceyi gündüz yapmaz.</b>
+        ///
+        /// Karanlık saklar, devriye arttırır; ikisi zıt yönde ve ikisi de
+        /// gerçek. Net sonuç gündüzden <b>düşük</b> olmalı — yoksa gece
+        /// gizlenmenin bir anlamı kalmaz ve bütün gece oynanışı çöker.
+        /// </summary>
+        [Test]
+        public void TheNightWatchSeesMoreButNotAsMuchAsDaylight()
+        {
+            Assert.IsTrue(Olaylar.DevriyeVar(VakitHesabi.Vakit.Yatsi),
+                "Yatsida gece devriyesi yok.");
+            Assert.IsFalse(Olaylar.DevriyeVar(VakitHesabi.Vakit.Ogle),
+                "Ogle vaktinde gece devriyesi cikti.");
+
+            var sistem = new GameObject("aranma").AddComponent<AranmaSistemi>();
+            float gunduz = sistem.gorusMesafesi;
+            float gece = gunduz * sistem.geceGorusCarpani;
+            float devriyeli = gece * Olaylar.DevriyeKatsayisi;
+            Object.DestroyImmediate(sistem.gameObject);
+
+            Assert.Greater(devriyeli, gece,
+                "Devriye gecesi siradan geceden daha genis gormeli.");
+            Assert.Less(devriyeli, gunduz,
+                $"Devriye menzili {devriyeli:F1} m, gunduz {gunduz:F1} m — "
+                + "gece gunduzden daha tehlikeli olursa gizlenmenin anlami "
+                + "kalmaz.");
+        }
+
         /// <summary>Günün olayları vakte göre doğru sırada geliyor.</summary>
         [Test]
         public void TheDaysEventsArriveAtTheRightPrayer()

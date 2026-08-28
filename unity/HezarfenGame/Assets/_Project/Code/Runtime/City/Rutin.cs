@@ -50,18 +50,21 @@ namespace Hezarfen.Sehir
             {
                 if (hedef == SokakGrafi.Tur.Mescit) return SokakGrafi.Tur.Cami;
 
-                // COGALTMA. Temel pay `p` olan bir meslekte Cuma payi
-                // `p * k` olsun istiyoruz. Mescide gitmeyenlerin
-                // `q = p(k-1)/(1-p)` kadari da bugun gider; sonuc
-                // `p + (1-p)q = pk`. Yani katsayi TEK BIR YERDE yazili ve
-                // olcum onu dogruluyor — elle ayarlanmis bir sayi degil.
-                float p = meslek.Olasilik(v, SokakGrafi.Tur.Mescit);
-                if (p > 0f && p < 1f)
-                {
-                    float q = p * (Olaylar.CumaKatsayisi - 1f) / (1f - p);
-                    if (Zar(tohum, 7717) < q) return SokakGrafi.Tur.Cami;
-                }
+                if (Cekilir(meslek, v, SokakGrafi.Tur.Mescit,
+                            Olaylar.CumaKatsayisi, tohum, 7717))
+                    return SokakGrafi.Tur.Cami;
             }
+
+            // --- CARSI SABAHI -----------------------------------------
+            //
+            // Gunes vakti kepenkler acilir ve yuk iskeleden carsiya akar;
+            // esnafin gunu burada baslar. Cuma ogle vaktindedir, bu gunes
+            // vaktinde — ikisi ayni kisiyi ayni anda cekmez.
+            if (Olaylar.PazarVar(v)
+                && hedef != SokakGrafi.Tur.Dukkan
+                && Cekilir(meslek, v, SokakGrafi.Tur.Dukkan,
+                           Olaylar.PazarKatsayisi, tohum, 5501))
+                return SokakGrafi.Tur.Dukkan;
 
             // --- KRONOLOJI ---------------------------------------------
             //
@@ -89,6 +92,25 @@ namespace Hezarfen.Sehir
             if (hedef == SokakGrafi.Tur.Cami) return true;
             if (hedef == SokakGrafi.Tur.Ev) return false;
             return meslek.Disarida(v, tohum);
+        }
+
+        /// <summary>
+        /// Bu kişi, temel hedefi o olmadığı hâlde <paramref name="tur"/>'e
+        /// çekiliyor mu.
+        ///
+        /// Temel payı `p` olan bir hedefte olay günü payın `p·k` olmasını
+        /// istiyoruz. Oraya gitmeyenlerin `q = p(k−1)/(1−p)` kadarı da o
+        /// gün gider; sonuç `p + (1−p)q = p·k`. Katsayı <b>tek bir yerde</b>
+        /// yazılı ve ölçüm onu doğruluyor — elle ayarlanmış bir sayı değil.
+        /// </summary>
+        private static bool Cekilir(NPCMeslek meslek, VakitHesabi.Vakit v,
+                                    SokakGrafi.Tur tur, float katsayi,
+                                    int tohum, int tuz)
+        {
+            float p = meslek.Olasilik(v, tur);
+            if (p <= 0f || p >= 1f) return false;
+            float q = p * (katsayi - 1f) / (1f - p);
+            return Zar(tohum, tuz) < q;
         }
 
         /// <summary>Deterministik zar: aynı (tohum, tuz) hep aynı sayı.</summary>
