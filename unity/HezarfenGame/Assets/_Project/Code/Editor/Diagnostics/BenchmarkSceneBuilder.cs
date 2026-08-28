@@ -141,6 +141,56 @@ namespace Hezarfen.Editor.Diagnostics
             }
             groups.Add(dense);
 
+            // --- CARSI KALABALIGI (Faz 7) ------------------------------
+            //
+            // Yapi yuku ile KALABALIK yuku ayri seylerdir ve ayri
+            // olculmeli: sekiz bin ev CPU'da toplu isleniyor, kalabalik ise
+            // her govde icin ayri bir Transform, ayri bir Animator ve ayri
+            // bir gölge. Sokak karesi kalabaliksiz olculurse "carsi 60 FPS
+            // veriyor" demek, carsinin bos halini olcmek olur.
+            //
+            // Sayi kaprisli degil: NPCYonetici'nin govde butcesi 60 ve
+            // olcum onun USTUNU zorlamali — butceyi karsilayan bir sahne,
+            // butcenin yetip yetmedigini soylemez.
+            const int KalabalikSayisi = 80;
+            var crowd = new GameObject("Load_09_CarsiKalabaligi");
+            crowd.transform.SetParent(root.transform, false);
+            var kisiPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/_Project/Art/Prefabs/PF_Hezarfen_Sivil.prefab");
+            var kalabalikRng = new System.Random(1632);
+            int kisiMade = 0;
+            for (int i = 0; i < KalabalikSayisi; i++)
+            {
+                // Sokak koridoru boyunca dagit: kamera tam icine bakar.
+                float x = (float)(kalabalikRng.NextDouble() * 120.0 - 60.0);
+                float z = (float)(kalabalikRng.NextDouble() * 40.0 - 20.0);
+                float y = terrain.SampleHeight(new Vector3(x, 0f, z))
+                          + terrain.transform.position.y;
+                if (y < 3f) continue;
+
+                GameObject kisi;
+                if (kisiPrefab != null)
+                    kisi = (GameObject)PrefabUtility.InstantiatePrefab(
+                        kisiPrefab, crowd.transform);
+                else
+                {
+                    // Prefab yoksa OLCUM DURMAZ ama neyi olctugunu soyler:
+                    // kapsul, gercek karakterin maliyetini TASIMAZ.
+                    kisi = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+                    kisi.transform.SetParent(crowd.transform, false);
+                    kisi.transform.localScale = new Vector3(0.5f, 0.85f, 0.5f);
+                }
+                kisi.transform.position = new Vector3(x, y, z);
+                kisi.transform.rotation = Quaternion.Euler(
+                    0f, (float)(kalabalikRng.NextDouble() * 360.0), 0f);
+                kisiMade++;
+            }
+            if (kisiPrefab == null)
+                Debug.LogWarning("[Hezarfen] PF_Hezarfen_Sivil bulunamadi — kalabalik "
+                                 + "KAPSULLERLE kuruldu. Bu adimin sayisi gercek "
+                                 + "karakter maliyetini ALTTAN gosterir.");
+            groups.Add(crowd);
+
             // --- olcum kamerasi: kule tepesinden sehre bakis ---
             var camGo = GameObject.Find("Main Camera") ?? new GameObject("Main Camera");
             camGo.tag = "MainCamera";
@@ -161,7 +211,9 @@ namespace Hezarfen.Editor.Diagnostics
             probe.targetCamera = cam;
             probe.loadGroups = groups;
             probe.warmupFrames = 150;
-            probe.sampleFrames = 300;
+            // 20 saniyelik tam tur icin ornek sayisi: 60 FPS'te 1200 kare.
+            // Az orneklemek turun yalnizca bir dilimini olcmek olurdu.
+            probe.sampleFrames = 1200;
             var tower = camGo.transform.position;
             var towerRot = camGo.transform.rotation.eulerAngles;
             // Yaya: sokagin ortasinda, 1,65 m'de, sokak boyunca bakis.
@@ -183,6 +235,26 @@ namespace Hezarfen.Editor.Diagnostics
                 // adim ayni kadrajin temel maliyetini verir — fark, evlerin payi.
                 new FrameTimeProbe.Step { label = "SOKAK: 8000+400 yapi", resolution = new Vector2Int(1920, 1080), activeGroups = 9, overrideCamera = true, cameraPosition = street, cameraEuler = streetRot },
                 new FrameTimeProbe.Step { label = "SOKAK: bos (kiyas)",   resolution = new Vector2Int(1920, 1080), activeGroups = 0 },
+
+                // --- FAZ 7: KULE TURU --------------------------------
+                //
+                // Plan Faz 4'un olcutu "kule tepesinden 360 derece bakista
+                // FPS hedefi tutuyor" diyor ve Faz 7 bunu iki cozunurlukte
+                // kilitliyor (1080p/60 orta segment, 1440p/60 ust).
+                //
+                // Sabit bakis YETMEZ: bir yon sehrin en ucuzu olabilir.
+                // Kamera ORNEKLENEN PENCERE boyunca tam tur atar ve p95
+                // turun en pahali yonunu de icerir.
+                new FrameTimeProbe.Step { label = "KULE TURU 360 (1080p)", resolution = new Vector2Int(1920, 1080), activeGroups = 9, overrideCamera = true, cameraPosition = tower, cameraEuler = towerRot, yawSweep360 = true },
+                new FrameTimeProbe.Step { label = "KULE TURU 360 (1440p)", resolution = new Vector2Int(2560, 1440), activeGroups = 9, yawSweep360 = true },
+
+                // --- FAZ 7: CARSI KALABALIGI -------------------------
+                //
+                // Yaya seviyesi + kalabalik: malzeme maliyeti ve govde
+                // sayisi ayni anda tepede. Kalabalik `loadGroups`in son
+                // grubunda; yoksa adim yine kosar ve rapor farki gosterir.
+                new FrameTimeProbe.Step { label = "CARSI KALABALIK (1080p)", resolution = new Vector2Int(1920, 1080), activeGroups = 10, overrideCamera = true, cameraPosition = street, cameraEuler = streetRot },
+                new FrameTimeProbe.Step { label = "CARSI KALABALIK (1440p)", resolution = new Vector2Int(2560, 1440), activeGroups = 10 },
             };
 
             var tag = probeGo.GetComponent<HistoricalTag>() ?? probeGo.AddComponent<HistoricalTag>();

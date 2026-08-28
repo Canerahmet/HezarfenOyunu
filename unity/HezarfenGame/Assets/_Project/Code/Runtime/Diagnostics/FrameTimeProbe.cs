@@ -32,6 +32,29 @@ namespace Hezarfen.Diagnostics
             public bool overrideCamera;
             public Vector3 cameraPosition;
             public Vector3 cameraEuler;
+
+            /// <summary>
+            /// Açıksa kamera, <b>örneklenen pencere boyunca tam 360°</b>
+            /// döner.
+            ///
+            /// <b>Neden gerekli:</b> plan Faz 4'ün ölçütü *"kule tepesinden
+            /// 360° bakışta FPS hedefi tutuyor"* diyor — 360°, tek kadraj
+            /// değil. Sabit bakış şehrin en ucuz yönünü seçmiş olabilir;
+            /// dönen kamera <b>en pahalı</b> yönü de ölçüme sokar.
+            ///
+            /// <b>Neden saniyede derece DEĞİL:</b> ilk yazımda öyleydi ve
+            /// ölçüm tekrarlanamaz çıktı — iki koşumda aynı adımın çizim
+            /// çağrısı 28 652 ve 13 858 oldu. Sebep: dönüş saate bağlıydı,
+            /// örnek sayısı kareye. Kare hızı değişince taranan yay da
+            /// değişiyordu (360° değil ~216°) ve başlangıç açısı ısınmanın
+            /// ne kadar sürdüğüne göre kayıyordu. Yani iki koşum şehrin iki
+            /// farklı dilimini ölçüp aynı sayıymış gibi karşılaştırılıyordu.
+            ///
+            /// Şimdi açı <b>örnek ilerlemesinden</b> türüyor: kaçıncı
+            /// örnekteysek yay o kadar dönmüş oluyor. Kare hızı ne olursa
+            /// olsun pencere tam bir tur, her koşumda aynı tur.
+            /// </summary>
+            public bool yawSweep360;
         }
 
         [Tooltip("Ölçülecek yapılandırmalar, sırayla.")]
@@ -57,6 +80,7 @@ namespace Hezarfen.Diagnostics
         private int frameInStep;
         private readonly List<float> samples = new List<float>();
         private RenderTexture rt;
+        private Vector3 sweepBaseEuler;
 
 #if UNITY_EDITOR
         // Cizim cagrisi sayimi YALNIZCA Editor'de okunabilir (UnityStats).
@@ -133,6 +157,13 @@ namespace Hezarfen.Diagnostics
                 targetCamera.transform.rotation = Quaternion.Euler(step.cameraEuler);
             }
 
+            // Taramanin TABAN acisi: adim kamerayi tasidiysa yeni poz,
+            // tasimadiysa sahnedeki mevcut poz. Bir onceki adimin
+            // birakttigi acidan devam etmek, adimlari karsilastirilamaz
+            // yapardi.
+            if (targetCamera != null)
+                sweepBaseEuler = targetCamera.transform.rotation.eulerAngles;
+
             if (rt != null) { targetCamera.targetTexture = null; rt.Release(); Destroy(rt); }
             rt = new RenderTexture(step.resolution.x, step.resolution.y, 24, RenderTextureFormat.ARGB32);
             rt.Create();
@@ -144,6 +175,23 @@ namespace Hezarfen.Diagnostics
             if (Finished || stepIndex >= steps.Count) return;
 
             frameInStep++;
+            var suAnki = steps[stepIndex];
+
+            // ACIYI ORNEK ILERLEMESINDEN KUR — saatten degil.
+            //
+            // Isinma boyunca kamera BASLANGIC acisinda durur; boylece her
+            // kosum ayni yerden baslar. Ornekleme baslayinca yay, kacinci
+            // ornekte oldugumuza gore aciliyor: pencere tam 360 derece,
+            // kare hizi ne olursa olsun.
+            if (suAnki.yawSweep360 && targetCamera != null)
+            {
+                float ilerleme = frameInStep <= warmupFrames
+                    ? 0f
+                    : Mathf.Clamp01(samples.Count / (float)Mathf.Max(1, sampleFrames));
+                targetCamera.transform.rotation =
+                    Quaternion.Euler(sweepBaseEuler + new Vector3(0f, 360f * ilerleme, 0f));
+            }
+
             if (frameInStep <= warmupFrames) return;
 
             samples.Add(Time.unscaledDeltaTime * 1000f);
@@ -165,7 +213,8 @@ namespace Hezarfen.Diagnostics
                 $"{step.label,-26} {step.resolution.x}x{step.resolution.y}  " +
                 $"medyan {median,6:F2} ms ({1000f / median,6:F1} fps)  " +
                 $"p95 {p95,6:F2} ms ({1000f / p95,6:F1} fps)  " +
-                $"encotu {worst,6:F2} ms";
+                $"encotu {worst,6:F2} ms" +
+                (step.yawSweep360 ? "  [360 tur]" : "");
 #if UNITY_EDITOR
             line += $"  | cizim {Median(drawSamples),5}  SRPB {Median(srpSamples),5}" +
                     $"  setPass {Median(setPassSamples),4}  ucgen {MedianF(triSamples),6:F2} M";
