@@ -424,29 +424,148 @@ namespace Hezarfen.Editor.Gis
             foreach (var y in yollar)
                 foreach (var q in y) yolNoktalari.Add(new Vector2(q.x, q.z));
 
-            // SEMTLERIN ICINE GIRME.
+            // POLIGONA DEGIL, GERCEK BINAYA BAK.
             //
-            // Ilk izgara denemesinde kapsam x −4297…3526 cikti: yani
-            // Uskudar'a kadar her yer. Sebep, sinirlarin kapilar ile
-            // landmark'larin kutusundan turemesiydi ve o kutu butun sehri
-            // kapsiyor. Bostan parseli evlerin ARASINA duserdi.
+            // Once semt POLIGONLARININ ici tumden disarida birakiliyordu.
+            // Oyun turunda cekilen kare bunun yanlis oldugunu gosterdi:
+            // (−2500, −600) noktasi D_Surici_Bati'nin ICINDE ama orada
+            // hicbir yapi yok — ufka kadar bos cayir. Semt sinirlari
+            // idari bir alan, dolu bir alan degil; mahalleler o alanin
+            // yalnizca bir kismina kuruluyor.
             //
-            // Semt sinirlari zaten veri olarak var (DistrictDef.boundary);
-            // uydurmaya gerek yok.
-            var semtler = new List<DistrictDef>();
-            var reg = AssetDatabase.LoadAssetAtPath<DistrictRegistry>(
-                "Assets/_Project/Data/DistrictDefs/DistrictRegistry.asset");
-            if (reg != null && reg.districts != null)
-                foreach (var d in reg.districts)
-                    if (d != null && d.boundary != null && d.boundary.Length >= 3)
-                        semtler.Add(d);
+            // Dogru kural: bir yerde YAPI varsa doku oraya girmez;
+            // yoksa girer. Bunun icin semt sahneleri gecici olarak
+            // acilir ve bina konumlari toplanir. Ayni ders dogum yeri
+            // seciminde de ogrenilmisti — editorde arazi sahnesi tek
+            // basina bostur, semtler acilmadan hicbir sorgu dogru cevap
+            // vermez.
+            var binaKutulari = new Dictionary<(int, int), List<Vector2>>();
+            const float BinaIzgara = 64f;
+            var acilan = new List<UnityEngine.SceneManagement.Scene>();
+            foreach (string sy in Directory.GetFiles(
+                         "Assets/_Project/Scenes/Districts", "*.unity"))
+            {
+                UnityEngine.SceneManagement.Scene sc;
+                try
+                {
+                    sc = EditorSceneManager.OpenScene(
+                        sy.Replace("\\", "/"), OpenSceneMode.Additive);
+                }
+                catch { continue; }
+                acilan.Add(sc);
+
+                foreach (var kok2 in sc.GetRootGameObjects())
+                    foreach (var mr in kok2.GetComponentsInChildren<MeshRenderer>(false))
+                    {
+                        var b = mr.bounds;
+                        // Kaide, kaldirim gibi birlesik yuzeyler bina degil.
+                        if (b.size.x > 120f || b.size.z > 120f) continue;
+                        var c2 = new Vector2(b.center.x, b.center.z);
+                        var an = (Mathf.FloorToInt(c2.x / BinaIzgara),
+                                  Mathf.FloorToInt(c2.y / BinaIzgara));
+                        if (!binaKutulari.TryGetValue(an, out var liste))
+                        { liste = new List<Vector2>(); binaKutulari[an] = liste; }
+                        liste.Add(c2);
+                    }
+            }
+            foreach (var sc in acilan)
+                if (sc.IsValid()) EditorSceneManager.CloseScene(sc, true);
+
+            int binaSayisi = 0;
+            foreach (var kv in binaKutulari) binaSayisi += kv.Value.Count;
+            Debug.Log($"[Hezarfen] Kirsal: {binaSayisi} bina konumu toplandi.");
+
+            bool BinaYakin(Vector2 c2, float menzil)
+            {
+                int r = Mathf.CeilToInt(menzil / BinaIzgara);
+                int gx = Mathf.FloorToInt(c2.x / BinaIzgara);
+                int gz = Mathf.FloorToInt(c2.y / BinaIzgara);
+                float m2 = menzil * menzil;
+                for (int dz = -r; dz <= r; dz++)
+                    for (int dx = -r; dx <= r; dx++)
+                    {
+                        if (!binaKutulari.TryGetValue((gx + dx, gz + dz),
+                                                      out var liste)) continue;
+                        foreach (var b2 in liste)
+                            if ((b2 - c2).sqrMagnitude < m2) return true;
+                    }
+                return false;
+            }
+
+            // KORUNAN ALANLAR — veri zaten ayrimi tasiyor.
+            //
+            // Ilk yogunlastirmada iki tarih testi kirildi ve ikisi de
+            // hakliydi:
+            //   * Okmeydani'na 8.688 agac dustu. II. Bayezid vakfiyesi
+            //     orada YAPI, MEZAR, SU YOLU, BAG VE BAHCE yapilmasini
+            //     yasaklar; orasi bilincle bos tutulmus talim alanidir —
+            //     ustelik Hezarfen'in kendi talim yeri.
+            //   * Langa Bostani'na 618 agac dustu. Bostan sebze tarhidir,
+            //     meyvelik degil.
+            //
+            // Sinir uydurmuyoruz: `greenery_local.json` bu alanlari zaten
+            // `species: "none"` ile isaretliyor ve testler ayni dosyayi
+            // okuyor. Ayrim tur bazinda:
+            //   yasak/yerlesim -> ne parsel ne agac
+            //   bostan         -> PARSEL evet, AGAC hayir (tam da bostan)
+            var yasakHepsi = new List<Vector2[]>();   // parsel de agac da yok
+            var agacYasak = new List<Vector2[]>();    // yalniz agac yok
+            try
+            {
+                string jp = System.IO.Path.Combine(
+                    "..", "..", "data", "gis", "istanbul",
+                    GreeneryBuilder.DataFile);
+                if (File.Exists(jp))
+                {
+                    var af = JsonUtility.FromJson<GreeneryBuilder.AreaFile>(
+                        File.ReadAllText(jp));
+                    foreach (var a in af.areas)
+                    {
+                        if (a.ring == null || a.ring.Length < 3) continue;
+                        var halka = new Vector2[a.ring.Length];
+                        for (int i = 0; i < a.ring.Length; i++)
+                            halka[i] = new Vector2(a.ring[i].x, a.ring[i].z);
+                        if (a.kind == "yasak" || a.kind == "yerlesim")
+                            yasakHepsi.Add(halka);
+                        else if (a.kind == "bostan")
+                            agacYasak.Add(halka);
+                    }
+                }
+                else Debug.LogWarning($"[Hezarfen] {jp} yok — korunan "
+                                      + "alanlar okunamadi.");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning("[Hezarfen] Yesil alan dosyasi okunamadi: "
+                                 + e.Message);
+            }
+            Debug.Log($"[Hezarfen] Korunan alan: {yasakHepsi.Count} tam yasak, "
+                      + $"{agacYasak.Count} agac yasagi.");
+
+            bool Icinde(List<Vector2[]> halkalar, Vector2 c2)
+            {
+                foreach (var h in halkalar)
+                    if (DistrictDef.ContainsXZ(h, c2.x, c2.y)) return true;
+                return false;
+            }
 
             var duvarlar = new List<(Vector2 c, float y, float gen,
                                      float der, float yaw)>();
             var agacYerleri = new List<(Vector3 p, float olcek)>();
             int parsel = 0, meyvelik = 0;
 
-            const float Adim = 58f;
+            // IZGARA ADIMI 58 -> 30 m.
+            //
+            // Olculdu: 58 m'de (−2500, −600) cevresindeki 80x80 m'lik
+            // alanda 121 isindan YALNIZ BIRI bir bostan duvarina carpti,
+            // yani orada tek bir parsel vardi. 0,9 m'lik bir duvar zaten
+            // zor gorulur; tek basina olani hic gorulmez. Caner'in
+            // "bosluk hala dolmamis" demesi bu.
+            //
+            // Parseller TEK mesh'te birlestigi icin sayilari cizim
+            // cagrisini artirmiyor — pahali olan agac, o yuzden agac
+            // sayisi degil PARSEL sikligi artiriliyor.
+            const float Adim = 30f;
             for (float z = zMin; z <= zMax; z += Adim)
                 for (float x = xMin; x <= xMax; x += Adim)
                 {
@@ -458,12 +577,11 @@ namespace Hezarfen.Editor.Gis
                     // doku, bostan degil.
                     if (sehir.Any(sp => (sp - c).sqrMagnitude < 130f * 130f))
                         continue;
-                    // Semtin ICINDE ya da 40 m yakininda parsel olmaz.
-                    if (semtler.Any(d => DistrictDef.ContainsXZ(
-                                             d.boundary, c.x, c.y)
-                                      || DistrictDef.DistanceXZ(
-                                             d.boundary, c.x, c.y) < 40f))
-                        continue;
+                    // Yapinin dibine parsel kurulmaz — ama semtin BOS
+                    // kalan icine kurulur.
+                    if (BinaYakin(c, 45f)) continue;
+                    // Talim alani ve yerlesim: hicbir sey konmaz.
+                    if (Icinde(yasakHepsi, c)) continue;
                     if (yolNoktalari.Any(
                             yp => (yp - c).sqrMagnitude < 18f * 18f))
                         continue;
@@ -481,14 +599,14 @@ namespace Hezarfen.Editor.Gis
                     float yaw = (float)rng.NextDouble() * 360f;
 
                     // BOSTAN SULANIR ve su yokusta durmaz: duz zemin sarti.
-                    if (hi - lo < 2.2f && rng.Next(100) < 62)
+                    if (hi - lo < 2.2f && rng.Next(100) < 72)
                     {
                         float gen = 24f + (float)rng.NextDouble() * 10f;
                         float der = 16f + (float)rng.NextDouble() * 8f;
                         duvarlar.Add((c, hi, gen, der, yaw));
                         parsel++;
                     }
-                    else
+                    else if (!Icinde(agacYasak, c))
                     {
                         // Agac sayisi olculdu: 6-12 arasi kume
                         // 68.863 agac ekliyordu ve arazi zaten 42.649
@@ -503,6 +621,13 @@ namespace Hezarfen.Editor.Gis
                             float h = arazi.SampleHeight(
                                 new Vector3(q.x, 0f, q.y)) + ay;
                             if (h < 2.5f) continue;
+                            // Yasak, HUCRE merkezinde degil AGACIN KENDI
+                            // konumunda sinanir: kume +-17 m sacilir ve
+                            // merkez disarida kalsa bile tek tek agaclar
+                            // iceri dusuyordu (Okmeydani'nda 72, Yedikule
+                            // Bostani'nda 25 kalmisti).
+                            if (Icinde(yasakHepsi, q)
+                                || Icinde(agacYasak, q)) continue;
                             agacYerleri.Add((new Vector3(q.x, h, q.y),
                                              0.8f + (float)rng.NextDouble() * 0.4f));
                         }

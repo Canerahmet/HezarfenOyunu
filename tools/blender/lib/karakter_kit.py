@@ -154,21 +154,60 @@ def yonu_olc(obj):
     dar_x = ax < ay
     guven = 1.0 - min(ax, ay) / max(ax, ay)
 
-    # 3) Isaret: ayaklarda hangi tarafa tasma fazla?
+    # 3) ISARET: BURUN.
+    #
+    # Onceki isaret ayak tasmasiydi ve YANLIS OLCTU. Referans olarak
+    # butun kosenlerin agirlik merkezini (`govde_o`) aliyordu; o nokta
+    # ayak bilegi degil, govde ve kafa koselerinin yogunluk merkezidir.
+    # Parmak-topuk farki o referansa gore isaret vermedi ve olcum tabani
+    # 180 derece ters cevirdi. Sonuc zincirin sonuna kadar gitti:
+    # catalog.json'a `yon_duzeltme_derece: -180.0` yazildi, inceleme
+    # render'inda "on cephe" karesi SIRTI gosterdi, Unity'de omuz ustu
+    # kamerasi karakterin yuzunu gordu, ve rig'in ayak parmagi kemigi
+    # TOPUGA kondu (rig_kit onun de -y oldugunu varsayiyor).
+    #
+    # Yeni isaret Unity tarafinda olculerek dogrulandi: govde onden
+    # arkadan neredeyse simetrik (ayak +0,275 / -0,271; bas +0,111 /
+    # -0,107) ama YUZ HIZASINDA, MERKEZ SERIDINDE burun 2 cm'lik keskin
+    # bir asimetri veriyor. Kaba ölçü yön söylemiyor, burun söylüyor.
     z0, z1 = min(zs), max(zs)
-    esik = z0 + (z1 - z0) * 0.08
-    ayak = [v for v in vs if v.z <= esik]
-    if not ayak:
-        ayak = vs
-    govde_o = (sum(xs) / len(xs), sum(ys) / len(ys))
-    if dar_x:
-        ileri = max(v.x for v in ayak) - govde_o[0]
-        geri = govde_o[0] - min(v.x for v in ayak)
-        d = Vector((1.0 if ileri >= geri else -1.0, 0.0, 0.0))
-    else:
-        ileri = max(v.y for v in ayak) - govde_o[1]
-        geri = govde_o[1] - min(v.y for v in ayak)
-        d = Vector((0.0, 1.0 if ileri >= geri else -1.0, 0.0))
+    boy = z1 - z0
+    if boy < 1e-6:
+        return Vector((0.0, -1.0, 0.0)), 0.0
+
+    yanal = ys if dar_x else xs          # genis eksen
+    derin = xs if dar_x else ys          # dar eksen = bakis ekseni
+    yanal_o = sum(yanal) / len(yanal)
+    serit = boy * 0.035                  # ~6 cm, yuzun orta seridi
+
+    ileri_uc, geri_uc = None, None
+    for i, v in enumerate(vs):
+        t = (v.z - z0) / boy
+        if not (0.86 <= t <= 0.93):      # yuz bandi
+            continue
+        if abs(yanal[i] - yanal_o) > serit:
+            continue
+        dv = derin[i]
+        ileri_uc = dv if ileri_uc is None else max(ileri_uc, dv)
+        geri_uc = dv if geri_uc is None else min(geri_uc, dv)
+
+    if ileri_uc is None or geri_uc is None:
+        # Yuz bandi bos: sessizce tahmin etme, guveni sifirla.
+        return Vector((0.0, -1.0, 0.0)), 0.0
+
+    derin_o = (ileri_uc + geri_uc) * 0.5
+    burun_arti = ileri_uc - derin_o
+    burun_eksi = derin_o - geri_uc
+    isaret = 1.0 if burun_arti >= burun_eksi else -1.0
+
+    # Burun sinyali cok zayifsa (simetrik kafa) guveni dusur ki
+    # `one_cevir` dondurmeyi reddetsin.
+    fark = abs(burun_arti - burun_eksi)
+    if fark < boy * 0.004:               # < ~7 mm
+        guven = min(guven, 0.4)
+
+    d = (Vector((isaret, 0.0, 0.0)) if dar_x
+         else Vector((0.0, isaret, 0.0)))
     return d, guven
 
 
@@ -201,6 +240,20 @@ def one_cevir(obj, hedef=Vector((0.0, -1.0, 0.0))):
     # genis olmali. Insan genis ve incedir. Ilk yazimda yon olcumu
     # govdeyi 82 derece yan cevirdi ve bu denetim olsaydi o anda patlardi;
     # onun yerine iki adim sonra omuz genisligi 0,247 m olarak cikti.
+    # INVARYANT 2: DONUSTEN SONRA BURUN -Y'DE OLMALI.
+    #
+    # Asagidaki genislik/derinlik denetimi 180 dereceye KORDUR: omuz
+    # ekseni 180 donusten sonra hala X, derinlik hala Y'dir, kontrol
+    # gecer. Nitekim gecti — tabani 180 ters cevirdik ve uretim hicbir
+    # hata vermeden tamamlandi. Hata ancak oyunda, kamera arkaya
+    # gectiginde goruldu.
+    d2, guven2 = yonu_olc(obj)
+    if guven2 >= 0.5 and d2.y > 0.0:
+        raise ValueError(
+            f"{obj.name}: donusten SONRA burun +Y'de. Hedef -Y "
+            f"(Unity +Z). Yon olcumu ters calisiyor — 180 derece "
+            f"donmus bir karakter uretilmek uzereydi.")
+
     mn, mx = hz.bounds(obj)
     if (mx[0] - mn[0]) <= (mx[1] - mn[1]):
         raise ValueError(
