@@ -64,6 +64,20 @@ namespace Hezarfen.Editor.Pipeline
         [MenuItem("Hezarfen/Boru Hatti/Build sahne listesini duzelt")]
         public static void ApplyMenu()
         {
+            Apply(out string ozet);
+            Debug.Log("[Hezarfen] " + ozet);
+        }
+
+        /// <summary>
+        /// Listeyi düzeltir ve özet döndürür.
+        ///
+        /// Build hattı da bunu çağırıyor: liste elle bozulmuş olabilir ve
+        /// bozuk bir listeyle alınan build sessizce yanlış sahneyle açılır.
+        /// İkinci bir kopya yazmak yerine gövde ortak.
+        /// </summary>
+        public static void Apply(out string ozet)
+        {
+            ozet = string.Empty;
             int before = EditorBuildSettings.scenes.Length;
             var removed = new List<string>();
             foreach (var s in EditorBuildSettings.scenes)
@@ -84,17 +98,19 @@ namespace Hezarfen.Editor.Pipeline
 
             if (list.Count == 0)
             {
-                Debug.LogError("[Hezarfen] Istenen sahnelerin HICBIRI yok — "
-                               + "liste bosaltilmadi. Eksik: "
-                               + string.Join(", ", missing));
+                ozet = "Istenen sahnelerin HICBIRI yok — liste "
+                       + "bosaltilmadi. Eksik: " + string.Join(", ", missing);
+                Debug.LogError("[Hezarfen] " + ozet);
                 return;
             }
 
             EditorBuildSettings.scenes = list.ToArray();
-            Debug.Log($"[Hezarfen] Build sahne listesi: {before} -> {list.Count}. "
-                      + $"Acilis: {list[0].path}."
-                      + (removed.Count > 0 ? "\n  Cikarilan: " + string.Join(", ", removed) : "")
-                      + (missing.Count > 0 ? "\n  BULUNAMADI: " + string.Join(", ", missing) : ""));
+            ozet = $"Build sahne listesi: {before} -> {list.Count}. "
+                   + $"Acilis: {list[0].path}."
+                   + (removed.Count > 0
+                        ? "\n  Cikarilan: " + string.Join(", ", removed) : "")
+                   + (missing.Count > 0
+                        ? "\n  BULUNAMADI: " + string.Join(", ", missing) : "");
         }
     }
 }
