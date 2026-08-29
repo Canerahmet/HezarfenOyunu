@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -42,6 +43,9 @@ namespace Hezarfen.Arayuz
         [Tooltip("Seçili kademenin ölçülmüş açıklaması.")]
         public Text kademeYazi;
 
+        [Tooltip("Açılışta klavyeyle seçili olacak düğme.")]
+        public GameObject ilkSecim;
+
         /// <summary>Yükleme başladı mı — test okur.</summary>
         public bool Yukleniyor { get; private set; }
 
@@ -57,6 +61,8 @@ namespace Hezarfen.Arayuz
             // neden 50 FPS aldigini anlamaz.
             Ayarlar.Uygula();
             Panel(menuPaneli);
+            if (ilkSecim != null && EventSystem.current != null)
+                EventSystem.current.SetSelectedGameObject(ilkSecim);
         }
 
         /// <summary>Yalnız verilen paneli açar, ötekileri kapatır.</summary>
@@ -65,6 +71,50 @@ namespace Hezarfen.Arayuz
             foreach (var p in new[] { menuPaneli, yuklemePaneli,
                                       ayarlarPaneli, krediPaneli })
                 if (p != null) p.SetActive(p == acik);
+            Sec(acik);
+        }
+
+        /// <summary>Şu an açık olan panel.</summary>
+        public GameObject AcikPanel
+        {
+            get
+            {
+                foreach (var p in new[] { menuPaneli, ayarlarPaneli,
+                                          krediPaneli, yuklemePaneli })
+                    if (p != null && p.activeInHierarchy) return p;
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Panelin ilk düğmesini <b>seçili</b> yapar.
+        ///
+        /// Klavye ve oyun kolu <c>Submit</c> eylemi EventSystem'in seçili
+        /// nesnesine gider. Panel değişince eski seçim devre dışı kalan
+        /// nesneyle birlikte düşer ve o andan sonra <b>hiçbir tuş bir işe
+        /// yaramaz</b> — menü açık durur, oyuncu basar, hiçbir şey olmaz.
+        /// </summary>
+        private static void Sec(GameObject panel)
+        {
+            var es = EventSystem.current;
+            if (es == null || panel == null) return;
+            var ilk = panel.GetComponentInChildren<Button>(false);
+            es.SetSelectedGameObject(ilk != null ? ilk.gameObject : null);
+        }
+
+        /// <summary>
+        /// Seçim düşerse geri koyar — klavye asla boşa basmasın.
+        ///
+        /// Fareyle boşluğa tıklamak da seçimi düşürür; bu güvenlik ağı
+        /// olmadan menü o noktadan sonra yalnız fareyle kullanılabilir
+        /// hale gelirdi.
+        /// </summary>
+        private void Update()
+        {
+            var es = EventSystem.current;
+            if (es == null) return;
+            var s = es.currentSelectedGameObject;
+            if (s == null || !s.activeInHierarchy) Sec(AcikPanel);
         }
 
         private void Goster(bool menu)

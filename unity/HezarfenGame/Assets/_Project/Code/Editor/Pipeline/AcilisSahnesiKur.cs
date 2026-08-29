@@ -1,5 +1,6 @@
 using Hezarfen.Arayuz;
 using UnityEditor;
+using UnityEditor.Events;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -53,7 +54,8 @@ namespace Hezarfen.Editor.Pipeline
             //
             // Ayni tuzak Faz 5 kapisinda da yakalanmisti.
             var esGo = new GameObject("EventSystem");
-            esGo.AddComponent<UnityEngine.EventSystems.EventSystem>();
+            var olayDizgesi = esGo
+                .AddComponent<UnityEngine.EventSystems.EventSystem>();
             esGo.AddComponent<
                 UnityEngine.InputSystem.UI.InputSystemUIInputModule>();
 
@@ -71,21 +73,51 @@ namespace Hezarfen.Editor.Pipeline
             acilis.menuPaneli = menu;
             acilis.yuklemePaneli = yukleme;
 
+            // DINLEYICILER KALICI OLMALI — AddListener SAHNEYE YAZILMAZ.
+            //
+            // `onClick.AddListener(...)` bir CALISMA ZAMANI dinleyicisi
+            // ekler. Editorde kurulum sirasinda cagrilinca dugme o an
+            // calisir gibi gorunur, ama sahne kaydedilirken o dinleyici
+            // serilestirilmez: sahne bir daha acildiginda dort dugme de
+            // BOSA basar. Menu kusursuz gorunur ve hicbir sey olmaz —
+            // Caner'in build'de yasadigi tam olarak buydu.
+            //
+            // `UnityEventTools.AddPersistentListener` ise hedefi ve metot
+            // adini sahneye yazar; kalici dinleyici sayisi olculebilir ve
+            // bir test onu tutuyor (AcilisMenusuTests).
+            //
+            // Ders eskisiyle ayni: menuyu "dogruladigimda" panelleri
+            // KODDAN cagirmistim (m.KredileriAc()), yani tiklama yolunu
+            // hic sinamamistim. Olculmeyen yol, olmayan yoldur.
+
             var basla = Dugme(menu.transform, "BaslaDugme", "Başla",
                               new Vector2(0f, -20f));
-            basla.onClick.AddListener(acilis.Basla);
+            UnityEventTools.AddPersistentListener(basla.onClick,
+                                               acilis.Basla);
 
             var ayarDugme = Dugme(menu.transform, "AyarDugme", "Ayarlar",
                                   new Vector2(0f, -95f));
-            ayarDugme.onClick.AddListener(acilis.AyarlariAc);
+            UnityEventTools.AddPersistentListener(ayarDugme.onClick,
+                                               acilis.AyarlariAc);
 
             var krediDugme = Dugme(menu.transform, "KrediDugme", "Krediler",
                                    new Vector2(0f, -170f));
-            krediDugme.onClick.AddListener(acilis.KredileriAc);
+            UnityEventTools.AddPersistentListener(krediDugme.onClick,
+                                               acilis.KredileriAc);
 
             var cik = Dugme(menu.transform, "CikDugme", "Çık",
                             new Vector2(0f, -245f));
-            cik.onClick.AddListener(acilis.Cik);
+            UnityEventTools.AddPersistentListener(cik.onClick,
+                                               acilis.Cik);
+
+            // KLAVYE ICIN SECILI BIR NESNE SART.
+            //
+            // Fare olmadan "Enter" bir yere basmaz: Submit eylemi
+            // EventSystem'in SECILI nesnesine gider ve secili nesne yoksa
+            // hicbir yere gitmez. Caner "tuslara bastim, giremedim" derken
+            // menude secili hicbir sey YOKTU.
+            olayDizgesi.firstSelectedGameObject = basla.gameObject;
+            acilis.ilkSecim = basla.gameObject;
 
             // --- AYARLAR ---
             var ayarlar = Panel(canvasGo.transform, "AyarlarPaneli");
@@ -104,7 +136,10 @@ namespace Hezarfen.Editor.Pipeline
                 var d = Dugme(ayarlar.transform, $"Kademe{i}",
                               UnityEngine.QualitySettings.names[i],
                               new Vector2(0f, 140f - i * 75f));
-                d.onClick.AddListener(() => acilis.KademeSec(k));
+                // Lambda serilestirilemez; int argumanli kalici
+                // dinleyici sahneye yaziliyor.
+                UnityEventTools.AddIntPersistentListener(
+                    d.onClick, acilis.KademeSec, k);
             }
 
             acilis.kademeYazi = Yazi(ayarlar.transform, "KademeYazi",
@@ -114,7 +149,8 @@ namespace Hezarfen.Editor.Pipeline
 
             var ayarGeri = Dugme(ayarlar.transform, "AyarGeri", "Geri",
                                  new Vector2(0f, -200f));
-            ayarGeri.onClick.AddListener(acilis.Geri);
+            UnityEventTools.AddPersistentListener(ayarGeri.onClick,
+                                               acilis.Geri);
 
             // --- KREDILER ---
             //
@@ -138,7 +174,8 @@ namespace Hezarfen.Editor.Pipeline
 
             var krediGeri = Dugme(krediler.transform, "KrediGeri", "Geri",
                                   new Vector2(0f, -505f));
-            krediGeri.onClick.AddListener(acilis.Geri);
+            UnityEventTools.AddPersistentListener(krediGeri.onClick,
+                                               acilis.Geri);
 
             // --- YUKLEME ---
             acilis.ilerlemeYazi = Yazi(yukleme.transform, "IlerlemeYazi",

@@ -5,7 +5,8 @@
         "Hezarfen.Runtime",
         "Hezarfen.Editor",
         "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner"
+        "UnityEditor.TestRunner",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [
         "Editor"
