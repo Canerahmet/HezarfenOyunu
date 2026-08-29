@@ -125,3 +125,6 @@ art/base/**/*.fbx
 **/LightingData-*.asset.meta
 **/*Baking Set*.bytes
 **/*Baking Set*.bytes.meta
+
+# Uretilmis varliklar — turetilmis veri girmez (ADR 0073).
+unity/HezarfenGame/Assets/_Project/Art/Generated/

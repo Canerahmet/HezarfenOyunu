@@ -183,10 +183,38 @@ yapmıyor; atlas ve son LOD kartı bizim üretmemiz gerekiyor.
 
 Bu bir araç işi ve **sıradaki iş**.
 
+---
+
+# Üçüncü tur — örnekleme, on iki adımın on ikisi geçti
+
+Ağaçlar GPU örneklemesiyle çiziliyor; arazinin kendi ağaç çizimi
+kapatıldı. **Hiçbir ağaç silinmedi** ve **diske hiçbir şey yazılmadı** —
+42 857 konumun hepsi arazi verisinden okunuyor (ADR 0073).
+
+| adım | önce | sonra |
+|---|---|---|
+| boş arazi 1080p | 8,31 | **4,81** |
+| boş arazi 1440p | 10,03 | **7,15** |
+| 8000 yapı 1080p | 10,37 | **5,15** |
+| SOKAK 1080p | 13,46 | **5,80** |
+| çarşı 1080p | 14,46 | **6,99** |
+| çarşı 1440p | 14,30 | **9,14** |
+| **kule turu 1080p** | **17,83 ❌** | **7,23 ✅** |
+| **kule turu 1440p** | **17,92 ❌** | **8,31 ✅** |
+
+Yön farkı düzleşti: **4,7–7,1 ms** (önce 6,8–17,0). Boş arazide çizim
+çağrısı 19 607 → **419**, üçgen 2,03 M → **0,53 M**.
+
+Diskte üretilen: **sıfır bayt**. İlk iki deneme geometri üretiyordu ve
+biri sahneyi 805 MB'a şişirdi (commit'lendi, geri alındı), öteki 900 MB
+varlık yazdı. Ayrıntı ADR 0073'te.
+
 ## Açık maddeler
 
-1. **Kule turu p95** — teşhis edildi: ağaçlar (17,0 → 7,0). Çözüm uzak
-   ağaçlar için impostor LOD üretmek. Gölge ve su elendi.
+1. ~~Kule turu p95~~ — **çözüldü** (ağaç kümeleme, ADR 0073).
+2. **Yakın ağaç LOD'u** — kümeler kaba LOD taşıdığı için yakındaki
+   ağaçlar da kaba görünüyor. Yakın/uzak karışımı denendi, yürümedi
+   (`treeDistance` ara değerlerde etkisiz; sebep açıklanamadı).
 2. **Kalabalık üçgen bütçesi** — kişi başına 62 000.
 3. **Taban çizim çağrısı** — boş arazide 19 600.
 4. **Gerçek süreli oturum** — bu ölçüm 12 adım × 1200 kare. Otuz
