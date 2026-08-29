@@ -69,7 +69,18 @@ namespace Hezarfen.Tests
         [UnityTest]
         public IEnumerator PressingStartSwitchesToLoading()
         {
-            var m = Kur("Faz1_Terrain");
+            // SEHIR SAHNESI DEGIL, ACILIS.
+            //
+            // Bu test panel gecisini olcuyor, sehri degil. `Faz1_Terrain`
+            // yuklemek gercek bir asenkron yukleme baslatiyordu ve test
+            // onu BEKLEMIYORDU: yukleme sonraki testin ortasinda
+            // tamamlanip sahneyi degistiriyor, semt akisi testi de kendi
+            // nesnelerini kaybedip patliyordu. Tek basina kosunca
+            // geciyordu — sirali kosumda degil.
+            //
+            // Acilis build listesinde ve neredeyse bos; ayni yolu olcer,
+            // arkasinda sehir birakmaz.
+            var m = Kur("Acilis");
             yield return null;
 
             Assert.IsTrue(m.menuPaneli.activeSelf, "Menu paneli kapali basladi.");

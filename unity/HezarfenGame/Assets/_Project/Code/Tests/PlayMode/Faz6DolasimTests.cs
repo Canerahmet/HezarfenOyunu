@@ -173,20 +173,16 @@ namespace Hezarfen.Tests
 
             // GOVDE NESNELERI COGALMADI MI: havuz yeniden kullanmali.
             //
-            // BU TESTIN KENDI ARTISI olculur, sahnedeki toplam degil.
-            // Ilk yazimda toplam sayiliyordu ve yeni bir PlayMode test
-            // sinifi eklenince test patladi (66 > 42): sayilan sey bu
-            // testin sizintisi degil, ONCEKI testlerden kalanlardi.
-            // Genel bir sayaca bakan test, kendisiyle ilgisiz bir
-            // degisiklikte patlar ve yanlis yeri isaret eder.
-            int govdeNesnesi = Object.FindObjectsByType<GameObject>(
-                    FindObjectsInactive.Include, FindObjectsSortMode.None)
-                .Count(o => o.name.StartsWith("GovdePrefab"));
-            int artis = govdeNesnesi - _baslangictakiGovde;
-            Assert.LessOrEqual(artis, y.govdeButcesi + 2,
-                $"Bu test {artis} govde nesnesi ekledi, butce "
-                + $"{y.govdeButcesi} — havuz sizdiriyor; uzun oturumda "
-                + "bellek buyur.");
+            // OLCU YONETICININ KENDI SAYACI, sahneyi ada gore taramak
+            // DEGIL. Once sahne taraniyordu ve bu olcu IKI KEZ yanlis
+            // alarm verdi (66 ve 57): saydigi sey bu yoneticinin havuzu
+            // degil, onceki testlerden kalan nesnelerdi. Bir olcu,
+            // kendisiyle ilgisiz degisikliklerde patliyorsa yanlis seyi
+            // sayiyordur.
+            Assert.LessOrEqual(y.UretilenGovde, y.govdeButcesi,
+                $"Havuz {y.UretilenGovde} govde uretti, butce "
+                + $"{y.govdeButcesi} — sizdiriyor; uzun oturumda bellek "
+                + "buyur.");
 
             // SEHIR HALA YURUYOR MU: don ve hareket olctur.
             _oyuncuGo.transform.position = new Vector3(200f, 0f, 200f);

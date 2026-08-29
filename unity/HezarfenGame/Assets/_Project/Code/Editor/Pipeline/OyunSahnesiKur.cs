@@ -137,6 +137,13 @@ namespace Hezarfen.Editor.Pipeline
             kayit.sehir = sehir;
             rapor.Add("Kayit: baglayici kuruldu");
 
+            // 11) HUD — tarih, ezani saat, aranma; ESC/F5/F9.
+            var hud = Tekil<OyunHud>("HUD");
+            hud.zaman = zaman;
+            hud.kayit = kayit;
+            hud.aranma = aranma;
+            rapor.Add("HUD: ESC duraklat, F5 kaydet, F9 yukle");
+
             EditorSceneManager.MarkSceneDirty(sahne);
             EditorSceneManager.SaveScene(sahne);
             Debug.Log("[Hezarfen] OYUN SAHNESI KURULDU\n  "

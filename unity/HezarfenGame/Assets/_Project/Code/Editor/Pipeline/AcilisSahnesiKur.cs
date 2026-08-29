@@ -43,10 +43,19 @@ namespace Hezarfen.Editor.Pipeline
             olcek.referenceResolution = new Vector2(1920, 1080);
             canvasGo.AddComponent<GraphicRaycaster>();
 
+            // GIRDI MODULU: InputSystemUIInputModule, StandaloneInputModule
+            // DEGIL.
+            //
+            // UGUI'nin varsayilan modulu eski `UnityEngine.Input` sinifini
+            // okuyor; proje Input System'e gecmis durumda ve o sinif
+            // CALISMA ZAMANINDA istisna atiyor. Derleme sessiz, hata
+            // oyunda: menu acilir, dugmeler TIKLANMAZ.
+            //
+            // Ayni tuzak Faz 5 kapisinda da yakalanmisti.
             var esGo = new GameObject("EventSystem");
             esGo.AddComponent<UnityEngine.EventSystems.EventSystem>();
             esGo.AddComponent<
-                UnityEngine.EventSystems.StandaloneInputModule>();
+                UnityEngine.InputSystem.UI.InputSystemUIInputModule>();
 
             var menu = Panel(canvasGo.transform, "MenuPaneli");
             var yukleme = Panel(canvasGo.transform, "YuklemePaneli");

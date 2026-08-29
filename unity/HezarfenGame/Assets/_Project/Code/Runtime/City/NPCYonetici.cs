@@ -67,6 +67,17 @@ namespace Hezarfen.Sehir
         /// <summary>Şu an gövdesi olan sakin sayısı — tanı ve test okur.</summary>
         public int GorunurSayisi { get; private set; }
 
+        /// <summary>
+        /// Havuzun ürettiği toplam gövde nesnesi — <b>sızıntının ölçüsü</b>.
+        ///
+        /// Testler bunu sahneyi ada göre tarayarak sayıyordu ve o ölçü
+        /// iki kez yanlış alarm verdi: saydığı şey bu yöneticinin havuzu
+        /// değil, önceki testlerden kalanlardı. Sayacı buraya koymak
+        /// ölçüyü olması gereken yere getiriyor — havuz kendi büyümesini
+        /// zaten biliyor.
+        /// </summary>
+        public int UretilenGovde { get; private set; }
+
         /// <summary>Bütün sakinler (görünür olsun olmasın).</summary>
         public IReadOnlyList<NPCAjan> Sakinler => _sakinler;
 
@@ -183,52 +194,58 @@ namespace Hezarfen.Sehir
         {
             Vector3 merkez = oyuncu != null ? oyuncu.position : Vector3.zero;
             float d2 = gorunurMesafe * gorunurMesafe;
-            int gorunur = 0;
 
-            // ONCE BIRAK, SONRA AL — iki ayri gecis.
+            // KIM GORUNECEK: once KARAR, sonra birakma, en son alma.
             //
-            // Tek gecisteyken havuz butceyi ASIYORDU: listede once gelen
-            // uzak bir sakin govdesini henuz birakmamisken, sonra gelen
-            // yakin bir sakin govde istiyordu; havuz bos oluyor ve YENI
-            // bir govde yaratiliyordu. Olcum bunu gosterdi — butce 40
-            // iken 70 govde nesnesi. Uzun oturumda tam da kacinilmak
-            // istenen sey: sessizce buyuyen bellek.
-            foreach (var a in _sakinler)
+            // Iki gecis yetmedi. Birinci gecis yalniz MENZIL DISINDAKILERI
+            // birakiyordu; menzilde olup butceye sigmayanlar govdelerini
+            // ikinci gecisin ICINDE, hem de alimlardan SONRA birakiyordu.
+            // Sonuc: 40 alim yapilirken 25 eski govde hala tutuluyor,
+            // havuz bos, yenileri yaratiliyor. Olcum bunu soyledi —
+            // butce 40 iken havuz 65 govde uretmisti.
+            //
+            // Once bir kez daha yanlis olcmustum: testler sahneyi ada
+            // gore tariyordu ve saydiklari onceki testlerden kalanlardi.
+            // Sayac yoneticinin kendisine tasininca gercek sizinti
+            // gorundu. Yanlis olcu, olmayan bir sorunu iki kez gosterip
+            // gercegini gizledi.
+            int gorunur = 0;
+            for (int i = 0; i < _sakinler.Count; i++)
             {
-                if (a.govde == null) continue;
-                if ((a.konum - merkez).sqrMagnitude > d2)
-                { GovdeBirak(a.govde); a.govde = null; }
+                var a = _sakinler[i];
+                a.gorunmeli = (a.konum - merkez).sqrMagnitude <= d2
+                              && gorunur < govdeButcesi;
+                if (a.gorunmeli) gorunur++;
             }
 
+            // BIRAK: gorunmeyecek herkes, alim yapilmadan once.
             foreach (var a in _sakinler)
             {
-                bool yakin = (a.konum - merkez).sqrMagnitude <= d2
-                             && gorunur < govdeButcesi;
-                if (yakin)
-                {
-                    if (a.govde == null) a.govde = GovdeAl();
-                    if (a.govde != null)
-                    {
-                        a.govde.position = a.konum;
-                        if (a.hiz > 0.05f)
-                        {
-                            var yon = a.YonBul(graf);
-                            if (yon.sqrMagnitude > 1e-4f)
-                                a.govde.rotation = Quaternion.LookRotation(yon);
-                        }
-                        var an = a.govde.GetComponentInChildren<Animator>();
-                        if (an != null) an.SetFloat("hiz", a.hiz);
-                        gorunur++;
-                    }
-                }
-                else if (a.govde != null)
-                {
-                    // Menzilde ama BUTCE doldu: govdesini birak.
-                    GovdeBirak(a.govde);
-                    a.govde = null;
-                }
+                if (a.govde == null || a.gorunmeli) continue;
+                GovdeBirak(a.govde);
+                a.govde = null;
             }
-            GorunurSayisi = gorunur;
+
+            // AL ve yerlestir.
+            int cizilen = 0;
+            foreach (var a in _sakinler)
+            {
+                if (!a.gorunmeli) continue;
+                if (a.govde == null) a.govde = GovdeAl();
+                if (a.govde == null) continue;
+
+                a.govde.position = a.konum;
+                if (a.hiz > 0.05f)
+                {
+                    var yon = a.YonBul(graf);
+                    if (yon.sqrMagnitude > 1e-4f)
+                        a.govde.rotation = Quaternion.LookRotation(yon);
+                }
+                var an = a.govde.GetComponentInChildren<Animator>();
+                if (an != null) an.SetFloat("hiz", a.hiz);
+                cizilen++;
+            }
+            GorunurSayisi = cizilen;
         }
 
         /// <summary>
@@ -249,6 +266,7 @@ namespace Hezarfen.Sehir
             }
             if (govdePrefab == null) return null;
             var go = Instantiate(govdePrefab, transform);
+            UretilenGovde++;
             return go.transform;
         }
 

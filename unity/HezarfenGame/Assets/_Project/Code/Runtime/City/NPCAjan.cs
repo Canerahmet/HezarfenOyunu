@@ -33,6 +33,13 @@ namespace Hezarfen.Sehir
         /// <summary>Hedef düğüm; -1 = hedefsiz (evinde bekliyor).</summary>
         public int hedefDugum = -1;
 
+        /// <summary>
+        /// Bu karede çizilecek mi — <see cref="NPCYonetici"/> önce karar
+        /// verir, sonra bırakır, en son alır. Karar bayrağı olmadan
+        /// bırakma ile alma iç içe geçiyor ve havuz bütçeyi aşıyordu.
+        /// </summary>
+        public bool gorunmeli;
+
         /// <summary>Görsel gövde — yalnız yakınken vardır.</summary>
         public Transform govde;
 
