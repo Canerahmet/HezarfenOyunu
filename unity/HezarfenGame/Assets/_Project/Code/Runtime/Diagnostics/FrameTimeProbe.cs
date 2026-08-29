@@ -79,6 +79,13 @@ namespace Hezarfen.Diagnostics
         private int stepIndex = -1;
         private int frameInStep;
         private readonly List<float> samples = new List<float>();
+
+        /// <summary>
+        /// Örnekler <b>zaman sırasında</b> — sürüklenme için.
+        /// <see cref="samples"/> yüzdelik hesabı için sıralanıyor ve sıra
+        /// bozuluyor; "zamanla kötüleşti mi" sorusu ise sırayı gerektirir.
+        /// </summary>
+        private readonly List<float> zamanSirali = new List<float>();
         private RenderTexture rt;
         private Vector3 sweepBaseEuler;
 
@@ -141,6 +148,7 @@ namespace Hezarfen.Diagnostics
             stepIndex++;
             frameInStep = 0;
             samples.Clear();
+            zamanSirali.Clear();
             for (int i = 0; i < YonKova; i++)
             {
                 if (yonOrnekleri[i] == null) yonOrnekleri[i] = new List<float>();
@@ -216,6 +224,7 @@ namespace Hezarfen.Diagnostics
 
             float suAnkiMs = Time.unscaledDeltaTime * 1000f;
             samples.Add(suAnkiMs);
+            zamanSirali.Add(suAnkiMs);
             if (suAnki.yawSweep360 && targetCamera != null)
             {
                 float aci = Mathf.Repeat(
@@ -250,6 +259,24 @@ namespace Hezarfen.Diagnostics
 #endif
             Report.Add(line);
 
+            // SURUKLENME: ilk ucte bir ile son ucte bir.
+            //
+            // Uzun oturumun sorusu "hizli mi" degil, "hizli KALIYOR mu".
+            // Bellek buyumesi, havuz sizintisi, isinma — hepsi zamanla
+            // agirlasir ve tek bir medyanin altinda gorunmez. Ornekleri
+            // ikiye bolup karsilastirmak bunu tek sayiyla soyluyor.
+            if (samples.Count >= 30)
+            {
+                // `samples` yukarida SIRALANDI; suruklenme icin SIRA
+                // gerekli, o yuzden ayri bir kopyadan olculur.
+                int ucte = zamanSirali.Count / 3;
+                float ilk = OrtaDeger(zamanSirali, 0, ucte);
+                float son = OrtaDeger(zamanSirali, zamanSirali.Count - ucte,
+                                      ucte);
+                Report.Add($"        suruklenme: ilk {ilk:F2} ms -> son "
+                           + $"{son:F2} ms  ({(son - ilk):+0.00;-0.00} ms)");
+            }
+
             // YON DOKUMU: turun neresi pahali.
             if (step.yawSweep360)
             {
@@ -265,6 +292,15 @@ namespace Hezarfen.Diagnostics
             }
 
             AdvanceStep();
+        }
+
+        /// <summary>Bir dilimin ortanca değeri (kopya alır, sırayı bozmaz).</summary>
+        private static float OrtaDeger(List<float> v, int bas, int adet)
+        {
+            if (adet <= 0) return 0f;
+            var dilim = v.GetRange(bas, Mathf.Min(adet, v.Count - bas));
+            dilim.Sort();
+            return dilim[dilim.Count / 2];
         }
 
         private void Cleanup()
