@@ -928,6 +928,35 @@ namespace Hezarfen.Editor.Gis
             tri.Add(b); tri.Add(b + 3); tri.Add(b + 2);
         }
 
+        /// <summary>
+        /// <b>Dışarıdan kaide ekler</b> — mahalle dışındaki yerleştiriciler
+        /// için.
+        ///
+        /// Kaide mantığı (en yüksek köşeye otur, altını taşla doldur) uzun
+        /// süre yalnız mahalle kurucusunun içinde yaşadı. Ölçüm gösterdi ki
+        /// aynı boşluk şehrin <b>en görünür</b> yapılarında da vardı:
+        /// Ayasofya 2,85 m, Fatih Camii 4,33 m, Beyazıt 4,87 m, Yedikule
+        /// 5,20 m havada duruyordu — çünkü landmark yerleştiricisi bu
+        /// listeye hiç dokunmuyordu. Denetim de onları taramıyordu, yani
+        /// kusur iki kez görünmez kaldı.
+        /// </summary>
+        public static void KaideEkle(Vector2 merkez, float ust, float alt,
+                                     float genislik, float derinlik,
+                                     float yawDerece)
+        {
+            if (ust - alt <= 0.05f) return;
+            podiums.Add(new Podium
+            {
+                center = merkez, top = ust, bottom = alt,
+                width = genislik, depth = derinlik, yawDeg = yawDerece,
+            });
+        }
+
+        /// <summary>Biriken kaideleri tek mesh olarak sahneye kurar.</summary>
+        public static void KaideleriKur(Transform ebeveyn, string ad,
+                                        string varlikAdi)
+            => BuildPodiums(ebeveyn, ad, varlikAdi);
+
         private static void BuildPodiums(Transform parent, string name, string quarter)
         {
             if (podiums.Count == 0) return;

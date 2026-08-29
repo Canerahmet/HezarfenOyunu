@@ -252,12 +252,36 @@ namespace Hezarfen.Editor.Gis
                 else face = Downhill(terrain, c);
                 inst.transform.rotation = Quaternion.LookRotation(face,
                                                                   Vector3.up);
+                // TERAS: landmark da en yuksek koseye oturur, altindaki
+                // bosluk tas istinat duvariyla dolar.
+                //
+                // Bu satirlar YOKTU ve sonucu olculdu: Ayasofya 2,85 m,
+                // Fatih Camii 4,33 m, Beyazit 4,87 m, Yedikule 5,20 m,
+                // Uskudar Mihrimah 6,38 m havada duruyordu. Sehrin en cok
+                // bakilan yapilari, en gorunur kusurla.
+                //
+                // Osmanli kulliyesi zaten boyle kurulur: yamacta avlu duz
+                // bir TERAS olur ve asagi yuzu istinat duvariyla tutulur.
+                // Yani bu bir yama degil, eksik kalan yapinin kendisi.
+                if (hi >= 0.5f && hi - lo > 0.05f)
+                {
+                    float kenar = radius * 2f + 1.2f;
+                    OttomanStreetBuilder.KaideEkle(
+                        c, hi, lo - 0.6f, kenar, kenar,
+                        inst.transform.eulerAngles.y);
+                }
+
                 placed++;
                 lines.Add($"  {f.id} -> {prefabName} @ ({c.x:F1}, {y:F1}, {c.y:F1}), "
                           + $"ayak izi altinda kot farki {hi - lo:F2} m, "
                           + $"yon {inst.transform.eulerAngles.y:F1} derece "
                           + (mosque ? "(KIBLE)" : "(egim)"));
             }
+
+            // Butun teraslar tek mesh: ayri ayri nesne yuzlerce cizim
+            // cagrisi ekler ve teraslar kipirdamaz.
+            OttomanStreetBuilder.KaideleriKur(host.transform, "Kaideler",
+                                              "Landmark");
 
             var tag = host.AddComponent<HistoricalTag>();
             tag.tier = HistoricalTier.Documented;

@@ -79,9 +79,52 @@ namespace Hezarfen.Editor.Pipeline
             Debug.Log($"[Hezarfen] BUILD ({rapor.summary.result})\n{ozet}");
         }
 
+        /// <summary>
+        /// <c>Resources/surum.txt</c>'e build zamanını ve commit özetini
+        /// yazar.
+        ///
+        /// Bir tur boyunca "düzeltme işe yaramadı mı, yoksa eski build mi
+        /// oynanıyor" sorusunu ayırt edemedik. Damga onu ekranda gösteriyor.
+        /// </summary>
+        private static void SurumDamgasiYaz()
+        {
+            string commit = "?";
+            try
+            {
+                var psi = new System.Diagnostics.ProcessStartInfo(
+                    "git", "rev-parse --short HEAD")
+                {
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    WorkingDirectory = Directory.GetCurrentDirectory(),
+                };
+                using (var pr = System.Diagnostics.Process.Start(psi))
+                {
+                    commit = pr.StandardOutput.ReadToEnd().Trim();
+                    pr.WaitForExit(4000);
+                }
+            }
+            catch { /* git yoksa damga yine de zamani tasir */ }
+
+            string metin = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm")
+                           + "  ·  " + (string.IsNullOrEmpty(commit) ? "?" : commit);
+
+            const string klasor = "Assets/_Project/Resources";
+            if (!AssetDatabase.IsValidFolder(klasor))
+                AssetDatabase.CreateFolder("Assets/_Project", "Resources");
+            File.WriteAllText(klasor + "/surum.txt", metin);
+            AssetDatabase.ImportAsset(klasor + "/surum.txt");
+            Debug.Log("[Hezarfen] Surum damgasi: " + metin);
+        }
+
         /// <summary>Build'i alır ve özet döndürür.</summary>
         public static BuildReport Kur(out string ozet)
         {
+            // 0) SURUM DAMGASI. Menude yazar; "hangi build'i oynuyorum"
+            //    sorusunu bir daha sormayalim diye.
+            SurumDamgasiYaz();
+
             // 1) SAHNE LISTESI KODDAN. Elle bozulmus olabilir; her build
             //    once duzeltir (BuildScenes'in kendi gerekcesi orada).
             BuildScenes.Apply(out string sahneOzet);

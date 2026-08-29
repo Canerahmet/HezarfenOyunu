@@ -69,6 +69,15 @@ namespace Hezarfen.Editor.Pipeline
             Yazi(menu.transform, "AltBaslik", "1632 · İstanbul", 40,
                  new Vector2(0f, 90f), new Vector2(900f, 60f));
 
+            // SURUM DAMGASI — kose yazisi.
+            //
+            // Hangi build'in oynandigi ekranda yazmayinca bir tur boyunca
+            // "duzeltme tutmadi mi, eski build mi" ayirt edilemedi.
+            var damga = Yazi(menu.transform, "SurumYazi",
+                             Hezarfen.Arayuz.Surum.Damga, 18,
+                             new Vector2(0f, -500f), new Vector2(900f, 30f));
+            damga.color = new Color(0.55f, 0.50f, 0.42f);
+
             var acilis = canvasGo.AddComponent<AcilisMenusu>();
             acilis.menuPaneli = menu;
             acilis.yuklemePaneli = yukleme;

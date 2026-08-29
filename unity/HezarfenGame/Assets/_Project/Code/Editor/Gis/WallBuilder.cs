@@ -157,6 +157,10 @@ namespace Hezarfen.Editor.Gis
 
             int merlons = BuildCurtain(terrain, host.transform, ring, gateAt);
 
+            // Biriken kaideler tek mesh olarak kurulur.
+            OttomanStreetBuilder.KaideleriKur(host.transform,
+                                              "Kaideler", "Galata");
+
             var tag = host.AddComponent<HistoricalTag>();
             tag.tier = HistoricalTier.Reconstruction;      // T2: hat kaba taslak
             tag.sourceNote =
@@ -222,6 +226,40 @@ namespace Hezarfen.Editor.Gis
         internal static float Ground(Terrain t, Vector2 p) =>
             t.SampleHeight(new Vector3(p.x, 0f, p.y)) + t.transform.position.y;
 
+        /// <summary>Prefabın ayak izi yarıçapı (m).</summary>
+        internal static float AyakIziYaricapi(GameObject prefab)
+        {
+            var rs = prefab.GetComponentsInChildren<Renderer>(true);
+            if (rs.Length == 0) return 4f;
+            var b = rs[0].bounds;
+            foreach (var r in rs) b.Encapsulate(r.bounds);
+            return Mathf.Max(b.extents.x, b.extents.z);
+        }
+
+        /// <summary>
+        /// Burcu/kapıyı <b>ayak izinin en yüksek köşesine</b> oturtur ve
+        /// altında kalan boşluğu bildirir.
+        ///
+        /// Önceden yalnız MERKEZ kotu alınıyordu. Yamaçta bu, kulenin bir
+        /// yanını havada bırakır: ölçüldü, sur burçlarının %18-50'si
+        /// (PF_SurBurcu %50, PF_SurBurcu_Dortgen %41,7) 0,5-1,0 m boşlukla
+        /// duruyordu. Sur bu şehrin en uzun yapısı; boşluk 5,5 km boyunca
+        /// tekrar ediyordu.
+        /// </summary>
+        internal static float Oturt(Terrain t, Vector2 c, float yaricap,
+                                    out float dip)
+        {
+            float hi = float.MinValue; dip = float.MaxValue;
+            for (int i = -1; i <= 1; i++)
+                for (int j = -1; j <= 1; j++)
+                {
+                    if (i == 0 && j == 0) continue;
+                    float h = Ground(t, c + new Vector2(i * yaricap, j * yaricap));
+                    hi = Mathf.Max(hi, h); dip = Mathf.Min(dip, h);
+                }
+            return hi;
+        }
+
         /// <summary>Yapıyı halkanın üstüne, dışa bakacak şekilde koyar.</summary>
         private static bool PlaceOn(Terrain terrain, Transform host, string prefabName,
                                     List<Vector2> ring, float s,
@@ -235,7 +273,8 @@ namespace Hezarfen.Editor.Gis
                 return false;
             }
             SampleRing(ring, s, out Vector2 p, out Vector2 tan);
-            float y = Ground(terrain, p);
+            float yaricap = AyakIziYaricapi(prefab);
+            float y = Oturt(terrain, p, yaricap, out float dip);
             if (y < 1f) return false;                       // suya kurulmaz
 
             // DISARI: halkanin disi. Halka saat yonunun tersineyse normal
@@ -251,6 +290,12 @@ namespace Hezarfen.Editor.Gis
                 new Vector3(nrm.x, 0f, nrm.y), Vector3.up);
             if (id != null)
                 lines?.Add($"    -> {prefabName} @ ({p.x:F0}, {y:F0}, {p.y:F0})");
+            
+            if (y - dip > 0.05f)
+                OttomanStreetBuilder.KaideEkle(
+                    p, y, dip - 0.5f, yaricap * 2f + 0.4f,
+                    yaricap * 2f + 0.4f, inst.transform.eulerAngles.y);
+
             return true;
         }
 

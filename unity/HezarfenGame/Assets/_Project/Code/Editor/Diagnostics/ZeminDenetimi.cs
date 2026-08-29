@@ -83,6 +83,36 @@ namespace Hezarfen.Editor.Diagnostics
                 return;
             }
 
+            // ANA SAHNENIN KENDI YAPILARI DA OLCULUR.
+            //
+            // Bu bir KOR NOKTAYDI: denetim yalnizca semt sahnelerini
+            // tariyordu. Surlar (SUR_Kara, SUR_Galata), landmark'lar ve
+            // iskeleler Faz1_Terrain'in KENDI kokleridir ve hicbiri hic
+            // olculmedi. Yani "18.338 yapi, sifir bosluk" dedigim sey
+            // sehrin en buyuk ve en cok goze carpan yapilarini
+            // KAPSAMIYORDU — Caner havada ev gormeye devam etti ve
+            // hakliydi.
+            //
+            // Ustelik dere yataklari yeni oyuldu: arazi degisti ve bu
+            // yapilar semtler gibi yeniden uretilmiyor.
+            {
+                var ana = SceneManager.GetActiveScene();
+                var gorulenAna = new HashSet<Transform>();
+                foreach (var kok2 in ana.GetRootGameObjects())
+                {
+                    if (!AnaSahneOlculur(kok2.name)) continue;
+                    foreach (var mf in kok2.GetComponentsInChildren<MeshFilter>(false))
+                    {
+                        var t = YapiKoku(mf.transform);
+                        if (t == null || !gorulenAna.Add(t)) continue;
+                        if (!Sayilir(t.name)) continue;
+                        toplamYapi++;
+                        var k = Yapiyi(t, "ANA:" + kok2.name, arazi);
+                        if (k != null) rapor.Add(k);
+                    }
+                }
+            }
+
             foreach (string yol in Directory
                          .GetFiles(DistrictDir, "*.unity")
                          .OrderBy(x => x))
@@ -307,6 +337,17 @@ namespace Hezarfen.Editor.Diagnostics
         }
 
         /// <summary>
+        /// Ana sahnenin bu kökü ölçülür mü.
+        ///
+        /// Arazi, su, ışık ve sistem nesneleri yapı değildir; sur, landmark
+        /// ve iskele öyledir.
+        /// </summary>
+        private static bool AnaSahneOlculur(string ad)
+            => ad.StartsWith("SUR_") || ad.StartsWith("LANDMARK")
+               || ad.StartsWith("ISKELE") || ad.StartsWith("GIS_")
+               || ad.StartsWith("OKMEYDANI");
+
+        /// <summary>
         /// Yapının kökü: prefab örneğinin en dış nesnesi. Alt parçaları tek
         /// tek ölçmek bir evi on kez sayardı.
         /// </summary>
@@ -423,6 +464,21 @@ namespace Hezarfen.Editor.Diagnostics
                 }
 
             if (!olculdu) return null;
+
+            // SUDAKI YAPI YERE DEGMEZ — degmemeli.
+            //
+            // Iskele kaziklarin uzerinde durur, Kiz Kulesi bir kayaligin.
+            // Ikisinin de altindaki "zemin" deniz TABANIdir ve 9-10 m
+            // asagidadir. Bunu kusur saymak, kayiklari deniz tabanina
+            // gore olcup "havada" demekle ayni hata olurdu — bu turda
+            // bir kez yapildi.
+            //
+            // Eleme ADA gore degil KOTA gore: isim listesi eninde sonunda
+            // birini kacirir (pereme kacirmisti).
+            float zeminKotu = arazi != null
+                ? arazi.SampleHeight(kutu.center) + arazi.transform.position.y
+                : 1f;
+            if (zeminKotu < 0.5f) return null;
             _tumEgimler.Add(Egim(arazi, kutu.center));
             _tumSayim.TryGetValue(t.name, out int adet);
             _tumSayim[t.name] = adet + 1;

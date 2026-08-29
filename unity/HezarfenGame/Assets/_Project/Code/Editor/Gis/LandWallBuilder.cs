@@ -205,6 +205,10 @@ namespace Hezarfen.Editor.Gis
                 else gateLines.Add($"    {g.id}: yerlestirilemedi");
             }
 
+            // Biriken kaideler tek mesh olarak kurulur.
+            OttomanStreetBuilder.KaideleriKur(hostGo.transform,
+                                              "Kaideler", "KaraSur");
+
             var tag = hostGo.AddComponent<HistoricalTag>();
             tag.tier = HistoricalTier.Documented;
             tag.sourceNote =
@@ -377,13 +381,24 @@ namespace Hezarfen.Editor.Gis
             Sample(line, s, out Vector2 p, out Vector2 tan);
             Vector2 o = Outward(tan, p, city);
             p += o * offset;
-            float y = WallBuilder.Ground(terrain, p);
+            // EN YUKSEK KOSEYE OTUR, ALTINI TASLA DOLDUR.
+            //
+            // Onceden yalniz MERKEZ kotu aliniyordu ve yamacta kulenin bir
+            // yani havada kaliyordu; olculdu, burclarin %18-50'si boslukla
+            // duruyordu.
+            float yaricap = WallBuilder.AyakIziYaricapi(prefab);
+            float y = WallBuilder.Oturt(terrain, p, yaricap, out float dip);
             if (y < 1f) return false;
 
             var inst = (GameObject)PrefabUtility.InstantiatePrefab(prefab, host);
             inst.transform.position = new Vector3(p.x, y, p.y);
             inst.transform.rotation = Quaternion.LookRotation(
                 new Vector3(o.x, 0f, o.y), Vector3.up);
+
+            if (y - dip > 0.05f)
+                OttomanStreetBuilder.KaideEkle(
+                    p, y, dip - 0.5f, yaricap * 2f + 0.4f,
+                    yaricap * 2f + 0.4f, inst.transform.eulerAngles.y);
             return true;
         }
 
