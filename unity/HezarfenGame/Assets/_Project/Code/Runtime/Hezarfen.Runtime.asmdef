@@ -7,7 +7,8 @@
         "Unity.Splines",
         "Unity.Addressables",
         "Unity.ResourceManager",
-        "Unity.RenderPipelines.HighDefinition.Runtime"
+        "Unity.RenderPipelines.HighDefinition.Runtime",
+        "Unity.RenderPipelines.Core.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
