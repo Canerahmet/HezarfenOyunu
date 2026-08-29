@@ -25,6 +25,20 @@ namespace Hezarfen.Editor.Lighting
     public static class SokakOkunabilirligi
     {
 
+        /// <summary>
+        /// Ölçümü çalıştırır ve konsola yazar.
+        ///
+        /// Bu menü geçici takım silinirken <b>onunla birlikte gitti</b>:
+        /// <c>Measure</c> taşındı ama sarmalayıcısı taşınmadı ve tanı
+        /// aracı sessizce kayboldu. Aletin kendisi de bir varlıktır.
+        /// </summary>
+        [MenuItem("Hezarfen/Aydinlatma/Sokak okunabilirligini olc")]
+        public static void OlcMenu()
+        {
+            string rapor = Measure(out float ayrinti);
+            Debug.Log($"[Hezarfen] {rapor}");
+        }
+
         public static string Measure(out float darkFraction)
         {
             darkFraction = 1f;

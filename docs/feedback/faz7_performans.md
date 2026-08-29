@@ -220,3 +220,77 @@ varlık yazdı. Ayrıntı ADR 0073'te.
 4. **Gerçek süreli oturum** — bu ölçüm 12 adım × 1200 kare. Otuz
    dakikalık kesintisiz oturum ayrı bir koşum ister ve build üzerinde
    yapılmalı.
+
+---
+
+# Post: film grain + ton eğrisi
+
+PLAN Bölüm 12: *"hafif film grain + ton eğrisi (dönem gravür esintisi
+**çok** hafif)"* — vurgu planın kendisinde.
+
+## Grain ölçüyü şişiriyor mu — hayır, ama sorulmalıydı
+
+Okunabilirlik ölçüsü (`SokakOkunabilirligi`) her pikselin 3×3 komşu
+ortalamasından **sapmasını** sayıyor. Film grain tam olarak odur. Yani
+ağır bir grain testi **sahte biçimde geçirebilirdi**.
+
+Ölçüldü:
+
+| grain | ayrıntı | ortalama |
+|---|---|---|
+| 0,00 | 2,24 | 79,2 |
+| 0,12 | **2,25** | 79,0 |
+
+Fark **+0,01** — bu şiddette grain ölçüyü kirletmiyor. Değer gözle değil
+bu ölçümle seçildi.
+
+## Ton eğrisi gölgeleri belirgin açtı
+
+Neutral tonemapper eklendikten sonra:
+
+| | önce | sonra |
+|---|---|---|
+| ortalama | 50,6 | **79,2** |
+| koyu piksel (<30) | %29,8 | **%0,6** |
+
+ACES seçilmedi: filmik ve kontrastlı, gravür değil sinema hissi verir.
+
+**Gölge derinliği bir sanat kararıdır** ve öğle karesinde şu an epey
+açık. İnceleme paketi üretildi (`Captures/mahalle/`, 8 kadraj × 2 an);
+Caner'in notuyla yakınsanacak.
+
+## Alçak güneşte gölge eziliyor mu — kalıcı ışıkta HAYIR
+
+Gün batımı inceleme karesinde gölgeli kaldırım neredeyse siyah çıktı ve
+ilk şüphem kalıcı pasın alçak güneşte çökmesiydi — geçici takımın
+`FillScaleForAltitude`'u tam bunu telafi ediyordu ve onu silmiştim.
+
+Ölçüldü, şüphe yanlış çıktı:
+
+| güneş yüksekliği | ayrıntı | koyu |
+|---|---|---|
+| 63,9° (öğle) | 2,25 | %0,6 |
+| **15,3° (alçak)** | **1,98** | %2,8 |
+
+Eşik 1,2; alçak güneşte de geçiyor. Siyah kaldırım **inceleme aracının
+kendi sabit poz taramasından** geliyor — çevrimdışı kare tekrarlanabilir
+olsun diye poz çivileniyor (oyunda otomatik poz uyum sağlar). Yani
+paketin gölgeleri gerçekte olduğundan **karanlık** gösteriyor; abartılı
+değil, kötümser.
+
+## Sessizce hiç çalışmayan kod
+
+Grain ve ton eğrisi eklendikten sonra profilde **görünmediler**.
+`Profil()` "bileşen varsa olduğu gibi döndür" diyordu; profil zaten üç
+bileşenle vardı, yeni kod hiç koşmadı. Menü yine "kuruldu" dedi.
+
+`Ensure<T>` zaten fikirsiz — varsa bulur, yoksa kurar. Artık her çağrıda
+hepsi geçiliyor ve profil kendini onarıyor.
+
+## Kaybolan alet
+
+Ölçüm menüsü (`Sokak parlakligini olc`) geçici takım silinirken
+**onunla birlikte gitti**: `Measure` taşındı ama menü sarmalayıcısı
+taşınmadı. Tanı aracı sessizce yok oldu ve ancak ihtiyaç duyulunca
+farkedildi. Geri kondu: `Hezarfen → Aydinlatma → Sokak okunabilirligini
+olc`.

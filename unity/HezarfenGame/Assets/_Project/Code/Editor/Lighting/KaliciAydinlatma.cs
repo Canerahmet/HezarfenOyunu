@@ -65,6 +65,17 @@ namespace Hezarfen.Editor.Lighting
         public const float AlacakaranlikEV = 6.0f;
 
         /// <summary>
+        /// Film grain şiddeti. <b>Çok hafif</b> — planın vurgusu.
+        ///
+        /// Ölçülebilir bir sınırı var: grain, okunabilirlik ölçüsünü
+        /// (<see cref="SokakOkunabilirligi"/>) <b>yukarı</b> çekebilir,
+        /// çünkü o ölçü komşu ortalamasından sapmayı sayıyor ve grain tam
+        /// olarak odur. Yani ağır bir grain testi sahte biçimde geçirirdi.
+        /// Değer bu yüzden ölçülerek seçildi, gözle değil.
+        /// </summary>
+        public const float GrainSiddeti = 0.12f;
+
+        /// <summary>
         /// Haliç sabahının sisi (m). Sis bir efekt değil bir <b>yer</b>
         /// bilgisi: Haliç sabahları basar ve Galata'dan bakınca suriçi
         /// siluetini yumuşatan şey odur.
@@ -257,16 +268,22 @@ namespace Hezarfen.Editor.Lighting
         /// <summary>Kalıcı Volume profili — yoksa üretilir.</summary>
         public static VolumeProfile Profil()
         {
-            var mevcut = AssetDatabase.LoadAssetAtPath<VolumeProfile>(ProfilePath);
-            // BOS bir profil, olmayan bir profilden DAHA KOTUdur: menu
-            // "kuruldu" der, sahne kararir ve sebep gorunmez. Bos bulursak
-            // atip yeniden kuruyoruz.
-            if (mevcut != null && mevcut.components.Count > 0) return mevcut;
-            if (mevcut != null) AssetDatabase.DeleteAsset(ProfilePath);
-
-            Directory.CreateDirectory(ProfileDir);
-            var profil = ScriptableObject.CreateInstance<VolumeProfile>();
-            AssetDatabase.CreateAsset(profil, ProfilePath);
+            // MEVCUT PROFIL ERKEN DONMEZ.
+            //
+            // Once "bilesen varsa oldugu gibi dondur" diyordu ve yeni bir
+            // bilesen (film grain, ton egrisi) eklendiginde o kod HIC
+            // KOSMADI: profil uc bilesenle duruyor, menu "kuruldu" diyor,
+            // eklenen sey ortada yok. Sessiz, cunku hata vermiyor.
+            //
+            // `Ensure<T>` zaten fikirsizdir — varsa bulur, yoksa kurar.
+            // O yuzden her cagrida HEPSI gecilir ve profil kendini onarir.
+            var profil = AssetDatabase.LoadAssetAtPath<VolumeProfile>(ProfilePath);
+            if (profil == null)
+            {
+                Directory.CreateDirectory(ProfileDir);
+                profil = ScriptableObject.CreateInstance<VolumeProfile>();
+                AssetDatabase.CreateAsset(profil, ProfilePath);
+            }
 
             // BILESENLER ALT-VARLIK OLARAK KAYDEDILMELI.
             //
@@ -317,6 +334,33 @@ namespace Hezarfen.Editor.Lighting
             var ssgi = Ensure<GlobalIllumination>(profil);
             ssgi.enable.overrideState = true;
             ssgi.enable.value = true;
+
+            // --- POST: gravür esintisi, ÇOK hafif ---------------------
+            //
+            // PLAN Bölüm 12: *"hafif film grain + ton eğrisi (dönem gravür
+            // esintisi ÇOK hafif)"* — vurgu planın kendisinde.
+            //
+            // Neden ağır olmamalı: Lorck ve Grelot gravürleri referans
+            // olarak duruyor ama oyun bir gravür DEĞİL. Ağır bir grain ya
+            // da sert bir eğri, üç fazdır ölçerek kurduğumuz malzeme ve
+            // ışık farklarını bir dokunun altına gömerdi — Balat'ın
+            // bilerek koyu paleti ile gölgedeki sıva aynı kirli griye
+            // düşerdi.
+            var grain = Ensure<FilmGrain>(profil);
+            grain.type.overrideState = true;
+            grain.type.value = FilmGrainLookup.Thin1;
+            grain.intensity.overrideState = true;
+            grain.intensity.value = GrainSiddeti;
+            // Karanlıkta grain daha görünürdür; tepki eğrisi onu kısar.
+            grain.response.overrideState = true;
+            grain.response.value = 0.8f;
+
+            var ton = Ensure<Tonemapping>(profil);
+            ton.mode.overrideState = true;
+            // ACES DEGIL: filmik ve kontrastli, gravür değil sinema
+            // hissi verir. Nötr, dizginlenmiş bir eğri gravürün düz
+            // tonlamasına daha yakın.
+            ton.mode.value = TonemappingMode.Neutral;
 
             EditorUtility.SetDirty(profil);
             AssetDatabase.SaveAssets();
