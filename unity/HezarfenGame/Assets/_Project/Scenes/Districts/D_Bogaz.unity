@@ -119,7 +119,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &1016159286
+--- !u!1 &1090767761
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -127,52 +127,38 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1016159289}
-  - component: {fileID: 1016159288}
-  - component: {fileID: 1016159287}
+  - component: {fileID: 1090767763}
+  - component: {fileID: 1090767762}
   m_Layer: 0
-  m_Name: D_Bogaz
+  m_Name: SEMT_D_Bogaz
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1016159287
+--- !u!114 &1090767762
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1016159286}
+  m_GameObject: {fileID: 1090767761}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6e60ea5c86c339049bcad6a3d68c5042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Core.HistoricalTag
-  tier: 0
-  sourceNote: "Bo\u011Faz \u2014 bolge yayini iskeleti (plan Faz 1 madde 6). Bu sahne
-    HENUZ BOSTUR; icerigi Faz 2-4'te gelir. Bolge siniri bir OYNANIS karari olup
-    tarihsel mahalle siniri degildir (ADR 0011)."
---- !u!114 &1016159288
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1016159286}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd917b3e4dcf7664cb826ab63b2a0e27, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Streaming.DistrictAnchor
-  districtId: D_Bogaz
---- !u!4 &1016159289
+  tier: 2
+  sourceNote: 'Semt dokusu: mahalle cekirdekleri araziden turetildi (kot, egim, landmark
+    uzakligi), sokak kurallari RESEARCH.md 4.1. Mahallelerin SAYISI ve YERI taslak
+    (T2); kaynaklarda 1632 mahalle sinirlari yoktur.'
+--- !u!4 &1090767763
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1016159286}
+  m_GameObject: {fileID: 1090767761}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -185,4 +171,4 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1016159289}
+  - {fileID: 1090767763}

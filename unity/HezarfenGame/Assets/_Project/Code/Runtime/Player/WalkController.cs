@@ -31,6 +31,7 @@ namespace Hezarfen.Player
     /// ## Tuşlar
     ///
     /// WASD yürü · fare bak · Shift koş · Space zıpla · Ctrl çömel ·
+    /// <b>V kamera kipi</b> (göz / omuz üstü — <see cref="KameraKipi"/>) ·
     /// <b>F uçuş kipi</b> (yerçekimsiz serbest kamera — damları ve kule
     /// tepesini görmek için) · Esc imleci bırak.
     /// </summary>
@@ -56,8 +57,28 @@ namespace Hezarfen.Player
         public float eyeHeight = 1.59f;
 
         [Header("Hız (m/s)")]
-        public float walkSpeed = 1.4f;         // insan yuruyusu
-        public float runSpeed = 3.6f;
+        /// <summary>
+        /// Yürüme hızı. <b>2,2 m/s — 1,4 değil</b> (Caner, 2026-08-29
+        /// oynarken: *"karakterin hizi biraz yavas gibi onu
+        /// hizlandiralim"*).
+        ///
+        /// Eski sayı 1,4'tü ve doğruydu: ortalama insan yürüyüşü budur.
+        /// Ama bu bir <b>oyun</b> ve şehir 10 km: Galata'dan Beyazıt'a
+        /// 1,4 m/s ile yürümek 40 dakika sürüyordu. Bu, gerçekçiliği
+        /// oynanabilirliğe tercih etmekti ve tercih yanlıştı.
+        ///
+        /// 2,2 m/s hâlâ bir <b>insan</b> hızı — tempolu yürüyüş — yani
+        /// mesafe duygusu ölmüyor, yalnız bekleme kısalıyor. Şehri
+        /// küçültmemek için koşu sınırı da açık uçlu bırakılmadı.
+        ///
+        /// Animator karışım eşikleri bu sayılardan TÜRETİLİR; ikisi
+        /// ayrışırsa ayaklar yerde kayar ve <c>AnimatorGrafigiTests</c>
+        /// kırılır.
+        /// </summary>
+        public float walkSpeed = 2.2f;
+
+        /// <summary>Koşu — insan sprintinin alt sınırı (6,0 m/s).</summary>
+        public float runSpeed = 6.0f;
         public float flySpeed = 12f;           // ucus kipi
         public float jumpSpeed = 3.6f;
         public float gravity = -9.81f;
@@ -69,6 +90,15 @@ namespace Hezarfen.Player
         private CharacterController cc;
         private Camera cam;
         private float pitch;
+        private KameraKipi kamera;
+
+        /// <summary>
+        /// Bakış eğimi (derece). <see cref="KameraKipi"/> okur.
+        ///
+        /// Açıyı bu sınıf, kameranın YERİNİ o sınıf sahiplenir. Bir sayının
+        /// iki sahibi olursa er ya da geç iki değeri olur.
+        /// </summary>
+        public float Pitch => pitch;
         private float vSpeed;
         private bool flying;
         private bool looking = true;
@@ -77,7 +107,10 @@ namespace Hezarfen.Player
         {
             cc = GetComponent<CharacterController>();
             cam = GetComponentInChildren<Camera>();
-            if (cam != null)
+            kamera = GetComponent<KameraKipi>();
+            // KameraKipi varsa kamerayi O yerlestirir; burada da yazmak
+            // ayni transforma iki sahip vermek olurdu.
+            if (cam != null && kamera == null)
                 cam.transform.localPosition = new Vector3(0f, eyeHeight, 0f);
         }
 
@@ -108,8 +141,9 @@ namespace Hezarfen.Player
                 Vector2 d = mouse.delta.ReadValue() * mouseSensitivity;
                 transform.Rotate(0f, d.x, 0f, Space.World);
                 pitch = Mathf.Clamp(pitch - d.y, -pitchLimit, pitchLimit);
-                if (cam != null)
-                    cam.transform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
+                if (cam != null && kamera == null)
+                    cam.transform.localRotation =
+                        Quaternion.Euler(pitch, 0f, 0f);
             }
 
             // --- yatay girdi ---

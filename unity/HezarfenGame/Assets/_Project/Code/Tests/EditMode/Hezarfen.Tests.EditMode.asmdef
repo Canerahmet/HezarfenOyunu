@@ -6,7 +6,8 @@
         "Hezarfen.Editor",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "Unity.RenderPipelines.HighDefinition.Runtime"
     ],
     "includePlatforms": [
         "Editor"

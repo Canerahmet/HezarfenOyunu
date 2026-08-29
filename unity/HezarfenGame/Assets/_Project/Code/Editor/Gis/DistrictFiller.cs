@@ -63,6 +63,42 @@ namespace Hezarfen.Editor.Gis
         /// <summary>Semtin kökü — silinip yeniden kurulur.</summary>
         public static string RootNameOf(string districtId) => $"SEMT_{districtId}";
 
+        /// <summary>
+        /// <b>Bütün semtleri yeniden doldurur.</b>
+        ///
+        /// Tek tek menü maddesi yalnız Galata ve Üsküdar için vardı; sekiz
+        /// semt varken bu, bir düzeltmeyi bütün şehre uygulamayı <b>elle
+        /// hatırlamaya</b> bırakıyordu — ve unutulan semt, düzeltmenin hiç
+        /// yapılmadığı semttir.
+        ///
+        /// Tohum her semt için aynı (1632): üretim deterministik kalsın,
+        /// aynı komut aynı şehri versin.
+        /// </summary>
+        [MenuItem("Hezarfen/GIS/Butun semtleri doldur")]
+        public static void FillAllMenu()
+        {
+            var reg = AssetDatabase.LoadAssetAtPath<DistrictRegistry>(RegistryPath);
+            if (reg == null || reg.districts == null)
+            {
+                Debug.LogError($"[Hezarfen] {RegistryPath} yok.");
+                return;
+            }
+
+            var adlar = new List<string>();
+            foreach (var d in reg.districts)
+                if (d != null && !string.IsNullOrEmpty(d.districtId))
+                    adlar.Add(d.districtId);
+
+            int i = 0;
+            foreach (string id in adlar)
+            {
+                i++;
+                Debug.Log($"[Hezarfen] Semt {i}/{adlar.Count}: {id}");
+                FillAndSave(id, 1632);
+            }
+            Debug.Log($"[Hezarfen] BUTUN SEMTLER DOLDU: {adlar.Count} semt.");
+        }
+
         [MenuItem("Hezarfen/GIS/Semti doldur (Galata)")]
         public static void FillGalataMenu() => FillAndSave("D_Galata", 1632);
 

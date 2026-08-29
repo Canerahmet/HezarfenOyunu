@@ -528,7 +528,16 @@ namespace Hezarfen.Editor.Gis
                     // havada bırakır. En yükseğe oturtup altını doldurmak,
                     // yamaç evinin gerçekte yapıldığı şeydir: taş istinat/
                     // subasman duvarı (RESEARCH.md §4.1 — merdivenli sokaklar).
-                    FootprintHeights(terrain, c, v, out float loH, out float hiH);
+                    // Evin DUNYA yaw'i: sokaga dik bakis + varyant sapmasi.
+                    // Ayak izi bu aciyla ornekleniyor; dunya eksenlerinde
+                    // ornekleme donmus evde yanlis koseleri olcerdi.
+                    float dunyaYaw = (Quaternion.LookRotation(
+                                          new Vector3(-nrm.x, 0f, -nrm.y),
+                                          Vector3.up)
+                                      * Quaternion.Euler(0f, yaw, 0f))
+                                     .eulerAngles.y;
+                    FootprintHeights(terrain, c, v, out float loH,
+                                     out float hiH, dunyaYaw);
                     float y = hiH;
                     float radius = Mathf.Max(v.footprint_x, v.wall_depth) * 0.5f;
                     if (loH < 3f || Overlaps(taken, c, radius * 0.72f))
@@ -584,18 +593,62 @@ namespace Hezarfen.Editor.Gis
 
         private static readonly List<Podium> podiums = new List<Podium>();
 
-        /// <summary>Ayak izinin dört köşesinde arazi kotu — en alçak ve en yüksek.</summary>
+        /// <summary>
+        /// Ayak izi altındaki en alçak ve en yüksek arazi kotu.
+        ///
+        /// <b>Ayak izi DÖNDÜRÜLÜR.</b> Önceki hâli köşeleri dünya
+        /// eksenlerinde örneklüyordu; oysa ev sokağa dönük durur ve
+        /// döndürülmüş bir dikdörtgenin köşeleri başka yerdedir. Yamaçta
+        /// bu, gerçek en alçak köşeyi <b>ıskalıyor</b> ve altına inen taş
+        /// kaide olması gerekenden kısa kalıyordu — yani boşluk kapanmış
+        /// sayılıp açık kalıyordu.
+        ///
+        /// Kenar ortaları da örnekleniyor: 8 m'lik bir ayak izinin altında
+        /// sırt ya da hendek varsa dört köşe onu görmez.
+        /// </summary>
         private static void FootprintHeights(Terrain t, Vector2 c, Variant v,
-                                             out float lo, out float hi)
+                                             out float lo, out float hi,
+                                             float yawDeg = 0f)
         {
             lo = float.MaxValue; hi = float.MinValue;
             float hw = v.wall_width * 0.5f, hd = v.wall_depth * 0.5f;
-            for (int i = -1; i <= 1; i += 2)
-                for (int j = -1; j <= 1; j += 2)
+            float rad = yawDeg * Mathf.Deg2Rad;
+            float cs = Mathf.Cos(rad), sn = Mathf.Sin(rad);
+
+            for (int i = -1; i <= 1; i++)
+                for (int j = -1; j <= 1; j++)
                 {
-                    float h = Height(t, c + new Vector2(i * hw, j * hd));
+                    if (i == 0 && j == 0) continue;
+                    float lx = i * hw, lz = j * hd;
+                    // Unity'de yaw ekseni +Y; yerelden dunyaya donusum.
+                    var d = new Vector2(lx * cs + lz * sn,
+                                        -lx * sn + lz * cs);
+                    float h = Height(t, c + d);
                     lo = Mathf.Min(lo, h); hi = Mathf.Max(hi, h);
                 }
+        }
+
+        /// <summary>
+        /// Döndürülmüş ayak izi altındaki <b>en alçak</b> arazi kotu.
+        /// Kaidenin ne kadar ineceğini bu belirler.
+        /// </summary>
+        private static float TabanKotu(Terrain t, Vector2 c, float genislik,
+                                       float derinlik, float yawDeg)
+        {
+            float lo = float.MaxValue;
+            float hw = genislik * 0.5f, hd = derinlik * 0.5f;
+            float rad = yawDeg * Mathf.Deg2Rad;
+            float cs = Mathf.Cos(rad), sn = Mathf.Sin(rad);
+            for (int i = -1; i <= 1; i++)
+                for (int j = -1; j <= 1; j++)
+                {
+                    if (i == 0 && j == 0) continue;
+                    float lx = i * hw, lz = j * hd;
+                    var d = new Vector2(lx * cs + lz * sn,
+                                        -lx * sn + lz * cs);
+                    lo = Mathf.Min(lo, Height(t, c + d));
+                }
+            return lo;
         }
 
         /// <summary>
@@ -639,6 +692,17 @@ namespace Hezarfen.Editor.Gis
             var left = new Vector3[n];
             var right = new Vector3[n];
             var ground = new float[n];
+            // BORDURUN INECEGI DIP — `ground` ile ayni sey DEGIL.
+            //
+            // `ground` kesitin EN YUKSEK noktasidir ve yurunen yuzeyin
+            // nereye oturacagini soyler (kaldirim gomulmesin diye).
+            // Bordurun dibi ise kesitin EN ALCAK noktasi olmali: yol
+            // yamaci yanlamasina keser, iki kenari arasinda metrelerce
+            // kot farki olur. Ikisini ayni sayidan beslemek bordurun
+            // yalniz yuksek kenara kadar inmesi demekti — asagi kenarda
+            // kaldirim havada asili kaliyordu. Olculdu: 68.864 hucrenin
+            // %28,7'sinde altta hava vardi, en kotusu 2,52 m.
+            var dipler = new float[n];
             int steps = 0;
 
             for (int i = 0; i < n; i++)
@@ -649,11 +713,43 @@ namespace Hezarfen.Editor.Gis
                 Vector2 c = new Vector2(pos.x, pos.z);
                 Vector2 a = c - nrm * width * 0.5f, b = c + nrm * width * 0.5f;
 
+                // Kesit BES noktada ornekleniyor, uc degil: 4,6 m'lik
+                // yolun altindaki sirt ya da hendek uc ornekle
+                // kacirilabiliyordu.
+                float en = float.MaxValue, us = float.MinValue;
+                for (int k = 0; k <= 4; k++)
+                {
+                    float h = Height(terrain, Vector2.Lerp(a, b, k * 0.25f));
+                    en = Mathf.Min(en, h); us = Mathf.Max(us, h);
+                }
+
                 // Kesitin EN YUKSEK noktasi: kaldirim gomulmesin.
-                ground[i] = Mathf.Max(Height(terrain, a),
-                                      Mathf.Max(Height(terrain, c), Height(terrain, b)));
+                ground[i] = us;
+                // Kesitin EN ALCAK noktasi, biraz da altina: bordur
+                // araziye girsin ki kenari acikta kalmasin.
+                dipler[i] = en - 0.25f;
                 left[i] = new Vector3(a.x, 0f, a.y);
                 right[i] = new Vector3(b.x, 0f, b.y);
+            }
+
+            // KOMSU EN KUCUGU: bordur iki kesit ARASINDAKI cukuru da
+            // kapatmali.
+            //
+            // Bordur i ile i+1 arasinda duz bir yuzeydir; arazi o araliktan
+            // asagi dalarsa iki uctan da olculen dip yetmez ve tam ortada
+            // hava kalir. Olculdu: kenar hucrelerinin %5,2'sinde, en
+            // kotusu 2,39 m. Her kesit komsularinin en alcagina cekiliyor.
+            if (n >= 3)
+            {
+                var yumusak = new float[n];
+                for (int i = 0; i < n; i++)
+                {
+                    float m = dipler[i];
+                    if (i > 0) m = Mathf.Min(m, dipler[i - 1]);
+                    if (i < n - 1) m = Mathf.Min(m, dipler[i + 1]);
+                    yumusak[i] = m;
+                }
+                System.Array.Copy(yumusak, dipler, n);
             }
 
             // Yurunen yuzey: basamaklara yuvarlanmis kot.
@@ -678,7 +774,8 @@ namespace Hezarfen.Editor.Gis
             }
             pavingStrips.Add(new[] { new Vector3(width, ds, 0f) });   // basligi
             for (int i = 0; i < n; i++)
-                pavingStrips.Add(new[] { left[i], right[i], new Vector3(0f, ground[i], 0f) });
+                pavingStrips.Add(new[] { left[i], right[i],
+                                         new Vector3(0f, dipler[i], 0f) });
             return steps;
         }
 
@@ -1171,23 +1268,40 @@ namespace Hezarfen.Editor.Gis
             // cevresi cıplak kalirsa dokuya degil, araziye konmus gibi durur.
             // Hristiyan mezarinda bas batida, ayak doguda — mezar ekseni bu
             // yuzden kilisenin apsis eksenine paraleldir.
-            if (!eastFacing) { taken.Add((bestC, Mathf.Max(ex, ez) * 0.55f)); goto placed; }
+            // KAIDE HER YAPIYA — KILISEYE OZGU DEGIL.
+            //
+            // Burada bir `goto placed` vardi ve `!eastFacing` (yani kilise
+            // OLMAYAN her sey) o siçramayla asagidaki `podiums.Add`'in
+            // ustunden atliyordu. Sicrayisin amaci kilise avlusunu
+            // (hazire) atlamakti; yanina dusen kaide uretimi ise butun
+            // yapilar icin gecerliydi.
+            //
+            // Sonuc olculdu (renders/denetim/zemin_denetimi.md): bu yoldan
+            // gecen SIVIL yapilarin neredeyse hepsi havada duruyordu —
+            // PF_Hamam_A %100, PF_Firin_A %94, PF_Mektep_A %88,
+            // PF_Kahvehane_A %83. Evler ise %9-26'da kaldi, cunku onlar
+            // baska bir yoldan (PlaceAlong) geciyor ve kaidelerini
+            // aliyorlar. Caner'in "bazi evler yere temas etmiyor"
+            // dedigi sey buydu.
+            //
+            // Kaide artik sicramadan ONCE uretilir; sicrama yalnizca
+            // kiliseye ait avluyu atlar.
+            podiums.Add(new Podium
+            {
+                center = bestC, top = y,
+                bottom = Mathf.Min(Height(terrain, bestC) - 0.6f, y - 0.4f),
+                width = ex + 0.6f, depth = ez + 0.6f,
+                yawDeg = inst.transform.rotation.eulerAngles.y,
+            });
+            taken.Add((bestC, Mathf.Max(ex, ez) * 0.55f));
+
+            if (!eastFacing) goto placed;
             var churchNature = LoadNatureCatalog();
             Vector2 yardC = bestC + new Vector2(0f, ez * 0.5f + 5.5f);
             if (Height(terrain, yardC) > 3f)
                 PlaceHazire(yardC, 6.0f, 8.0f, terrain, parent,
                             new System.Random(1632), muslim: false,
                             nature: churchNature);
-
-            // Kural 8: en yuksek koseye oturur, altindaki bosluk tas kaideyle dolar.
-            podiums.Add(new Podium
-            {
-                center = bestC, top = y,
-                bottom = Mathf.Min(Height(terrain, bestC) - 0.6f, y - 0.4f),
-                width = w + 0.6f, depth = d + 0.6f,
-                yawDeg = inst.transform.rotation.eulerAngles.y,
-            });
-            taken.Add((bestC, Mathf.Max(w, d) * 0.55f));
 
         placed:
             Debug.Log($"[Hezarfen] {prefabName}: sokak boyunca "
@@ -1284,6 +1398,23 @@ namespace Hezarfen.Editor.Gis
                     inst.transform.rotation = Quaternion.LookRotation(
                         new Vector3(-sgn * axis.x, 0f, -sgn * axis.y), Vector3.up);
                     taken.Add((c, r * 0.95f));
+
+                    // KAIDE — turbe de en yuksek koseye oturuyor.
+                    //
+                    // Olculdu: PF_Turbe_A'nin %55'i, PF_Turbe_B'nin
+                    // TAMAMI havada duruyordu. Turbe hazirenin ucunda,
+                    // yani mezarligin egimli kenarinda durur; kaidesiz
+                    // birakmak onu tam da en cok goze carpacak yerde
+                    // havaya asar. Yukaridaki `hi - lo > 2.2f` elemesi
+                    // teras gerektirecek kadar dik yerleri zaten
+                    // atiyor; geri kalan fark tasla kapanir.
+                    if (y - lo > 0.05f)
+                        podiums.Add(new Podium
+                        {
+                            center = c, top = y, bottom = lo - 0.4f,
+                            width = r * 2f + 0.16f, depth = r * 2f + 0.16f,
+                            yawDeg = inst.transform.rotation.eulerAngles.y,
+                        });
                     Debug.Log($"[Hezarfen] {name} hazirenin ucunda, kot farki "
                               + $"{hi - lo:F2} m.");
                     return 1;
@@ -1533,6 +1664,24 @@ namespace Hezarfen.Editor.Gis
             inst.transform.rotation = Quaternion.LookRotation(
                 new Vector3(-nrm.x, 0f, -nrm.y), Vector3.up);
             taken.Add((c, r * 0.7f));
+
+            // KAIDE — dukkan, cesme, sebil ve turbe de yamaca oturur.
+            //
+            // Bu yol (`PlaceProp`) kaide uretmiyordu ve olcum onu tek
+            // basina gosterdi: PF_Dukkan_A %62, PF_Sebil_A %73,
+            // PF_Cesme_C %65, PF_Turbe_A %58 havada duruyordu. Yapiyi en
+            // yuksek koseye oturtup altini bos birakmak, ucundan asagi
+            // bakinca havada duran bir cesme demektir.
+            float dip = TabanKotu(terrain, c, v.wall_width, v.wall_depth,
+                                  inst.transform.rotation.eulerAngles.y);
+            if (y - dip > 0.05f)
+                podiums.Add(new Podium
+                {
+                    center = c, top = y, bottom = dip - 0.4f,
+                    width = v.wall_width + 0.16f,
+                    depth = v.wall_depth + 0.16f,
+                    yawDeg = inst.transform.rotation.eulerAngles.y,
+                });
             return 1;
         }
 
@@ -1601,7 +1750,8 @@ namespace Hezarfen.Editor.Gis
             // --- kapi: on kenarin ortasinda, merdivenin tepesinde ---
             if (gate != null)
             {
-                n += Put(gate, parent, frontEdge, yTop, toStreet);
+                n += PutDuvar(gate, parent, frontEdge, yTop, toStreet,
+                              terrain, 3.4f, 1.0f);
                 taken.Add((frontEdge, 2.0f));
             }
 
@@ -1616,9 +1766,9 @@ namespace Hezarfen.Editor.Gis
                     float span = cw * 0.5f - 1.9f;         // kapi yarim genisligi
                     int cnt = Mathf.FloorToInt(span / seg);
                     for (int i = 0; i < cnt; i++)
-                        n += Put(wall, parent,
+                        n += PutDuvar(wall, parent,
                                  frontEdge + side * (s * (1.9f + seg * (i + 0.5f))),
-                                 yTop, toStreet);
+                                 yTop, toStreet, terrain, seg, 0.9f);
                 }
                 // Yan kenarlar
                 for (int s = -1; s <= 1; s += 2)
@@ -1628,7 +1778,8 @@ namespace Hezarfen.Editor.Gis
                     {
                         Vector2 pos = cc + side * (s * cw * 0.5f)
                                     + toStreet * (cd * 0.5f - seg * (i + 0.5f) - 0.4f);
-                        n += Put(wall, parent, pos, yTop, side * s);
+                        n += PutDuvar(wall, parent, pos, yTop, side * s,
+                                      terrain, seg, 0.9f);
                     }
                 }
             }
@@ -1828,6 +1979,45 @@ namespace Hezarfen.Editor.Gis
             inst.transform.rotation = Quaternion.LookRotation(
                 new Vector3(facing.x, 0f, facing.y), Vector3.up);
             return 1;
+        }
+
+        /// <summary>
+        /// Duvar/kapı segmentini koyar <b>ve altındaki boşluğu kaideyle
+        /// doldurur</b>.
+        ///
+        /// Avlu duvarı bir HALKA'dır ve avlu tabanı düzdür: bütün segmentler
+        /// aynı <c>yTop</c> kotuna oturur. Yamaçta bu, halkanın aşağı
+        /// tarafını havada bırakır — ölçüldü, PF_AvluDuvar'ın <b>%46,2</b>'si
+        /// (1.444'ün 667'si) görünür boşlukla duruyordu ve bu, tek başına
+        /// bütün kusurun dörtte biriydi.
+        ///
+        /// Halkayı araziye uydurmak yanlış çözüm olurdu: avlu duvarının üst
+        /// hattı düz olmalı, yoksa avlu avlu gibi durmaz. Doğru çözüm evinkiyle
+        /// aynı: <b>altını taşla doldur</b> (Kural 8).
+        /// </summary>
+        private static int PutDuvar(GameObject prefab, Transform parent,
+                                    Vector2 c, float y, Vector2 facing,
+                                    Terrain terrain, float genislik,
+                                    float derinlik)
+        {
+            int n = Put(prefab, parent, c, y, facing);
+            if (n == 0 || terrain == null) return n;
+
+            float zemin = Height(terrain, c);
+            if (y - zemin <= 0.05f) return n;
+
+            podiums.Add(new Podium
+            {
+                center = c,
+                top = y,
+                bottom = zemin - 0.4f,
+                width = genislik,
+                depth = derinlik,
+                yawDeg = Quaternion.LookRotation(
+                    new Vector3(facing.x, 0f, facing.y),
+                    Vector3.up).eulerAngles.y,
+            });
+            return n;
         }
 
         private static float PrefabWidth(GameObject prefab)

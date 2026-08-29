@@ -153,6 +153,7 @@ namespace Hezarfen.Editor.Pipeline
         /// <summary>Oyuncuyu kurar: yürüme + uçuş + kamera.</summary>
         private static GameObject Oyuncu(out string rapor)
         {
+            string rapor2;
             var eski = GameObject.Find("OYUNCU");
             if (eski != null) Object.DestroyImmediate(eski);
 
@@ -190,19 +191,90 @@ namespace Hezarfen.Editor.Pipeline
             var kamGo = new GameObject("Main Camera");
             kamGo.tag = "MainCamera";
             kamGo.transform.SetParent(go.transform, false);
-            // Goz yuksekligini WalkController kendisi kuruyor
-            // (`eyeHeight`); burada da yazmak ayni sayiya iki sahip
-            // vermek olurdu.
+            // Kamerayi KameraKipi yerlestirir (goz ya da omuz ustu);
+            // burada bir yer yazmak ayni transforma iki sahip vermek olur.
             kamGo.transform.localPosition = Vector3.zero;
             kamGo.AddComponent<Camera>();
             kamGo.AddComponent<AudioListener>();
-            kamGo.AddComponent<UnityEngine.Rendering.HighDefinition
-                .HDAdditionalCameraData>();
+            var kamVeri = kamGo.AddComponent<UnityEngine.Rendering
+                .HighDefinition.HDAdditionalCameraData>();
+
+            // KENAR YUMUSATMA — TITREMENIN SEBEBI BUYDU.
+            //
+            // Caner (2026-08-29): *"modellerin kenar ve koselerinde
+            // titremeler var... isiksal mi yoksa baska bir problem mi?"*
+            // Isik degil: sahnedeki kameranin `antialiasing` degeri
+            // SIFIRDI (None) ve kod tabaninda AA'ya dokunan tek satir
+            // yoktu. Kiremit sirtlari, sur mazgallari ve minare
+            // kenarlari gibi ince, yuksek kontrastli kenarlar her karede
+            // baska pikseli orttugu icin kaynasiyordu.
+            //
+            // TAA secildi, SMAA degil: SMAA tek karelik bir kenar
+            // filtresidir ve HAREKET eden ince geometride kaynamayi
+            // durdurmaz — burada sikayet tam olarak harekette. TAA
+            // kareleri biriktirdigi icin uzaktaki kiremit ve mazgal da
+            // durulur.
+            kamVeri.antialiasing = UnityEngine.Rendering.HighDefinition
+                .HDAdditionalCameraData.AntialiasingMode
+                .TemporalAntialiasing;
+            kamVeri.TAAQuality = UnityEngine.Rendering.HighDefinition
+                .HDAdditionalCameraData.TAAQualityLevel.High;
+            // Titrek desen (dithering): gokyuzu ve sis gecislerindeki
+            // bant izini kirar; AA ile ayni sikayetin ikinci yarisi.
+            kamVeri.dithering = true;
+
+            // GORUNUR GOVDE — ucuncu sahis kamerasi bir govde ister.
+            // Birinci sahista gizlenmez, ShadowsOnly'ye duser: gunes
+            // altinda golgesiz yuruyen bir adam dikkat cekerdi.
+            var govde = GovdeTak(go, out string govdeNot);
+            rapor2 = govdeNot;
+
+            var kipler = go.AddComponent<KameraKipi>();
+            kipler.govde = govde != null ? govde.transform : null;
+            // Acilista OMUZ USTU: oyuncu once karakterini gormeli.
+            kipler.kip = Bakis.UcuncuSahis;
 
             rapor = $"Oyuncu: Galata, ({go.transform.position.x:F0}, "
                     + $"{go.transform.position.y:F0}, "
-                    + $"{go.transform.position.z:F0})";
+                    + $"{go.transform.position.z:F0}); "
+                    + $"kamera TAA/High; {rapor2}";
             return go;
+        }
+
+        /// <summary>
+        /// Oyuncuya görünür karakteri takar.
+        ///
+        /// Prefab bulunamazsa <b>sessizce geçmez</b>: üçüncü şahıs kamerası
+        /// gövdesiz kalırsa oyuncu boşluğun arkasından bakar ve bunun
+        /// nedeni sahnede hiçbir yerde yazmaz.
+        /// </summary>
+        private static GameObject GovdeTak(GameObject oyuncu, out string not)
+        {
+            const string yol =
+                "Assets/_Project/Art/Prefabs/PF_Hezarfen_Sivil.prefab";
+            var pf = AssetDatabase.LoadAssetAtPath<GameObject>(yol);
+            if (pf == null)
+            {
+                not = "GOVDE YOK (" + yol + " bulunamadi) — ucuncu sahis "
+                      + "kamerasi bos bakar";
+                Debug.LogWarning("[Hezarfen] " + not);
+                return null;
+            }
+
+            var ornek = (GameObject)PrefabUtility
+                .InstantiatePrefab(pf, oyuncu.transform);
+            ornek.name = "Govde";
+            ornek.transform.localPosition = Vector3.zero;
+            ornek.transform.localRotation = Quaternion.identity;
+
+            // Govdenin kendi carpisticilari CharacterController ile
+            // kavga eder ve karakteri havaya firlatir; gorsel govde
+            // yalnizca GORSELDIR.
+            foreach (var c in ornek.GetComponentsInChildren<Collider>(true))
+                Object.DestroyImmediate(c);
+
+            not = "govde: PF_Hezarfen_Sivil";
+            return ornek;
         }
 
         /// <summary>Adı verilen tekil sistem nesnesini bulur ya da kurar.</summary>
