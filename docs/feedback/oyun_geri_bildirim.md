@@ -54,3 +54,117 @@ eksikti; gövde sayımında test kendi artığını sayıyordu; burada da
 Kurucu artık `UnityEventTools.AddPersistentListener` kullanıyor ve
 `AcilisMenusu` seçim düşerse geri koyuyor (fareyle boşluğa tıklamak da
 seçimi düşürür).
+
+
+---
+
+## 002 — Kamera açısı değiştirilebilsin
+
+**Caner (2026-08-29):**
+> "oyunun kamera acisini degistirmeye izin versin. karakterin gozlerinden
+> veya gta rdr ac gibi karakterin ustunden bir kamera olsun."
+
+**Durum:** yapıldı (v3 build).
+
+`V` ile göz ↔ omuz üstü. Omuz üstü kadraj küre taramasıyla engele göre
+kısalıyor — 4,6 m'lik sokakta (ADR 0016) sabit bir kol duvarın içine
+girerdi. Tekerlekle 1,4–6 m. Birinci şahısta gövde silinmiyor,
+`ShadowsOnly`'ye düşüyor: gölgesiz yürüyen bir adam dikkat çekerdi.
+
+Oyuncuya görünür karakter (`PF_Hezarfen_Sivil`) de takıldı — **daha önce
+hiç yoktu**, oyuncu görünmez bir kapsüldü.
+
+---
+
+## 003 — Bazı evler yere temas etmiyor
+
+**Caner (2026-08-29):**
+> "bazi evler yere temas etmiyor, merdivenler yanlis yerlere koyulmus vs."
+
+**Durum:** yapılar için **sıfır**; kaldırımda %5'lik açıklanamayan kuyruk
+kaldı.
+
+### Üç gerçek kusur
+
+| yerleştirici | ne oluyordu | sonrası |
+|---|---|---|
+| `TryPlaceChurch` | `goto placed` bütün **kilise olmayan** yapıları kaide üretiminin üstünden atlatıyordu | hamam %100 → 0, fırın %94 → 0, mektep %88 → 0, kahvehane %83 → 0 |
+| `PlaceProp` | hiç kaide üretmiyordu | dükkân %62 → 0, sebil %73 → 0, çeşme %65 → 0 |
+| `PlaceTurbe` | hiç kaide üretmiyordu | `PF_Turbe_B` %100 → 0 |
+
+Bir de `FootprintHeights` ayak izi köşelerini **döndürmeden**
+örnekliyordu; ev sokağa dönük durduğu için yamaçta gerçek en alçak köşe
+ıskalanıyor ve kaide kısa kalıyordu.
+
+Son ölçüm: **18.338 yapı, sıfır görünür boşluk.**
+
+### Merdivenler
+
+Bu şehirde merdiven elle konmuyor — kaldırım şeridi araziyi izliyor ve
+kot farkı bir rıht (0,17 m) biriktiğinde kendiliğinden basamaklanıyor.
+Yani "yanlış yere konmuş merdiven" diye bir şey yok; olan şey
+**bordürün yere inmemesi**di: bordür kesitin *en yüksek* noktasına kadar
+iniyordu, oysa yol yamacı yanlamasına keser. %28,7 → **%5,0**, medyan
++0,04 m → −0,83 m.
+
+Kalan %5 için iki açıklama denedim, ikisi de ölçümle yanlışlandı
+(örnekler arası çukur; basamak rıhtları). Sebebi **bilinmiyor** ve kodda
+öyle yazıyor.
+
+### Bu maddede kendi payım
+
+Beş kez yanlış cetvelle ölçtüm ve beşinde de sayı gerçekte olduğundan
+kötü göründü: kayıkları deniz tabanına göre, evleri dünya eksenli kutuyla
+(dönmüş bir evin kutusunun "içi" iki ev arasındaki boşluğa düşüyor),
+kaldırımı "yüzey arazinin kaç metre üstünde" diye, ağaç filtresini hiç
+eşleşmeyen bir adla (`Cinar` ile başlayan yok, `PF_Cinar_A` var), ve
+build'in bittiğini `.exe` zaman damgasından anlamaya çalışarak (`.exe`
+yalnız başlatıcı, değişmiyor).
+
+İlk verdiğim **"%12,4 ev havada"** rakamı bu yüzden şişmişti. Düzeltmelerin
+gerçekliğini aynı cetvelle önce/sonra kıyaslayarak doğruladım.
+
+---
+
+## 004 — Karakterin hızı yavaş
+
+**Durum:** yapıldı. 1,4 → **2,2 m/s**, koşu 3,6 → **6,0**.
+
+Eski sayı doğruydu (ortalama insan yürüyüşü) ama Galata'dan Beyazıt'a 40
+dakika sürüyordu. Animator karışım eşikleri de bu sayılardan türüyor —
+ve türemiyordu: `AnimatorKur` 1,4 ve 3,6'yı **elle** yazmıştı, yorumu ise
+"WalkController ile aynı" diyordu. Hız değişince yorum hâlâ doğru
+görünüyordu, sayı değil. Test yakaladı; hızın artık tek sahibi var.
+
+---
+
+## 005 — Modellerin kenarlarında titreme
+
+**Caner:** *"isiksal mi yoksa baska bir pronblem mi var?"*
+
+**Durum:** ışıksal değil. Sahnedeki kameranın `antialiasing` değeri
+**None**'dı ve kod tabanında AA'ya dokunan tek satır yoktu. TAA/High
+açıldı (SMAA değil — SMAA tek karelik bir filtredir ve **hareket eden**
+ince geometride kaynamayı durdurmaz; şikâyet tam olarak harekette).
+
+---
+
+## 006 — Dünya boş duruyor; ırmak olsun
+
+**Durum:** dereler kondu, **bostan ve yollar yapılmadı**.
+
+Dereler için ADR 0074 şunu önermişti: *"yatak elle çizilmez, DEM'in en
+alçak çizgisinden türetilir — bu bir ölçüm, bir çizim değil."* Sınadım,
+**yanlış çıktı**: denize ulaşan en büyük havza 0,83 km² (Kağıthane
+gerçekte 100 km²+ — havzalar haritanın dışında), kenardan giren yolların
+oyuk derinliği **0,4 m**. Bu DEM'de vadi yok.
+
+Caner ölçümü görüp C2'yi seçti: yatak oyuldu. Kağıthane 4.575 m, Alibey
+3.293 m, Lykos 7.092 m. **Ağızlar** coğrafyadan (Haliç'in başı −3277,
+2591; Marmara kıyısı z ≈ −2800), **aradaki güzergâh** en-az-tırmanış
+yolundan. Üçü de T2; Alibey ve Lykos'un kaynak satırı olmadığı
+`sourceNote`'larında yazıyor.
+
+**Eksik kalan:** kapı yolları, bostan parselleri, bağ/meyvelik ve servili
+mezarlık dokusu — yani ADR 0074'ün A seçeneğinin geri kalanı. "Boş
+duruyor" şikâyetinin asıl gövdesi orası ve sıradaki iş bu.
