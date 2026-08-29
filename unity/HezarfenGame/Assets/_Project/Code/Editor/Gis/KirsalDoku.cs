@@ -510,7 +510,7 @@ namespace Hezarfen.Editor.Gis
                     }
                 }
 
-            DuvarMeshi(ebeveyn, duvarlar);
+            DuvarMeshi(ebeveyn, duvarlar, arazi);
             AraziAgaclari(arazi, agacYerleri);
 
             Debug.Log($"[Hezarfen] Kirsal: {parsel} bostan parseli, "
@@ -524,7 +524,8 @@ namespace Hezarfen.Editor.Gis
         /// </summary>
         private static void DuvarMeshi(
             Transform ebeveyn,
-            List<(Vector2 c, float y, float gen, float der, float yaw)> parseller)
+            List<(Vector2 c, float y, float gen, float der, float yaw)> parseller,
+            Terrain arazi)
         {
             if (parseller.Count == 0) return;
 
@@ -535,18 +536,50 @@ namespace Hezarfen.Editor.Gis
             var uvs = new List<Vector2>();
             var tris = new List<int>();
 
+            float ay = arazi != null ? arazi.transform.position.y : 0f;
+
+            // HER KENAR KENDI ALTINDAKI ARAZIYE INER.
+            //
+            // Onceki hali butun halkayi TEK bir kota (parselin en yuksek
+            // kosesi) oturtuyordu ve kutulari yalnizca 0,4 m gomuyordu.
+            // Parsel 2,2 m kot farkina kadar kabul edildigine gore asagi
+            // yandaki duvar **1,8 m'ye kadar havada** kaliyordu — yani
+            // Caner'in "bosluk problemi duzelmemis gibi" demesinin
+            // sebeplerinden biri, bu turda benim EKLEDIGIM seydi.
+            //
+            // Ust hat duz kalir (parsel duvarinin ustu terazidedir), dip
+            // arazinin altina iner: evin tas kaidesiyle ayni kural.
             foreach (var p2 in parseller)
             {
                 var rot = Quaternion.Euler(0f, p2.yaw, 0f);
                 float hw = p2.gen * 0.5f, hd = p2.der * 0.5f;
-                Kutu(verts, uvs, tris, p2.c, p2.y, rot,
-                     new Vector3(0f, 0f, hd), p2.gen, Kalinlik, Yukseklik, TexMetre);
-                Kutu(verts, uvs, tris, p2.c, p2.y, rot,
-                     new Vector3(0f, 0f, -hd), p2.gen, Kalinlik, Yukseklik, TexMetre);
-                Kutu(verts, uvs, tris, p2.c, p2.y, rot,
-                     new Vector3(hw, 0f, 0f), Kalinlik, p2.der, Yukseklik, TexMetre);
-                Kutu(verts, uvs, tris, p2.c, p2.y, rot,
-                     new Vector3(-hw, 0f, 0f), Kalinlik, p2.der, Yukseklik, TexMetre);
+                var kenarlar = new (Vector3 yerel, float g, float d)[]
+                {
+                    (new Vector3(0f, 0f, hd), p2.gen, Kalinlik),
+                    (new Vector3(0f, 0f, -hd), p2.gen, Kalinlik),
+                    (new Vector3(hw, 0f, 0f), Kalinlik, p2.der),
+                    (new Vector3(-hw, 0f, 0f), Kalinlik, p2.der),
+                };
+
+                foreach (var k in kenarlar)
+                {
+                    // Kenarin altindaki EN ALCAK arazi kotu.
+                    var merkez = new Vector3(p2.c.x, 0f, p2.c.y) + rot * k.yerel;
+                    float dip = float.MaxValue;
+                    for (int i = -1; i <= 1; i++)
+                        for (int j = -1; j <= 1; j++)
+                        {
+                            var q = merkez + rot * new Vector3(
+                                i * k.g * 0.5f, 0f, j * k.d * 0.5f);
+                            float h = arazi != null
+                                ? arazi.SampleHeight(q) + ay
+                                : p2.y;
+                            dip = Mathf.Min(dip, h);
+                        }
+                    float gomme = Mathf.Max(0.4f, p2.y - dip + 0.3f);
+                    Kutu(verts, uvs, tris, p2.c, p2.y, rot, k.yerel,
+                         k.g, k.d, Yukseklik, TexMetre, gomme);
+                }
             }
 
             var mesh = new Mesh { name = "SM_BostanDuvarlari" };
@@ -582,7 +615,8 @@ namespace Hezarfen.Editor.Gis
         private static void Kutu(List<Vector3> v, List<Vector2> uv,
                                  List<int> tri, Vector2 merkez, float taban,
                                  Quaternion rot, Vector3 yerel,
-                                 float gen, float der, float yuk, float tex)
+                                 float gen, float der, float yuk, float tex,
+                                 float gomme = 0.4f)
         {
             var o = new Vector3(merkez.x, taban, merkez.y) + rot * yerel;
             float hw = gen * 0.5f, hd = der * 0.5f;
@@ -601,12 +635,12 @@ namespace Hezarfen.Editor.Gis
                 int i0 = v.Count;
                 // Duvar araziye 0,4 m gomulur ki alt kenari acikta kalmasin
                 // — kaldirimda ogrenilen ders.
-                v.Add(a + Vector3.down * 0.4f);
-                v.Add(b + Vector3.down * 0.4f);
+                v.Add(a + Vector3.down * gomme);
+                v.Add(b + Vector3.down * gomme);
                 v.Add(b + Vector3.up * yuk);
                 v.Add(a + Vector3.up * yuk);
                 float u = Vector3.Distance(a, b) / tex;
-                float h = (yuk + 0.4f) / tex;
+                float h = (yuk + gomme) / tex;
                 uv.Add(new Vector2(0f, 0f)); uv.Add(new Vector2(u, 0f));
                 uv.Add(new Vector2(u, h)); uv.Add(new Vector2(0f, h));
                 tri.Add(i0); tri.Add(i0 + 2); tri.Add(i0 + 1);

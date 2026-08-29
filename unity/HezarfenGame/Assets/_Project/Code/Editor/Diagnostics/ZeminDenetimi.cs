@@ -221,6 +221,34 @@ namespace Hezarfen.Editor.Diagnostics
                                            Vector3 p)>();
             int meshSayisi = 0;
 
+            // ANA SAHNE de taranir: yollar ve bostan duvarlari orada.
+            foreach (var kok2 in SceneManager.GetActiveScene().GetRootGameObjects())
+                foreach (var mf in kok2.GetComponentsInChildren<MeshFilter>(true))
+                {
+                    string mad2 = mf.gameObject.name;
+                    if (!mad2.StartsWith("Kaldirim") && !mad2.StartsWith("Yol_")
+                        && !mad2.StartsWith("BostanDuvarlari")) continue;
+                    if (mf.sharedMesh == null) continue;
+                    meshSayisi++;
+                    var verts2 = mf.sharedMesh.vertices;
+                    for (int i = 0; i < verts2.Length; i += 3)
+                    {
+                        var d2 = mf.transform.TransformPoint(verts2[i]);
+                        var an2 = (Mathf.FloorToInt(d2.x / Hucre),
+                                   Mathf.FloorToInt(d2.z / Hucre), "ANA");
+                        if (hucreler.TryGetValue(an2, out var e2))
+                        {
+                            if (d2.y < e2.min)
+                                hucreler[an2] = (d2.y, e2.max,
+                                                 arazi.SampleHeight(d2) + ay, d2);
+                            else if (d2.y > e2.max)
+                                hucreler[an2] = (e2.min, d2.y, e2.zemin, e2.p);
+                        }
+                        else hucreler[an2] = (d2.y, d2.y,
+                                              arazi.SampleHeight(d2) + ay, d2);
+                    }
+                }
+
             foreach (string yol in Directory.GetFiles(DistrictDir, "*.unity")
                                             .OrderBy(x => x))
             {
@@ -233,7 +261,10 @@ namespace Hezarfen.Editor.Diagnostics
                 foreach (var kok in sahne.GetRootGameObjects())
                     foreach (var mf in kok.GetComponentsInChildren<MeshFilter>(true))
                     {
-                        if (!mf.gameObject.name.StartsWith("Kaldirim")) continue;
+                        string mad = mf.gameObject.name;
+                        if (!mad.StartsWith("Kaldirim")
+                            && !mad.StartsWith("Yol_")
+                            && !mad.StartsWith("BostanDuvarlari")) continue;
                         if (mf.sharedMesh == null) continue;
                         meshSayisi++;
 
@@ -337,15 +368,41 @@ namespace Hezarfen.Editor.Diagnostics
         }
 
         /// <summary>
-        /// Ana sahnenin bu kökü ölçülür mü.
+        /// Ana sahnenin bu kökü ölçülür mü — <b>RED listesi</b>, izin
+        /// listesi değil.
         ///
-        /// Arazi, su, ışık ve sistem nesneleri yapı değildir; sur, landmark
-        /// ve iskele öyledir.
+        /// Burada bir izin listesi vardı (<c>SUR_</c>, <c>LANDMARK</c>,
+        /// <c>ISKELE</c>, <c>GIS_</c>, <c>OKMEYDANI</c>) ve aynı hata
+        /// <b>üçüncü kez</b> aynı biçimde oldu:
+        ///
+        /// 1. Denetim yalnız semt sahnelerini tarıyordu → surlar ve
+        ///    landmark'lar hiç ölçülmedi; Ayasofya 2,85 m havadaydı.
+        /// 2. İzin listesi eklendi → yeni gelen <c>KIRSAL_1632</c> kökü
+        ///    (yollar ve bostan duvarları) listede olmadığı için yine
+        ///    ölçülmedi.
+        ///
+        /// İzin listesi <b>sessizce</b> kaçırır: yeni bir kök eklendiğinde
+        /// hiçbir şey bozulmaz, sadece görünmez olur. Red listesi
+        /// <b>gürültülü</b> kaçırır: yeni kök ölçüme girer, yanlış
+        /// pozitif verirse görürüz ve elemeyi yazarız.
+        ///
+        /// Yapı olmayan şeyler açıkça sayılıyor; geri kalan her şey ölçülür.
         /// </summary>
         private static bool AnaSahneOlculur(string ad)
-            => ad.StartsWith("SUR_") || ad.StartsWith("LANDMARK")
-               || ad.StartsWith("ISKELE") || ad.StartsWith("GIS_")
-               || ad.StartsWith("OKMEYDANI");
+        {
+            // Arazi, su, isik, gokyuzu ve sistem nesneleri yapi degildir.
+            string[] disarida =
+            {
+                "TR_", "WATER_", "SUN_", "SkyAndFog", "AYDINLATMA",
+                "DERELER_",              // su yuzeyi; yere degmez, degmemeli
+                "AGAC_CIZICI", "ZAMAN", "SEHIR_NPC", "ARANMA", "BARK",
+                "HAVA", "SEMT_AKISI", "KAYIT", "HUD", "OYUNCU",
+                "Main Camera", "EventSystem", "Canvas",
+            };
+            foreach (string d in disarida)
+                if (ad.StartsWith(d)) return false;
+            return true;
+        }
 
         /// <summary>
         /// Yapının kökü: prefab örneğinin en dış nesnesi. Alt parçaları tek
@@ -354,7 +411,22 @@ namespace Hezarfen.Editor.Diagnostics
         private static Transform YapiKoku(Transform t)
         {
             var kok = PrefabUtility.GetOutermostPrefabInstanceRoot(t.gameObject);
-            return kok != null ? kok.transform : null;
+            if (kok != null) return kok.transform;
+
+            // PREFAB OLMAYAN YAPILAR DA OLCULUR.
+            //
+            // Burada `null` donuluyordu ve bu, ayni kor noktanin DORDUNCU
+            // bicimiydi:
+            //   1. denetim yalniz semt sahnelerini tariyordu,
+            //   2. ana sahnede izin listesi kullaniyordu,
+            //   3. izin listesi yeni gelen KIRSAL_1632'yi kacirdi,
+            //   4. red listesine cevrildi ama sayi DEGISMEDI (18.605),
+            //      cunku yol ve bostan duvarlari uretilmis mesh'ler —
+            //      prefab ORNEGI degiller ve bu satir onlari eliyordu.
+            //
+            // Sayinin degismemesi bir olcumdur: kapsam genisledi ama
+            // hicbir yeni yapi girmedi, demek ki eleme baska yerdeydi.
+            return t;
         }
 
         /// <summary>
@@ -364,7 +436,19 @@ namespace Hezarfen.Editor.Diagnostics
         /// </summary>
         private static bool Sayilir(string ad)
         {
+            // BIRLESIK YUZEYLER YAPI DEGIL — BASKA CETVELLE OLCULUR.
+            //
+            // Kaide, kaldirim, yol ve bostan duvari kilometrelerce uzanan
+            // TEK mesh'lerdir. Yapi cetveli ayak izinin ic kismini tarar;
+            // 5 km genisliginde bir kutunun "ici" vadinin ustunde havada
+            // bir noktadir ve olcum 14 m bosluk uydurur. Nitekim uydurdu.
+            //
+            // Dogru cetvel yuzey denetimindedir (Kaldirim ve merdivenler
+            // yerinde mi): mesh 5 m'lik hucrelere bolunur ve her hucrede
+            // EN ALCAK nokta araziyle karsilastirilir.
             if (ad.StartsWith("Kaide") || ad.StartsWith("Kaldirim")) return false;
+            if (ad.StartsWith("Yol_") || ad.StartsWith("BostanDuvarlari"))
+                return false;
 
             // AGAC VE MEZAR TASI OLCULMEZ — ve bu eleme BIR KEZ KACTI.
             //
