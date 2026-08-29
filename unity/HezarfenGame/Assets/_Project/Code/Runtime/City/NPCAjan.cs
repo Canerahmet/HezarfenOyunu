@@ -50,6 +50,34 @@ namespace Hezarfen.Sehir
         public float yurumeHizi = 1.4f;
 
         /// <summary>
+        /// Gövdenin sokak eksenine göre <b>yanal sapması</b> (m).
+        ///
+        /// Sakin sokak grafının düğüm ve kenarları üzerinde yürüyor; hepsi
+        /// eksenin tam üstünde durunca <b>üst üste yığılıyorlar</b>.
+        /// Ölçüldü: 9.000 sakin yalnız <b>3.070 ayrı noktada</b>, bir
+        /// noktada 33 kişiye kadar. Şehir bu yüzden boş görünüyordu —
+        /// otuz kişi iç içe durunca uzaktan tek kişi eder.
+        ///
+        /// Sapma <see cref="tohum"/>'dan türer, yani <b>deterministiktir</b>:
+        /// aynı tohum aynı şehri verir (ADR 0070'in saf işlev kuralı).
+        /// İlk denemede ±1,6 m'ydi ve yetmedi: doğum yerinde 20 m
+        /// yarıçapta <b>254 sakin</b> toplanıyor ve hepsi omuz omuza tek
+        /// bir küme oluyordu — kalabalık değil, yığın. Graf 1.544 düğüm,
+        /// nüfus 40.000; düğüm başına ~26 kişi düşüyor ve onlar düğümün
+        /// üstünde değil, çevresindeki alana yayılmalı.
+        ///
+        /// ±6 m yanal, ±12 m boylamsal: meydanda kalabalık, sokakta sıra
+        /// olur. Duvara girenler olabilir — kabul: bir kalabalığın
+        /// içinden geçmek, yığının içinden geçmekten iyidir.
+        /// </summary>
+        public float Sapma => ((tohum * 2654435761u) % 1000u) / 1000f
+                              * 12f - 6f;
+
+        /// <summary>İleri-geri sapma — sıra hâlinde dizilmesinler.</summary>
+        public float Boylamsal => ((tohum * 40503u) % 997u) / 997f
+                                  * 24f - 12f;
+
+        /// <summary>
         /// Bu vakit ne söylüyor — <see cref="BarkKorpusu"/>'ndan seçilmiş
         /// replik. Vakit değişince yenilenir.
         ///

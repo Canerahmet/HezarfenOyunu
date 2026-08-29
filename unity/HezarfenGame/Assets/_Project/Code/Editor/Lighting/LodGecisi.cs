@@ -81,9 +81,23 @@ namespace Hezarfen.Editor.Lighting
                     var lodlar = g.GetLODs();
                     for (int i = 0; i < lodlar.Length; i++)
                     {
-                        if (lodlar[i].fadeTransitionWidth >= GecisBandi - 1e-4f)
+                        // SON LOD'A BANT VERILMEZ.
+                        //
+                        // Ilk yazimda butun LOD'lara 0,25 bant verdim ve
+                        // bu, son LOD'un YOK OLMAYA dogru solmasi demek.
+                        // Sonucu oyun turunda goruldu: 41 NPC govdesi
+                        // ekranin icinde, en yakini 33 m, hepsi etkin,
+                        // gorus konisinde — ve hicbiri cizilmiyordu.
+                        // Karakter 33 m'de son LOD'a duser; binalar o
+                        // mesafede hala LOD0'dadir, o yuzden sehir
+                        // gorunurken insanlar yok oldu.
+                        //
+                        // Son LOD'un bandi 0 kalir: uzakta silinmek
+                        // yerine oldugu gibi cizilir.
+                        float bant = (i == lodlar.Length - 1) ? 0f : GecisBandi;
+                        if (Mathf.Abs(lodlar[i].fadeTransitionWidth - bant) < 1e-4f)
                             continue;
-                        lodlar[i].fadeTransitionWidth = GecisBandi;
+                        lodlar[i].fadeTransitionWidth = bant;
                         dokunuldu = true;
                     }
                     if (dokunuldu) g.SetLODs(lodlar);
@@ -120,9 +134,11 @@ namespace Hezarfen.Editor.Lighting
                 foreach (var g in kok.GetComponentsInChildren<LODGroup>(true))
                 {
                     if (g.fadeMode != LODFadeMode.CrossFade) { n++; break; }
+                    // Son LOD haric hepsinde bant olmali.
+                    var ls = g.GetLODs();
                     bool sert = false;
-                    foreach (var l in g.GetLODs())
-                        if (l.fadeTransitionWidth < 1e-4f) sert = true;
+                    for (int i = 0; i < ls.Length - 1; i++)
+                        if (ls[i].fadeTransitionWidth < 1e-4f) sert = true;
                     if (sert) { n++; break; }
                 }
             }

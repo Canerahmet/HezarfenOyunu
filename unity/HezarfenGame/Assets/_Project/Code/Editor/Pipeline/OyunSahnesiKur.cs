@@ -101,6 +101,7 @@ namespace Hezarfen.Editor.Pipeline
             // ve olcum "hicbir sey degismedi" dedi.
             sehir.sakinSayisi = NPCYonetici.VarsayilanSakin;
             sehir.gorunurMesafe = NPCYonetici.VarsayilanGorunurMesafe;
+            sehir.dilim = NPCYonetici.VarsayilanDilim;
             rapor.Add($"Sehir: {(graf == null ? "GRAF YOK" : graf.dugumler.Count + " dugum")}, "
                       + $"{meslekler.Count} meslek, {sehir.sakinSayisi} sakin");
 

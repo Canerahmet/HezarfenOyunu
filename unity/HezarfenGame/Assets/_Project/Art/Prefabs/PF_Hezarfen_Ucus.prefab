@@ -118,7 +118,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4742473837712756890, guid: a7cd52d526942bc42a0c322ab0132339, type: 3}
       propertyPath: m_LODs.Array.data[1].fadeTransitionWidth
-      value: 0.25
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4742473837712756890, guid: a7cd52d526942bc42a0c322ab0132339, type: 3}
       propertyPath: m_LODs.Array.data[0].screenRelativeHeight

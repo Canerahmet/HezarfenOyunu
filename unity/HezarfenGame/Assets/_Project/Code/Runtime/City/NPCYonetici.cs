@@ -77,7 +77,23 @@ namespace Hezarfen.Sehir
         /// alan varsayılanını değiştirmek zaten kurulmuş bir sahneyi
         /// değiştirmez ve bir kez tam olarak bu oldu.
         /// </summary>
-        public const int VarsayilanSakin = 9000;
+        public const int VarsayilanSakin = 40000;
+
+        // 9.000 -> 40.000. Gerekce OLCULDU, tahmin degil:
+        //
+        // NPC cizicileri kapatilip kare farki alindi — 640x360'lik karede
+        // yalnizca 277 piksel degisti (%0,12). Yani insanlar CIZILIYORDU,
+        // ama her biri iki-uc piksel: 58 kisi 120 m yaricapa, yani
+        // 45.000 m²'ye yayilmisti. 1.000 m²'ye 1,3 kisi.
+        //
+        // Bir sokagin kalabalik gorunmesi icin insanin YAKINDA olmasi
+        // gerekir; 120 m'deki bir adam 19 piksel boyundadir. Govde
+        // butcesi 60 iken o butce uzaktaki minicik insanlara harcaniyordu.
+        //
+        // 1632 Istanbul'unun nufusu ~700.000; 40.000 hala bunun
+        // yirmide biri. Sanal sakin ucuz (konum + meslek + saf islev
+        // rutini) ve guncelleme `dilim` kare boyunca yayiliyor; pahali
+        // olan govde sayisi degismedi.
 
         /// <summary>
         /// Bu mesafeden yakındakiler gövde alır (m). <b>90 → 120.</b>
@@ -97,7 +113,14 @@ namespace Hezarfen.Sehir
         public int govdeButcesi = 60;
 
         [Tooltip("Her karede sanal sakinlerin kaçta biri güncellensin.")]
-        [Range(1, 60)] public int dilim = 12;
+        // Dilim 12 -> 40: sakin sayisi dortten fazla katlandi, is ayni
+        // sayida kareye sigmaz. Bir sakin artik 40 karede bir guncellenir
+        // (~0,67 sn) ve `dilimDt` bunu telafi ediyor, yani yuruyus hizi
+        // degismiyor.
+        [Range(1, 60)] public int dilim = VarsayilanDilim;
+
+        /// <summary>Dilimin tek sahibi — sahne kurulumu bunu yazar.</summary>
+        public const int VarsayilanDilim = 40;
 
         /// <summary>Şu an gövdesi olan sakin sayısı — tanı ve test okur.</summary>
         public int GorunurSayisi { get; private set; }
@@ -269,13 +292,20 @@ namespace Hezarfen.Sehir
                 if (a.govde == null) a.govde = GovdeAl();
                 if (a.govde == null) continue;
 
-                a.govde.position = a.konum;
-                if (a.hiz > 0.05f)
-                {
-                    var yon = a.YonBul(graf);
-                    if (yon.sqrMagnitude > 1e-4f)
-                        a.govde.rotation = Quaternion.LookRotation(yon);
-                }
+                // SAPMA: eksenin tam ustunde durmasinlar.
+                //
+                // Yigilma olculdu: 9.000 sakin 3.070 ayri noktada, bir
+                // noktada 33 kisiye kadar. Sokak ekseni bir CIZGI, oysa
+                // insanlar bir SERIT boyunca yurur. Sapma tohumdan turer,
+                // yani sehir deterministik kalir.
+                var yon = a.YonBul(graf);
+                var ileri = yon.sqrMagnitude > 1e-4f
+                    ? yon.normalized : Vector3.forward;
+                var yanal = new Vector3(-ileri.z, 0f, ileri.x);
+                a.govde.position = a.konum + yanal * a.Sapma
+                                   + ileri * a.Boylamsal;
+                if (a.hiz > 0.05f && yon.sqrMagnitude > 1e-4f)
+                    a.govde.rotation = Quaternion.LookRotation(yon);
                 var an = a.govde.GetComponentInChildren<Animator>();
                 if (an != null) an.SetFloat("hiz", a.hiz);
                 cizilen++;

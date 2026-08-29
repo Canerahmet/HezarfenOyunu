@@ -84,6 +84,24 @@ namespace Hezarfen.Sehir
 
             // En yakinlar konusur — kalabalikta duyulan da odur.
             _adaylar.Sort((x, y) => x.d2.CompareTo(y.d2));
+
+            // EKRANDA AYRI DURSUNLAR.
+            //
+            // Kalabalikta en yakin dort kisi genellikle YAN YANA duruyor
+            // ve dort replik ust uste binip okunmaz bir lekeye donusuyor.
+            // Doğum yerinde cekilen karede tam olarak bu goruldu.
+            // Birbirine 3 m'den yakin konusanlardan yalniz biri konusur.
+            for (int i = _adaylar.Count - 1; i >= 0; i--)
+            {
+                for (int j = 0; j < i; j++)
+                {
+                    if ((_adaylar[i].ajan.konum
+                         - _adaylar[j].ajan.konum).sqrMagnitude > 9f) continue;
+                    _adaylar.RemoveAt(i);
+                    break;
+                }
+            }
+
             int n = Mathf.Min(_adaylar.Count, ayniAndaEnCok);
             GorunurReplik = n;
 
@@ -94,8 +112,20 @@ namespace Hezarfen.Sehir
                 t.text = a.replik.metin;
                 t.transform.position = a.konum + Vector3.up * yukseklik;
                 if (_kamera != null)
-                    t.transform.rotation = Quaternion.LookRotation(
-                        t.transform.position - _kamera.transform.position);
+                {
+                    var bakis = t.transform.position - _kamera.transform.position;
+                    t.transform.rotation = Quaternion.LookRotation(bakis);
+
+                    // EKRANDAKI BOYU SABIT TUT.
+                    //
+                    // TextMesh dunya uzayindadir: 3 m'deki bir replik
+                    // ekranin ucte birini kapliyordu ("Selamunaleykum"
+                    // karenin yarisi kadardi). Olcek mesafeyle buyur,
+                    // boylece yazi uzakta okunur, yakinda ekrani yemez.
+                    // Alt sinir 6 m: daha yakinda buyumesin.
+                    float uzak = Mathf.Max(6f, bakis.magnitude);
+                    t.transform.localScale = Vector3.one * (uzak / 12f);
+                }
                 t.gameObject.SetActive(true);
             }
             for (int i = n; i < _havuz.Count; i++)
