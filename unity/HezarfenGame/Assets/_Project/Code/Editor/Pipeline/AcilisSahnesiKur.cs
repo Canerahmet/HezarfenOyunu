@@ -63,12 +63,73 @@ namespace Hezarfen.Editor.Pipeline
             acilis.yuklemePaneli = yukleme;
 
             var basla = Dugme(menu.transform, "BaslaDugme", "Başla",
-                              new Vector2(0f, -40f));
+                              new Vector2(0f, -20f));
             basla.onClick.AddListener(acilis.Basla);
 
+            var ayarDugme = Dugme(menu.transform, "AyarDugme", "Ayarlar",
+                                  new Vector2(0f, -95f));
+            ayarDugme.onClick.AddListener(acilis.AyarlariAc);
+
+            var krediDugme = Dugme(menu.transform, "KrediDugme", "Krediler",
+                                   new Vector2(0f, -170f));
+            krediDugme.onClick.AddListener(acilis.KredileriAc);
+
             var cik = Dugme(menu.transform, "CikDugme", "Çık",
-                            new Vector2(0f, -130f));
+                            new Vector2(0f, -245f));
             cik.onClick.AddListener(acilis.Cik);
+
+            // --- AYARLAR ---
+            var ayarlar = Panel(canvasGo.transform, "AyarlarPaneli");
+            ayarlar.SetActive(false);
+            acilis.ayarlarPaneli = ayarlar;
+
+            Yazi(ayarlar.transform, "AyarBaslik", "AYARLAR", 56,
+                 new Vector2(0f, 260f), new Vector2(900f, 80f));
+
+            // Kademe adlari OLDUGU GIBI: olculen sey ile menude yazan sey
+            // ayrilirsa oyuncu neden 50 FPS aldigini anlamaz.
+            for (int i = 0; i < UnityEngine.QualitySettings.names.Length
+                            && i < 3; i++)
+            {
+                int k = i;
+                var d = Dugme(ayarlar.transform, $"Kademe{i}",
+                              UnityEngine.QualitySettings.names[i],
+                              new Vector2(0f, 140f - i * 75f));
+                d.onClick.AddListener(() => acilis.KademeSec(k));
+            }
+
+            acilis.kademeYazi = Yazi(ayarlar.transform, "KademeYazi",
+                Hezarfen.Arayuz.Ayarlar.KademeAciklamasi[
+                    Mathf.Clamp(Hezarfen.Arayuz.Ayarlar.Kademe, 0, 2)],
+                24, new Vector2(0f, -70f), new Vector2(1100f, 60f));
+
+            var ayarGeri = Dugme(ayarlar.transform, "AyarGeri", "Geri",
+                                 new Vector2(0f, -200f));
+            ayarGeri.onClick.AddListener(acilis.Geri);
+
+            // --- KREDILER ---
+            //
+            // ODbL atfi HUKUKI yukumluluk; metin sabitten geliyor ve bir
+            // test icerigini sinar (Krediler.ZorunluAtif).
+            var krediler = Panel(canvasGo.transform, "KrediPaneli");
+            krediler.SetActive(false);
+            acilis.krediPaneli = krediler;
+
+            // PUNTO OLCULEREK: metin ~60 satir ve 18 punto/820 px
+            // kutuda TASIYORDU — ekranda ortasindan basliyordu. Krediler
+            // tasarsa atif GORUNMEZ olur ve gorunmeyen bir atif, olmayan
+            // bir atiftir.
+            var krediYazi = Yazi(krediler.transform, "KrediMetin",
+                Hezarfen.Arayuz.Krediler.Metin, 15,
+                new Vector2(0f, 30f), new Vector2(1560f, 960f));
+            krediYazi.alignment = TextAnchor.UpperLeft;
+            krediYazi.resizeTextForBestFit = true;
+            krediYazi.resizeTextMinSize = 9;
+            krediYazi.resizeTextMaxSize = 16;
+
+            var krediGeri = Dugme(krediler.transform, "KrediGeri", "Geri",
+                                  new Vector2(0f, -505f));
+            krediGeri.onClick.AddListener(acilis.Geri);
 
             // --- YUKLEME ---
             acilis.ilerlemeYazi = Yazi(yukleme.transform, "IlerlemeYazi",

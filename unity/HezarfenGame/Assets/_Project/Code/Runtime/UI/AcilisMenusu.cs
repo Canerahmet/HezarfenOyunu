@@ -34,8 +34,13 @@ namespace Hezarfen.Arayuz
         [Header("Bağlantılar")]
         public GameObject menuPaneli;
         public GameObject yuklemePaneli;
+        public GameObject ayarlarPaneli;
+        public GameObject krediPaneli;
         public Slider ilerleme;
         public Text ilerlemeYazi;
+
+        [Tooltip("Seçili kademenin ölçülmüş açıklaması.")]
+        public Text kademeYazi;
 
         /// <summary>Yükleme başladı mı — test okur.</summary>
         public bool Yukleniyor { get; private set; }
@@ -43,12 +48,44 @@ namespace Hezarfen.Arayuz
         /// <summary>Son görülen ilerleme (0-1) — test okur.</summary>
         public float SonIlerleme { get; private set; }
 
-        private void Start() => Goster(menu: true);
+        private void Start()
+        {
+            // AYARLAR ACILISTA UYGULANIR.
+            //
+            // Kaydedilmis ama uygulanmamis bir ayar, olmayan bir ayardir:
+            // menude "Balanced" yazar, oyun High Fidelity kosar ve oyuncu
+            // neden 50 FPS aldigini anlamaz.
+            Ayarlar.Uygula();
+            Panel(menuPaneli);
+        }
+
+        /// <summary>Yalnız verilen paneli açar, ötekileri kapatır.</summary>
+        private void Panel(GameObject acik)
+        {
+            foreach (var p in new[] { menuPaneli, yuklemePaneli,
+                                      ayarlarPaneli, krediPaneli })
+                if (p != null) p.SetActive(p == acik);
+        }
 
         private void Goster(bool menu)
+            => Panel(menu ? menuPaneli : yuklemePaneli);
+
+        /// <summary>"Ayarlar" düğmesi.</summary>
+        public void AyarlariAc() => Panel(ayarlarPaneli);
+
+        /// <summary>"Krediler" düğmesi.</summary>
+        public void KredileriAc() => Panel(krediPaneli);
+
+        /// <summary>"Geri" düğmesi — menüye döner.</summary>
+        public void Geri() => Panel(menuPaneli);
+
+        /// <summary>Kalite kademesini değiştirir ve uygular.</summary>
+        public void KademeSec(int k)
         {
-            if (menuPaneli != null) menuPaneli.SetActive(menu);
-            if (yuklemePaneli != null) yuklemePaneli.SetActive(!menu);
+            Ayarlar.Kademe = k;
+            if (kademeYazi != null)
+                kademeYazi.text = Ayarlar.KademeAciklamasi[
+                    Mathf.Clamp(k, 0, Ayarlar.KademeAciklamasi.Length - 1)];
         }
 
         /// <summary>"Başla" düğmesi.</summary>
