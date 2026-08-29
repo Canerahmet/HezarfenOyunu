@@ -59,7 +59,27 @@ namespace Hezarfen.Sehir
                 // yazi havada asili kalirdi.
                 if (a.govde == null || a.replik == null) continue;
                 float d2 = (a.konum - oyuncu.position).sqrMagnitude;
-                if (d2 <= menzil2) _adaylar.Add((a, d2));
+                if (d2 > menzil2) continue;
+
+                // GORUS HATTI SART.
+                //
+                // Yazi dunyada duruyor ama duvarin ARKASINDAN da
+                // okunuyordu: cami avlusunda cekilen karede dort replik
+                // ust uste binmis, direklerin ve evlerin onunde asili
+                // duruyordu. Duyulmasi degil GORULMESI sorun — konusan
+                // kisi gorunmuyorsa sozu de gorunmemeli.
+                if (_kamera != null)
+                {
+                    var agiz = a.konum + Vector3.up * yukseklik;
+                    var goz = _kamera.transform.position;
+                    var fark = agiz - goz;
+                    if (Physics.Raycast(goz, fark.normalized,
+                                        fark.magnitude - 0.4f, ~0,
+                                        QueryTriggerInteraction.Ignore))
+                        continue;
+                }
+
+                _adaylar.Add((a, d2));
             }
 
             // En yakinlar konusur — kalabalikta duyulan da odur.

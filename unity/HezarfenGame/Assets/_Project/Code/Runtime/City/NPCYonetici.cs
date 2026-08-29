@@ -51,11 +51,46 @@ namespace Hezarfen.Sehir
         public AranmaSistemi aranma;
 
         [Header("Kademe")]
-        [Tooltip("Şehirdeki toplam sakin sayısı.")]
-        public int sakinSayisi = 1200;
+        /// <summary>
+        /// Şehirdeki toplam sakin. <b>9.000 — 1.200 değil.</b>
+        ///
+        /// Caner (2026-08-29, oynarken): *"npc ler yok, ve sehir daha dolu
+        /// gozuksun."* Ölçüldü ve haklıydı: 1.200 sakin sokak grafının
+        /// 9,6 × 7,8 km'lik kapsamına yayılıyordu, yani <b>75 km²'ye 1.200
+        /// kişi</b>. Şehrin <b>en kalabalık</b> 90 m'lik dairesinde bile
+        /// yalnız <b>21</b> kişi vardı ve ortalama <b>8,9</b>'du; gövde
+        /// bütçesi 60 iken hiç dolmuyordu. Yani kalabalık kodu çalışıyordu,
+        /// gösterecek kalabalık yoktu.
+        ///
+        /// Sayı ölçülerek seçildi: yoğunluk sakin sayısıyla doğru orantılı,
+        /// 8,9 × (9000/1200) ≈ <b>67</b> — yani 90 m'lik dairede gövde
+        /// bütçesini dolduracak kadar, aşırıya kaçmadan.
+        ///
+        /// Sanal sakin ucuzdur: konum + meslek + saf işlev rutini, ve
+        /// güncelleme <c>dilim</c> kare boyunca yayılıyor. Pahalı olan
+        /// <see cref="govdeButcesi"/>, o değişmedi.
+        /// </summary>
+        public int sakinSayisi = VarsayilanSakin;
 
-        [Tooltip("Bu mesafeden yakındakiler gövde alır (m).")]
-        public float gorunurMesafe = 90f;
+        /// <summary>
+        /// Nüfusun <b>tek sahibi</b>. Sahne kurulumu bu sabiti yazar;
+        /// alan varsayılanını değiştirmek zaten kurulmuş bir sahneyi
+        /// değiştirmez ve bir kez tam olarak bu oldu.
+        /// </summary>
+        public const int VarsayilanSakin = 9000;
+
+        /// <summary>
+        /// Bu mesafeden yakındakiler gövde alır (m). <b>90 → 120.</b>
+        ///
+        /// Sokak 4,6 m ve evler iki katlı; 90 m'de bir sonraki köşe
+        /// görünüyor ama oradaki kimse görünmüyordu. 120 m, dolaşırken
+        /// insanların <b>uzaktan belirip</b> yaklaşmasını sağlıyor —
+        /// birden bire yanınızda belirmelerini değil.
+        /// </summary>
+        public float gorunurMesafe = VarsayilanGorunurMesafe;
+
+        /// <summary>Görünür mesafenin tek sahibi (m).</summary>
+        public const float VarsayilanGorunurMesafe = 120f;
 
         [Tooltip("Aynı anda en fazla kaç gövde. Bütçe: 30 dk kesintisiz " +
                  "dolaşım bunu aşarsa kaybedilir.")]

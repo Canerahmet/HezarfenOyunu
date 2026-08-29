@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Hezarfen.Arayuz;
 using Hezarfen.Editor.Lighting;
@@ -40,6 +41,9 @@ namespace Hezarfen.Editor.Pipeline
         public const string DunyaSahnesi =
             "Assets/_Project/Scenes/Faz1_Terrain.unity";
 
+        /// <summary>Sokak grafı varlığı — tek yol, iki yerde kullanılıyor.</summary>
+        public const string GrafYolu = "Assets/_Project/Data/SG_Sehir.asset";
+
         /// <summary>Oyuncunun doğduğu yer: Galata Kulesi'nin dibi.</summary>
         public static readonly Vector3 BaslangicNoktasi =
             new Vector3(25f, 0f, 25f);
@@ -73,8 +77,7 @@ namespace Hezarfen.Editor.Pipeline
                       + $"saat {zaman.saat:F1}");
 
             // 4) SEHIR: sakinler
-            var graf = AssetDatabase.LoadAssetAtPath<SokakGrafi>(
-                "Assets/_Project/Data/SG_Sehir.asset");
+            var graf = AssetDatabase.LoadAssetAtPath<SokakGrafi>(GrafYolu);
             var meslekler = AssetDatabase.FindAssets("t:NPCMeslek")
                 .Select(AssetDatabase.GUIDToAssetPath)
                 .Select(AssetDatabase.LoadAssetAtPath<NPCMeslek>)
@@ -88,6 +91,16 @@ namespace Hezarfen.Editor.Pipeline
             sehir.govdePrefab = govde;
             sehir.oyuncu = oyuncu.transform;
             sehir.zaman = zaman;
+
+            // NUFUS DEGERLERI BURADA YAZILIR — koddaki varsayilan YETMEZ.
+            //
+            // Sahnedeki bilesen serilestirilmis eski degerleri tasir;
+            // NPCYonetici'nin alan varsayilanini degistirmek ZATEN
+            // kurulmus bir sahneyi degistirmez. Bir kez tam olarak bu
+            // oldu: sayilari kodda 9.000'e cikardim, sahne 1.200'de kaldi
+            // ve olcum "hicbir sey degismedi" dedi.
+            sehir.sakinSayisi = NPCYonetici.VarsayilanSakin;
+            sehir.gorunurMesafe = NPCYonetici.VarsayilanGorunurMesafe;
             rapor.Add($"Sehir: {(graf == null ? "GRAF YOK" : graf.dugumler.Count + " dugum")}, "
                       + $"{meslekler.Count} meslek, {sehir.sakinSayisi} sakin");
 
@@ -163,8 +176,134 @@ namespace Hezarfen.Editor.Pipeline
                 ? arazi.SampleHeight(BaslangicNoktasi)
                   + arazi.transform.position.y
                 : 0f;
-            go.transform.position = new Vector3(
+            // DOGUM YERI SOKAGA OTURUR.
+            //
+            // Galata Kulesi'nin dibi dunya orijini, ama olculdu: oradan
+            // en yakin sokak grafi dugumu **215 m** oteydi ve en yakin
+            // sakin **227 m**. Gorunur mesafe 120 m oldugu icin oyuncu
+            // her acilista bos bir meydanda doguyordu — "npc ler yok"
+            // izleniminin yarisi buydu, nufusla ilgisi yoktu.
+            //
+            // Kule yine baslangic noktasi; yalnizca en yakin sokaga
+            // kaydiriliyor ki oyuncu insanlarin arasinda uyansin.
+            var baslangic = new Vector3(
                 BaslangicNoktasi.x, y + 0.2f, BaslangicNoktasi.z);
+            // SokakGrafi bir ScriptableObject; sahnede aranmaz, varlik
+            // olarak yuklenir. Ilk yazimda FindAnyObjectByType kullandim
+            // ve sessizce null dondu — dogum yeri hic kaydirilmadi.
+            var grafObj = AssetDatabase.LoadAssetAtPath<SokakGrafi>(GrafYolu);
+            if (grafObj != null && grafObj.dugumler.Count > 0)
+            {
+                // SEMTLERI GECICI OLARAK AC — yoksa hicbir sey "dolu"
+                // gorunmez.
+                //
+                // Bu adim eksikti ve sonucu olculdu: aciklik puani her
+                // adayda 8/8 cikiyor, en yakin dugum kazaniyor ve oyuncu
+                // yine duvar dibinde doguyordu. Sebep, evlerin Faz1_Terrain'de
+                // DEGIL semt sahnelerinde olmasi: editorde arazi sahnesi tek
+                // basina bostur, butun isinlar serbest gecer.
+                //
+                // Fizik sorgusu ancak carpisticilar YUKLU iken bir sey
+                // soyler. Semtler eklenerek acilir, secim yapilir, kapanir.
+                var geciciSemtler = new List<UnityEngine.SceneManagement.Scene>();
+                foreach (string sy in Directory.GetFiles(
+                             "Assets/_Project/Scenes/Districts", "*.unity"))
+                {
+                    string temiz = sy.Replace("\\", "/");
+                    try
+                    {
+                        geciciSemtler.Add(EditorSceneManager.OpenScene(
+                            temiz, OpenSceneMode.Additive));
+                    }
+                    catch { /* acilamayan semt secimi engellemez */ }
+                }
+                Physics.SyncTransforms();
+
+                // EN YAKIN DUGUM YETMEZ, "BOS" DUGUM DE YETMEZ.
+                //
+                // Iki deneme de olculdu ve ikisi de yetersizdi:
+                //  1. En yakin dugum: oyuncu bir binanin TAS KAIDESI
+                //     ustunde, sacagin altinda dogdu.
+                //  2. Kapsul bos mu + tepede 3 m aciklik: ayni nokta
+                //     gecti, cunku kapsul gercekten bostu — ama kamera
+                //     0,95 m arkadaki duvara carpiyordu (kol 3,20 -> 0,70).
+                //
+                // Gereken sey bir NOKTANIN bos olmasi degil, cevresinin
+                // ACIK olmasi. Sekiz yone 6 m isin atilir; kac tanesi
+                // serbest, o dugumun puanidir. En yakin 250 aday arasindan
+                // en acik olani secilir — boylece oyuncu meydanda ya da
+                // genis sokakta uyanir, duvar dibinde degil.
+                var adaylar = new List<Vector3>(grafObj.dugumler.Count);
+                foreach (var d in grafObj.dugumler) adaylar.Add(d.konum);
+                adaylar.Sort((a, b) =>
+                    (a - baslangic).sqrMagnitude.CompareTo(
+                        (b - baslangic).sqrMagnitude));
+
+                Vector3? secilen = null;
+                int enIyiPuan = -1;
+                int bakilan = Mathf.Min(250, adaylar.Count);
+                for (int i = 0; i < bakilan; i++)
+                {
+                    var aday = adaylar[i];
+                    float yy = YuzeyKotu(arazi, aday);
+
+                    // YUZEY ZEMIN KATI OLMALI — CATI DEGIL.
+                    //
+                    // Aciklik puani catiyi sever: bir damin uzerinde sekiz
+                    // isin de serbesttir. Olculdu, secim oyuncuyu bir
+                    // kahvehanenin damina koydu (PF_Kahvehane_A, kot
+                    // 74,59 iken arazi 70,9). Zeminden 1,5 m'den fazla
+                    // yukaridaki her yuzey damdir ya da terastir.
+                    float araziKotu = arazi != null
+                        ? arazi.SampleHeight(aday) + arazi.transform.position.y
+                        : yy;
+                    if (yy - araziKotu > 1.5f) continue;
+
+                    var ayak = new Vector3(aday.x, yy + 0.2f, aday.z);
+                    var alt = ayak + Vector3.up * 0.35f;
+                    var ust = ayak + Vector3.up * 1.55f;
+                    if (Physics.CheckCapsule(alt, ust, 0.32f, ~0,
+                                             QueryTriggerInteraction.Ignore))
+                        continue;
+                    // Tepede aciklik: sacak/teras altina dusme.
+                    if (Physics.Raycast(ust, Vector3.up, 4f, ~0,
+                                        QueryTriggerInteraction.Ignore))
+                        continue;
+
+                    int puan = 0;
+                    var goz = ayak + Vector3.up * 1.4f;
+                    for (int a = 0; a < 8; a++)
+                    {
+                        float rad = a * Mathf.PI * 0.25f;
+                        var yon2 = new Vector3(Mathf.Cos(rad), 0f, Mathf.Sin(rad));
+                        if (!Physics.Raycast(goz, yon2, 6f, ~0,
+                                             QueryTriggerInteraction.Ignore))
+                            puan++;
+                    }
+                    if (puan <= enIyiPuan) continue;
+                    enIyiPuan = puan;
+                    secilen = ayak;
+                    if (puan == 8) break;      // tam acik, daha iyisi yok
+                }
+
+                if (secilen.HasValue)
+                {
+                    float uzak = Vector3.Distance(secilen.Value, baslangic);
+                    baslangic = secilen.Value;
+                    Debug.Log($"[Hezarfen] Dogum yeri: {uzak:F0} m otede, "
+                              + $"aciklik {enIyiPuan}/8, kot {baslangic.y:F1}.");
+                }
+                else
+                {
+                    Debug.LogWarning("[Hezarfen] Acik sokak dugumu yok — "
+                                     + "kule dibinde doguldu.");
+                }
+
+                foreach (var gs in geciciSemtler)
+                    if (gs.IsValid()) EditorSceneManager.CloseScene(gs, true);
+            }
+
+            go.transform.position = baslangic;
 
             var cc = go.AddComponent<CharacterController>();
             cc.height = 1.70f; cc.radius = 0.30f;
@@ -274,7 +413,60 @@ namespace Hezarfen.Editor.Pipeline
                 Object.DestroyImmediate(c);
 
             not = "govde: PF_Hezarfen_Sivil";
+
+            // ANIMATORU SUREN BILESEN.
+            //
+            // Govde animator'unu kimse surmuyordu: karakter durus pozunda
+            // KAYIYORDU ve hiz arttikca kayma da hizlaniyordu — Caner'in
+            // "kosmaya baslayinca problem oluyor" dedigi sey buydu.
+            //
+            // HezarfenAnimator hizi CharacterController'dan okuyup
+            // karisim agacina veriyor; esikler WalkController'in
+            // sabitlerinden turedigi icin ayaklar yerde kaymaz.
+            var animator = ornek.GetComponentInChildren<Animator>(true);
+            if (animator == null)
+            {
+                not += " (ANIMATOR YOK — karakter canlanmaz)";
+                Debug.LogWarning("[Hezarfen] Govdede Animator yok.");
+            }
+            else
+            {
+                if (animator.runtimeAnimatorController == null)
+                    Debug.LogWarning("[Hezarfen] Govde animatorunde controller "
+                                     + "YOK — Boru Hatti -> Karakter "
+                                     + "animatorunu bagla.");
+                animator.applyRootMotion = false;
+
+                var surucu = oyuncu.GetComponent<HezarfenAnimator>()
+                             ?? oyuncu.AddComponent<HezarfenAnimator>();
+                surucu.animator = animator;
+                surucu.karakterKontrol = oyuncu.GetComponent<CharacterController>();
+                surucu.suzulme = oyuncu.GetComponent<GlideController>();
+                not += " + animator";
+            }
+
             return ornek;
+        }
+
+        /// <summary>
+        /// Noktanın üstündeki <b>gerçek yüzeyin</b> kotu.
+        ///
+        /// Arazi kotu yetmiyor: sokakta arazinin ÜSTÜNDE kaldırım var,
+        /// yapıların altında taş kaide var. Oyuncuyu arazi kotuna
+        /// oturtmak onu kaldırımın içine gömüyordu — ölçüldü, bele kadar.
+        ///
+        /// Yukarıdan aşağı ışın atılır ve ilk çarpılan yüzey alınır;
+        /// hiçbir şeye çarpmazsa araziye düşülür.
+        /// </summary>
+        private static float YuzeyKotu(Terrain arazi, Vector3 nokta)
+        {
+            var bas = new Vector3(nokta.x, nokta.y + 60f, nokta.z);
+            if (Physics.Raycast(bas, Vector3.down, out var vurus, 200f, ~0,
+                                QueryTriggerInteraction.Ignore))
+                return vurus.point.y;
+            return arazi != null
+                ? arazi.SampleHeight(nokta) + arazi.transform.position.y
+                : nokta.y;
         }
 
         /// <summary>Adı verilen tekil sistem nesnesini bulur ya da kurar.</summary>

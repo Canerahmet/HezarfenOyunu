@@ -219,12 +219,37 @@ namespace Hezarfen.Player
             var yon = Quaternion.Euler(pitch, transform.eulerAngles.y, 0f);
             var geri = yon * Vector3.back;
 
+            // ENGEL TARAMASI KENDI GOVDESINI ATLAR.
+            //
+            // Burada tek `Physics.SphereCast` vardi ve calismiyordu:
+            // tarama omuz noktasindan basliyor, omuz noktasi oyuncunun
+            // KENDI kapsulunun (yaricap 0,30; omuz kaymasi 0,45; kure
+            // yaricapi 0,25) icinde kaliyor, ve Unity baslangicta cakisan
+            // carpisticilari SphereCast'te yok sayiyor. Yani hicbir engel
+            // gorulmuyordu.
+            //
+            // Olculdu: `SphereCastAll` ayni noktada OYUNCU'yu 0,00 m'de
+            // dondurdu, tekil `SphereCast` ise hicbir sey dondurmedi.
+            // Sonucu ekranda goruldu — yamacta kol tam boyunda kalip
+            // kamerayi terasin ICINE soktu; oyuncu bele kadar gomulmus
+            // gibi gorunuyordu, oysa gomulen kameraydi.
             float istenen = mesafe;
-            if (Physics.SphereCast(eksen, carpismaYaricapi, geri,
-                                   out var vurus, mesafe, ~0,
-                                   QueryTriggerInteraction.Ignore))
+            var vuruslar = Physics.SphereCastAll(
+                eksen, carpismaYaricapi, geri, mesafe, ~0,
+                QueryTriggerInteraction.Ignore);
+            float enKisa = float.MaxValue;
+            foreach (var v in vuruslar)
+            {
+                // Kendi govdesi ve gorsel karakteri engel sayilmaz.
+                if (v.transform == transform
+                    || v.transform.IsChildOf(transform)) continue;
+                // Baslangicta cakisan carpistirici 0 mesafe dondurur;
+                // o durumda kolu en kisaya cekmek dogrudur.
+                if (v.distance < enKisa) enKisa = v.distance;
+            }
+            if (enKisa < float.MaxValue)
                 istenen = Mathf.Max(enYakin * 0.5f,
-                                    vurus.distance - carpismaYaricapi);
+                                    enKisa - carpismaYaricapi);
 
             // Engele DOGRU ani, engelden UZAKLASIRKEN yumusak: duvara
             // girerken gecikmek kamerayi tasin icine sokar, cikarken
