@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/_Project/Scenes/Acilis.unity
+    guid: 842de7c70ce0d9a45b507d3cc1d395c0
+  - enabled: 1
     path: Assets/_Project/Scenes/Faz1_Terrain.unity
     guid: 5dd4b6fedd5b0234290b7c6bd49f8734
   - enabled: 1

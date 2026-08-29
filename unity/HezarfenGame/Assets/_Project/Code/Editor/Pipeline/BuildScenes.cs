@@ -40,11 +40,23 @@ namespace Hezarfen.Editor.Pipeline
         /// katmanları, yeşil kütleler). `FlightSlice` uçuş grayboxudur ve
         /// Faz 1'in ölçüm sahnesi olarak yaşamaya devam ediyor.
         ///
-        /// Gerçek açılış akışı (menü → yükleme → şehir) Faz 7'nin kararıdır;
-        /// bu liste o güne kadar <b>doğru</b> olanı tutar, nihai olanı değil.
+        /// Gerçek açılış akışı (menü → yükleme → şehir) <b>Faz 7'de
+        /// kararlaştırıldı</b>: ilk sahne <c>Acilis</c>, oradan asenkron
+        /// olarak <c>Faz1_Terrain</c>.
         /// </summary>
         public static readonly string[] Wanted =
         {
+            // FAZ 7 KARARI: acilis MENUDUR, sehir degil.
+            //
+            // Dogrudan sehre acmak, oyuncuyu arazi + su + sur + semt
+            // katmanlari yuklenirken donmus bir ekranla karsilamak
+            // demekti; ilk izlenim bir takilma olurdu. Menu sahnesi
+            // neredeyse bostur, aninda acilir ve sehri ARKADA yukler.
+            //
+            // Faz 6'nin "yukleme ekrani yok" olcutu bunu yasaklamaz: o
+            // olcut SERBEST DOLASIM icindir — sehirde gezerken ekran
+            // kesilmemeli. Acilistaki tek yukleme onun kapsaminda degil.
+            "Assets/_Project/Scenes/Acilis.unity",
             "Assets/_Project/Scenes/Faz1_Terrain.unity",
             "Assets/_Project/Scenes/FlightSlice.unity",
         };

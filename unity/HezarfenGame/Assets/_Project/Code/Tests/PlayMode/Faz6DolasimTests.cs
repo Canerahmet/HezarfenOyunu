@@ -32,6 +32,9 @@ namespace Hezarfen.Tests
     {
         private GameObject _kok, _oyuncuGo, _zamanGo, _prefab;
 
+        /// <summary>Test başlarken sahnede duran gövde nesnesi sayısı.</summary>
+        private int _baslangictakiGovde;
+
         private (NPCYonetici y, ZamanSistemi z) Kur(int sakin = 400,
                                                     int butce = 40)
         {
@@ -78,6 +81,10 @@ namespace Hezarfen.Tests
                 meslek.cizelge.Add(new NPCMeslek.Adim
                 { vakit = v, hedef = hedef, olasilik = 1f, disarida = true });
             }
+
+            _baslangictakiGovde = Object.FindObjectsByType<GameObject>(
+                    FindObjectsInactive.Include, FindObjectsSortMode.None)
+                .Count(o => o.name.StartsWith("GovdePrefab"));
 
             _prefab = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             _prefab.name = "GovdePrefab";
@@ -165,12 +172,21 @@ namespace Hezarfen.Tests
                 + "— butce asilirsa 30 dakikalik oturum kare duserek biter.");
 
             // GOVDE NESNELERI COGALMADI MI: havuz yeniden kullanmali.
+            //
+            // BU TESTIN KENDI ARTISI olculur, sahnedeki toplam degil.
+            // Ilk yazimda toplam sayiliyordu ve yeni bir PlayMode test
+            // sinifi eklenince test patladi (66 > 42): sayilan sey bu
+            // testin sizintisi degil, ONCEKI testlerden kalanlardi.
+            // Genel bir sayaca bakan test, kendisiyle ilgisiz bir
+            // degisiklikte patlar ve yanlis yeri isaret eder.
             int govdeNesnesi = Object.FindObjectsByType<GameObject>(
                     FindObjectsInactive.Include, FindObjectsSortMode.None)
                 .Count(o => o.name.StartsWith("GovdePrefab"));
-            Assert.LessOrEqual(govdeNesnesi, y.govdeButcesi + 2,
-                $"{govdeNesnesi} govde nesnesi var, butce {y.govdeButcesi} — "
-                + "havuz sizdiriyor; uzun oturumda bellek buyur.");
+            int artis = govdeNesnesi - _baslangictakiGovde;
+            Assert.LessOrEqual(artis, y.govdeButcesi + 2,
+                $"Bu test {artis} govde nesnesi ekledi, butce "
+                + $"{y.govdeButcesi} — havuz sizdiriyor; uzun oturumda "
+                + "bellek buyur.");
 
             // SEHIR HALA YURUYOR MU: don ve hareket olctur.
             _oyuncuGo.transform.position = new Vector3(200f, 0f, 200f);

@@ -4,7 +4,8 @@
     "references": [
         "Hezarfen.Runtime",
         "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner"
+        "UnityEditor.TestRunner",
+        "Unity.ugui"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
