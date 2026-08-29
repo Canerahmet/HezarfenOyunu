@@ -82,6 +82,21 @@ namespace Hezarfen.Diagnostics
         private RenderTexture rt;
         private Vector3 sweepBaseEuler;
 
+        /// <summary>
+        /// Tam turda kare süresini <b>yöne göre</b> ayıran kovalar (12 × 30°).
+        ///
+        /// <b>Neden gerekli:</b> tur adımının tek bir p95'i, örnekleme
+        /// penceresi değişince 15,6 ms'den 17,9 ms'ye kayıyordu — aynı
+        /// sahne, aynı tur. Tek sayı "nerede pahalı" sorusuna cevap
+        /// vermiyor ve bu yüzden geçti/kaldı demeye de yetmiyor.
+        ///
+        /// Yöne göre ayırmak soruyu ölçülebilir yapar: şehre bakınca mı
+        /// pahalı, denize bakınca mı ucuz. Bir turda p95'i tek başına
+        /// belirleyen sektör varsa, iş orada.
+        /// </summary>
+        private const int YonKova = 12;
+        private readonly List<float>[] yonOrnekleri = new List<float>[YonKova];
+
 #if UNITY_EDITOR
         // Cizim cagrisi sayimi YALNIZCA Editor'de okunabilir (UnityStats).
         //
@@ -126,6 +141,11 @@ namespace Hezarfen.Diagnostics
             stepIndex++;
             frameInStep = 0;
             samples.Clear();
+            for (int i = 0; i < YonKova; i++)
+            {
+                if (yonOrnekleri[i] == null) yonOrnekleri[i] = new List<float>();
+                else yonOrnekleri[i].Clear();
+            }
 #if UNITY_EDITOR
             srpSamples.Clear();
             setPassSamples.Clear();
@@ -194,7 +214,16 @@ namespace Hezarfen.Diagnostics
 
             if (frameInStep <= warmupFrames) return;
 
-            samples.Add(Time.unscaledDeltaTime * 1000f);
+            float suAnkiMs = Time.unscaledDeltaTime * 1000f;
+            samples.Add(suAnkiMs);
+            if (suAnki.yawSweep360 && targetCamera != null)
+            {
+                float aci = Mathf.Repeat(
+                    targetCamera.transform.rotation.eulerAngles.y
+                    - sweepBaseEuler.y, 360f);
+                yonOrnekleri[Mathf.Clamp((int)(aci / (360f / YonKova)),
+                                         0, YonKova - 1)].Add(suAnkiMs);
+            }
 #if UNITY_EDITOR
             srpSamples.Add(UnityEditor.UnityStats.srpBatcherDrawCalls);
             setPassSamples.Add(UnityEditor.UnityStats.setPassCalls);
@@ -220,6 +249,20 @@ namespace Hezarfen.Diagnostics
                     $"  setPass {Median(setPassSamples),4}  ucgen {MedianF(triSamples),6:F2} M";
 #endif
             Report.Add(line);
+
+            // YON DOKUMU: turun neresi pahali.
+            if (step.yawSweep360)
+            {
+                var yon = new System.Text.StringBuilder("        yon (medyan ms): ");
+                for (int i = 0; i < YonKova; i++)
+                {
+                    var v = yonOrnekleri[i];
+                    if (v == null || v.Count == 0) { yon.Append("  --- "); continue; }
+                    v.Sort();
+                    yon.Append($"{i * (360 / YonKova),3}d:{v[v.Count / 2],5:F1} ");
+                }
+                Report.Add(yon.ToString());
+            }
 
             AdvanceStep();
         }

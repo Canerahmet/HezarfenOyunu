@@ -116,10 +116,77 @@ dilimine bakıp aynı sayı gibi karşılaştırılıyordu.
 koşumda aynı tur. Düzeltmeden sonra iki çözünürlüğün çizim çağrısı
 30 365 ve 30 368 — aynı turu ölçtüklerinin kanıtı.
 
+---
+
+# İkinci tur — kule turu teşhis edildi
+
+Kule turu tek kalan başarısızlıktı ve sebebi bulundu: **ağaçlar**.
+
+## Yöne göre ölçmek
+
+Tek bir p95 yetmiyordu; örnekleme penceresi değişince 15,6 ms'den
+17,9 ms'ye kayıyordu — aynı sahne, aynı tur. Bir sayı "nerede pahalı"
+sorusuna cevap vermiyor, dolayısıyla geçti/kaldı demeye de yetmiyor.
+
+Alet artık turu **12 × 30° kovaya** ayırıyor. Tablo hemen konuştu:
+
+| yön | 30° | 60° | 90° | 150° | **180°** | **210°** | 270° |
+|---|---|---|---|---|---|---|---|
+| ms | 6,8 | 7,0 | 6,9 | 14,2 | **17,0** | **16,6** | 12,4 |
+
+Yönler arası **2,5 kat** fark. Medyan 91 FPS; p95'i tek başına
+150°–240° sektörü belirliyor. Deniz yönü ucuz, kara yönü pahalı.
+
+## Değişkenler tek tek elendi
+
+| şüpheli | sonuç |
+|---|---|
+| gölge (güneş gölgesi) | 17,55 → 17,35 — **değil** |
+| su yüzeyi (`WATER_Bogaz_Halic`) | 17,03 → 16,7 — **değil** |
+| **ağaçlar** (`treeDistance = 0`) | **17,03 → 6,99** |
+
+Ağaçlar kapalıyken **yön farkı da tümüyle kayboluyor** (5,1–6,6 ms, düz).
+Yani hem maliyetin hem de yöne bağlılığın tek kaynağı onlar — mantıklı,
+çünkü ağaçlar karada ve dağılımları yöne göre değişen tek büyük yük.
+
+| | ağaçlı | ağaçsız |
+|---|---|---|
+| p95 | 17,03 ms | 6,99 ms |
+| çizim çağrısı | 30 361 | 12 233 |
+| üçgen | 1,93 M | 0,49 M |
+
+Yani "boş arazide 19 600 çizim çağrısı" bulgusunun cevabı da bu: o
+çağrılar ağaçlardı.
+
+## Sorun üçgen değil, çizim çağrısı
+
+Ağaç prefablarının son LOD'u zaten **80–84 üçgen** — uzakta üçgen
+maliyeti yok. 42 857 ağacın getirdiği şey ~18 100 **çizim çağrısı**.
+
+Denenen ve **işe yaramayan**: dört ağaç malzemesinde GPU örneklemesini
+açmak. Çizim çağrısı kımıldamadı (30 361 → 30 361). p95 bir koşumda
+15,90 çıktı ama tekrarında **17,54** — yani o "iyileşme" koşum
+değişkenliğiydi. Mekanizma çizim çağrısında görünmediği için zaten
+şüpheliydi.
+
+**Bu adımın koşumlar arası değişkenliği ±1 ms.** Bunun altındaki hiçbir
+fark iyileşme sayılamaz. (Aynı koşum içindeki iki özdeş adım ±0,1 ms
+veriyor; belirsizlik koşumlar arasında.)
+
+## Doğru çözüm: silmek değil, ucuzlatmak
+
+Ağaçları uzakta çizdirmemek FPS verir ama bu bir kez denendi ve yanlıştı
+(yukarıya bakınız — orman kayboluyordu). Doğru iş, siluet dururken
+maliyeti düşürmek: uzak ağaçlar için **gerçek impostor/billboard LOD'u**
+üretmek. Unity bunu SpeedTree olmayan varlıklar için kendiliğinden
+yapmıyor; atlas ve son LOD kartı bizim üretmemiz gerekiyor.
+
+Bu bir araç işi ve **sıradaki iş**.
+
 ## Açık maddeler
 
-1. **Kule turu p95** — 17,8-17,9 ms, iki çözünürlükte de. CPU/görünürlük
-   tarafı; gölge ve culling incelenecek.
+1. **Kule turu p95** — teşhis edildi: ağaçlar (17,0 → 7,0). Çözüm uzak
+   ağaçlar için impostor LOD üretmek. Gölge ve su elendi.
 2. **Kalabalık üçgen bütçesi** — kişi başına 62 000.
 3. **Taban çizim çağrısı** — boş arazide 19 600.
 4. **Gerçek süreli oturum** — bu ölçüm 12 adım × 1200 kare. Otuz
