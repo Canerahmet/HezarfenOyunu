@@ -165,6 +165,31 @@ namespace Hezarfen.Player
         }
 
         /// <summary>
+        /// Kamerayı ve gövdeyi <b>geç de olsa</b> bulur.
+        ///
+        /// Awake'te aramak yetmiyor: kamera bu bileşenden SONRA eklenirse
+        /// <c>_kam</c> sonsuza dek boş kalır ve sınıf hiçbir şey yapmaz —
+        /// hata da vermez, kamera sadece hiç kıpırdamaz. Testler tam olarak
+        /// bunu yakaladı. Sahne kurulumunda sıra bugün doğru; yarın
+        /// değişebilir ve o gün kimse bunu hata olarak görmez.
+        /// </summary>
+        private bool Baglan()
+        {
+            if (_kam == null) _kam = GetComponentInChildren<Camera>(true);
+            if (_yurume == null) _yurume = GetComponent<WalkController>();
+            if (govde == null)
+            {
+                GovdeBul();
+                if (govde != null)
+                {
+                    CiziciTopla();
+                    GovdeGoster(kip == Bakis.UcuncuSahis);
+                }
+            }
+            return _kam != null && _yurume != null;
+        }
+
+        /// <summary>
         /// Kamerayı yerleştirir.
         ///
         /// <c>LateUpdate</c>: gövde o kare zaten hareket etmiş olur.
@@ -174,7 +199,7 @@ namespace Hezarfen.Player
         /// </summary>
         private void LateUpdate()
         {
-            if (_kam == null || _yurume == null || !_yurume.enabled) return;
+            if (!Baglan() || !_yurume.enabled) return;
 
             float pitch = _yurume.Pitch;
 

@@ -104,6 +104,49 @@ namespace Hezarfen.Editor.Gis
             },
         };
 
+        /// <summary>
+        /// <b>Yalnız su yüzeyini yeniler — yatağı OYMAZ.</b>
+        ///
+        /// Ayrı bir komut olmasının sebebi bir tuzak: oyma işlemi hedefini
+        /// <b>o anki</b> araziden hesaplar, yani "Dere yataklarini oy"u
+        /// ikinci kez çalıştırmak yatağı bir kat daha derinleştirir. Suyu
+        /// düzeltmek için o komutu tekrar koşmak, sessizce 14 m derin bir
+        /// kanyon açmak olurdu.
+        ///
+        /// Yatak zaten oyulduğu için güzergâh şimdi kanalın tabanıdır:
+        /// yol yeniden bulunur, su o tabanın biraz üstüne oturur.
+        /// </summary>
+        [MenuItem("Hezarfen/GIS/Dere sularini yenile")]
+        public static void SuyuYenile()
+        {
+            var sahne = EditorSceneManager.OpenScene(
+                TerrainScene, OpenSceneMode.Single);
+            var arazi = Object.FindAnyObjectByType<Terrain>();
+            if (arazi == null) { Debug.LogError("[Hezarfen] Arazi yok."); return; }
+
+            var yollar = new Dictionary<string, List<Vector3>>();
+            foreach (var d in Dereler())
+            {
+                var yol = Yumusat(EnUcuzYol(arazi, d.giris, d.agiz), 4);
+                if (yol.Count < 4) continue;
+                var su = new List<Vector3>(yol.Count);
+                foreach (var p in yol)
+                {
+                    // Yol araziden geliyor ve arazi ARTIK oyulmus: p.y
+                    // yatagin tabanidir. Su onun biraz ustunde durur.
+                    float taban = arazi.SampleHeight(p) + arazi.transform.position.y;
+                    su.Add(new Vector3(p.x, taban, p.z));
+                }
+                yollar[d.ad] = su;
+            }
+
+            SuyuKur(yollar, tabanHazir: true);
+            EditorSceneManager.MarkSceneDirty(sahne);
+            EditorSceneManager.SaveScene(sahne, TerrainScene);
+            AssetDatabase.SaveAssets();
+            Debug.Log("[Hezarfen] Dere sulari yenilendi.");
+        }
+
         [MenuItem("Hezarfen/GIS/Dere yataklarini oy")]
         public static void Oy()
         {
@@ -165,6 +208,9 @@ namespace Hezarfen.Editor.Gis
             }
 
             data.SetHeights(0, 0, yuk);
+
+            // SU YUZEYI — yoksa oyulan sey dere degil HENDEKtir.
+            SuyuKur(yollar, tabanHazir: false);
             EditorSceneManager.MarkSceneDirty(sahne);
             EditorSceneManager.SaveScene(sahne, TerrainScene);
             AssetDatabase.SaveAssets();
@@ -181,6 +227,148 @@ namespace Hezarfen.Editor.Gis
                               rapor.ToString());
             Debug.Log("[Hezarfen] Dere yataklari oyuldu. SONRAKI ADIM: "
                       + "Hezarfen -> GIS -> Butun semtleri doldur");
+        }
+
+        /// <summary>
+        /// Yatakların üstüne su şeridi kurar.
+        ///
+        /// Yatağı oymak tek başına bir <b>hendek</b> üretir. Su yüzeyi
+        /// yatağın biraz üstünde, kıyıya doğru genişleyen düz bir şerittir;
+        /// akış yönünde UV ilerler ki malzeme akıntıyı gösterebilsin.
+        ///
+        /// Deniz yüzeyi (<c>WATER_Bogaz_Halic</c>) y=0'dadır ve dereler
+        /// ondan yukarı çıkar; ikisi ağızda üst üste biner, bu doğrudur —
+        /// derenin ağzı gerçekten denizdir.
+        /// </summary>
+        private static void SuyuKur(Dictionary<string, List<Vector3>> yollar,
+                                    bool tabanHazir)
+        {
+            var kok = GameObject.Find("DERELER_1632");
+            if (kok != null) Object.DestroyImmediate(kok);
+            kok = new GameObject("DERELER_1632");
+
+            var malzeme = SuMalzemesi();
+
+            foreach (var d in Dereler())
+            {
+                if (!yollar.TryGetValue(d.ad, out var yol)) continue;
+                if (yol.Count < 3) continue;
+
+                var verts = new List<Vector3>();
+                var uvs = new List<Vector2>();
+                var tris = new List<int>();
+                float mesafe = 0f;
+
+                for (int i = 0; i < yol.Count; i++)
+                {
+                    Vector3 ileri = i == 0 ? yol[1] - yol[0]
+                                  : yol[i] - yol[i - 1];
+                    ileri.y = 0f;
+                    if (ileri.sqrMagnitude < 1e-4f) ileri = Vector3.forward;
+                    ileri.Normalize();
+                    var yan = new Vector3(-ileri.z, 0f, ileri.x);
+
+                    // Su, yatagin icinde durur: kiyi payi kalsin.
+                    // `tabanHazir` ise yol zaten oyulmus kanalin tabani;
+                    // degilse yatak kotu hesaplanmis haliyle geliyor.
+                    float y = yol[i].y + d.derinlik * (tabanHazir ? 0.35f : 0.6f);
+                    float yariGen = d.genislik * 0.5f;
+
+                    verts.Add(yol[i] - yan * yariGen + Vector3.up * (y - yol[i].y));
+                    verts.Add(yol[i] + yan * yariGen + Vector3.up * (y - yol[i].y));
+                    uvs.Add(new Vector2(0f, mesafe / 12f));
+                    uvs.Add(new Vector2(1f, mesafe / 12f));
+
+                    if (i > 0)
+                    {
+                        int b = (i - 1) * 2;
+                        tris.Add(b); tris.Add(b + 2); tris.Add(b + 1);
+                        tris.Add(b + 1); tris.Add(b + 2); tris.Add(b + 3);
+                        mesafe += Vector3.Distance(yol[i - 1], yol[i]);
+                    }
+                }
+
+                var mesh = new Mesh { name = $"SM_Dere_{d.ad}" };
+                mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+                mesh.SetVertices(verts);
+                mesh.SetUVs(0, uvs);
+                mesh.SetTriangles(tris, 0);
+                mesh.RecalculateNormals();
+                mesh.RecalculateTangents();
+                mesh.RecalculateBounds();
+
+                EnsureFolder("Assets/_Project/Art/Models/Generated");
+                AssetDatabase.CreateAsset(
+                    mesh,
+                    $"Assets/_Project/Art/Models/Generated/SM_Dere_{d.ad}.asset");
+
+                var go = new GameObject($"Dere_{d.ad}");
+                go.transform.SetParent(kok.transform, false);
+                go.AddComponent<MeshFilter>().sharedMesh = mesh;
+                var mr = go.AddComponent<MeshRenderer>();
+                if (malzeme != null) mr.sharedMaterial = malzeme;
+
+                var tag = go.AddComponent<Hezarfen.Core.HistoricalTag>();
+                tag.tier = Hezarfen.Core.HistoricalTier.Reconstruction;
+                tag.sourceNote = d.kaynakNotu;
+            }
+        }
+
+        /// <summary>
+        /// Dere suyunun malzemesi — <b>yoksa üretilir</b>.
+        ///
+        /// Deniz HDRP'nin <c>WaterSurface</c> bileşenini kullanıyor ama o
+        /// bileşen <b>düz bir yüzey</b>dir: kıvrılan bir dereyi izlemek için
+        /// yol boyunca onlarca örnek gerekirdi ve her biri ayrı bir su
+        /// simülasyonu demek. Dere için şerit mesh + saydam malzeme yeterli.
+        ///
+        /// İlk yazımda burada var olmayan iki malzeme yolu deneniyordu ve
+        /// ikisi de bulunamayınca şerit <b>malzemesiz</b> kalıyordu — yani
+        /// oyunda macenta bir kurdele. Depoda su malzemesi olmadığı için
+        /// artık kod onu kendisi kuruyor; sohbette kalan varlık yok
+        /// (CLAUDE.md), dosyaya yazılıyor.
+        /// </summary>
+        private static Material SuMalzemesi()
+        {
+            const string yol = "Assets/_Project/Art/Materials/M_Su_Dere.mat";
+            var m = AssetDatabase.LoadAssetAtPath<Material>(yol);
+            if (m != null) return m;
+
+            var shader = Shader.Find("HDRP/Lit");
+            if (shader == null)
+            {
+                Debug.LogError("[Hezarfen] HDRP/Lit bulunamadi.");
+                return null;
+            }
+
+            m = new Material(shader) { name = "M_Su_Dere" };
+            // Saydam, koyu yesil-mavi, cok parlak: durgun dere suyu.
+            m.SetFloat("_SurfaceType", 1f);              // Transparent
+            m.SetFloat("_BlendMode", 0f);                // Alpha
+            m.SetFloat("_Smoothness", 0.94f);
+            m.SetFloat("_Metallic", 0f);
+            m.SetColor("_BaseColor", new Color(0.10f, 0.22f, 0.21f, 0.78f));
+            m.SetFloat("_AlphaCutoffEnable", 0f);
+            m.renderQueue = 3000;
+
+            EnsureFolder("Assets/_Project/Art/Materials");
+            AssetDatabase.CreateAsset(m, yol);
+            Debug.Log("[Hezarfen] M_Su_Dere.mat uretildi.");
+            return m;
+        }
+
+        private static void EnsureFolder(string yol)
+        {
+            if (AssetDatabase.IsValidFolder(yol)) return;
+            var parca = yol.Split('/');
+            string b = parca[0];
+            for (int i = 1; i < parca.Length; i++)
+            {
+                string alt = b + "/" + parca[i];
+                if (!AssetDatabase.IsValidFolder(alt))
+                    AssetDatabase.CreateFolder(b, parca[i]);
+                b = alt;
+            }
         }
 
         /// <summary>

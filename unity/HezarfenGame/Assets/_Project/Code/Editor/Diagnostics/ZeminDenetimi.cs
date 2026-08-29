@@ -159,7 +159,22 @@ namespace Hezarfen.Editor.Diagnostics
             // EN ALCAK kose ile arazi karsilastirilir: o hucrede mesh'in
             // en asagi inen noktasi hala arazinin ustundeyse, orada
             // gercekten hava vardir.
-            const float Hucre = 2.0f;
+            // HUCRE SOKAK GENISLIGI KADAR (4,6 m sokak — ADR 0016).
+            //
+            // 2 m'lik hucre kesiti ikiye boluyordu ve ortadaki BASAMAK
+            // RIHTLARI ayri hucreye dusuyordu. Riht dikey yayilir, yani
+            // "kenar hucresi" sayilir; oysa iki yani bordurle kapalidir
+            // ve altinda gorunur bir bosluk yoktur. Hucre kesitin
+            // tamamini kapsayinca rihtin yanindaki bordur ayni hucreye
+            // duser ve en alcak nokta dogru okunur.
+            const float Hucre = 5.0f;
+            // NOT: kalan kuyruk (kenar hucrelerinin ~%5'i) iki kez
+            // aciklanmaya calisildi ve iki aciklama da OLCUMLE yanlislandi:
+            // once "ornekler arasi cukur" denildi (komsu en kucugu
+            // eklendi — oran degismedi), sonra "basamak rihtlari" denildi
+            // (hucre sokak genisligine cikarildi — yine degismedi).
+            // Yani bu kuyruk gercek: %95 dogru oturuyor, %5 oturmuyor.
+            // Sebebi henuz bilinmiyor ve bilinmedigi burada yaziyor.
             // Hucre basina EN ALCAK ve EN YUKSEK kose.
             //
             // Yukseklik farki neden lazim: seridin ORTASINDAKI hucrelerde
@@ -245,7 +260,7 @@ namespace Hezarfen.Editor.Diagnostics
             sb.AppendLine("kalması.");
             sb.AppendLine();
             sb.AppendLine($"Ölçülen kaldırım mesh'i: **{meshSayisi}**  ");
-            sb.AppendLine($"2 m'lik hücre: **{hucreler.Count}**  ");
+            sb.AppendLine($"{Hucre:0.#} m'lik hücre: **{hucreler.Count}**  ");
             sb.AppendLine($"Bunlardan **{duzAtlanan}** tanesi şeridin düz iç "
                           + "kısmı — ölçüme girmez, çünkü orada aşağı inen "
                           + "geometri de görünür bir kenar da yok.  ");

@@ -61,7 +61,12 @@ namespace Hezarfen.Editor.Pipeline
         /// </remarks>
         private static readonly (string ad, float hiz)[] Locomotion =
         {
-            ("Durus", 0f), ("Yurume", 1.4f), ("Kosma", 3.6f),
+            ("Durus", 0f),
+            // ELLE YAZILMIS SAYI YOK: esikler WalkController'in
+            // sabitlerinden gelir. Once boyle degildi ve hiz
+            // degisince esikler eski deger uzerinde kaldi.
+            ("Yurume", Hezarfen.Player.WalkController.VarsayilanYurume),
+            ("Kosma", Hezarfen.Player.WalkController.VarsayilanKosma),
         };
 
         [MenuItem("Hezarfen/Boru Hatti/Animator kontrolcusunu uret")]

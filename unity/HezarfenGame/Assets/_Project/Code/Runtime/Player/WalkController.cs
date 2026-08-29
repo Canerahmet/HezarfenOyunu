@@ -56,6 +56,21 @@ namespace Hezarfen.Player
         /// </summary>
         public float eyeHeight = 1.59f;
 
+        /// <summary>
+        /// Yürüme hızının <b>tek sahibi</b>.
+        ///
+        /// Bu sayı iki yerde kullanılıyor: burada ve Animator karışım
+        /// ağacının eşiğinde. İkisi ayrışırsa ayaklar yerde kayar — ve bir
+        /// kez ayrıştı: <c>AnimatorKur</c> 1,4 ve 3,6'yı ELLE yazıyordu,
+        /// yorumu ise "WalkController ile aynı" diyordu. Hız 2,2'ye
+        /// çıkınca yorum hâlâ doğru görünüyordu, sayı değil.
+        /// <c>AnimatorGrafigiTests</c> yakaladı.
+        /// </summary>
+        public const float VarsayilanYurume = 2.2f;
+
+        /// <summary>Koşu hızının tek sahibi — bkz. <see cref="VarsayilanYurume"/>.</summary>
+        public const float VarsayilanKosma = 6.0f;
+
         [Header("Hız (m/s)")]
         /// <summary>
         /// Yürüme hızı. <b>2,2 m/s — 1,4 değil</b> (Caner, 2026-08-29
@@ -75,10 +90,10 @@ namespace Hezarfen.Player
         /// ayrışırsa ayaklar yerde kayar ve <c>AnimatorGrafigiTests</c>
         /// kırılır.
         /// </summary>
-        public float walkSpeed = 2.2f;
+        public float walkSpeed = VarsayilanYurume;
 
         /// <summary>Koşu — insan sprintinin alt sınırı (6,0 m/s).</summary>
-        public float runSpeed = 6.0f;
+        public float runSpeed = VarsayilanKosma;
         public float flySpeed = 12f;           // ucus kipi
         public float jumpSpeed = 3.6f;
         public float gravity = -9.81f;
