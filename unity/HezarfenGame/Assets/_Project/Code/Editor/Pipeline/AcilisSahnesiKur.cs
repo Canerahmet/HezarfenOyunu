@@ -73,14 +73,17 @@ namespace Hezarfen.Editor.Pipeline
             //
             // Hangi build'in oynandigi ekranda yazmayinca bir tur boyunca
             // "duzeltme tutmadi mi, eski build mi" ayirt edilemedi.
-            var damga = Yazi(menu.transform, "SurumYazi",
-                             Hezarfen.Arayuz.Surum.Damga, 18,
+            // Metin BURADA yazilmaz; AcilisMenusu onu calisma zamaninda
+            // okur (damgayi build adimi uretir, bu sahne ondan once
+            // kaydedilir).
+            var damga = Yazi(menu.transform, "SurumYazi", "", 18,
                              new Vector2(0f, -500f), new Vector2(900f, 30f));
             damga.color = new Color(0.55f, 0.50f, 0.42f);
 
             var acilis = canvasGo.AddComponent<AcilisMenusu>();
             acilis.menuPaneli = menu;
             acilis.yuklemePaneli = yukleme;
+            acilis.surumYazi = damga;
 
             // DINLEYICILER KALICI OLMALI — AddListener SAHNEYE YAZILMAZ.
             //

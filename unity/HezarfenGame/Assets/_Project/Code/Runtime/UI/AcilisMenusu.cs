@@ -46,6 +46,9 @@ namespace Hezarfen.Arayuz
         [Tooltip("Açılışta klavyeyle seçili olacak düğme.")]
         public GameObject ilkSecim;
 
+        [Tooltip("Build damgasının yazıldığı yer.")]
+        public Text surumYazi;
+
         /// <summary>Yükleme başladı mı — test okur.</summary>
         public bool Yukleniyor { get; private set; }
 
@@ -60,6 +63,15 @@ namespace Hezarfen.Arayuz
             // menude "Balanced" yazar, oyun High Fidelity kosar ve oyuncu
             // neden 50 FPS aldigini anlamaz.
             Ayarlar.Uygula();
+
+            // DAMGA CALISMA ZAMANINDA OKUNUR.
+            //
+            // Sahne kurulurken yazmak ise yaramaz: damgayi build ADIMI
+            // uretiyor, sahne ise ondan once kaydediliyor. Yani menude
+            // bir onceki build'in (ya da hic build alinmamissa "editor")
+            // yazardi — tam da cozmeye calistigi karisikligi uretirdi.
+            if (surumYazi != null) surumYazi.text = Surum.Damga;
+
             Panel(menuPaneli);
             if (ilkSecim != null && EventSystem.current != null)
                 EventSystem.current.SetSelectedGameObject(ilkSecim);
