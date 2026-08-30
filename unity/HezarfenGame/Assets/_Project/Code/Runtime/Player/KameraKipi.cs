@@ -248,7 +248,14 @@ namespace Hezarfen.Player
                 if (v.distance < enKisa) enKisa = v.distance;
             }
             if (enKisa < float.MaxValue)
-                istenen = Mathf.Max(enYakin * 0.5f,
+                // Alt sinir enYakin'in YARISI degil KENDISI.
+                //
+                // Yarisi 0,70 m ediyordu ve olculdu: kaidenin ustunde
+                // duvara sirti donuk duran oyuncuda kol tam o degere
+                // cokuyor, kamera karakterin kafasinin icine giriyordu
+                // (turda uc durakta birden). 1,40 m'de sirt gorunur
+                // kalir; daha yakini zaten kadraj olmaktan cikar.
+                istenen = Mathf.Max(enYakin,
                                     enKisa - carpismaYaricapi);
 
             // Engele DOGRU ani, engelden UZAKLASIRKEN yumusak: duvara

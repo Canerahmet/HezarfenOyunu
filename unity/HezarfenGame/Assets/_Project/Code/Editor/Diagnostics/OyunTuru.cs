@@ -133,6 +133,7 @@ namespace Hezarfen.Editor.Diagnostics
                 var npc = Object.FindAnyObjectByType<NPCYonetici>();
                 var bark = Object.FindAnyObjectByType<BarkGosterici>();
                 var arazi = Object.FindAnyObjectByType<Terrain>();
+                var graf = npc != null ? npc.graf : null;
                 var kam = Camera.main;
                 if (oyuncu == null || kam == null)
                 {
@@ -149,19 +150,52 @@ namespace Hezarfen.Editor.Diagnostics
                     var hedef = d.nokta == Vector3.zero ? dogum : d.nokta;
                     if (d.nokta != Vector3.zero)
                     {
+                        // DURAK SOKAGA OTURUR.
+                        //
+                        // Ilk turda duraklar elle secilmis koordinatlardi
+                        // ve olculdu: en yakin sokak dugumu 211-463 m
+                        // oteydi. Tur "burada kimse yok" diyordu, oysa
+                        // oyuncu oralarda zaten yurumez — insanlar sokakta.
+                        // Yanlis yere bakan bir olcu aleti, olmayan bir
+                        // kusur bildirir; bu oturumda tam olarak bu hata
+                        // bes kez tekrarlandi.
+                        if (graf != null && graf.dugumler.Count > 0)
+                        {
+                            float en = float.MaxValue;
+                            Vector3 sokak = hedef;
+                            foreach (var n in graf.dugumler)
+                            {
+                                float m = (new Vector2(n.konum.x, n.konum.z)
+                                           - new Vector2(hedef.x, hedef.z))
+                                          .sqrMagnitude;
+                                if (m >= en) continue;
+                                en = m; sokak = n.konum;
+                            }
+                            hedef = new Vector3(sokak.x, hedef.y, sokak.z);
+                        }
+
                         // Yuzeyi bul: arazi kotu yeterli degil, kaldirim
                         // ve kaide arazinin USTUNDE.
-                        var tepe = new Vector3(hedef.x, 400f, hedef.z);
-                        hedef = Physics.Raycast(tepe, Vector3.down,
-                                                out var v, 800f, ~0,
-                                                QueryTriggerInteraction.Ignore)
-                            ? v.point + Vector3.up * 0.3f
-                            : new Vector3(hedef.x,
-                                          (arazi != null
-                                           ? arazi.SampleHeight(hedef)
-                                             + arazi.transform.position.y
-                                           : 0f) + 0.3f,
-                                          hedef.z);
+                        // ZEMIN KATINA IN — CATIYA DEGIL.
+                        //
+                        // Yukaridan atilan isin once CATIYA carpiyor ve
+                        // durak orada aciliyordu: olcumde Ayasofya'nin
+                        // kubbesinde +70,1 m, Uskudar Mihrimah'ta +41,6 m
+                        // cikti. Cati uzerinden alinan kare ne kalabaligi
+                        // ne dokuyu gosterir.
+                        //
+                        // Cozum: yuzey arazi kotundan 2 m'den fazla
+                        // yukaridaysa yok sayilir ve arazi kotu kullanilir.
+                        float ilkKot = arazi != null
+                            ? arazi.SampleHeight(hedef) + arazi.transform.position.y
+                            : 0f;
+                        float yuzey = ilkKot;
+                        var tepe = new Vector3(hedef.x, ilkKot + 6f, hedef.z);
+                        if (Physics.Raycast(tepe, Vector3.down, out var v, 12f,
+                                            ~0, QueryTriggerInteraction.Ignore)
+                            && v.point.y - ilkKot <= 2f)
+                            yuzey = v.point.y;
+                        hedef = new Vector3(hedef.x, yuzey + 0.3f, hedef.z);
                     }
 
                     cc.enabled = false;

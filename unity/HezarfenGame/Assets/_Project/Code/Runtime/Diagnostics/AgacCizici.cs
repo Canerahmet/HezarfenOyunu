@@ -43,8 +43,21 @@ namespace Hezarfen.Tani
         [Tooltip("Ağaçları taşıyan arazi. Boşsa sahnedeki ilk arazi.")]
         public Terrain arazi;
 
-        [Tooltip("Kesme için hücre kenarı (m).")]
-        public float hucreKenari = 128f;
+        /// <summary>
+        /// Kesme için hücre kenarı (m). <b>256 — 128 değil.</b>
+        ///
+        /// Hücre hem kesme birimi hem <b>örnekleme partisi</b>: her hücre,
+        /// her prototip ve her alt-mesh için ayrı bir çizim çağrısı çıkar.
+        /// Kırsal doku sıklaşınca ölçüldü — 20.282 ağaç <b>1.138 çizim
+        /// çağrısı</b> ediyordu, yani parti başına ~18 ağaç. İnstancing'in
+        /// anlamı büyük partidir; 18'lik partide sürücü yükü kazancı yer.
+        ///
+        /// Kenarı ikiye katlamak hücre sayısını dörde böler. Bedeli, kesme
+        /// tanesinin kabalaşması: kadrajın kenarındaki bir hücrenin görünmeyen
+        /// kısmı da çizilir. Ağaç ucuz, çizim çağrısı pahalı — bu takas
+        /// ölçülerek seçildi.
+        /// </summary>
+        public float hucreKenari = 256f;
 
         [Tooltip("Bu mesafenin ötesindeki hücreler çizilmez (m).")]
         public float gorusMesafesi = 3000f;

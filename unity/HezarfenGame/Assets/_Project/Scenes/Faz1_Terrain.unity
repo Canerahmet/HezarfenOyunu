@@ -9522,7 +9522,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Tani.AgacCizici
   arazi: {fileID: 40318562}
-  hucreKenari: 128
+  hucreKenari: 256
   gorusMesafesi: 3000
   golgeVer: 1
   inceMesafe: 220
