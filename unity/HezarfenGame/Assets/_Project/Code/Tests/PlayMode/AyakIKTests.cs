@@ -48,6 +48,24 @@ namespace Hezarfen.Tests
             // kapinin ucte biri. Ayaklarin gercekten ayrildigi eksen
             // X'tir (±0,19 m); egimi oraya cevirince fark 0,38 × tan18°
             // ≈ 12 cm olur ve IK'nin isi gorunur hale gelir.
+            // BASKA TESTIN ZEMINI ORTADA KALMASIN.
+            //
+            // Izole kosunca iki test de geciyordu, tam takimda negatif
+            // kontrol soneuyordu: olculen sapma 12 cm yerine 4,7 cm
+            // cikiyordu. Sebep artik geometriydi — AyakKaymasiTests'in
+            // 80x80 DUZ zemini sahnede kaliyor ve karakter rampaya degil
+            // ona basiyor. Duz zeminde IK'siz ayak zaten yerde olur, yani
+            // kontrol "kusur geri gelmedi" der ve YANLIS yere bakar.
+            //
+            // Testler birbirinin sahnesini miras almamali; devralinan
+            // her sey once temizlenir.
+            foreach (var eski in Object.FindObjectsByType<GameObject>(
+                         FindObjectsSortMode.None))
+            {
+                if (eski.name.EndsWith("Zemini") || eski.name == "TestYokusu")
+                    Object.DestroyImmediate(eski);
+            }
+
             _yokus = GameObject.CreatePrimitive(PrimitiveType.Cube);
             _yokus.name = "TestYokusu";
             _yokus.transform.position = new Vector3(0f, -0.5f, 0f);
@@ -96,6 +114,19 @@ namespace Hezarfen.Tests
             var ik = anim.GetComponent<AyakIK>()
                      ?? anim.gameObject.AddComponent<AyakIK>();
             ik.yumusatma = 0f;   // testte yumusatmayi bekleyecek zaman yok
+
+            // KURULUM YUKSEK SESLE DOGRULANIR.
+            //
+            // Bir tur, karakter rampanin 43 cm ustunde duruyordu ve test
+            // "IK calismiyor" diye kirmizi yandi — oysa IK calisiyordu,
+            // ayak o mesafeden zemini bulamiyordu. Kurulumun kendisi
+            // yanlissa testin sonucu hicbir sey soylemez.
+            yield return null;
+            float ilk = TabanFarki(anim, HumanBodyBones.RightFoot);
+            Assert.LessOrEqual(Mathf.Abs(ilk), 0.25f,
+                $"KURULUM BOZUK: karakter zeminden {ilk:+0.000;-0.000} m "
+                + "uzakta basliyor. Test IK'yi degil kendi yerlestirmesini "
+                + "olcerdi.");
 
             // Animatorun ve IK'nin oturmasi icin birkac kare.
             for (int i = 0; i < 12; i++) yield return null;

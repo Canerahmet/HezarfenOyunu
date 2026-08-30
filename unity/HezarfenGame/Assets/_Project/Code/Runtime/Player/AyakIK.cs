@@ -42,7 +42,17 @@ namespace Hezarfen.Player
 
         [Tooltip("Ayağın altında bu kadar derine bakılır. Daha uzağı " +
                  "zemin değil boşluktur ve orada IK uygulanmaz.")]
-        public float aramaAsagi = 0.55f;
+        //
+        // 0,55 m ile baslamisti ve testte SOL ayak zemini HIC bulamadi
+        // (`solFark = NaN`), yani agirlik 0 kaldi ve ayak 11,5 cm gomulu
+        // dondu. Sebep menzildi: eğimli zeminde iki ayak arasindaki kot
+        // farki 12 cm, ustune govdenin kendi salinimi binince alt ayak
+        // yarim metreyi asabiliyor.
+        //
+        // 1,2 m oyunda da dogru sayi: kaldirimdan inen ayak, basamak
+        // kenarina gelen ayak. Daha derini zaten dusustur ve orada IK
+        // devreye girmemeli.
+        public float aramaAsagi = 1.2f;
 
         [Tooltip("Zemin sayılan katmanlar.")]
         public LayerMask zeminMaskesi = ~0;
