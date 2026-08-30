@@ -54,6 +54,7 @@ hukuken serbest olurdu; kural hukuki değil, yöntemsel.
 |---|---|---|---|---|
 | Copernicus DEM GLO-30 (4 karo: N40/N41 × E028/E029) | `copernicus-dem-30m.s3.amazonaws.com` (AWS Open Data) | Serbest kullanım, **atıf zorunlu** | Kullanımda — `data/gis/istanbul/` | 2026-08-18 |
 | Blender Studio **Human Base Meshes** bundle v1.4.1 | `download.blender.org/demo/asset-bundles/human-base-meshes/human-base-meshes-bundle-v1.4.1.zip` | **CC0** (kamu malına bırakılmış; atıf zorunlu değil, ticari kullanım serbest) | Faz 5 taban geometrisi — `art/base/blender-studio/` (depoya girmez, `meta.json` girer) | 2026-08-28 |
+| **MPFB 2.0.17** (MakeHuman Plugin For Blender) — eklenti + çekirdek varlıklar | `extensions.blender.org/download/sha256:4f0a879d64a39bf646fbf5f53601ac678855da329d650617dca5737548239a87/add-on-mpfb-v2.0.17.zip` | Eklenti kodu: **GPL-3.0-or-later** (Blender eklenti platformu, SPDX). Çekirdek varlıklar (taban mesh, hedefler, deriler) ve **dışa aktarılan modeller: CC0** | Faz 1 taban gövde üretimi. Blender ≥ 4.2 (bizde 5.2). **Yalnız çekirdek varlıklar** — üçüncü taraf asset pack'leri ayrı lisans ister, kullanılmaz | 2026-08-30 |
 
 ### Human Base Meshes hakkında not
 
@@ -83,6 +84,30 @@ Yükümlülük üç yerde kayıtlıdır ki sessizce kaybolmasın:
 **Not:** Copernicus GLO-30 bir **DSM**'dir (yüzey modeli) — modern binalar ve ağaçlar
 irtifaya karışır. 1632 için bu bir tarihsel kusurdur; gerekçe ve azaltma yöntemi
 [ADR 0007](../docs/decisions/0007-dem-terrain.md).
+
+### MPFB / MakeHuman — GPL araç, CC0 çıktı
+
+Karışması kolay olduğu için ayrıca yazıyorum: **GPL eklentiyi bağlar,
+ürettiğini değil.** Blender'ın kendisi GPL'dir ve Blender'da yapılan eser
+sahibinindir; MPFB de aynı.
+
+MakeHuman'ın kendi SSS'i birebir şöyle diyor:
+
+> *"All core assets (the base mesh, targets, skins…) are shared under CC0."*
+> — [Can I sell models made with MPFB?](https://static.makehumancommunity.org/mpfb/faq/can_i_sell_models.html)
+
+Kapalı kaynak ticari oyunda kullanım açıkça serbest; GPL yalnızca eklenti
+koduna uygulanır.
+
+**Sınır — ve bu bizim için bağlayıcı:**
+
+> *"Note that if you use a third party asset shared under a different
+> license it is your responsibility to fulfill the obligations of that
+> license."*
+
+Yani **üçüncü taraf asset pack'i indirilmez.** Yalnız MPFB'nin çekirdek
+varlıkları kullanılır. Bir gün bir pack gerekirse önce buraya satır
+yazılır, sonra indirilir.
 
 ### ⚠️ OpenStreetMap — ZORUNLU ATIF METNİ
 
