@@ -6685,7 +6685,6 @@ MonoBehaviour:
   aranma: {fileID: 567701420}
   sehir: {fileID: 159983479}
   akce: 0
-  perde: {fileID: 0}
 --- !u!4 &552734079
 Transform:
   m_ObjectHideFlags: 0

@@ -1,0 +1,48 @@
+[Licensing::Module] Trying to connect to existing licensing client channel...
+Built from '6000.5/staging' branch; Version is '6000.5.8f1 (5cb7df797b7d) revision 6076383'; Using compiler version '194234433'; Build Type 'Release'
+OS: 'Windows 11  (10.0.26200) Core' Language: 'en' Physical Memory: 32475 MB
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-ahmet" at "2026-08-30T09:32:27.9786006Z"
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1
+System  architecture: x64
+Process architecture: x64
+Date: 2026-08-30T09:32:27Z
+[Licensing::Client] Error: HandshakeResponse reported an error:
+	ResponseCode: 505
+	ResponseStatus: Unsupported protocol version '1.18.1'.
+[Licensing::Module] Error: Failed to handshake to channel: "LicenseClient-ahmet"
+[Licensing::IpcConnector] LicenseClient-ahmet channel disconnected successfully.
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-ahmet-6000.5.8" at "2026-08-30T09:32:29.0026154Z"
+[Licensing::Client] Code 10 while verifying Licensing Client signature (process Id: 46032, path: "C:/Program Files/Unity/Hub/Editor/6000.5.8f1/Editor/Data/Resources/Licensing/Client/Unity.Licensing.Client.exe")
+[Licensing::Module] LicensingClient has failed validation; ignoring
+[Licensing::Client] Handshaking with LicensingClient:
+  Version:                 1.18.1+9fbee8e
+  Session Id:              31a203a3284a4445a3303e61f6239393
+  Correlation Id:          55cbb741d38933027fd0dafde754109d
+  External correlation Id: 1318609868314180510
+  Machine Id:              B/sp53odU5nomPmxF9WfncKg264=
+[Licensing::Module] Successfully connected to LicensingClient on channel: "LicenseClient-ahmet-6000.5.8" (connect: 0.00s, validation: 0.00s, handshake: 0.01s)
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-ahmet-6000.5.8-notifications" at "2026-08-30T09:32:29.0111783Z"
+[Licensing::Module] Error: Access token is unavailable; failed to update
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] License group:
+  Id: 18968483418683-UnityPersXXXX
+  Product: Unity Personal
+  Type: Assigned
+  Expiration: Unlimited
+[Licensing::Client] Successfully updated license, isAsync: True, time: 0.00
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] Licensing Background thread has ended after 1.04s
+
+COMMAND LINE ARGUMENTS:
+C:\Program Files\Unity\Hub\Editor\6000.5.8f1\Editor\Unity.exe
+-batchmode
+-projectPath
+unity/HezarfenGame
+-executeMethod
+BuildPipelineEntry.BuildWindows
+-quit
+-logFile
+build_win.log
+Successfully changed project path to: D:/ClaudeCodeProjects/Hezarfen_Oyunu/unity/HezarfenGame
+D:/ClaudeCodeProjects/Hezarfen_Oyunu/unity/HezarfenGame
+Exiting without the bug reporter. Application will terminate with return code 1

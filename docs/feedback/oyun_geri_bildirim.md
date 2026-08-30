@@ -212,3 +212,26 @@ kalabalık dilimlemesinin tavanı normal bir kareden küçüktü.
   avlu içi nesne (odun yığını, küp, çardak, kuyu) yok. Bir sonraki tur.
 - Kalan 28 bulgudan yükleme-ışınlaması (bulgu 17) ve görev üretimi
   (bulgu 15'in görev kısmı) kapatılmadı.
+
+### Tur 4b — mahalle hayatı donatısı
+
+Şehir içi boşluk için sekiz T2 varlık üretildi (odunluk ×2, su küpü ×2,
+sepet, çardak, kuyu, çit — 36–1968 üçgen) ve **19.992 tanesi** binaların
+9 m yakınına, semt sahnelerine kondu.
+
+| ölçü | önce | sonra |
+|---|---|---|
+| 4 m içinde hiçbir şey olmayan zemin | %81,7 | **%69,1** |
+| kare süresi (mahallede) | — | 11,4 ms (~88 FPS) |
+| yapı-zemin teması | 0/17.220 | **0/37.212** |
+
+İlk denemede yarıçap 26 m'ydi ve **gözle bakınca yanlış olduğu görüldü**:
+eşyalar evin arkasındaki açık düzlüğe dağılıyor, çölde duran sandıklar
+gibi okunuyordu — boşluğu doldurmak yerine görünür kılıyordu. 9 m'ye
+çekmek ölçüde 3,4 puana mal oldu ama yerleşimi doğru yaptı.
+
+**Asıl sebep bu değil.** Mahallenin arkasında *parsel* yok: evler sokağa
+dizili bir şerit ve arkaları çitsiz, duvarsız açık arazi. Osmanlı evinin
+bahçesi arkadadır ve **çevrilidir**. Boşluğun gerçek çözümü ev sırasının
+arkasına parsel sınırı koymak; donatı ancak o zaman "avlu eşyası" gibi
+okunur. Bir sonraki turun işi bu.
