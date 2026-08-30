@@ -211,6 +211,47 @@ def yonu_olc(obj):
     return d, guven
 
 
+def on_yonu(o):
+    """
+    Gövdenin baktığı Y yönü: -1 (-Y) ya da +1 (+Y). Ölçü **ayaktan**.
+
+    ## Neden kafadan değil
+
+    Önce kafa bandındaki en uzak noktaya baktım — ve o nokta burun
+    değil **ense kubbesi** çıktı. Kafa y=0'da merkezli değildir, o
+    yüzden `abs(en_uzak)` karşılaştırması yüzü değil kafanın hangi
+    tarafının orijinden uzak olduğunu ölçer. Ölçüm "+Y" dedi; aynı
+    gövdenin -Y'den alınan render'ı **yüzü** gösterdi. Sayı yanlış,
+    resim doğruydu.
+
+    ## Ayak neden şüpheye yer bırakmıyor
+
+    Ayak bileğinden parmak ucuna olan mesafe, topuğa olanın yaklaşık
+    iki katıdır — ve bu her insanda böyledir. Tek şart doğru referans:
+    gövde merkezi değil, **baldırın kendisi**. `karakter_kit`'in eski
+    hatası tam buydu; oradaki not "referans olarak bütün köşelerin
+    ağırlık merkezini alıyordu" diyor.
+
+    Referans: z = 0,06-0,11 bandındaki (alt baldır) köşelerin y
+    ortalaması. Taban: z < 0,02 (yere basan taban).
+    """
+    vs = [v.co for v in o.data.vertices]
+    zs = [v.z for v in vs]
+    zmin, zmax = min(zs), max(zs)
+    boy = zmax - zmin
+    baldir = [v.y for v in vs
+              if zmin + boy * 0.035 <= v.z <= zmin + boy * 0.065]
+    taban = [v.y for v in vs if v.z <= zmin + boy * 0.012]
+    if not baldir or not taban:
+        return 0
+    ref = sum(baldir) / len(baldir)
+    ileri = max(taban) - ref          # +Y yonunde tasma
+    geri = ref - min(taban)           # -Y yonunde tasma
+    if abs(ileri - geri) < boy * 0.005:
+        return 0                      # ayirt edilemiyor
+    return 1 if ileri > geri else -1
+
+
 def one_cevir(obj, hedef=Vector((0.0, -1.0, 0.0))):
     """Ölçülen yönü Blender **-Y**'ye (Unity +Z) döndürür.
 
@@ -220,8 +261,26 @@ def one_cevir(obj, hedef=Vector((0.0, -1.0, 0.0))):
     """
     d, guven = yonu_olc(obj)
     if guven < 0.5:
-        hz.log(f"UYARI {obj.name}: yon olcumu zayif (guven {guven:.2f}); "
-               "dondurulmedi.")
+        # Istatistiksel olcum karar veremiyorsa AYAGA sorulur. Ayak
+        # bileginden parmak ucuna olan mesafe topuga olanin ~iki
+        # katidir ve bu her insanda boyledir; `on_yonu` bunu olcer.
+        #
+        # Once burada yalnizca "olcum zayif, dondurulmedi" yazip
+        # geciyordum. Bunun ne demek oldugu olculdu: MPFB govdesinde
+        # guven 0,40 cikti, yani hem donus HEM DE "burun +Y'de
+        # kalmasin" degismezi atlandi ve karakter sirti donuk
+        # uretilebilirdi. Bir olcum karar veremiyorsa yapilacak sey
+        # susmak degil, BASKA BIR SEYI OLCMEKTIR.
+        yon = on_yonu(obj)
+        if yon == 0:
+            hz.log(f"UYARI {obj.name}: yon ne siluetten ne ayaktan "
+                   f"olculebildi (guven {guven:.2f}); dondurulmedi.")
+            return 0.0
+        if yon > 0:
+            obj.data.transform(Matrix.Rotation(math.pi, 4, "Z"))
+            obj.data.update()
+            hz.log(f"{obj.name}: yon ayaktan olculdu, 180 derece donduruldu.")
+            return math.pi
         return 0.0
     aci = math.atan2(hedef.y, hedef.x) - math.atan2(d.y, d.x)
     # En kucuk esdeger donusu sec.

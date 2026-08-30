@@ -43,10 +43,14 @@ SOURCE_GOVDE = (
     "HEZARFEN AHMED CELEBI'nin GOVDESI. Portresi YOKTUR — ne minyaturu, "
     "ne tarifi. RESEARCH.md: sahsi hakkinda bilinen tek sey Evliya'nin "
     "birkac cumlesidir. Bu yuzden govde bir BENZERLIK iddiasi tasimaz; "
-    "genel yetiskin erkek anatomisidir. Taban geometri Blender Studio "
-    "Human Base Meshes v1.4.1 (CC0, kayit: art/base/blender-studio/"
-    "meta.json). Boy 1,70 m ve bu sayi keyfi degil: bu projenin butun "
-    "inceleme paketleri 1,70 m'lik olcek figurune gore yargilandi."
+    "genel yetiskin erkek anatomisidir. Taban geometri MPFB2 "
+    "(MakeHuman Plugin For Blender) 2.0.17 CEKIRDEK varlıklariyla "
+    "parametrik uretilir; eklenti GPL-3.0 ama URETILEN MODEL CC0 "
+    "(kayit: refs/LICENSES.md, MakeHuman SSS bagi orada). Ucuncu "
+    "taraf asset pack'i KULLANILMAZ. Makro degerleri "
+    "HEZARFEN_MAKRO'da ve gerekcelidir. Boy 1,70 m ve bu sayi keyfi "
+    "degil: bu projenin butun inceleme paketleri 1,70 m'lik olcek "
+    "figurune gore yargilandi."
 )
 SOURCE_KIYAFET = (
     "KIYAFET: Ralamb kiyafet albumunden (1657-58, kamu mali, refs/ralamb/) "
@@ -470,8 +474,18 @@ def main():
         prefab_notu="Ara urun: rig ve kiyafet tamamlanmadan prefab uretilmez.",
         kind="karakter", state="base", status="draft", accuracy="D3",
         tier="T3", source=SOURCE_GOVDE,
-        taban_paket="human-base-meshes-bundle-v1.4.1",
-        taban_obje=kar.TABAN_OBJE, taban_lisans="CC0-1.0",
+        # Taban kaydi KAYNAGA GORE yazilir. Once burada sabit olarak
+        # "human-base-meshes-bundle-v1.4.1 / CC0" yaziyordu ve taban
+        # MPFB2'ye gectikten sonra da oyle yazmaya devam etti: katalog
+        # kullanmadigimiz bir paketi kaynak gosteriyordu. Ticari
+        # yayinda yanlis lisans kaydi kusurun en pahalisidir.
+        **(dict(taban_paket="mpfb-v2.0.17-cekirdek",
+                taban_obje="MPFB2 parametrik (HEZARFEN_MAKRO)",
+                taban_lisans="CC0-1.0 (uretilen model) / GPL-3.0 (arac)",
+                taban_makro=dict(HEZARFEN_MAKRO))
+           if getattr(args, "taban_kaynak", "mpfb") == "mpfb" else
+           dict(taban_paket="human-base-meshes-bundle-v1.4.1",
+                taban_obje=kar.TABAN_OBJE, taban_lisans="CC0-1.0")),
         yon_duzeltme_derece=round(aci * 57.2958, 2), olcek_carpani=round(k, 5),
         tris_lod0=kar.hz_tri(govde), tris_lod1=kar.hz_tri(lod1),
         uv_var=kar.uv_var_mi(govde), **olcu))
