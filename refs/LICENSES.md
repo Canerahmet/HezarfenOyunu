@@ -6,6 +6,27 @@
 **Durum:** İlk referans **görselleri** indirildi (Rålamb kıyafet albümü, kamu malı —
 aşağıda). Bir **veri** kümesi ve bir **CC0 taban geometri** de kayıtlı. (2026-08-28)
 
+## ⚠️ TİCARİ YAYIN KOŞULU (Caner, 2026-08-30)
+
+Oyun **Steam'de satılacak**. Bu, kayda giren her satır için tek bir soruyu
+zorunlu kılıyor: *bu varlık ticari bir üründe kullanılabilir mi?*
+
+- **Girebilir:** CC0, kamu malı, MIT/BSD benzeri, "royalty-free commercial".
+- **GİREMEZ:** CC BY-NC (ticari değil), CC ND (türev yok), "yalnız kişisel
+  kullanım", telifli kitap/arşiv taraması.
+- **Koşullu girer:** atıf zorunlu olanlar (CC BY, Copernicus, ODbL) — atıf
+  metni **aynı turda** `Krediler.Metin`'e de yazılır.
+
+**Denetim otomatik:** `KredilerTests.EveryAttributionTheRegisterDemandsIsOnScreen`
+bu dosyada "atıf zorunlu" diye işaretli her satırı okur ve krediler ekranında
+karşılığını arar. Karşılıksız bir satır kalırsa test kırmızı yanar.
+
+> Bu denetim yazıldığı gün bir kusur buldu: **Copernicus DEM GLO-30** burada
+> "atıf zorunlu" yazılıydı, şart koşulan metin `tools/gis/dem_fetch.py` içinde
+> duruyordu, ama krediler ekranında yalnızca *"kamu erişimli DEM kaynakları"*
+> vardı — arazinin tamamı o veriden türetilmiş olmasına rağmen. Test o gün
+> yazılmasaydı oyun eksik atıfla yayınlanacaktı.
+
 ## Kayıt formatı
 
 | Dosya | Kaynak (URL) | Eser / Tarih | Lisans | Oyunda kullanım | İndirme tarihi |

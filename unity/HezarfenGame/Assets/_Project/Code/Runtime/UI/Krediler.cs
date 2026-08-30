@@ -5,10 +5,15 @@ namespace Hezarfen.Arayuz
     ///
     /// ## Atıf bir nezaket değil, YÜKÜMLÜLÜK
     ///
-    /// OpenStreetMap verisi <b>ODbL</b> altında. Atıf eksikse bu bir
-    /// incelik kusuru değil, <b>lisans ihlali</b>. Bu yüzden metin bir
-    /// sabit ve bir test onun içeriğini sınıyor — krediler ekranı bir gün
-    /// yeniden yazılırsa atıf sessizce düşmesin.
+    /// İki kaynak atıf ŞART koşuyor ve ikisinin de metni
+    /// <c>refs/LICENSES.md</c>'de yazılı: <b>Copernicus DEM GLO-30</b>
+    /// (arazinin tamamı) ve <b>OpenStreetMap</b> (Ayasofya/Sultanahmet
+    /// plan ölçüleri). Atıf eksikse bu bir incelik kusuru değil,
+    /// <b>lisans ihlali</b> — ve oyun ticari yayınlanacak.
+    ///
+    /// Bu yüzden metin bir sabit ve bir test onun içeriğini sınıyor:
+    /// krediler ekranı bir gün yeniden yazılırsa atıf sessizce düşmesin.
+    /// Nitekim düşmüştü — Copernicus hiç girmemişti.
     ///
     /// ## Kaynakça oyunun PAZARLAMA GÜCÜ
     ///
@@ -23,11 +28,26 @@ namespace Hezarfen.Arayuz
     /// </summary>
     public static class Krediler
     {
-        /// <summary>Yasal olarak zorunlu atıflar — testle korunuyor.</summary>
+        /// <summary>
+        /// Yasal olarak zorunlu atıflar — testle korunuyor.
+        ///
+        /// <b>Copernicus bu listede YOKTU ve bu bir kusurdu.</b> Oyun
+        /// Steam'de ticari yayınlanacak; `refs/LICENSES.md` Copernicus DEM
+        /// GLO-30'u <i>"serbest kullanım, atıf zorunlu"</i> diye kaydetmiş
+        /// ve şart koşulan metni <c>tools/gis/dem_fetch.py</c> içine
+        /// yazmıştı — ama krediler ekranında yalnızca <i>"kamu erişimli
+        /// DEM kaynakları"</i> yazıyordu. Test de yanlış şeyi koruyordu:
+        /// kullandığımızı sormuyor, listede olanı tutuyordu.
+        ///
+        /// Arazinin TAMAMI o veriden türetildi; yani eksik olan atıf,
+        /// oyunun en büyük tek varlığınınkiydi.
+        /// </summary>
         public static readonly string[] ZorunluAtif =
         {
             "OpenStreetMap",
-            "ODbL",
+            "Open Database License (ODbL)",
+            "Copernicus",
+            "Airbus Defence and Space",
         };
 
         public const string Metin =
@@ -35,11 +55,17 @@ namespace Hezarfen.Arayuz
 
 — VERİ VE VARLIK ATIFLARI —
 
-Harita verisi: © OpenStreetMap katkıcıları.
-Open Database License (ODbL) altında kullanılmıştır.
-Kıyı çizgisi ve topografya bu veriden türetilmiştir.
+Yükseklik verisi: Copernicus DEM GLO-30.
+Produced using Copernicus WorldDEM-30 (c) DLR e.V. 2010-2014
+and (c) Airbus Defence and Space GmbH 2014-2018 provided under
+COPERNICUS by the European Union and ESA; all rights reserved.
+Arazi, kıyı çizgisi ve topografya bu veriden türetilmiştir.
 
-Yükseklik verisi: kamu erişimli DEM kaynakları.
+Yapı planı ölçüleri (Ayasofya, Sultanahmet):
+Contains information from OpenStreetMap and OpenStreetMap
+Foundation, which is made available under the
+Open Database License (ODbL).
+Geometri kopyalanmadı; plandan yalnızca ölçü okundu.
 
 HDRI ve doku: Poly Haven (CC0).
 Taban insan geometrisi: Blender Studio, Human Base Meshes (CC0).

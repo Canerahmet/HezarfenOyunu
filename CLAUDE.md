@@ -78,6 +78,12 @@ Bu, "sadece sohbette var olan varlık yasak" kuralını GEVŞETMEZ — her kalı
 - Her yeni sahne öğesine HistoricalTag (T1/T2/T3) ata; T1 için RESEARCH.md'den kaynak satırı yaz.
 - Çalışma zamanında bulut LLM çağrısı YOK (v1.0). NPC içerikleri offline üretilir ve statik gemiye konur.
 - refs/ altına lisansı LICENSES.md'de belgelenmemiş HİÇBİR görsel indirme.
+- **TİCARİ YAYIN (Caner, 2026-08-30):** oyun Steam'de satılacak. Kullanılan her
+  varlık — doku, model, karakter, animasyon, ses, veri — **ticari kullanıma
+  açık ve ücretsiz** olmalı. CC BY-NC, CC ND, "yalnız kişisel kullanım" ve
+  telifli tarama GİREMEZ. Atıf zorunlu olan kaynak (Copernicus DEM,
+  OpenStreetMap) `refs/LICENSES.md`'ye **ve** `Krediler.Metin`'e aynı turda
+  girer; `KredilerTests` ikisini birbirine bağlar.
 - Şüphede kal → docs/decisions/ altına kısa ADR yaz, iki seçenek + öneri sun, Caner'e sor.
 
 ## Adlandırma
