@@ -845,6 +845,22 @@ def _build_floor(p, mats, col, asset_name, tag, level_z, w, d, cy, body_mat,
                            (0.0, cy, level_z + p.floor_height * 0.5), col)
         hz.assign(body, body_mat)
         parts.append(body)
+    else:
+        # KATIN TAVANI.
+        #
+        # `near` kipinde kat yalniz dort duvar paneliydi; arada doseme
+        # yoktu. Ev disaridan dogru gorunuyordu cunku kimse icine
+        # girmiyordu — collider dolu bir kutuydu. Zemin kat acilinca
+        # eksik goruldu: kapidan girip yukari bakinca ust katin ici ve
+        # catinin ici goruluyor.
+        #
+        # Doseme ayni zamanda ust katin ZEMINI. Iki ayri levha koymak
+        # ayni yuzeyi iki kez cizmek olurdu; bir tanesi iki isi de
+        # goruyor ve 12 ucgen tutuyor.
+        tavan = hz.make_box(f"{asset_name}_{tag}_Doseme", (w, d, 0.18),
+                            (0.0, cy, level_z + p.floor_height - 0.09), col)
+        hz.assign(tavan, mats["timber"])
+        parts.append(tavan)
 
     for face in ("front", "back", "left", "right"):
         u_axis, n_axis, (fx, fy), span = _wall_axes(face, w, d, cy)

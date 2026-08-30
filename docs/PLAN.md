@@ -50,9 +50,10 @@ Bugün kapatılan kusurlar ve ölçüleri ADR 0079'da.
 | Mest kalıptan (kabuk değil) | ✅ |
 | Sakal kabuk + opak malzeme | ✅ |
 | Giyinik üçgen ≤ 80.000 | ✅ 55.168 |
-| FBX export + Unity'ye iniş + testler | ⬜ |
-| Mixamo locomotion klipleri (Caner indirir) → yeniden hedefleme, ayak kayması < 5 cm | ⬜ |
-| **Ayak IK** (yokuşta ayak gömülmesin) | ⬜ |
+| FBX export + Unity'ye iniş + testler | ✅ |
+| Mixamo locomotion klipleri → yeniden hedefleme | ✅ 20 klip (ADR 0080) |
+| Oyun içi ayak kayması ölçümü | ✅ **0,05 m/s** orta duruşta (≈3 cm/basış) |
+| **Ayak IK** (yokuşta ayak gömülmesin) | ✅ |
 
 **Kapı:** boy 1,70 m ±2 cm · giyinik ≤ 80.000 üçgen · 22 Humanoid kemik ·
 ayak kayması < 5 cm · yokuşta ayak boşlukta/gömülü değil.
@@ -83,9 +84,10 @@ listesinden alınan mantık, bizim coğrafyamıza uyarlanmış):
 | `SuUzakligi` < 12 m | söğüt/sazlık artar |
 | Nem düşük + güney bakı | servi, zeytin |
 
-**Kapı:** bina içinde ağaç **0** · yol ekseninin 4 m'sinde ağaç **0** ·
-su kenarı bitki yoğunluğu ölçülebilir şekilde artmış · Galata karesi
-≤ 16,7 ms · yeni ölçüm aracı `AraziOznitelikDenetimi`.
+**Kapı:** bina içinde ağaç **0** ✅ · yol ekseninin 4 m'sinde ağaç **0** ✅
+(1.671 ağaç elendi) · su kenarı yoğunluğu — **AÇIK**: Galata'nın kıyısı
+liman, kural doğal kıyı için ve semt niteleyicisi bekliyor · Galata karesi
+≤ 16,7 ms — ölçüm bekliyor · araç `AgacOznitelikDenetimi` ✅
 
 ---
 
@@ -107,8 +109,10 @@ dükkân üstü konut, konak, köşe evi, gayrimüslim varyantı.
 
 Örnek başına değişim mesh çoğaltmadan: `MaterialPropertyBlock`.
 
-**Kapı:** varyant ≥ 150 · aynı mahallede yan yana özdeş çift **0**
-(`EvTekrari`) · kare ≤ 16,7 ms.
+**Kapı:** varyant ≥ 150 → **201** ✅ · yan yana özdeş çift **0** ✅
+(en yakın komşusu aynı varyant olan ev: 0/2.651) · örnek başına ton
+değişimi ✅ (`EvTonu`) · kir/yaşlanma/prop katmanları **⬜** ·
+kare ≤ 16,7 ms — ölçüm bekliyor.
 
 ---
 
@@ -119,9 +123,10 @@ kanadı → iç kabuk (zemin, tavan, bölme) → merdiven → tohumdan iç plan
 (ortalama **4,12** oda, hayat merkezde, harem–selamlık) → dönem
 mobilyası (sedir, minder, sandık, rahle, mangal, kilim, yüklük, ocak).
 
-**Kapı:** ölçülen evlerin ≥ %95'i taşma dolgusuyla girilebilir ·
-aynı eve iki kez girince aynı plan (determinizm testi) · 40 m'de
-kare ≤ 16,7 ms.
+**Kapı:** ölçülen evlerin ≥ %95'i girilebilir → **%97,0** ✅
+(332 örnek, `EvErisimi`) · iç kabuk: kat döşemesi ✅, bölme/merdiven **⬜** ·
+tohumdan iç plan **⬜** · dönem mobilyası **⬜** · determinizm testi **⬜** ·
+40 m'de kare ≤ 16,7 ms **⬜**.
 
 ---
 
