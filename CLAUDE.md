@@ -4,6 +4,13 @@
 1632 İstanbul'unda geçen 3D açık dünya uçuş/keşif oyunu. Plan: docs/PLAN.md. Tarih: docs/RESEARCH.md.
 Fazların kabul kriterleri karşılanmadan sonraki faza GEÇME.
 
+**Ana plan (Caner, 2026-08-30 — ADR 0078):** faz sırası `docs/PLAN.md` **Bölüm II**'dir;
+Bölüm 5–13 yapılan işin kaydıdır. İki değişmez: (1) **referans semt `D_Galata`** — yeni her
+katman önce orada bitirilir ve ORADA ölçülür, kapı geçilmeden öteki semtlere yayılmaz;
+(2) bir faz, kendi kare ölçümü (`Hezarfen → Olcum → Kare suresini bolustur`, bütçe **16,7 ms**)
+olmadan bitmiş sayılmaz. **URP'ye geçilmez, HDRP'de kalınır** (ADR 0004 + 0078); Blender 5.2
+kilidi, MPFB2 (MB-Lab değil), MetaHuman yasak (ticari lisans).
+
 ## Rol
 Tüm üretim (kod + 3D + animasyon + ışık + NPC içerikleri) bende. Caner yalnızca kurulum/onay
 yapar ve yazılı geri bildirim verir. Ona üretim görevi atama. İnceleme paketlerini üret ve

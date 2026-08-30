@@ -27,6 +27,8 @@ for _p in (_HERE, os.path.join(_HERE, "lib")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
+from mathutils import Vector        # noqa: E402
+
 import hz_blender as hz             # noqa: E402
 import karakter_kit as kar          # noqa: E402
 import kiyafet_kit as kiy           # noqa: E402
@@ -59,6 +61,42 @@ SOURCE_KIYAFET = (
     "BIR KAYNAK YOK ve bu bosluk kapatilamaz, ancak soylenebilir."
 )
 
+#: Taban gövdenin makro ayarları (MPFB2 / MakeHuman).
+#:
+#: **Varsayılan bırakmak bir seçimdi ve yanlış seçimdi:** MPFB
+#: `gender: 0.5` ile gelir, yani ne erkek ne kadın — üretilen gövdede
+#: göğüs vardı ve entarinin altından okunuyordu. İlk inceleme
+#: paketinde (Hezarfen_Sivil_v3) görünen buydu. Bir varsayılan, hiç
+#: karar vermemek değildir; başkasının verdiği karardır.
+#:
+#: | anahtar | değer | neden |
+#: |---|---|---|
+#: | gender | 1,0 | Hezarfen Ahmed Çelebi bir erkektir (RESEARCH §2) |
+#: | age | 0,58 | MakeHuman'da 0,5 = 25 yaş, 1,0 = 90; bu ≈ 35 yaş |
+#: | muscle | 0,58 | kanat yapıp kuleye çıkan adam; atlet değil |
+#: | weight | 0,48 | dönem tasvirlerinde zanaatkâr ince yapılıdır |
+#: | proportions | 0,5 | "ideal" oran istemiyoruz, ortalama insan |
+#: | height | 0,5 | boy zaten 1,70 m'ye ÖLÇEKLENİYOR; buradaki değer
+#:                   yalnız uzuv oranlarını etkiler, ortalama kalsın |
+#: | race | ağırlıklı caucasian | MakeHuman'ın bu ekseni Akdeniz ve
+#:                   Yakın Doğu'yu "caucasian" altında toplar |
+#:
+#: **T3 — bu bir portre değildir.** Hezarfen'in çağdaş bir tasviri
+#: yoktur (RESEARCH §2); buradaki yüz onun yüzü DEĞİL, 17. yy
+#: İstanbul'unda yetişkin bir erkeğin makul bir gövdesidir. Kaynak
+#: olmadığı için iddia da yok.
+HEZARFEN_MAKRO = {
+    "gender": 1.0,
+    "age": 0.58,
+    "muscle": 0.58,
+    "weight": 0.48,
+    "proportions": 0.5,
+    "height": 0.5,
+    "cupsize": 0.0,
+    "firmness": 0.5,
+    "race": {"caucasian": 0.80, "asian": 0.15, "african": 0.05},
+}
+
 #: (ad, etek_kotu_orani, dizlik_var, neden)
 VARIANTS = [
     ("Hezarfen_Sivil", kiy.BILEK_ORAN, False,
@@ -80,23 +118,36 @@ def giydir(govde, col, mats, etek_orani, dizlik_var):
     z_etek = boy * etek_orani
     z_boyun = boy * 0.855
 
-    # --- Kol/govde siniri OLCULUR, elle yazilmaz -------------------------
-    kol_esik = kiy.kol_siniri(govde, z_kalca) or (boy * 0.11)
+    # --- Kol/govde/BACAK ayrimi OLCULUR, elle yazilmaz --------------------
+    # Iki sayi gerekiyor, bir degil: bu duruslarda bacak koldan daha
+    # disaridadir (|x| 0,24 > 0,20), yani tek bir |x| esigi kolu bacaktan
+    # ayiramaz. Gerekce ve olcum: kiy.kol_ayirici.
+    kol_esik, z_kol_alt = kiy.kol_ayirici(govde)
+    if kol_esik is None:
+        kol_esik = kiy.kol_siniri(govde, z_kalca) or (boy * 0.11)
+    if z_kol_alt is None:
+        z_kol_alt = z_kalca
+
+    def kol(c):
+        """Bu kose kola mi ait? Disarida VE bacak kotunun ustunde."""
+        return abs(c.x) >= kol_esik and c.z >= z_kol_alt
 
     # Kol bolgesinin en alt noktasi parmak ucudur; bilek ondan bir el boyu
     # (boyun ~%10,5'i) yukaridadir. Kol agzi bilekte biter — plakalarda
     # parmaklar gorunur, entari eli yutmaz.
-    kol_vs = [v.co.z for v in govde.data.vertices if abs(v.co.x) >= kol_esik]
+    kol_vs = [v.co.z for v in govde.data.vertices if kol(v.co)]
     z_parmak = min(kol_vs) if kol_vs else boy * 0.36
     z_bilek = z_parmak + boy * 0.105
 
     # --- GOMLEK (ic keten) ------------------------------------------------
     gomlek = kiy.kopya_kabuk(
         govde, "Gomlek", col,
-        tut=lambda c: z_kalca <= c.z <= z_boyun,
+        # Belin altinda kalan gomlek eteğin ICINDE kalir; gorunmeyen
+        # geometri uretmiyoruz.
+        tut=lambda c: (z_bel - boy * 0.035) <= c.z <= z_boyun and not kol(c),
         sisme=0.008, kalinlik=kiy.GOMLEK_KAL)
     if gomlek:
-        parts.append(hz.assign(gomlek, mats["gomlek"]))
+        parts.append(hz.assign(kiy.yumusat(gomlek, 3), mats["gomlek"]))
 
     # --- SALVAR ------------------------------------------------------------
     # Sisme kota GORE degisir: bilekte dar, uylukte bol, belde toplanir.
@@ -121,43 +172,80 @@ def giydir(govde, col, mats, etek_orani, dizlik_var):
 
     salvar = kiy.kopya_kabuk(
         govde, "Salvar", col,
-        tut=lambda c: (z0 <= c.z <= z_bel) and abs(c.x) < kol_esik,
+        # "abs(c.x) < kol_esik" yazmak baldirin DISINI (|x| 0,24 > esik
+        # 0,20) salvarin disinda birakiyordu — pacada bir serit acikta
+        # kaliyordu. Dogru olcut kolun ta kendisi: kol degilse bacaktir.
+        tut=lambda c: (z0 <= c.z <= z_bel) and not kol(c),
         sisme=salvar_sis, kalinlik=kiy.GOMLEK_KAL)
     if salvar:
-        parts.append(hz.assign(salvar, mats["salvar"]))
+        parts.append(hz.assign(kiy.yumusat(salvar, 4), mats["salvar"]))
 
     # --- ENTARI: govde + kollar --------------------------------------------
-    # Bacaklar DISARIDA birakiliyor: etek onlari takip etmez, serbest duser.
+    #
+    # Etek ARTIK BELDEN basliyor (asagida), o yuzden ust kabuk kalcaya
+    # kadar inmiyor: belin biraz altinda biter ve gerisi konidir. Once
+    # kalcaya kadar iniyordu ve o parca eteğin ICINDE kaliyordu — hic
+    # gorunmeyen ~7 bin ucgen. Bir katman gorunmuyorsa katman degildir.
+    z_ust_alt = z_bel - boy * 0.035
     entari_ust = kiy.kopya_kabuk(
         govde, "Entari_Ust", col,
-        tut=lambda c: (z_kalca <= c.z <= z_boyun)
-        or (abs(c.x) >= kol_esik and c.z >= z_bilek),
+        tut=lambda c: (z_ust_alt <= c.z <= z_boyun and not kol(c))
+        or (kol(c) and c.z >= z_bilek),
         sisme=ENTARI_SIS, kalinlik=kiy.ENTARI_KAL)
     if entari_ust:
-        parts.append(hz.assign(entari_ust, mats["entari"]))
+        parts.append(hz.assign(kiy.yumusat(entari_ust, 5), mats["entari"]))
 
     # --- ENTARI ETEGI -------------------------------------------------------
-    kalca = (kiy.kesit(govde, z_kalca, x_esik=kol_esik)
-             or (boy * 0.11, boy * 0.075))
-    r_ust = (kalca[0] + ETEK_PAY, kalca[1] + ETEK_PAY)
+    #
+    # ## Etek BELDEN baslar, kalcadan degil
+    #
+    # Once kalcadan (z_kalca + 2 cm) basliyordu ve ust halkasi entarinin
+    # yuzeyinden 2,4 cm disaridaydi: aradaki halka acikligindan icerisi —
+    # kirmizi salvar — gorunuyordu. Inceleme paketi v5'te karakter belden
+    # asagi bir kovanin icinde duruyor gibiydi. Etek belde, kusagin
+    # altinda baslarsa dikis kusakla ortulur ve bakilacak aralik kalmaz.
+    #
+    # ## Alt yaricap ELLE degil, alt zarftan hesaplanir
+    #
+    # Gerekce kiy.etek_acikligi'nda: koni gövdeden bagimsizdir, o yuzden
+    # gövdeyi icerdigi garanti degildir.
+    bel_k = (kiy.kesit_merkezli(govde, z_bel, dislama=kol)
+             or (boy * 0.10, boy * 0.068, 0.0))
+    bel_cy = bel_k[2]
+    etek_ust_z = z_bel
+    r_ust = (bel_k[0] + ENTARI_SIS + kiy.ENTARI_KAL + 0.002,
+             bel_k[1] + ENTARI_SIS + kiy.ENTARI_KAL + 0.002)
+
     # Kisa entari daha cok acilir: hareket eden adamin adimina yer birakir.
     acilma = 1.34 if etek_orani < 0.15 else 1.52
-    r_alt = (r_ust[0] * acilma, r_ust[1] * acilma)
+    # Etek SALVARI ortmek zorundadir, ayagi degil: mest ve ayak eteğin
+    # altindan gorunur. O yuzden zarf salvarin kot araliginda olculur.
+    zarf = kiy.alt_zarf(govde, max(z_etek, z0), etek_ust_z, salvar_sis,
+                        dislama=kol)
+    r_ust, r_alt, bel_cy, etek_cy_alt = kiy.etek_acikligi(
+        r_ust, bel_cy, etek_ust_z, z_etek, zarf,
+        kiy.GOMLEK_KAL + 0.012, acilma)
+    hz.log(f"etek: ust {r_ust[0]:.3f}/{r_ust[1]:.3f} @cy {bel_cy:+.3f} -> "
+           f"alt {r_alt[0]:.3f}/{r_alt[1]:.3f} @cy {etek_cy_alt:+.3f}")
+
     parts.append(hz.assign(kiy.etek(
-        "Entari_Etek", col, z_kalca + 0.02, z_etek,
-        r_ust, r_alt, kiy.ENTARI_KAL, yarik=True), mats["entari"]))
+        "Entari_Etek", col, etek_ust_z, z_etek,
+        r_ust, r_alt, kiy.ENTARI_KAL, yarik=True, cy=bel_cy,
+        cy_alt=etek_cy_alt), mats["entari"]))
 
     # --- KUSAK ---------------------------------------------------------------
-    bel = (kiy.kesit(govde, z_bel, x_esik=kol_esik)
-           or (boy * 0.10, boy * 0.068))
+    bel = bel_k
     # Kusak entarinin USTUNDE baglanir; ic katman degildir. Ilk turda
     # yaricapi entarininkinden kucuktu (0,024 < 0,034) ve kusak entarinin
     # ICINDE kaldi — yalnizca belin ve sirtin CUKUR yerlerinde bir damla
     # gibi disari sizdi. Bir kusak gorunmuyorsa kusak degildir.
-    kusak_pay = ENTARI_SIS + kiy.ENTARI_KAL + 0.012
+    # Kusak entarinin YUZEYINE oturur; disari cikmasini fici bicimi
+    # (kiy.band) saglar. Once buraya 12 mm daha ekliyordum ve kusak
+    # giysiden ayri, ortasi bos bir cember gibi duruyordu.
+    kusak_pay = ENTARI_SIS + kiy.ENTARI_KAL + 0.002
     parts.append(hz.assign(kiy.band(
         "Kusak", col, z_bel, (bel[0] + kusak_pay, bel[1] + kusak_pay),
-        boy * 0.055, kiy.KUSAK_KAL), mats["kusak"]))
+        boy * 0.055, kiy.KUSAK_KAL, cy=bel_cy), mats["kusak"]))
 
     # --- DIZLIK (yalniz ucus varyanti) ---------------------------------------
     if dizlik_var:
@@ -203,34 +291,62 @@ def giydir(govde, col, mats, etek_orani, dizlik_var):
     # gorunmeyecek 40 kartin bedelini odemek olurdu.
     sac_mat = sk.hair_material()
     hat = sk.cene_hatti(govde, boy)
-    # UC KATMAN. Ilk yazimda tek siraydi ve sakal render'da neredeyse
-    # gorunmuyordu — kartlar dogru yerdeydi (olculdu), ama bir sakal
-    # birkac tel degil bir KUTLEDIR. Alfa kapsamasi %24; tek katman
-    # yuzeyin dortte birini doldurur. Uc katman ust uste binince kutle
-    # okunur, ve bindirme zaten sac kartlarinin calisma bicimidir.
+
+    # --- SAKAL: KART DEGIL KABUK ------------------------------------------
     #
-    # Katmanlar farkli SERIT kullanir: hepsi ayni desen olsaydi
-    # bindirme bir tekrar deseni uretirdi ve o tekrar okunurdu.
-    # KATMAN OFSETI mutlak mesafedir, oran degil. Ilk yazimda konumu
-    # 0,986/1,008/1,028 ile olcekliyordum; y ~ -0,06 oldugu icin bu
-    # katmanlari 1,7 mm ayiriyordu — hicbir sey. Giysi kabuklarinda
-    # ogrendigimiz sey burada da gecerli: dis katman ic katmandan
-    # OLCULEBILIR kadar disarida olmali.
-    for kat, (pay, ser, uz) in enumerate((
-            (0.008, 0, 0.058), (0.016, 2, 0.082), (0.024, 1, 0.104))):
-        for i, (p, yon) in enumerate(hat):
-            for sx in (-1, 1):
-                if sx > 0 and abs(p.x) < boy * 0.004:
-                    continue              # on ortadaki kart tek
-                k = sk.kart(f"Sakal_{kat}_{sx}_{i}",
-                            (p.x * sx + yon.x * sx * pay,
-                             p.y + yon.y * pay, p.z),
-                            # Sakal asagi ve hafifce disari sarkar.
-                            (yon.x * sx * 0.42, yon.y * 0.42, -1.0),
-                            (yon.x * sx, yon.y, 0.30),
-                            boy * uz, boy * 0.034, col,
-                            serit=ser, egim=0.20 + 0.06 * kat)
-                parts.append(hz.assign(k, sac_mat))
+    # Sakali uc kat alfa kartiyla kuruyordum. Yakin cekimde ne oldugu
+    # goruldu (renders/denetim/kafa_yakin.png): kartlar cene hattina
+    # diziliyor ama duz dikdortgen olduklari icin kulaktan kulaga giden
+    # bir ONLUK olusturuyorlardi — cenenin bicimini hic izlemiyorlardi.
+    # Ustelik kartlarin arasi bosluk oldugu icin toplu halde isik almiyor
+    # ve siyah bir delik gibi okunuyorlardi.
+    #
+    # Giysilerde calisan yontem burada da calisir ve ayni sebeple:
+    # sakal da altindaki bicime OTURAN bir kutledir. Cene bolgesinin
+    # yuzleri kopyalanip disari itilince sakal kafanin bicimini kendi
+    # kendine alir — kart dizmek gerekmez, ve kafa degisirse sakal
+    # kendini yeniden kurar.
+    #
+    # Bolge cene hattindan OLCULUR: bir kose, cene yayindaki en yakin
+    # noktaya `sakal_menzil`den yakinsa ve agiz kotunun altindaysa
+    # sakaldir. Boylece ust dudak (biyik ayri parcadir) ve boyun disarida
+    # kalir.
+    if hat:
+        hat_p = [p for p, _ in hat]
+        # Yay yalniz sag yarimdir; sol taraf aynalanarak eklenir.
+        hat_p = hat_p + [Vector((-p.x, p.y, p.z)) for p in hat_p]
+        z_agiz = boy * 0.897
+        z_dip = boy * 0.806
+        sakal_menzil = boy * 0.052
+
+        def sakal_bolge(c):
+            if c.z > z_agiz or c.z < z_dip:
+                return False
+            return min((c - p).length for p in hat_p) < sakal_menzil
+
+        sakal = kiy.kopya_kabuk(
+            govde, "Sakal", col, tut=sakal_bolge,
+            sisme=lambda c: 0.006 + 0.016 * min(
+                1.0, max(0.0, (z_agiz - c.z) / (z_agiz - z_dip))),
+            kalinlik=0.004)
+        if sakal:
+            parts.append(hz.assign(kiy.yumusat(sakal, 2),
+                                   sk.sakal_material()))
+
+    # Cene ucundan sarkan tutam: kabuk yuzeye oturur, sakalin UCU
+    # yuzeyden ayrilir. Birkac kart bu silueti verir.
+    for i, (p, yon) in enumerate(hat[:4]):
+        for sx in (-1, 1):
+            if sx > 0 and abs(p.x) < boy * 0.004:
+                continue
+            k = sk.kart(f"SakalUc_{sx}_{i}",
+                        (p.x * sx + yon.x * sx * 0.020,
+                         p.y + yon.y * 0.020, p.z - boy * 0.030),
+                        (yon.x * sx * 0.30, yon.y * 0.30, -1.0),
+                        (yon.x * sx, yon.y, 0.30),
+                        boy * 0.030, boy * 0.028, col,
+                        serit=i % 4, egim=0.22)
+            parts.append(hz.assign(k, sac_mat))
 
     # BIYIK: ust dudak. Plaka 20 ve 35'te sakalla birlikte var.
     for sx in (-1, 1):
@@ -248,24 +364,47 @@ def giydir(govde, col, mats, etek_orani, dizlik_var):
             k = sk.kart(f"Sac_{sx}_{i}",
                         (sx * kesit[0] * 0.94, dy * kesit[1], boy * dz),
                         (sx * 0.35, dy * 0.3, -1.0), (sx, dy * 0.4, 0.25),
-                        boy * 0.060, boy * 0.034, col, serit=ser, egim=0.30)
+                        boy * 0.034, boy * 0.030, col, serit=ser, egim=0.30)
             parts.append(hz.assign(k, sac_mat))
 
     # --- MEST ------------------------------------------------------------------
-    mest = kiy.kopya_kabuk(
-        govde, "Mest", col,
-        tut=lambda c: c.z <= boy * 0.042,
-        sisme=0.007, kalinlik=0.004)
-    if mest:
-        kiy.zemine_otur(mest)
-        parts.append(hz.assign(mest, mats["mest"]))
+    # Mest kabuk DEGIL kaliptir; gerekcesi kiy.mest'te (kabuk yontemi
+    # MakeHuman'in bes ayri parmagini deriye tasiyordu).
+    for sx in (-1.0, 1.0):
+        m = kiy.mest(f"Mest_{int(sx)}", col, govde, sx, boy)
+        if m:
+            kiy.zemine_otur(m)
+            parts.append(hz.assign(m, mats["mest"]))
 
-    return parts, kol_esik
+    return parts, kol_esik, z_kol_alt
 
 
 def taban_kur(args, mats):
-    """Çıplak taban gövdeyi getirir, ölçer, normalleştirir."""
-    govde = kar.taban_getir(args.taban, col=hz.collection(COLLECTION))
+    """
+    Çıplak taban gövdeyi getirir, ölçer, normalleştirir.
+
+    ## İki kaynak, tek sözleşme
+
+    `mpfb` (varsayılan) — MPFB2 ile **parametrik** üretilir; yaş, boy,
+    kilo, kas kaydırıcıları var ve Faz 6'nın NPC çeşitliliği oradan
+    gelecek. `paket` — Blender Studio'nun CC0 tek gövdesi; geri çekilme
+    yolu olarak duruyor.
+
+    İkisi de aynı şeyi döndürür (kimlik dönüşümü, ayaklar z=0, boy
+    1,70 m), o yüzden aşağıdaki üç satır — temizle, öne çevir,
+    normalleştir — ikisinde de aynı çalışır. ADR 0068 bunu iki gün önce
+    böyle öngörmüştü: kıyafet gövdeden kopyalanıyor, rig gövdeden
+    ölçülüyor; taban değişimi bu hattın KIRILMASI değil, tasarlandığı
+    durum.
+    """
+    if getattr(args, "taban_kaynak", "mpfb") == "mpfb":
+        import mpfb_kit as mp                       # noqa: PLC0415
+        govde = mp.taban_getir_mpfb(col=hz.collection(COLLECTION),
+                                    makro=HEZARFEN_MAKRO)
+        hz.log(f"taban: MPFB2 parametrik — {mp.olc(govde)}")
+    else:
+        govde = kar.taban_getir(args.taban, col=hz.collection(COLLECTION))
+        hz.log("taban: Blender Studio CC0 paketi")
     kar.temiz_ag(govde)
     aci = kar.one_cevir(govde)
     k = kar.normalize(govde)
@@ -296,6 +435,8 @@ def main():
     ap.add_argument("--catalog", default=os.path.join("art", "blend", "karakter",
                                                       "catalog.json"))
     ap.add_argument("--taban", default=None, help="Human Base Meshes .blend yolu")
+    ap.add_argument("--taban-kaynak", default="mpfb", choices=("mpfb", "paket"),
+                    help="Taban govde kaynagi: mpfb (parametrik) | paket (CC0 tek govde)")
     ap.add_argument("--no-textures", action="store_true")
     # Rig'siz bir karakteri prefab yapmak erken olur; `_Import` bos kalir
     # (CLAUDE.md: "_Import bos birakilir").
@@ -344,12 +485,16 @@ def main():
                                               textured=not args.no_textures)
         asset = f"SK_{ad}"
         govde, _, _ = taban_kur(args, mats)
-        giysi, kol_esik = giydir(govde, col, mats, etek_orani, dizlik_var)
+        giysi, kol_esik, z_kol_alt = giydir(govde, col, mats, etek_orani, dizlik_var)
+        # Adlar BIRLESTIRMEDEN once alinir: birlestirme parca nesnelerini
+        # siler ve sonradan okumak "StructRNA has been removed" verir.
+        giysi_adlari = sorted({o.name.split(".")[0] for o in giysi})
+        giysi_sayisi = len(giysi)
 
         # Eklemler CIPLAK govdeden olculur, giyinikten degil: entari
         # omzu 3,4 cm kalinlastirir ve omuz eklemini o kadar disari
         # atardi. Rig tenin altindadir.
-        eklem = rk.eklemleri_olc(govde, kol_esik)
+        eklem = rk.eklemleri_olc(govde, kol_esik, z_kol_alt)
         rig_hata = rk.uzuv_denetimi(eklem, kar.HEDEF_BOY)
         if rig_hata:
             raise SystemExit(f"[HZ] HATA {ad} rig: " + "; ".join(rig_hata))
@@ -376,7 +521,8 @@ def main():
             en_genis=round(mx[0] - mn[0], 4),
             derinlik=round(mx[1] - mn[1], 4),
             etek_kotu=round(kar.HEDEF_BOY * etek_orani, 3),
-            dizlik=dizlik_var, giysi_parca=len(giysi),
+            dizlik=dizlik_var, giysi_parca=giysi_sayisi,
+            giysi_adlari=giysi_adlari,
             tris_lod0=kar.hz_tri(lod0), tris_lod1=kar.hz_tri(lod1),
             kemik=len(arm.data.bones),
             kemikler=rk.kemik_raporu(arm, kar.HEDEF_BOY))
@@ -403,13 +549,23 @@ def main():
                 f"[HZ] HATA {ad}: giyinik boy {bilgi['boy']:.3f} m — ciplak "
                 f"{kar.HEDEF_BOY} m'nin %10'undan fazla ustunde.")
         # Bir kabuk secimi bos donerse giysi sessizce eksik kalir ve
-        # karakter yari ciplak cikar; sayi onu yakalar.
-        beklenen = 50 if dizlik_var else 48
-        if bilgi["giysi_parca"] < beklenen:
+        # karakter yari ciplak cikar.
+        #
+        # Bunu ONCE bir SAYI ile denetliyordum ("en az 48 parca"). Sayi
+        # yanlis seyi olcuyordu: sakal 54 karttan tek bir kabuga
+        # dusunce denetim, giysinin tamami yerinde oldugu halde uretimi
+        # reddetti. Bir esik, saydigi seyin ne oldugunu bilmiyorsa
+        # yalan soyler — burada gereken sayi degil, ADLARDIR.
+        zorunlu = {"Gomlek", "Salvar", "Entari_Ust", "Entari_Etek",
+                   "Kusak", "Sakal", "Kavuk", "Sarik",
+                   "Mest_-1", "Mest_1"}
+        if dizlik_var:
+            zorunlu |= {"Dizlik_-1", "Dizlik_1"}
+        eksik_giysi = sorted(zorunlu - set(bilgi["giysi_adlari"]))
+        if eksik_giysi:
             raise SystemExit(
-                f"[HZ] HATA {ad}: {bilgi['giysi_parca']} giysi parcasi "
-                f"uretildi, en az {beklenen} bekleniyordu — bir kabuk "
-                "secimi bos donmus olabilir.")
+                f"[HZ] HATA {ad}: giysi parcasi eksik: {eksik_giysi} — "
+                "bir kabuk secimi bos donmus olabilir.")
 
         catalog.append(bilgi)
         hz.log(f"{ad:16s} boy {bilgi['boy']:.3f} m, etek {bilgi['etek_kotu']:.2f} m, "

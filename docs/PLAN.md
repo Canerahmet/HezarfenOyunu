@@ -6,6 +6,206 @@
 
 > Bu belge, Hezarfen Ahmed Çelebi'nin ana karakter olduğu, 1632 İstanbul'unda geçen 3D PC oyununun üretim planıdır. Claude Code bu belgeyi repo kökünde `docs/PLAN.md` olarak tutmalı, her fazın kabul kriterlerini karşılamadan bir sonrakine geçmemelidir. Tarihsel dayanaklar için `docs/RESEARCH.md` (araştırma raporu — Caner ekleyecek) esas alınır.
 
+
+> **[2.0 · 2026-08-30]** Faz sırası **ADR 0078** ile yeniden kuruldu: aşağıdaki Bölüm 5–13 yapılan işin kaydıdır; yeni iş **Bölüm II**'den sıralanır. URP'ye geçmiyoruz, HDRP'de kalıyoruz (gerekçe ADR 0078).
+
+---
+
+# BÖLÜM II — ÜRETİM HATTI ANA PLANI (2026-08-30, **ADR 0078**)
+
+> **Bu bölüm bundan sonraki faz sırasını belirler.** Aşağıdaki Bölüm
+> 5–13 (Faz 0–8) **yapılan işin kaydı** olarak duruyor; oradaki fazların
+> çoğu bitti ve o kayıt silinmiyor. Ama yeni iş **buradan** sıralanır.
+>
+> Gerekçe, neyin alındığı ve **neyin alınmadığı** (URP, Blender 4.5,
+> MB-Lab, MetaHuman, araç/savaş sistemleri): `docs/decisions/0078-uretim-hatti-ana-plan.md`.
+
+## II.0 İki değişmez kural
+
+**1. Referans semt: `D_Galata`.** Yeni her katman önce Galata'da
+bitirilir ve **orada ölçülür**. Ölçü kapıyı geçmeden öteki semtlere
+yayılmaz. Sebep: "her yeri biraz iyi" yapmak, "bir yeri gerçekten iyi"
+yapmaktan hem daha pahalı hem daha az inandırıcıdır. Bu, ChatGPT
+listesindeki *vertical slice* fikrinin bize uyarlanmış hâlidir —
+şehri küçültmüyoruz, kalite eşiğini bir yere çakıyoruz.
+
+**2. Her özellik maliyetiyle birlikte gelir.** Bir faz, kendi
+`Hezarfen → Olcum → Kare suresini bolustur` çıktısı olmadan bitmiş
+sayılmaz. Kare bütçesi **16,7 ms** (60 FPS, RTX 4070 Laptop).
+
+---
+
+## II.A — Karakter hattı · **DEVAM EDİYOR**
+
+Taban gövde artık MPFB2 (MakeHuman) ile parametrik üretiliyor.
+Bugün kapatılan kusurlar ve ölçüleri ADR 0079'da.
+
+| kalem | durum |
+|---|---|
+| MPFB2 headless taban, boy 1,70 m | ✅ |
+| Erkek makro (`HEZARFEN_MAKRO`), T3 — portre iddiası yok | ✅ |
+| Yön sözleşmesi (burun −Y) ayaktan ölçülüyor | ✅ |
+| Kol/gövde/bacak ayrımı iki sayıyla (`kol_ayirici`) | ✅ |
+| Etek konisi ölçülen alt zarftan çözülüyor | ✅ |
+| Mest kalıptan (kabuk değil) | ✅ |
+| Sakal kabuk + opak malzeme | ✅ |
+| Giyinik üçgen ≤ 80.000 | ✅ 55.168 |
+| FBX export + Unity'ye iniş + testler | ⬜ |
+| Mixamo locomotion klipleri (Caner indirir) → yeniden hedefleme, ayak kayması < 5 cm | ⬜ |
+| **Ayak IK** (yokuşta ayak gömülmesin) | ⬜ |
+
+**Kapı:** boy 1,70 m ±2 cm · giyinik ≤ 80.000 üçgen · 22 Humanoid kemik ·
+ayak kayması < 5 cm · yokuşta ayak boşlukta/gömülü değil.
+
+---
+
+## II.B — Zemin gerçeği: arazi öznitelik katmanları ve biyom
+
+**Neden ilk sırada:** 40.765 ağacın binaların içinden bittiği kusuru
+kapattık ama **sebebini** kapatmadık. Bitki yerleştirici zemin hakkında
+hiçbir şey bilmiyor; her seferinde ayrı bir filtre yazıyoruz. Katman
+yoksa kusur geri gelir.
+
+Her arazi hücresinde okunabilir olacak:
+
+```
+Yukseklik · Egim · Normal · Nem · YolUzakligi · SuUzakligi · BinaUzakligi
+```
+
+Biyom kuralları bunlardan **türer**, elle yazılmaz. Örnek (ChatGPT
+listesinden alınan mantık, bizim coğrafyamıza uyarlanmış):
+
+| kural | sonuç |
+|---|---|
+| Eğim > 32° | büyük ağaç yok, çalı ve kaya |
+| `YolUzakligi` < 4 m | ağaç yok (sokak açık kalır) |
+| `BinaUzakligi` < 2 m | ağaç yok, bahçe bitkisi olabilir |
+| `SuUzakligi` < 12 m | söğüt/sazlık artar |
+| Nem düşük + güney bakı | servi, zeytin |
+
+**Kapı:** bina içinde ağaç **0** · yol ekseninin 4 m'sinde ağaç **0** ·
+su kenarı bitki yoğunluğu ölçülebilir şekilde artmış · Galata karesi
+≤ 16,7 ms · yeni ölçüm aracı `AraziOznitelikDenetimi`.
+
+---
+
+## II.C — Ev çeşitliliği ve gerçekçilik katmanları
+
+Bugün ev **iki** katman taşıyor (geometri, malzeme). Beş olacak:
+
+| katman | ne |
+|---|---|
+| 1 Geometri | duvar, pencere, kapı, cumba, saçak |
+| 2 Malzeme | sıva, ahşap, kiremit, taş |
+| 3 **Kir** | alt kısım, yağmur izi, pencere altı |
+| 4 **Yaşlanma** | boya dökülmesi, çatlak, yosun, ahşap gri |
+| 5 **Prop** | kepenk, saksı, asma, çamaşır ipi, tabela, kandil |
+
+Varyant üreteci: 26 → **~200**, tohumdan; taban alanı dağılımı
+RESEARCH §4.1'den (36–715 zira², %80'i 172 m² altında). Yeni tipler:
+dükkân üstü konut, konak, köşe evi, gayrimüslim varyantı.
+
+Örnek başına değişim mesh çoğaltmadan: `MaterialPropertyBlock`.
+
+**Kapı:** varyant ≥ 150 · aynı mahallede yan yana özdeş çift **0**
+(`EvTekrari`) · kare ≤ 16,7 ms.
+
+---
+
+## II.D — Girilebilir iç mekân
+
+Kesintisiz geçiş (kapıyı aç gir). Sırasıyla: gerçek kapı boşluğu ve
+kanadı → iç kabuk (zemin, tavan, bölme) → merdiven → tohumdan iç plan
+(ortalama **4,12** oda, hayat merkezde, harem–selamlık) → dönem
+mobilyası (sedir, minder, sandık, rahle, mangal, kilim, yüklük, ocak).
+
+**Kapı:** ölçülen evlerin ≥ %95'i taşma dolgusuyla girilebilir ·
+aynı eve iki kez girince aynı plan (determinizm testi) · 40 m'de
+kare ≤ 16,7 ms.
+
+---
+
+## II.E — Su, hava ve ortam sesi
+
+Haliç ve Boğaz oyunun yarısı; bugün ikisi de düz yüzey ve oyun sessiz.
+
+- **Su:** yansıma, kırılma, derinlik solması, köpük, kıyı çizgisinde
+  kara–su geçişi, dalga.
+- **Hava:** açık / bulutlu / kapalı / yağmur / fırtına / sis / rüzgâr.
+  Yağmur yalnız parçacık değil: **ıslaklık** → pürüzlülük ↓, yansıma ↑.
+- **Ses:** biyom + saat + havaya göre ortam. Ezan ve namaz vakitleri
+  `VakitHesabi` ile zaten bağlı; ses o iskelete oturur.
+
+**Kapı:** Galata'da yağmurda ıslaklık ölçülebilir (pürüzlülük farkı) ·
+ses kaynakları 3B ve mesafeyle sönümlü · kare ≤ 16,7 ms.
+
+---
+
+## II.F — Sinematik pas
+
+ADR 0072'nin **hiç çalışmamış** temel katmanı burada kapanır.
+
+- **APV pişirme** (19 ProbeVolume var, diskte veri yok — iç mekânlar
+  geldiğinde bu artık isteğe bağlı değil)
+- Ortam örtme (AO), temas gölgesi
+- Bloom, renk derecelendirme (LUT), vinyet
+- VFX: ocak dumanı, toz, kuş sürüsü, deniz serpintisi
+
+**Kapı:** `renders/tur/` altına gündüz/gün batımı/gece üç kare ·
+APV verisi diskte · kare ≤ 16,7 ms.
+
+---
+
+## II.G — İnsan DNA'sı ve kalabalığın dönüşü
+
+ADR 0077 ile kapatılan kalabalık buradan geri gelir — ama tek gövdeyle
+değil. **İnsan DNA'sı**:
+
+```
+Yas · Cinsiyet · Boy · Kilo · Kas · YuzBicimi · TenTonu
+Sac · SacRengi · Sakal · Kiyafet · Aksesuar · Meslek
+```
+
+MPFB2 makro sistemi bunu doğrudan karşılıyor (`HEZARFEN_MAKRO`
+deseninde). Kıyafet zaten gövdeden türüyor, yani DNA değişince kıyafet
+kendini yeniden kurar — hat bunun için tasarlandı.
+
+Üstüne **Utility AI**, var olan `Rutin` / `NPCMeslek` / `SehirGunu`
+iskeletine eklenir: ihtiyaç (açlık, uyku, sosyal, güvenlik) → puan →
+davranış. Kalabalık LOD zaten `NPCYonetici`'de.
+
+**Kapı:** 200 NPC'de özdeş çift **0** · kare ≤ 16,7 ms · oturma
+farkı 0,00 m (bugünkü ölçü korunur).
+
+---
+
+## II.H — Etkileşim, envanter, diyalog, kayıt
+
+- `IEtkilesim` arayüzü: kapı, sandık, NPC, merdiven, kayık, kandil
+  aynı yolu kullanır.
+- Envanter (ScriptableObject yapılandırma).
+- Diyalog: bark'tan seçimli konuşmaya; **çalışma zamanında bulut LLM
+  yok**, içerik çevrimdışı üretilir ve statik gemiye konur.
+- Kayıt kapsamı genişler: oyuncu, envanter, görev, NPC durumu, dünya
+  durumu, hava, zaman, kapı durumu, yıkılmış/alınmış nesneler.
+
+**Kapı:** kaydet–yükle turunda ölçülen dünya durumu birebir aynı.
+
+---
+
+## II.I — Cila ve Steam
+
+LOD, culling, bellek, çökme testi, build hattı, Steam bütünleşmesi.
+`refs/LICENSES.md` ↔ `Krediler` testi yeşil (bugün kuruldu).
+
+---
+
+## II.J — Sıra ve büyüklük (dürüst tahmin)
+
+A en küçüğü, D en büyüğü. D tek başına bu projedeki en büyük özellik:
+10.868 eve kesintisiz, tohumdan, mobilyalı iç mekân. Her fazın sonunda
+**oynanabilir** bir şey bırakılır; bir faz yarım kalırsa oyun bozulmaz.
+
 ---
 
 ## 0. Proje Özeti ve Tasarım Direkleri

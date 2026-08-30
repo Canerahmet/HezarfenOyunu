@@ -33,6 +33,8 @@ değişmeden çalışır — ADR 0068'in *"taban değişimi bu hattın tasarland
 durumdur"* iddiası tam olarak buna dayanıyor.
 """
 
+import math
+
 import bpy
 from mathutils import Matrix
 
@@ -74,6 +76,47 @@ def _sinir(o):
             if v.co[i] > mx[i]:
                 mx[i] = v.co[i]
     return tuple(mn), tuple(mx)
+
+
+def _on_yonu(o):
+    """
+    Gövdenin baktığı Y yönü: -1 (-Y) ya da +1 (+Y). Ölçü **ayaktan**.
+
+    ## Neden kafadan değil
+
+    Önce kafa bandındaki en uzak noktaya baktım — ve o nokta burun
+    değil **ense kubbesi** çıktı. Kafa y=0'da merkezli değildir, o
+    yüzden `abs(en_uzak)` karşılaştırması yüzü değil kafanın hangi
+    tarafının orijinden uzak olduğunu ölçer. Ölçüm "+Y" dedi; aynı
+    gövdenin -Y'den alınan render'ı **yüzü** gösterdi. Sayı yanlış,
+    resim doğruydu.
+
+    ## Ayak neden şüpheye yer bırakmıyor
+
+    Ayak bileğinden parmak ucuna olan mesafe, topuğa olanın yaklaşık
+    iki katıdır — ve bu her insanda böyledir. Tek şart doğru referans:
+    gövde merkezi değil, **baldırın kendisi**. `karakter_kit`'in eski
+    hatası tam buydu; oradaki not "referans olarak bütün köşelerin
+    ağırlık merkezini alıyordu" diyor.
+
+    Referans: z = 0,06-0,11 bandındaki (alt baldır) köşelerin y
+    ortalaması. Taban: z < 0,02 (yere basan taban).
+    """
+    vs = [v.co for v in o.data.vertices]
+    zs = [v.z for v in vs]
+    zmin, zmax = min(zs), max(zs)
+    boy = zmax - zmin
+    baldir = [v.y for v in vs
+              if zmin + boy * 0.035 <= v.z <= zmin + boy * 0.065]
+    taban = [v.y for v in vs if v.z <= zmin + boy * 0.012]
+    if not baldir or not taban:
+        return 0
+    ref = sum(baldir) / len(baldir)
+    ileri = max(taban) - ref          # +Y yonunde tasma
+    geri = ref - min(taban)           # -Y yonunde tasma
+    if abs(ileri - geri) < boy * 0.005:
+        return 0                      # ayirt edilemiyor
+    return 1 if ileri > geri else -1
 
 
 class MpfbYok(RuntimeError):
@@ -189,6 +232,42 @@ def taban_getir_mpfb(col=None, makro=None, hedef_boy=None, alt_bolme=0):
     mn, mx = _sinir(o)
     o.data.transform(Matrix.Translation((0.0, 0.0, -mn[2])))
     o.data.update()
+
+    # --- BURUN -Y'YE CEVRILIR -----------------------------------
+    #
+    # Hattin sozlesmesi: burun Blender -Y'de (Unity +Z) —
+    # `karakter_kit.one_cevir`. MPFB govdesi +Y'ye bakiyor.
+    #
+    # Bunu hattin istatistiksel yon olcumune BIRAKMIYORUM ve sebebi
+    # olculdu: `one_cevir` guven 0,50'nin altinda donmuyor, MPFB
+    # govdesinde guven 0,40 cikti — yani hem donus hem de "burun +Y'de
+    # kalmasin" degismezi ATLANDI. Karakter sirti donuk uretildi ve
+    # uretim hicbir hata vermedi. Bu proje ayni kusuru bir kez yasadi;
+    # o zaman da "hata ancak oyunda, kamera arkaya gectiginde goruldu".
+    #
+    # Kaynagin kendi sozlesmesi BILINIYOR, o yuzden donus kesin yapilir
+    # ve sonra OLCULEREK dogrulanir.
+    if _on_yonu(o) > 0:
+        o.data.transform(Matrix.Rotation(math.pi, 4, "Z"))
+        o.data.update()
+    if _on_yonu(o) > 0:
+        raise MpfbYok(
+            "Govde donusten sonra hala +Y'ye bakiyor — olcum ters calisiyor.")
+
+    # ONBELLEGI TAZELE — BU NESNE BASKALARINA VERILIYOR.
+    #
+    # `o.data.transform(...)` mesh'i degistirir ama `obj.bound_box`
+    # onbelleklidir ve depsgraph guncellenene kadar ESKI degeri doner.
+    # Kendi olcumumu koselerden yaparak kurtulmustum; ama bu nesne
+    # `karakter_kit.normalize`'a gidiyor ve O `hz.bounds` okuyor —
+    # govde 1,70'e olceklenmis oldugu halde "boy 1,6594, hedef 1,7"
+    # diye patladi.
+    #
+    # Kendi olcumumu duzeltip komsununkini bozuk birakmak, kusuru
+    # cozmek degil tasimaktir. Tazeleme burada yapilir.
+    o.data.update()
+    if bpy.context.view_layer:
+        bpy.context.view_layer.update()
 
     hz.link(o, col)
     return o

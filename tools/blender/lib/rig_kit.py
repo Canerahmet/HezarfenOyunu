@@ -82,27 +82,47 @@ def _dilim_merkezi(vs, z, kal, filtre=None):
 def uzuv_cizgisi(obj, z_ust, z_alt, filtre, adim=40, kesintide_dur=True):
     """Bir uzvun merkez çizgisi: yukarıdan aşağı dilimlerin merkezleri.
 
-    `kesintide_dur` **boş dilimde durur** ve bu davranış zorunludur.
+    `kesintide_dur` **uzuv bittiğinde durur** — ama boşluk boşluk değildir.
+
+    ## İki ayrı boşluk, tek eşik
 
     İlk yazımda boş dilimleri atlıyordum. Kolun filtresi "gövde ekseninden
     uzak noktalar"dı ve o filtre parmak uçlarının 55 cm altında AYAKLARI da
     yakalıyordu. Çizgi omuzdan ayağa iniyor, %82'sine yürüyünce bilek
     **ayak bileği hizasında** çıkıyordu: kot %14,6, oysa olması gereken
-    ~%40. Parmak ucu ile ayak arasındaki boşluk gerçek bir yapısal
+    ~%40. Parmak ucu ile ayak arasındaki boşluk gerçek bir **yapısal**
     işarettir — atlamak yerine ona GÜVENMEK gerekir.
+
+    Sonra bunu "ilk boş dilimde dur" diye yazdım ve düzeltmesi gereken
+    hatanın ikizini ürettim. Yeni taban gövdenin baldırında köşe satırları
+    seyrektir; ölçülen boşluklar 2,6 / 4,0 / **4,8** / 3,0 cm. Dilim
+    kalınlığı 4,1 cm. Yani 4,8 cm'lik bir **örnekleme** boşluğu, uzvun
+    bittiği sanıldı: bacak çizgisi 0,238 m'de kesildi, diz kotu 0,297'den
+    0,346'ya kaydı ve rig denetimi haklı olarak reddetti.
+
+    İki boşluk arasında ölçülmüş geniş bir açıklık var — 4,8 cm ile 55 cm.
+    Eşik ortadadır: boyun %8'i (≈13,6 cm). Örnekleme boşluğunun üç katı,
+    yapısal boşluğun dörtte biri.
     """
     mn, mx = hz.bounds(obj)
-    kal = (mx[2] - mn[2]) * 0.012
+    boy = mx[2] - mn[2]
+    kal = boy * 0.012
+    #: Uzvun bittigine karar vermek icin gereken KESINTISIZ bos yukseklik.
+    bosluk_tol = boy * 0.08
     mw = obj.matrix_world
     vs = [mw @ v.co for v in obj.data.vertices]
     nokta = []
+    dilim_yuk = abs(z_alt - z_ust) / float(max(1, adim))
+    bos = 0.0
     for i in range(adim + 1):
         z = z_ust + (z_alt - z_ust) * (i / float(adim))
         m = _dilim_merkezi(vs, z, kal, filtre)
         if m is None:
-            if kesintide_dur and nokta:
+            bos += dilim_yuk
+            if kesintide_dur and nokta and bos > bosluk_tol:
                 break
             continue
+        bos = 0.0
         nokta.append(m)
     return nokta
 
@@ -130,8 +150,15 @@ def cizgide_ilerle(nokta, t):
     return nokta[-1].copy()
 
 
-def eklemleri_olc(obj, kol_esik):
-    """Gövdeden **ölçülen** eklem noktaları. `{ad: Vector}` döner."""
+def eklemleri_olc(obj, kol_esik, z_kol_alt=None):
+    """Gövdeden **ölçülen** eklem noktaları. `{ad: Vector}` döner.
+
+    `z_kol_alt` verilirse kol yalnız o kotun **üstünde** aranır. Gerekçe
+    `kiyafet_kit.kol_ayirici`'da: bu duruşta bacak (|x| 0,24) koldan
+    (0,17) daha dışarıdadır, yani tek bir |x| eşiği bacağı kol sanır.
+    Sanınca da bacak çizgisi baldırın dışını kaybeder ve diz kotu
+    0,297'den 0,353'e kayar — diz yukarı çıkmaz, ölçüsü bozulur.
+    """
     mn, mx = hz.bounds(obj)
     boy = mx[2] - mn[2]
     mw = obj.matrix_world
@@ -192,7 +219,8 @@ def eklemleri_olc(obj, kol_esik):
         bx = -1.0 if yan == "Left" else 1.0
 
         def kol_bolge(v, bx=bx):
-            return v.x * bx > 0 and abs(v.x) >= kol_esik
+            return (v.x * bx > 0 and abs(v.x) >= kol_esik
+                    and (z_kol_alt is None or v.z >= z_kol_alt))
 
         kol = [v for v in vs if kol_bolge(v)]
         if not kol:
@@ -215,7 +243,10 @@ def eklemleri_olc(obj, kol_esik):
     for yan, sx in (("Left", 1.0), ("Right", -1.0)):
         bx = -sx
         def bacak(v, bx=bx):
-            return v.x * bx > 0 and abs(v.x) < kol_esik
+            # "Kol degilse bacaktir" — baldirin disi de bacaktir.
+            return v.x * bx > 0 and not (
+                abs(v.x) >= kol_esik
+                and (z_kol_alt is None or v.z >= z_kol_alt))
         z_kalca = boy * 0.520
         cizgi = uzuv_cizgisi(obj, z_kalca, boy * 0.045, bacak)
         if not cizgi:

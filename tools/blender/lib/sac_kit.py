@@ -47,6 +47,35 @@ SERIT = 4
 KART_KAL = 0.0015
 
 
+def sakal_material(ad="M_Beard", renk=(0.105, 0.072, 0.052)):
+    """Sakal **kütlesi** için opak malzeme — kart malzemesi değil.
+
+    Sakalı kart yığınından kabuğa çevirince (bkz. `gen_hezarfen.giydir`)
+    kart malzemesini olduğu gibi kullandım ve sakal render'da tamamen
+    kayboldu. Sebep basit ama görülmesi zor: kart malzemesinin alfası bir
+    **tel deseni**dir; kartın büyük kısmı zaten şeffaf olsun diyedir. O
+    maskeyi katı bir kabuğa uygulayınca kabuğun kendisi delik deşik olur.
+    Kütlenin maskeye ihtiyacı yoktur; siluetini geometri veriyor.
+
+    Renk saç kartlarıyla aynı aileden ama biraz açık: tam siyah bir
+    sakal ışık almadığı için yüzde delik gibi okunuyordu.
+    """
+    mat = bpy.data.materials.get(ad) or bpy.data.materials.new(ad)
+    mat.use_nodes = True
+    nt = mat.node_tree
+    nt.nodes.clear()
+    out = nt.nodes.new("ShaderNodeOutputMaterial")
+    bsdf = nt.nodes.new("ShaderNodeBsdfPrincipled")
+    bsdf.inputs["Base Color"].default_value = (*renk, 1.0)
+    bsdf.inputs["Roughness"].default_value = 0.72
+    if "Specular IOR Level" in bsdf.inputs:
+        bsdf.inputs["Specular IOR Level"].default_value = 0.25
+    nt.links.new(bsdf.outputs["BSDF"], out.inputs["Surface"])
+    if hasattr(mat, "blend_method"):
+        mat.blend_method = "OPAQUE"
+    return mat
+
+
 def hair_material(ad="M_Hair", doku_dir=None, renk=(0.12, 0.08, 0.055)):
     """Alfa kesmeli saç malzemesi.
 
