@@ -61,20 +61,75 @@ namespace Hezarfen.Editor.Gis
         /// 9 m: bir avlunun evden uzaklığı. Bu mesafede eşya duvara ait
         /// görünür; ötesi tarladır ve orayı dolduran şey başkadır
         /// (<see cref="KirsalDoku"/>).
+        ///
+        /// ## Sonra 13 m oldu — çünkü artık duvar var
+        ///
+        /// 9 m'nin gerekçesi "çevrilmemiş zeminde tek başına duran nesne
+        /// boşluğa işaret eder"di. <see cref="OttomanStreetBuilder"/> ev
+        /// arkalarına <b>parsel duvarı</b> koyduktan sonra bu gerekçe
+        /// düştü: bahçe 9-14 m derin ve <b>çevrili</b>, yani 13 m'deki
+        /// bir su küpü tarlada değil bahçede duruyor. 9 m'de kalmak
+        /// bahçelerin iç yarısını boş bırakıyordu.
+        ///
+        /// Sayı değişmedi çünkü fikrim değişti; <b>zemin</b> değişti.
         /// </summary>
-        public const float EnCokUzaklik = 9f;
+        public const float EnCokUzaklik = 13f;
 
         /// <summary>Binaya bundan yakın nokta duvarın içidir (m).</summary>
         public const float EnAzUzaklik = 2.2f;
 
         /// <summary>Örnekleme adımı (m). Yoğunluğu bu belirler.</summary>
-        public const float Izgara = 8f;
+        public const float Izgara = 6f;
 
         /// <summary>Bu eğimin üstüne eşya konmaz (derece).</summary>
         public const float EnCokEgim = 22f;
 
         /// <summary>İki eşya arası en az bu kadar (m).</summary>
         public const float EnAzAralik = 3.4f;
+
+        /// <summary>
+        /// <b>Kapalılık:</b> dört yönden en az bu kadarı bir şeye
+        /// çarpmalı — yoksa oraya eşya konmaz.
+        ///
+        /// Bu kural, bu turda iki kez ödenmiş bir dersin kodu:
+        /// <i>çevrilmemiş zeminde tek başına duran nesne boşluğu
+        /// doldurmaz, ona işaret eder.</i> Önce yarıçapı 26 m'den 9 m'ye
+        /// çekerek dolaylı yoldan sağlanmaya çalışıldı; sonra parsel
+        /// duvarları gelince yarıçap 13 m'ye çıktı ve <b>kuşbakışı
+        /// karede</b> açık düzlükteki tek tük sandıklar geri geldi.
+        ///
+        /// Mesafe yanlış cetveldi: bir noktanın eve <b>yakın</b> olması
+        /// onun <b>çevrili</b> olduğunu söylemez. Doğru soru mesafe değil,
+        /// kapalılık — ve o ölçülebilir: dört yöne ışın at, kaçı bir
+        /// duvara/binaya çarpıyor say.
+        /// </summary>
+        /// <remarks>
+        /// Eşik <b>ölçülerek</b> seçildi, tahminle değil. Sekiz yönde
+        /// kapalılık dağılımı şu çıktı:
+        /// <c>[0]=6689 [1]=1665 [2]=4403 [3]=8103 [4]=1884 [5]=50 …</c>
+        /// — en yoğun küme <b>3</b>'te ve sebebi görünür: bir bahçenin
+        /// üç duvarı vardır (arka + iki yan), dördüncü kenarı evin
+        /// kendisidir ve ışın çoğu zaman evin köşesinden kaçar.
+        /// 4 denendi ve 25.699 nokta elenip geriye 95 eşya kaldı; sayı
+        /// eşiğin yanlış yerde olduğunu söyledi.
+        /// </remarks>
+        /// <para>
+        /// 3 de denendi ve <b>ölçü kötüleşti</b>: 9.705 eşya kondu, "4 m
+        /// içinde hiçbir şey yok" oranı %64,8'den %70,2'ye çıktı. Yani
+        /// açıktaki sandıkları temizlerken bahçelerin içini de
+        /// boşalttı. 2 = "iki duvarın köşesi" — tam açık zemini (0-1)
+        /// eler, avlu köşesini bırakır. Sıklık ızgarayı sıkılaştırarak
+        /// geri kazanılıyor: eleme <b>nerede</b> olduğunu, ızgara
+        /// <b>ne kadar</b> olduğunu ayarlar; ikisini tek sayıya
+        /// yüklemek ikisini birden yanlış yapıyordu.
+        /// </para>
+        public const int EnAzKapaliYon = 2;
+
+        /// <summary>Kapalılık kaç yönde ölçülür.</summary>
+        public const int KapalilikYonu = 8;
+
+        /// <summary>Kapalılık ışını bu kadar uzağa bakar (m).</summary>
+        public const float KapalilikMenzili = 16f;
 
         //: (prefab, ağırlık) — hangi eşya ne sıklıkta.
         private static readonly (string ad, int agirlik)[] Esyalar =
@@ -192,7 +247,8 @@ namespace Hezarfen.Editor.Gis
             var konanlar = new List<Vector2>();
             var konanIzgara = new Dictionary<(int, int), List<int>>();
             int konan = 0, egimElendi = 0, uzakElendi = 0, yakinElendi = 0,
-                cakismaElendi = 0, yuzeyElendi = 0;
+                cakismaElendi = 0, yuzeyElendi = 0, acikElendi = 0;
+            var kapaliDagilim = new int[KapalilikYonu + 1];
 
             var rng = new System.Random(1632);
 
@@ -236,7 +292,21 @@ namespace Hezarfen.Editor.Gis
                     zemin = vurus.point.y;
                 }
 
-                // 5) SEC ve KOY
+                // 5) KAPALILIK: cevrilmemis zemine esya konmaz.
+                var goz = new Vector3(jx, zemin + 1.0f, jz);
+                int kapali = 0;
+                for (int y = 0; y < KapalilikYonu; y++)
+                {
+                    var yon = Quaternion.Euler(0f, y * (360f / KapalilikYonu), 0f)
+                              * Vector3.forward;
+                    if (Physics.Raycast(goz, yon, KapalilikMenzili, ~0,
+                                        QueryTriggerInteraction.Ignore))
+                        kapali++;
+                }
+                kapaliDagilim[kapali]++;
+                if (kapali < EnAzKapaliYon) { acikElendi++; continue; }
+
+                // 6) SEC ve KOY
                 int pay = rng.Next(toplamAgirlik);
                 GameObject secilen = prefablar[0].go;
                 foreach (var (g, a) in prefablar)
@@ -274,7 +344,9 @@ namespace Hezarfen.Editor.Gis
                       + $"{dagitilan} tanesi semtlere dagitildi. "
                       + $"Elenen — kir (binadan uzak) {uzakElendi}, "
                       + $"duvar dibi {yakinElendi}, egim {egimElendi}, "
-                      + $"dolu yuzey {yuzeyElendi}, aralik {cakismaElendi}. "
+                      + $"dolu yuzey {yuzeyElendi}, aralik {cakismaElendi}, "
+                      + $"cevrili degil {acikElendi}. "
+                      + $"Kapalilik dagilimi [{string.Join(",", kapaliDagilim)}]. "
                       + $"{kutular.Count} bina kutusu tarandi.");
         }
 

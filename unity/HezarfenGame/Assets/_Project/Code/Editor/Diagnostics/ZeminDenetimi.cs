@@ -231,7 +231,8 @@ namespace Hezarfen.Editor.Diagnostics
                 {
                     string mad2 = mf.gameObject.name;
                     if (!mad2.StartsWith("Kaldirim") && !mad2.StartsWith("Yol_")
-                        && !mad2.StartsWith("BostanDuvarlari")) continue;
+                        && !mad2.StartsWith("BostanDuvarlari")
+                        && !mad2.StartsWith("BahceDuvarlari")) continue;
                     if (mf.sharedMesh == null) continue;
                     meshSayisi++;
                     var verts2 = mf.sharedMesh.vertices;
@@ -267,7 +268,8 @@ namespace Hezarfen.Editor.Diagnostics
                         string mad = mf.gameObject.name;
                         if (!mad.StartsWith("Kaldirim")
                             && !mad.StartsWith("Yol_")
-                            && !mad.StartsWith("BostanDuvarlari")) continue;
+                            && !mad.StartsWith("BostanDuvarlari")
+                            && !mad.StartsWith("BahceDuvarlari")) continue;
                         if (mf.sharedMesh == null) continue;
                         meshSayisi++;
 
@@ -466,6 +468,13 @@ namespace Hezarfen.Editor.Diagnostics
             if (ad.StartsWith("Kaide") || ad.StartsWith("Kaldirim")) return false;
             if (ad.StartsWith("Yol_") || ad.StartsWith("BostanDuvarlari"))
                 return false;
+            // BAHCE PARSEL DUVARI DA BIRLESIK. Eklendigi gun bu liste
+            // guncellenmedi ve denetim "66 duvarin 41'i havada, en
+            // kotusu 8,76 m" dedi. Sayi gercekti, sorusu yanlisti: bir
+            // mahalle boyu uzanan tek mesh'in "ayak izi ici" hicbir yere
+            // karsilik gelmiyor. Yukaridaki gerekce aynen gecerli — ve
+            // bu, o gerekcenin ikinci kez odendigi yer.
+            if (ad.StartsWith("BahceDuvarlari")) return false;
 
             // AGAC VE MEZAR TASI OLCULMEZ — ve bu eleme BIR KEZ KACTI.
             //

@@ -92,6 +92,28 @@ namespace Hezarfen.Editor.Gis
         /// </summary>
         public const float CaprazEgim = 0.45f;
 
+        /// <summary>
+        /// Evin arkasındaki bahçenin derinliği (m) — parselin evden
+        /// sonraki kısmı.
+        ///
+        /// Kaynakta parsel ölçüsü yok; sayı tipolojiden: Osmanlı evi
+        /// sokak çizgisine oturur ve <b>bahçesi arkadadır</b>
+        /// (RESEARCH.md 4.1). Bahçe evin derinliğinin 1,5-2,5 katıdır —
+        /// ev ~6 m, bahçe 9-14 m.
+        /// </summary>
+        public const float BahceEnAz = 9f;
+        public const float BahceEnCok = 14f;
+
+        /// <summary>
+        /// Bahçe duvarının yüksekliği (m).
+        ///
+        /// Bostan duvarı bel hizasıdır (0,9 m) çünkü tarlayı işaretler.
+        /// Bahçe duvarı <b>mahremiyet</b> içindir ve göz hizasını aşar:
+        /// avlu duvarla çevrilidir ve o duvar evin içini sokaktan ayırır
+        /// (bkz. `camasir_kit` başlığı — aynı gerekçe).
+        /// </summary>
+        public const float BahceDuvarYukseklik = 1.95f;
+
         [Serializable] private class Variant
         {
             public string name;
@@ -271,6 +293,7 @@ namespace Hezarfen.Editor.Gis
             taken.Clear();
             evKutulari.Clear();
             evIzgara.Clear();
+            bahceler.Clear();
             podiums.Clear();
             pavingStrips.Clear();
         }
@@ -429,6 +452,7 @@ namespace Hezarfen.Editor.Gis
             int podiumCount = podiums.Count;
             BuildPodiums(root.transform, "Kaideler", q.Name);
             BuildPaving(root.transform, "Kaldirim", q.Name);
+            BuildBahceler(root.transform, "BahceDuvarlari", q.Name, terrain);
 
             // ZEMİN: mahallenin bastığı yer otlak değil, ÇİĞNENMİŞ TOPRAK.
             //
@@ -637,6 +661,34 @@ namespace Hezarfen.Editor.Gis
                     taken.Add((c, radius * 0.72f));
                     EvKutusuEkle(c, new Vector2(v.wall_width, v.wall_depth),
                                  dunyaYaw);
+
+                    // BAHCE EVIN ARKASINDA. Sokaktan uzaga dogru.
+                    //
+                    // Gorulen sey soyleydi: evler sokaga dizili bir serit
+                    // ve arkalari citsiz, duvarsiz acik arazi. Ne
+                    // sacilirsa sacilsin cevrilmemis zemin KIR gibi
+                    // okunuyor — 19.992 avlu esyasi konduktan sonra bile.
+                    // Parsel, bosluga sinir cizen sey.
+                    float bahceDerin = BahceEnAz
+                        + (float)rng.NextDouble() * (BahceEnCok - BahceEnAz);
+                    var bahceMerkez = c + nrm
+                        * (v.wall_depth * 0.5f + bahceDerin * 0.5f);
+                    // Parselin eni evin eni + komsu araliginin payi:
+                    // komsu bahceler bitisir ve sinir SUREKLI okunur.
+                    // (Aralik `gap` asagida seciliyor; burada sabit bir
+                    // pay kullaniliyor cunku parselin eni evin degil
+                    // SOKAGIN dokusudur.)
+                    // PARSEL ENI KOMSU ARALIGINDAN DAR.
+                    //
+                    // 1,6 m pay verilmisti ve komsu aralik 1,4-3,0 m
+                    // oldugu icin bitisik parseller yer yer 0,2 m
+                    // ORTUSUYORDU: iki 0,30 m'lik duvar neredeyse ayni
+                    // yerde, yani z-cakismasi. 0,9 m, en dar aralikta
+                    // bile ortusmez ve bahceler arasinda 0,5-2,1 m'lik
+                    // bir gecit birakir.
+                    bahceler.Add((bahceMerkez,
+                                  new Vector2(v.wall_width + 0.9f, bahceDerin),
+                                  dunyaYaw, c));
                     // Kaide: evin tabanindan en alcak kose ALTINA kadar.
                     if (y - loH > 0.05f)
                         podiums.Add(new Podium
@@ -910,6 +962,225 @@ namespace Hezarfen.Editor.Gis
         /// kalmıştı. Sahne bozulmuş görünmüyordu — eksik olan şey sessizce
         /// başka bir yerdeydi.
         /// </summary>
+        /// <summary>
+        /// <b>Ev arkası bahçe parsellerinin duvarı — tek mesh.</b>
+        ///
+        /// ## Neden gerekliydi
+        ///
+        /// Mahalle içi boşluk üç turda üç kez bildirildi ve her seferinde
+        /// bir şey ekledim: önce şehir dışına yol ve bostan, sonra avluya
+        /// 19.992 eşya. Ölçü her seferinde biraz düzeldi (4 m içinde
+        /// hiçbir şey olmayan zemin %81,7 to %69,1) ama <b>karelere
+        /// bakınca</b> sebep başkaydı: evlerin arkası çitsiz, duvarsız
+        /// açık araziydi. Çevrilmemiş zemin, üstüne ne konursa konsun
+        /// <b>kır</b> gibi okunur; tek başına duran bir odunluk boşluğu
+        /// doldurmaz, ona işaret eder.
+        ///
+        /// Osmanlı evi sokak çizgisine oturur ve <b>bahçesi arkadadır</b>
+        /// (RESEARCH.md 4.1). O bahçe çevrilidir; mahremiyet o duvarın
+        /// işidir.
+        ///
+        /// ## Neden tek mesh
+        ///
+        /// 10.868 ev çarpı üç kenar kırk bin nesne ederdi. Parsel duvarı
+        /// kıpırdamaz; kaldırım ve kaidelerle aynı gerekçe.
+        ///
+        /// ## Her kenar kendi altındaki araziye iner
+        ///
+        /// Bu ders <see cref="KirsalDoku"/> tarafında ödendi: bütün
+        /// halkayı tek kota oturtmak, yamacın aşağı yanındaki duvarı
+        /// 1,8 m havada bırakıyordu. Üst hat terazide kalır, dip araziye
+        /// gömülür.
+        /// </summary>
+        private static void BuildBahceler(Transform parent, string name,
+                                          string quarter, Terrain terrain)
+        {
+            if (bahceler.Count == 0) return;
+            const float Kalinlik = 0.30f;
+            const float TexMetre = 2.0f;
+
+            var verts = new List<Vector3>();
+            var uvs = new List<Vector2>();
+            var tris = new List<int>();
+            float ay = terrain != null ? terrain.transform.position.y : 0f;
+            int kurulan = 0, atlanan = 0;
+
+            foreach (var b in bahceler)
+            {
+                // PARSEL BASKA BIR EVIN USTUNE OTURMAZ.
+                //
+                // Bahce evin arkasina uzanir ve arkada baska bir sokagin
+                // ev sirasi olabilir. Cakisan parsel kurulmaz: duvar evin
+                // icinden gecerdi.
+                if (EvKutusuCakisiyor(b.c, b.olcu, b.yaw)) { atlanan++; continue; }
+
+                // PARSELIN ICINDE BASKA BIR YAPI OLMAZ.
+                //
+                // Ev kutulari yalniz EVLERI bilir; mescit, cesme, turbe,
+                // firin `taken` dairelerinde durur. Bahce duvari onlarin
+                // etrafini cevirirse mahalle mescidi birinin bahcesinde
+                // kalir. Sahibi olan ev parselin DISINDA (merkezi
+                // yarim derinlikten uzakta), o yuzden bu sinama kendi
+                // evini yanlislikla elemez.
+                bool icerdeYapi = false;
+                foreach (var (tc, tr) in taken)
+                {
+                    var yerelP = Quaternion.Euler(0f, -b.yaw, 0f)
+                                 * new Vector3(tc.x - b.c.x, 0f, tc.y - b.c.y);
+                    if (Mathf.Abs(yerelP.x) < b.olcu.x * 0.5f + tr * 0.5f
+                        && Mathf.Abs(yerelP.z) < b.olcu.y * 0.5f + tr * 0.5f)
+                    { icerdeYapi = true; break; }
+                }
+                if (icerdeYapi) { atlanan++; continue; }
+
+                var rot = Quaternion.Euler(0f, b.yaw, 0f);
+                float hw = b.olcu.x * 0.5f, hd = b.olcu.y * 0.5f;
+
+                // Ust kot: parselin altindaki EN YUKSEK arazi — duvarin
+                // ustu terazide durur ve hicbir yerde gomulu kalmaz.
+                float ust = float.MinValue;
+                for (int i = -1; i <= 1; i++)
+                    for (int j = -1; j <= 1; j++)
+                    {
+                        var q2 = new Vector3(b.c.x, 0f, b.c.y)
+                                 + rot * new Vector3(i * hw, 0f, j * hd);
+                        float h = terrain != null
+                            ? terrain.SampleHeight(q2) + ay : 0f;
+                        if (h > ust) ust = h;
+                    }
+
+                // KAPANAN KENAR EVIN TERSI YONUNDE — EVIN ONU +Z'DIR.
+                //
+                // Ilk yazimda kapanan kenar yerel +Z'ye konmustu ve
+                // kusbakisi kare kusuru gosterdi: her evin arkasindan
+                // iki ince KANAT cikiyor, bahce hic kapanmiyordu. Sebep
+                // eksen sozlesmesi — CLAUDE.md'de yazili: "evin onu +Z".
+                // Yani +Z SOKAGA bakar; parselin kapanmasi gereken uzak
+                // kenari −Z'dedir. Duvari +Z'ye koymak onu evin arka
+                // cephesiyle parsel arasina, yani gorunmez bir yere
+                // gomuyordu.
+                //
+                // Sayilar dogruydu (142 mesh, 122.010 ucgen); yanlis olan
+                // yonun kendisiydi ve bunu ancak BAKINCA gordum.
+                var kenarlar = new (Vector3 yerel, float g, float d)[]
+                {
+                    (new Vector3(0f, 0f, -hd), b.olcu.x, Kalinlik),   // uzak kenar
+                    (new Vector3(hw, 0f, 0f), Kalinlik, b.olcu.y),
+                    (new Vector3(-hw, 0f, 0f), Kalinlik, b.olcu.y),
+                };
+
+                foreach (var k in kenarlar)
+                {
+                    var merkez = new Vector3(b.c.x, 0f, b.c.y) + rot * k.yerel;
+                    float dip = float.MaxValue;
+                    for (int i = -1; i <= 1; i++)
+                        for (int j = -1; j <= 1; j++)
+                        {
+                            var q3 = merkez + rot * new Vector3(
+                                i * k.g * 0.5f, 0f, j * k.d * 0.5f);
+                            float h = terrain != null
+                                ? terrain.SampleHeight(q3) + ay : ust;
+                            dip = Mathf.Min(dip, h);
+                        }
+                    float gomme = Mathf.Max(0.35f, ust - dip + 0.3f);
+                    BahceKutu(verts, uvs, tris, b.c, ust, rot, k.yerel,
+                              k.g, k.d, BahceDuvarYukseklik, TexMetre, gomme);
+                }
+
+                // KAPANAN KENAR EVDEN UZAKTA MI — BAGIMSIZ SINAMA.
+                //
+                // Ilk yazimda kenar yerel +Z'ye konmustu ve bahce hic
+                // kapanmadi: her evin arkasindan iki ince kanat cikiyordu.
+                // Sayilar dogruydu, yon yanlisti ve bunu ancak kusbakisi
+                // bir kareye BAKINCA gordum.
+                //
+                // Sinama yonu kendi varsayimiyla degil, EVIN KONUMUYLA
+                // olcuyor: kapanan kenar parsel merkezinden daha uzakta
+                // olmali. Isaret ters cevrilirse bu satir bagirir.
+                var uzakKenar = new Vector3(b.c.x, 0f, b.c.y)
+                                + rot * new Vector3(0f, 0f, -hd);
+                var evP = new Vector3(b.ev.x, 0f, b.ev.y);
+                if (Vector3.Distance(uzakKenar, evP)
+                    <= Vector3.Distance(new Vector3(b.c.x, 0f, b.c.y), evP))
+                    throw new Exception(
+                        "Bahce parselinin kapanan kenari EVE dogru bakiyor — "
+                        + "eksen isareti ters. Evin onu +Z'dir (CLAUDE.md), "
+                        + "yani uzak kenar -Z'dedir.");
+
+                kurulan++;
+            }
+
+            if (verts.Count == 0) { bahceler.Clear(); return; }
+
+            var mesh = new Mesh { name = $"SM_{name}_{quarter}" };
+            mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+            mesh.SetVertices(verts);
+            mesh.SetUVs(0, uvs);
+            mesh.SetTriangles(tris, 0);
+            mesh.RecalculateNormals();
+            mesh.RecalculateTangents();
+            mesh.RecalculateBounds();
+            AssetDatabase.CreateAsset(mesh, MeshAssetPath(name, quarter));
+
+            var go = new GameObject(name);
+            go.transform.SetParent(parent, false);
+            go.AddComponent<MeshFilter>().sharedMesh = mesh;
+            go.AddComponent<MeshRenderer>().sharedMaterial =
+                AssetDatabase.LoadAssetAtPath<Material>(
+                    "Assets/_Project/Art/Materials/Ottoman/M_Stone_Rubble.mat");
+            go.AddComponent<MeshCollider>().sharedMesh = mesh;
+
+            var tag = go.AddComponent<HistoricalTag>();
+            tag.tier = HistoricalTier.Reconstruction;
+            tag.sourceNote =
+                "Ev arkasi bahce parsel duvarlari (T2, taslak). Osmanli evi "
+                + "sokak cizgisine oturur, bahcesi arkadadir ve cevrilidir "
+                + "(RESEARCH.md 4.1). Parsel OLCUSU kaynakta yok: derinlik "
+                + "evin derinliginin 1,5-2,5 kati olarak turetildi.";
+
+            Debug.Log($"[Hezarfen] {quarter}: {kurulan} bahce parseli, "
+                      + $"{atlanan} tanesi baska yapiyla cakistigi icin atlandi.");
+            bahceler.Clear();
+        }
+
+        /// <summary>Bahçe duvarı kutusu — <see cref="BuildBahceler"/> için.</summary>
+        private static void BahceKutu(List<Vector3> v, List<Vector2> uv,
+                                      List<int> tri, Vector2 merkez, float taban,
+                                      Quaternion rot, Vector3 yerel,
+                                      float gen, float der, float yuk,
+                                      float tex, float gomme)
+        {
+            var c = new Vector3(merkez.x, taban, merkez.y) + rot * yerel;
+            float hx = gen * 0.5f, hz = der * 0.5f;
+            float z0 = -gomme, z1 = yuk;
+
+            var kose = new Vector3[8];
+            int n = 0;
+            foreach (float zz in new[] { z0, z1 })
+                foreach (var (sx, sz) in new[]
+                         { (-1f, -1f), (1f, -1f), (1f, 1f), (-1f, 1f) })
+                    kose[n++] = c + rot * new Vector3(sx * hx, zz, sz * hz);
+
+            void Yuz(int a, int b2, int c2, int d, float u, float vlen)
+            {
+                int i0 = v.Count;
+                v.Add(kose[a]); v.Add(kose[b2]); v.Add(kose[c2]); v.Add(kose[d]);
+                uv.Add(new Vector2(0f, 0f));
+                uv.Add(new Vector2(u / tex, 0f));
+                uv.Add(new Vector2(u / tex, vlen / tex));
+                uv.Add(new Vector2(0f, vlen / tex));
+                tri.Add(i0); tri.Add(i0 + 2); tri.Add(i0 + 1);
+                tri.Add(i0); tri.Add(i0 + 3); tri.Add(i0 + 2);
+            }
+
+            float h = yuk + gomme;
+            Yuz(0, 1, 5, 4, gen, h);
+            Yuz(1, 2, 6, 5, der, h);
+            Yuz(2, 3, 7, 6, gen, h);
+            Yuz(3, 0, 4, 7, der, h);
+            Yuz(4, 5, 6, 7, gen, der);
+        }
+
         private static string MeshAssetPath(string name, string quarter)
         {
             string dir = "Assets/_Project/Art/Models/Generated";
@@ -1218,6 +1489,12 @@ namespace Hezarfen.Editor.Gis
         }
 
         private static readonly List<EvKutu> evKutulari = new();
+
+        //: Ev arkasi bahce parselleri: (merkez, (en, derinlik), yaw, ev).
+        //: `ev` BAGIMSIZ bir referanstir — kapanan kenarin dogru yonde
+        //: oldugu onunla sinaniyor (bkz. BuildBahceler).
+        private static readonly List<(Vector2 c, Vector2 olcu, float yaw,
+                                      Vector2 ev)> bahceler = new();
         private static readonly Dictionary<(int, int), List<int>> evIzgara = new();
 
         /// <summary>Izgara hücresi (m) — en geniş evden büyük olmalı.</summary>

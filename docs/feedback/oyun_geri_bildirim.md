@@ -235,3 +235,45 @@ dizili bir şerit ve arkaları çitsiz, duvarsız açık arazi. Osmanlı evinin
 bahçesi arkadadır ve **çevrilidir**. Boşluğun gerçek çözümü ev sırasının
 arkasına parsel sınırı koymak; donatı ancak o zaman "avlu eşyası" gibi
 okunur. Bir sonraki turun işi bu.
+
+---
+
+## Tur 5 — 2026-08-30, "npcleri kaldir haritaya odaklanalim"
+
+Caner: *"simdilik npcleri kaldir haritaya odaklanalim. npcleri daha guzel
+bir sekilde uretip sonra ekleriz."*
+
+**Kalabalık kapatıldı** (ADR 0077) — silinmedi, tek bayrağa bağlandı.
+Arkasındaki her şey (graf, meslekler, rutin, 5.088 replik, aranma,
+testler) yerinde duruyor.
+
+**Haritada asıl eksik kapatıldı: parsel.** Bir önceki tur "evlerin
+arkasında çit yok, duvar yok" diye bitmişti. Artık her evin arkasında
+9-14 m derinliğinde, üç yanı 1,95 m duvarla çevrili bir bahçe var
+(mahalle başına tek birleşik mesh, toplam 142 mesh).
+
+| ölçü | önce | sonra |
+|---|---|---|
+| Mahalle silueti | sokağa dizili ev şeridi + boş tarla | sokak → ev → duvarlı bahçe → kır |
+| 4 m içinde hiçbir şey olmayan zemin | %81,7 (tur başı) | **%67,5** |
+| Yapı-zemin teması | — | **0 / 41.448** |
+| Yüzey (kaldırım + bahçe duvarı) hava | %0,6 | **%0,4** |
+| Avlu eşyası | 19.992, kısmen açıkta | **24.205, hepsi ölçülmüş biçimde çevrili yerde** |
+
+### Bu turda ödenen üç ders
+
+1. **Eksen sözleşmesi.** Parselin kapanan kenarını yerel +Z'ye koydum;
+   CLAUDE.md'de "evin önü +Z" yazıyor, yani duvar sokağa bakan yüze
+   gömüldü ve her evin arkasından iki ince kanat çıktı. Sayılar doğruydu
+   (142 mesh, 122.010 üçgen); **kuşbakışı kareye bakınca** göründü.
+   Artık kod bunu bağımsız bir değişmezle sınıyor.
+2. **Yanlış cetvel, ikinci kez.** Denetim "66 bahçe duvarının 41'i
+   havada, en kötüsü 8,76 m" dedi. Kuralın kendisi zaten yazılıydı
+   ("birleşik yüzeyler yapı değil") — yeni adı listeye eklemeyi
+   unutmuştum. Doğru cetvelle: 0 boşluk.
+3. **Eşiği ölçerek seç.** "Çevrili olmayan yere eşya koyma" kuralında
+   8 yönden 4 istedim → 25.699 nokta elendi, 95 eşya kaldı. Dağılımı
+   ölçtüm — en yoğun küme 3'te, çünkü bahçenin üç duvarı var — ve 2'ye
+   indirip sıklığı ızgaradan kazandım. Eleme **nerede**, ızgara **ne
+   kadar** olduğunu ayarlıyor; ikisini tek sayıya yüklemek ikisini
+   birden yanlış yapıyordu.

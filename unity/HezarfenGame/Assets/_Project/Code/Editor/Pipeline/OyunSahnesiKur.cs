@@ -38,6 +38,30 @@ namespace Hezarfen.Editor.Pipeline
     /// </summary>
     public static class OyunSahnesiKur
     {
+        /// <summary>
+        /// <b>Şehirde insan var mı?</b>
+        ///
+        /// Caner (2026-08-30, oynadıktan sonra):
+        ///
+        /// > "simdilik npcleri kaldir haritaya odaklanalim. npcleri daha
+        /// >  guzel bir sekilde uretip sonra ekleriz."
+        ///
+        /// Bu bir <b>silme</b> değil, bir <b>anahtar</b>. Kalabalığın
+        /// arkasında duran her şey yerinde kalıyor: sokak grafı, meslek
+        /// çizelgeleri, rutin, replik korpusu (5.088 satır), aranma
+        /// sistemi, kayıt bağları ve bunları koruyan testler. Kapatılan
+        /// tek şey, oyun sahnesinde gövde çizilmesi.
+        ///
+        /// Silmek ucuz görünürdü ve pahalı olurdu: gövdeler geri
+        /// geldiğinde yeniden bağlanacak yedi ayrı bağlantı var ve her
+        /// biri sessizce yanlış bağlanabilir. Bir bayrak, geri dönüşü
+        /// <b>tek satıra</b> indiriyor.
+        ///
+        /// Geri açmak: burayı <c>true</c> yap, sonra
+        /// <b>Hezarfen → Boru Hatti → Oyun sahnesini kur</b>.
+        /// </summary>
+        public const bool KalabalikVar = false;
+
         public const string DunyaSahnesi =
             "Assets/_Project/Scenes/Faz1_Terrain.unity";
 
@@ -99,11 +123,22 @@ namespace Hezarfen.Editor.Pipeline
             // kurulmus bir sahneyi degistirmez. Bir kez tam olarak bu
             // oldu: sayilari kodda 9.000'e cikardim, sahne 1.200'de kaldi
             // ve olcum "hicbir sey degismedi" dedi.
-            sehir.sakinSayisi = NPCYonetici.VarsayilanSakin;
+            sehir.sakinSayisi = KalabalikVar ? NPCYonetici.VarsayilanSakin : 0;
             sehir.gorunurMesafe = NPCYonetici.VarsayilanGorunurMesafe;
             sehir.dilim = NPCYonetici.VarsayilanDilim;
-            rapor.Add($"Sehir: {(graf == null ? "GRAF YOK" : graf.dugumler.Count + " dugum")}, "
-                      + $"{meslekler.Count} meslek, {sehir.sakinSayisi} sakin");
+
+            // KALABALIK KAPALIYSA BILESEN DE KAPANIR.
+            //
+            // Yalniz `sakinSayisi = 0` yazmak yetmez: `Update` yine her
+            // kare kosar ve bir gun biri `Kur()` cagirdiginda sehir geri
+            // gelir. Kapali demek kapali olmali.
+            sehir.enabled = KalabalikVar;
+
+            rapor.Add(KalabalikVar
+                ? $"Sehir: {(graf == null ? "GRAF YOK" : graf.dugumler.Count + " dugum")}, "
+                  + $"{meslekler.Count} meslek, {sehir.sakinSayisi} sakin"
+                : "Sehir: KALABALIK KAPALI (Caner, 2026-08-30) — graf ve "
+                  + $"meslekler bagli kaldi ({meslekler.Count} meslek)");
 
             // 5) KOLLUK
             var aranma = Tekil<AranmaSistemi>("ARANMA");
@@ -117,7 +152,9 @@ namespace Hezarfen.Editor.Pipeline
             var bark = Tekil<BarkGosterici>("BARK");
             bark.yonetici = sehir;
             bark.oyuncu = oyuncu.transform;
-            rapor.Add("Replik: gosterici kuruldu");
+            bark.enabled = KalabalikVar;      // konusacak kimse yoksa susar
+            rapor.Add(KalabalikVar ? "Replik: gosterici kuruldu"
+                                   : "Replik: KAPALI (kalabalik yok)");
 
             // 7) HAVA — lodos; ucusu mumkun kilan sey bu.
             var hava = Tekil<HavaProfili>("HAVA");
