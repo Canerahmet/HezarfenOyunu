@@ -56,6 +56,27 @@ hukuken serbest olurdu; kural hukuki değil, yöntemsel.
 | Blender Studio **Human Base Meshes** bundle v1.4.1 | `download.blender.org/demo/asset-bundles/human-base-meshes/human-base-meshes-bundle-v1.4.1.zip` | **CC0** (kamu malına bırakılmış; atıf zorunlu değil, ticari kullanım serbest) | Faz 5 taban geometrisi — `art/base/blender-studio/` (depoya girmez, `meta.json` girer) | 2026-08-28 |
 | **MPFB 2.0.17** (MakeHuman Plugin For Blender) — eklenti + çekirdek varlıklar | `extensions.blender.org/download/sha256:4f0a879d64a39bf646fbf5f53601ac678855da329d650617dca5737548239a87/add-on-mpfb-v2.0.17.zip` | Eklenti kodu: **GPL-3.0-or-later** (Blender eklenti platformu, SPDX). Çekirdek varlıklar (taban mesh, hedefler, deriler) ve **dışa aktarılan modeller: CC0** | Faz 1 taban gövde üretimi. Blender ≥ 4.2 (bizde 5.2). **Yalnız çekirdek varlıklar** — üçüncü taraf asset pack'leri ayrı lisans ister, kullanılmaz | 2026-08-30 |
 
+| **Mixamo** animasyon klipleri (Adobe) | `mixamo.com` — Adobe ID ile, ücretsiz | Adobe SSS: Mixamo karakter ve animasyonları **telifsiz**; ticari projelerde kullanılabilir, **atıf zorunlu değil**. Kısıt: klipler bir animasyon **kütüphanesi/asset paketi olarak yeniden satılamaz** — oyunun içinde kullanılır. | Faz II.A locomotion + Faz II.G kalabalık. İndirilen ham FBX `Assets/_Project/Art/Animation/Mixamo/` altına iner (Unity okuduğu için depoya girer) | 2026-08-30 |
+
+
+### Mixamo hakkında not — neden ticari yayına uygun
+
+Adobe'un Mixamo SSS'i klipleri **telifsiz (royalty-free)** sayar ve
+ticari projelerde kullanıma açar; atıf istemez. Bizim için önemli olan
+tek kısıt şudur: klipler **kendileri bir ürün olarak** yeniden
+satılamaz — yani bir "animasyon paketi" çıkaramayız. Oyunun içinde
+oynatmak tam olarak amaçlanan kullanımdır.
+
+**Ne indirilmeyecek:** Mixamo'nun karakter modelleri (X Bot, Y Bot ve
+diğerleri) oyuna **girmez**. Onlar yalnız indirme sırasında iskelet
+taşıyıcısıdır ve indirme "Without Skin" seçilerek yapılır; gelen
+dosyada mesh yoktur. Karakterimiz MPFB2'den kendi hattımızda üretiliyor
+(ADR 0079) ve öyle kalacak.
+
+**Kayıt disiplini:** her klip `art/mixamo/meta.json`'a adı, indirme
+tarihi ve indirme ayarlarıyla yazılır. Bir klip kayıtta yoksa oyunda
+kullanılmaz.
+
 ### Human Base Meshes hakkında not
 
 Plan Bölüm 10 taban geometriyi bu kaynağa bağlıyor. **CC0 olduğu için
