@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Hezarfen.Editor.Player;
 using UnityEditor;
 using UnityEngine;
 
@@ -121,6 +122,21 @@ namespace Hezarfen.Editor.Pipeline
             if (ok == fbx.Length) Debug.Log("[Hezarfen] " + sb);
             else Debug.LogError("[Hezarfen] " + sb);
             AssetDatabase.Refresh();
+
+            // YON DUZELTMESI YERLESTIRMENIN PARCASIDIR.
+            //
+            // FBX'ten gelen model Unity'de -Z'ye bakiyor ve bunu duzelten
+            // adim ayri bir menu maddesiydi: "Karakter yonunu duzelt".
+            // Ayri olmasi, atlanabilir olmasi demekti — ve atlandi.
+            // Bugun karakter yeniden uretildi, yerlestirildi, uc test
+            // kirmizi dondu ve sebebi bir kusur degil ATLANMIS BIR ADIMDI.
+            //
+            // Bu projede ayni sinif hata bir kez oyuna kadar gitti:
+            // "Hata ancak oyunda, kamera arkaya gectiginde goruldu."
+            // Iki adimdan biri her zaman otekini gerektiriyorsa iki adim
+            // degildir. Duzelt() kendi olcumunu yapar ve yuz zaten
+            // ileriyse dokunmaz, yani burada cagirmak guvenlidir.
+            KarakterYonu.Duzelt();
         }
 
         /// <summary>
