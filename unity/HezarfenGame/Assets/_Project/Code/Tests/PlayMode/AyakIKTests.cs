@@ -40,11 +40,19 @@ namespace Hezarfen.Tests
         {
             // 18 derecelik bir rampa. Galata'nin sokak egimleri bu
             // aralikta; duz bir zemin bu testi anlamsiz kilardi.
+            //
+            // EGIM Z EKSENINDE, X'te DEGIL. Once X ekseninde (ileri-geri)
+            // egiliyordu ve duruş klibi degisince kontrol sondu: yeni
+            // duruşta ayaklar YAN YANA duruyor, yani ileri-geri egim iki
+            // ayagi neredeyse ayni kota koyuyor — olculen fark 1,5 cm,
+            // kapinin ucte biri. Ayaklarin gercekten ayrildigi eksen
+            // X'tir (±0,19 m); egimi oraya cevirince fark 0,38 × tan18°
+            // ≈ 12 cm olur ve IK'nin isi gorunur hale gelir.
             _yokus = GameObject.CreatePrimitive(PrimitiveType.Cube);
             _yokus.name = "TestYokusu";
             _yokus.transform.position = new Vector3(0f, -0.5f, 0f);
             _yokus.transform.localScale = new Vector3(20f, 1f, 20f);
-            _yokus.transform.rotation = Quaternion.Euler(18f, 0f, 0f);
+            _yokus.transform.rotation = Quaternion.Euler(0f, 0f, 18f);
         }
 
         [TearDown]
@@ -75,6 +83,15 @@ namespace Hezarfen.Tests
                 Physics.Raycast(tepe, Vector3.down, out RaycastHit v, 10f),
                 "Test rampasi isinla bulunamadi.");
             _ornek.transform.position = v.point;
+            // KAMERASIZ SAHNEDE ANIMATOR CALISMAZ.
+            //
+            // Varsayilan culling "ekranda degilse guncelleme"dir ve test
+            // sahnesinde kamera yoktur — yani animasyon HIC ilerlemez.
+            // Bu sessizce yanlis olcum uretir: ayaklar govdeyle birlikte
+            // gider ve "kayma" diye olculen sey aslinda govdenin yoludur.
+            // Ilk kayma olcumum tam bunu yapti (yurume 16,4 cm, kosma
+            // 34,2 cm — ikisi de hiza oranti, yani klip degil govde).
+            anim.cullingMode = AnimatorCullingMode.AlwaysAnimate;
 
             var ik = anim.GetComponent<AyakIK>()
                      ?? anim.gameObject.AddComponent<AyakIK>();

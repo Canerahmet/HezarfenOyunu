@@ -1,6 +1,9 @@
 # ADR 0076 — Animasyon kliplerini toptan yeniden üretmek karakteri bozuyor
 
-- **Durum:** AÇIK KUSUR — geçici çözüm uygulandı, kök sebep bulunamadı
+- **Durum:** AÇIK ama **YOL ÜSTÜNDE DEĞİL** (2026-08-30, ADR 0080) —
+  kök sebep hâlâ bulunamadı; yer hareketi Mixamo'ya geçtiği için o
+  üretim artık yapılmıyor. Kalan beş uçuş klibi elle yapıldı ve yeniden
+  üretilmiyor. Kusur, üretici yeniden çalıştırılırsa geri gelir.
 - **Tarih:** 2026-08-30
 - **Bağlam:** Faz 8, oynanış turu
 - **İlişki:** ADR 0068 (karakter hattı), CLAUDE.md "Commit'lemeden önce ölç"

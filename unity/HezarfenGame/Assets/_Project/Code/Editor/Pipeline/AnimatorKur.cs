@@ -52,6 +52,9 @@ namespace Hezarfen.Editor.Pipeline
         public const string TIn = "in";
         public const string TCakil = "cakil";
 
+        /// <summary>Mixamo'dan gelen kliplerin dosya öneki.</summary>
+        private const string MixamoOnEki = "MX_Hezarfen@";
+
         /// <summary>Locomotion karışımının hız düğümleri (m/s).</summary>
         /// <remarks>
         /// Sayılar klip kataloğundan gelir, buradan değil — ama düğüm
@@ -130,10 +133,49 @@ namespace Hezarfen.Editor.Pipeline
                 useAutomaticThresholds = false,
             };
             AssetDatabase.AddObjectToAsset(locoTree, ac);
+            var kayit = MixamoKaydi.Oku();
             foreach (var (ad, hiz) in Locomotion)
             {
                 if (!klip.TryGetValue(ad, out var c)) continue;
                 locoTree.AddChild(c, hiz);
+
+                // OYNATMA CARPANI: esik / klibin OZ hizi.
+                //
+                // Elle yapilan klipler istenen hiz icin URETILIYORDU, o
+                // yuzden carpan hep 1'di. Mixamo klibinin hizi sabittir:
+                // yurume 1,786 m/s gelirken oyun 2,2 m/s yurutuyor.
+                // Carpan olmadan ayak her adimda kayar.
+                //
+                // Klibi hizlandirmak adim SIKLIGINI artirir, adim BOYUNU
+                // degil — yani kayma yapisal olarak sifirlanir. Sayi
+                // art/mixamo/meta.json'dan okunur; buraya elle yazmak
+                // ADR 0076'nin kok sebebini tekrar uretmek olurdu.
+                // OZ HIZ UNITY'DE OLCULUR, Blender'daki kayittan degil.
+                // Gerekce KlipYerHizi'nda: yeniden hedefleme adim boyunu
+                // HEDEFIN bacak uzunluguyla olcekler, kaynagin degil.
+                // meta.json'daki sayi yedek olarak kalir.
+                // OZ HIZ: oyunda olculen, yeniden hedeflenmis yer hizi
+                // (unity_hiz_ms). Blender'daki sayi yalnizca yedek —
+                // gerekce KlipYerHiziOlcumu'nda: yeniden hedefleme adimi
+                // HEDEFIN oranlariyla olcekler, kaynagin degil.
+                float oz = MixamoKaydi.UnityHiz(ad);
+                if (oz <= 0.01f) oz = MixamoKaydi.OzHiz(ad);
+                var cocuklar = locoTree.children;
+                int i = cocuklar.Length - 1;
+                if (hiz > 0.01f && oz > 0.01f)
+                {
+                    cocuklar[i].timeScale = hiz / oz;
+                    locoTree.children = cocuklar;
+                    sb.AppendLine($"    {ad}: oz {oz:0.000} m/s -> "
+                                  + $"esik {hiz:0.0} m/s, carpan "
+                                  + $"{hiz / oz:0.000}");
+                }
+                else if (hiz > 0.01f && kayit != null)
+                {
+                    Debug.LogWarning($"[Hezarfen] {ad}: oz hiz kaydi yok "
+                        + "(art/mixamo/meta.json). Oynatma carpani 1 "
+                        + "birakildi — ayak kayabilir.");
+                }
             }
             var loco = sm.AddState("Locomotion");
             loco.motion = locoTree;
@@ -207,22 +249,65 @@ namespace Hezarfen.Editor.Pipeline
             Debug.Log("[Hezarfen] " + sb);
         }
 
-        /// <summary>Klipleri model klasöründen adlarıyla toplar.</summary>
+        /// <summary>
+        /// Klipleri model klasöründen adlarıyla toplar.
+        ///
+        /// ## Aynı adlı iki klip var — kim kazanır, yazılı olsun
+        ///
+        /// Yer hareketleri artık Mixamo'dan geliyor
+        /// (<c>MX_Hezarfen@Durus</c>), uçuş klipleri elde yapılmaya devam
+        /// ediyor (<c>SK_Hezarfen_Ucus@Suzulme</c>). Ama <c>Durus</c>,
+        /// <c>Yurume</c>, <c>Kosma</c> ve <c>Merdiven</c> <b>ikisinde
+        /// birden</b> var.
+        ///
+        /// Sözlüğe son yazan kazanırdı ve o sıra dosya sistemi tarama
+        /// sırasıdır — yani hangi klibin oynadığı, klasörün alfabetik
+        /// düzenine bağlı olurdu. Bu tam olarak ADR 0076'nın kök
+        /// sebebidir: bir sayının (burada bir klibin) iki sahibi.
+        ///
+        /// Kural açık: <b>Mixamo kazanır</b>, ve kimin elendiği
+        /// <b>söylenir</b>. Sessiz bir tercih, tercih değil kazadır.
+        /// </summary>
         private static Dictionary<string, AnimationClip> Klipler()
         {
             var d = new Dictionary<string, AnimationClip>();
+            var kaynak = new Dictionary<string, string>();
+            var elenen = new List<string>();
+
             foreach (string guid in AssetDatabase.FindAssets(
                          "t:Model", new[] { ModelDir }))
             {
                 string yol = AssetDatabase.GUIDToAssetPath(guid);
                 int at = yol.IndexOf('@');
                 if (at < 0) continue;
+                bool mixamo = System.IO.Path.GetFileName(yol)
+                                     .StartsWith(MixamoOnEki);
+
                 foreach (var c in AssetDatabase.LoadAllAssetsAtPath(yol)
                              .OfType<AnimationClip>())
                 {
                     if (c.name.StartsWith("__preview__")) continue;
+                    if (d.ContainsKey(c.name))
+                    {
+                        bool oncekiMixamo = kaynak[c.name]
+                            .StartsWith(MixamoOnEki);
+                        if (oncekiMixamo || !mixamo)
+                        {
+                            elenen.Add($"{c.name} <- "
+                                       + System.IO.Path.GetFileName(yol));
+                            continue;
+                        }
+                        elenen.Add($"{c.name} <- {kaynak[c.name]}");
+                    }
                     d[c.name] = c;
+                    kaynak[c.name] = System.IO.Path.GetFileName(yol);
                 }
+            }
+
+            if (elenen.Count > 0)
+            {
+                Debug.Log("[Hezarfen] Ayni adli klipler — Mixamo tercih "
+                          + "edildi, elenenler: " + string.Join(", ", elenen));
             }
             return d;
         }

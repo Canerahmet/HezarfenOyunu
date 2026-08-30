@@ -84,9 +84,34 @@ namespace Hezarfen.Editor.Pipeline
             importer.addCollider = false;
 
             // --- Animasyon ---
-            // Statik varliklar animasyon tasimaz. Iskeletli varliklar (SK_ oneki)
-            // ayrica ele alinacak; su an boru hattinda yoklar.
-            if (!System.IO.Path.GetFileName(assetPath).StartsWith("SK_"))
+            //
+            // Statik varliklar animasyon tasimaz ve tasimamalidir: her
+            // graybox kutusuna bos bir klip iliskirmek hem ice aktarmayi
+            // yavaslatir hem de Animator penceresini coplestirir.
+            //
+            // ANCAK bu kural bir zamanlar "SK_ ile baslamayan her sey
+            // statiktir" diye yazilmisti ve o gun dogruydu — yorumun
+            // kendisi soyluyor: "su an boru hattinda yoklar".
+            //
+            // Bugun yoklar degil. Mixamo klipleri `MX_Hezarfen@Yurume`
+            // adiyla geliyor ve bu kural onlarin animasyonunu SESSIZCE
+            // siliyordu. Bulunmasi pahaliya mal oldu: dosya bicimini,
+            // Unity'nin FBX okuyucusunu ve eksik deriyi sucladim; ucu de
+            // masumdu. Kusuru ortaya cikaran sey KONTROL oldu — calistigi
+            // bilinen bir klibi ayni yoldan gecirince o da sifir klip
+            // verdi. Bir olcum, kendi dogrulugunu kanitlayamiyorsa once
+            // olcumu sinamak gerekir.
+            //
+            // Kural artik dosyanin NE OLDUGUNU soruyor:
+            //   SK_  — iskeletli karakter varligi
+            //   MX_  — Mixamo'dan gelen klip
+            //   @    — Unity'nin "model@klip" animasyon dosyasi kurali
+            string dosyaAdi = System.IO.Path.GetFileName(assetPath);
+            bool animasyonTasir =
+                dosyaAdi.StartsWith("SK_") ||
+                dosyaAdi.StartsWith("MX_") ||
+                dosyaAdi.Contains("@");
+            if (!animasyonTasir)
             {
                 importer.animationType = ModelImporterAnimationType.None;
                 importer.importAnimation = false;
