@@ -308,3 +308,29 @@ Denetim: 36.302 yapı, **0 boşluk**; yüzey (kaldırım + bahçe duvarı)
 > yüklenmedi, kuyruk kilitlendi). Addressables kataloğu build'den kalma
 > olduğu için editöre özgü görünüyor; build kataloğu yeniden kuruyor.
 > Oynarken takılma görülürse ilk bakılacak yer burası.
+
+### Tur 5c — kapı yeri ve yanlış cetvel (üçüncü kez)
+
+Kapı açıklığı önce eve yakın uca kondu. Sonra bahçelerin içinden
+36 yöne ışın atıp "60 noktanın 15'inin çıkışı yok" diye ölçtüm ve
+açıklığı uzak uca taşıyıp 1,4 → 1,9 m genişlettim. **Sayı düşmedi**
+(80'de 23).
+
+Çünkü cetvel yanlıştı: sık bir mahallede her yönde 22 m içinde bir şeye
+çarpmak "mahsur kalmak" demek değil — oyuncu köşe döner. Kapsül taraması
+da aynı hatayı yapıyor, o da düz koridor arıyor.
+
+Doğru alet **taşma dolgusu**: bahçeden başla, 0,6 m'lik hücrelerde
+oyuncunun kapsülü sığıyorsa yayıl, 36 m'ye ulaşabiliyor musun bak.
+
+| ölçüm | sonuç |
+|---|---|
+| 36 yönde ışın (yanlış cetvel) | %29 "mühürlü" |
+| kapsül taraması (hâlâ düz koridor) | %36 "çıkışı yok" |
+| **taşma dolgusu (doğru cetvel)** | **20 bahçenin 16'sı açık, 4'ü kapalı** |
+
+Yani kapı çalışıyor; kalan **%20 kapalı bahçe** gerçek ve açık kusur.
+
+Dürüstlük notu: kapı yerini **destekleyemeyecek bir ölçüme dayanarak**
+değiştirdim. Değişiklik zararsız (uzak uç kıra açılıyor) ama karar
+gerekçesizdi. Bu oturumda yanlış cetvel üçüncü kez iş yaptırdı.

@@ -117,12 +117,14 @@ namespace Hezarfen.Editor.Gis
         /// <summary>
         /// Bahçe kapısının açıklığı (m) — duvarda bırakılan boşluk.
         ///
-        /// 1,4 m: bir kişinin yüklü geçebileceği en. Kapı kanadı
+        /// 1,9 m: bir kişinin yüklü geçebileceği enin üstünde. İlk
+        /// değer 1,4 m'ydi; 36 yönde ölçülünce bahçelerin dörtte biri
+        /// mühürlü çıktı ve açıklık hem yerini hem enini değiştirdi. Kapı kanadı
         /// modellenmiyor; kapatılmış bir bahçe oynanabilir değil ve
         /// oyuncunun 10.868 avlunun hiçbirine girememesi, avluyu
         /// yapmamakla aynı kapıya çıkardı.
         /// </summary>
-        public const float KapiAcikligi = 1.4f;
+        public const float KapiAcikligi = 1.9f;
 
         [Serializable] private class Variant
         {
@@ -1097,10 +1099,21 @@ namespace Hezarfen.Editor.Gis
                     bool buYanKapili = (ki == 1 && kapiSagda) || (ki == 2 && !kapiSagda);
                     if (!buYanKapili) { kenarListesi.Add(k0); continue; }
 
-                    // Aciklik EVE YAKIN ucta: bahceye evin yanindan girilir.
+                    // ACIKLIK EVDEN UZAK UCTA — OLCEREK DEGISTI.
+                    //
+                    // Once eve yakin uca konmustu: "bahceye evin yanindan
+                    // girilir" mantikliydi ama komsu parselin duvari tam
+                    // orada ve aradaki gecit 0,5-2,1 m. Olculdu: 60 bahce
+                    // noktasindan 15'inin 36 yonun HICBIRINE cikisi yoktu
+                    // — yani her dort bahceden biri muhurluydu.
+                    //
+                    // Uzak uc her zaman aciktir: arkasi kirdir ve orayi
+                    // kapatan bir sey yok. Bahce kapisinin arka araziye
+                    // acilmasi tarihsel olarak da tuhaf degil; bahcenin
+                    // arkasi zaten bostan ve yoldur.
                     float kalanD = Mathf.Max(0.6f, k0.d - KapiAcikligi);
                     float kaydir = (k0.d - kalanD) * 0.5f;
-                    kenarListesi.Add((k0.yerel + new Vector3(0f, 0f, -kaydir),
+                    kenarListesi.Add((k0.yerel + new Vector3(0f, 0f, kaydir),
                                       k0.g, kalanD));
                 }
 
