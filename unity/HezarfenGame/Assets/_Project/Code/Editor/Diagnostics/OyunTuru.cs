@@ -161,17 +161,47 @@ namespace Hezarfen.Editor.Diagnostics
                         // bes kez tekrarlandi.
                         if (graf != null && graf.dugumler.Count > 0)
                         {
-                            float en = float.MaxValue;
-                            Vector3 sokak = hedef;
-                            foreach (var n in graf.dugumler)
+                            // BOS dugum aranir, en yakin degil.
+                            //
+                            // En yakini almak yetmedi: dugum bir yapinin
+                            // icindeyse oyuncu orada dogar, fizik onu
+                            // disari iterken zeminden gecirir ve arazinin
+                            // 15 m altina duser. Turda uc durakta birden
+                            // oldu.
+                            var sirali = new List<Vector3>();
+                            foreach (var n in graf.dugumler) sirali.Add(n.konum);
+                            sirali.Sort((a, b) =>
+                                (new Vector2(a.x, a.z) - new Vector2(hedef.x, hedef.z))
+                                    .sqrMagnitude.CompareTo(
+                                (new Vector2(b.x, b.z) - new Vector2(hedef.x, hedef.z))
+                                    .sqrMagnitude));
+
+                            foreach (var aday in sirali)
                             {
-                                float m = (new Vector2(n.konum.x, n.konum.z)
-                                           - new Vector2(hedef.x, hedef.z))
-                                          .sqrMagnitude;
-                                if (m >= en) continue;
-                                en = m; sokak = n.konum;
+                                float ak2 = arazi != null
+                                    ? arazi.SampleHeight(aday)
+                                      + arazi.transform.position.y
+                                    : aday.y;
+                                float yz = ak2;
+                                if (Physics.Raycast(
+                                        new Vector3(aday.x, ak2 + 8f, aday.z),
+                                        Vector3.down, out var vv, 20f, ~0,
+                                        QueryTriggerInteraction.Ignore))
+                                    yz = vv.point.y;
+                                // Cati degil, zemin kati: yuzey araziden
+                                // 2 m'den fazla yukaridaysa orasi damdir.
+                                // Aksi halde tur mektebin catisindan olcuyor
+                                // (olculdu: +5,8 m).
+                                if (yz - ak2 > 2f) continue;
+                                if (Physics.CheckCapsule(
+                                        new Vector3(aday.x, yz + 0.45f, aday.z),
+                                        new Vector3(aday.x, yz + 1.55f, aday.z),
+                                        0.32f, ~0,
+                                        QueryTriggerInteraction.Ignore))
+                                    continue;
+                                hedef = new Vector3(aday.x, hedef.y, aday.z);
+                                break;
                             }
-                            hedef = new Vector3(sokak.x, hedef.y, sokak.z);
                         }
 
                         // Yuzeyi bul: arazi kotu yeterli degil, kaldirim
@@ -231,11 +261,19 @@ namespace Hezarfen.Editor.Diagnostics
                         ? arazi.SampleHeight(p) + arazi.transform.position.y
                         : 0f;
 
-                    // Kare suresi: on kare ortalamasi.
-                    float toplam = 0f;
-                    for (int i = 0; i < 10; i++)
-                    { yield return null; toplam += Time.unscaledDeltaTime; }
-                    float ms = toplam / 10f * 1000f;
+                    // KARE SURESI: OTURDUKTAN SONRA, ORTANCA.
+                    //
+                    // Once isinlanmadan hemen sonra on karenin ORTALAMASI
+                    // aliniyordu ve o sayi oturmus kareyi degil, akisin
+                    // ve havuzun o andaki telasini olcuyordu: ayni yerde
+                    // 14,7 ms de cikti 30,6 ms de. Ortalama, tek bir
+                    // sicramayla suruklenir; ortanca surumez.
+                    for (int i = 0; i < 120; i++) yield return null;   // otur
+                    var ornekler = new List<float>(90);
+                    for (int i = 0; i < 90; i++)
+                    { yield return null; ornekler.Add(Time.unscaledDeltaTime); }
+                    ornekler.Sort();
+                    float ms = ornekler[ornekler.Count / 2] * 1000f;
 
                     // --- YAKALA ---
                     var rt = new RenderTexture(1280, 720, 24,

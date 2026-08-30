@@ -133,6 +133,66 @@ namespace Hezarfen.Player
 
         private void OnDisable() => Capture(false);
 
+        /// <summary>
+        /// <b>Dünyanın dışına düşeni geri koyar.</b>
+        ///
+        /// Ölçüldü: oyuncu bir sokak düğümüne — o düğüm bir yapının
+        /// içindeydi — yerleştirilince fizik onu dışarı iterken zeminden
+        /// geçirdi ve <b>arazinin 160 m altına</b> düştü. Grafın içindeki
+        /// 58 bozuk düğüm atıldı, ama bu tür bir sıkışma her zaman
+        /// mümkündür: dar bir aralığa girmek, bir kaidenin köşesine
+        /// sürtünmek yeter.
+        ///
+        /// Oyun tarafında doğru davranış düşmeyi <b>engellemek</b> değil,
+        /// düşüşten <b>dönmek</b>: arazinin bu kadar altına inen bir
+        /// oyuncu zaten kaybolmuştur ve orada bırakmak oyunu bitirir.
+        ///
+        /// Eşik 3 m: kuyu, mahzen ya da oyulmuş dere yatağı gibi meşru
+        /// çukurlar bundan sığdır; 3 m aşağısı artık zeminin içidir.
+        /// </summary>
+        private void DunyayaGeriKoy()
+        {
+            if (_arazi == null)
+            {
+                _arazi = Terrain.activeTerrain;
+                if (_arazi == null) return;
+            }
+
+            float zemin = _arazi.SampleHeight(transform.position)
+                          + _arazi.transform.position.y;
+            if (transform.position.y >= zemin - 3f) return;
+
+            // Yuzey ZEMIN KATI olmali — dam degil.
+            //
+            // Ilk yazimda en yuksek vurus aliniyordu ve bu, dusen oyuncuyu
+            // bir binanin CATISINA koyabiliyordu: turda iki durak
+            // PF_Mektep_A'nin 5,8 m ustunde olctu. Kaldirim ve kaide
+            // arazinin biraz ustundedir; dam cok daha yukarida.
+            float yuzey = zemin;
+            if (Physics.Raycast(new Vector3(transform.position.x, zemin + 6f,
+                                            transform.position.z),
+                                Vector3.down, out var v, 12f, ~0,
+                                QueryTriggerInteraction.Ignore)
+                && v.point.y - zemin <= 2f)
+                yuzey = v.point.y;
+
+            cc.enabled = false;
+            transform.position = new Vector3(transform.position.x,
+                                             yuzey + 0.4f,
+                                             transform.position.z);
+            cc.enabled = true;
+            vSpeed = 0f;
+            Dusus++;
+            Debug.LogWarning($"[Hezarfen] Oyuncu zeminin altina dustu "
+                             + $"({zemin - transform.position.y:F1} m) — "
+                             + "yuzeye geri konuldu.");
+        }
+
+        /// <summary>Kaç kez dünyadan düşüldü — tanı ve test okur.</summary>
+        public int Dusus { get; private set; }
+
+        private Terrain _arazi;
+
         private void Capture(bool on)
         {
             looking = on;
@@ -200,6 +260,8 @@ namespace Hezarfen.Player
             var step = wish * speed;
             step.y = vSpeed;
             cc.Move(step * Time.deltaTime);
+
+            DunyayaGeriKoy();
         }
     }
 }
