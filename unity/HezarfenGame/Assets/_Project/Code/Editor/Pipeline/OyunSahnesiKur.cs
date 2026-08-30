@@ -516,7 +516,12 @@ namespace Hezarfen.Editor.Pipeline
                 surucu.animator = animator;
                 surucu.karakterKontrol = oyuncu.GetComponent<CharacterController>();
                 surucu.suzulme = oyuncu.GetComponent<GlideController>();
-                not += " + animator";
+
+                // Ayak IK animatorun KENDI nesnesine biner: Unity
+                // OnAnimatorIK'yi Animator ile ayni GameObject'te arar.
+                if (animator.GetComponent<AyakIK>() == null)
+                    animator.gameObject.AddComponent<AyakIK>();
+                not += " + animator + ayak IK";
             }
 
             return ornek;

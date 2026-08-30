@@ -103,6 +103,21 @@ namespace Hezarfen.Editor.Pipeline
             foreach (string t in new[] { TKusan, TAtla, TIn, TCakil })
                 ac.AddParameter(t, AnimatorControllerParameterType.Trigger);
 
+            // IK PASS ACIK OLMALI.
+            //
+            // `AyakIK` ayaklari gercek zemine `OnAnimatorIK` icinde
+            // oturtur ve Unity bu geri cagriyi YALNIZCA katmanin IK
+            // pass'i acikken calistirir. Kapaliyken bilesen sessizce
+            // hicbir sey yapmaz — hata yok, log yok, sadece ayaklar
+            // yokusa gomulur. Bu, "olculmeyen yon olmayan yondur"
+            // dersinin ayni sinifta tekrari olurdu.
+            //
+            // Katman dizisi DEGER kopyasi dondurur: alani degistirip
+            // diziyi geri yazmak gerekiyor.
+            var katmanlar = ac.layers;
+            katmanlar[0].iKPass = true;
+            ac.layers = katmanlar;
+
             var sm = ac.layers[0].stateMachine;
             var sb = new StringBuilder("ANIMATOR");
 

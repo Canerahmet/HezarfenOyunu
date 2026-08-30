@@ -112,6 +112,10 @@ namespace Hezarfen.Editor.Player
             ha.karakterKontrol = cc;
             ha.suzulme = glide;
 
+            // OnAnimatorIK, Animator ile AYNI GameObject'te aranir.
+            if (anim.GetComponent<AyakIK>() == null)
+                anim.gameObject.AddComponent<AyakIK>();
+
             // --- KAMERA ------------------------------------------------------
             var hedef = new GameObject("KameraHedef");
             hedef.transform.SetParent(kok.transform, false);
