@@ -129,6 +129,119 @@ VARIANTS = [
 ]
 
 
+# =====================================================================
+# TOHUMDAN UREYEN AILE
+# =====================================================================
+
+#: Kaç kalıptan üretiliyorsa, sokakta o kadar tekrar var.
+#:
+#: Ölçüldü: 26 varyant, 10.868 ev — **varyant başına 418 tekrar**. Örnek
+#: başına değişen tek şey ±6° yaw ve birkaç santim geri çekilme. Caner'in
+#: isteği açık: *"ev çeşitliliğini çok yüksek tut, benzerlik olsa bile
+#: hiçbir ev birbirinin aynısı olmasın."*
+#:
+#: Yukarıdaki 26 varyant **çapa**dır: her biri bir tipolojik durumu
+#: temsil eder ve elle yazılmış olması bilerekdir. Aile onların yerine
+#: geçmez, aralarını doldurur.
+#:
+#: ## Dağılım nereden geliyor
+#:
+#: RESEARCH.md §4.1(e): 18. yy yapı taban alanları 36–715 zira²,
+#: **%80'i 300 zira² (≈172 m²) altında**. Sıradan mahalle evi dağılımın
+#: alt-orta bandındadır; konak ve saray bu kitin işi değil. Bu yüzden
+#: taban alanı 28–95 m² arasında, **medyanı 42 m²** olan sağa çarpık bir
+#: dağılımdan örneklenir — birkaç büyük ev çıkar, çoğu küçük kalır.
+#:
+#: Rastgele bir parametre taraması aynı sayıyı verirdi ama şehir
+#: dokusunu vermezdi. Buradaki her aralık bir gerekçe taşıyor.
+AILE_KURALLARI = {
+    "taban_alan_m2": "28-95, medyan 42, saga carpik (RESEARCH 4.1e)",
+    "en_boy_orani": "0.72-1.55; dar cephe daha sik, cunku sokak cephesi pahali",
+    "kat": "2 kat %70, 1 kat %22, 3 kat %8 — uc kat nadir, ana sokak uzeri",
+    "cumba": "yok %16, duz %44, payandali %34, kose %6",
+    "palet": "gayrimuslim %18",
+    "kose": "%14 — iki cephesi sokaga bakan parsel",
+}
+
+
+def _carpik(rng, alt, medyan, ust):
+    """Sağa çarpık örnekleme: küçükler sık, büyükler seyrek."""
+    u = rng.random()
+    if u < 0.5:
+        return alt + (medyan - alt) * (u / 0.5) ** 0.85
+    return medyan + (ust - medyan) * ((u - 0.5) / 0.5) ** 2.1
+
+
+def _sec(rng, secenekler):
+    """(deger, olasilik) listesinden secer."""
+    u = rng.random()
+    top = 0.0
+    for deger, p in secenekler:
+        top += p
+        if u <= top:
+            return deger
+    return secenekler[-1][0]
+
+
+def aile_uret(sayi, tohum):
+    """`sayi` kadar tohumlanmış varyant döndürür: `[(ad, neden, params)]`."""
+    import random
+
+    cikti = []
+    for i in range(sayi):
+        rng = random.Random(tohum * 100003 + i)
+
+        alan = _carpik(rng, 28.0, 42.0, 95.0)
+        oran = _carpik(rng, 0.72, 1.02, 1.55)      # en / derinlik
+        derin = (alan / oran) ** 0.5
+        en = alan / derin
+
+        kat = _sec(rng, [(2, 0.70), (1, 0.22), (3, 0.08)])
+        cumba_tip = _sec(rng, [("flat", 0.44), ("corbel", 0.34),
+                               ("none", 0.16), ("corner", 0.06)])
+
+        # TEK KATLI EVDE CUMBA OLMAZ.
+        #
+        # Cumba tanimi geregi UST KATIN cikmasidir; tek katli evde
+        # cikacak ust kat yoktur. Kural yazilmayinca uretim bunu kendi
+        # soyledi: `Aile_000` tek katli + payandali cumba cikti ve
+        # payanda zeminin 27 cm altina sarkti — pivot denetimi reddetti.
+        #
+        # Elle yazilmis varyantlar bunu zaten gozetiyordu (D_Tek,
+        # E_TekGenis, V_GayriTek hepsi cumbasiz); ornekleyici o sessiz
+        # bilgiyi bilmiyordu. Simdi biliyor.
+        if kat == 1:
+            cumba_tip = "none"
+        kose = cumba_tip == "corner" or rng.random() < 0.10
+        palet = "nonmuslim" if rng.random() < 0.18 else "default"
+
+        p = dict(
+            floors=kat,
+            width=round(en, 2),
+            depth=round(derin, 2),
+            floor_height=round(rng.uniform(2.55, 2.95), 2),
+            plinth=round(rng.uniform(0.30, 0.95), 2),
+            cumba_type=cumba_tip,
+            cumba=0.0 if cumba_tip == "none"
+                  else round(rng.uniform(0.42, 1.05), 2),
+            window_density=round(rng.uniform(0.38, 0.72), 2),
+            window_width=round(rng.uniform(0.66, 0.90), 2),
+            kafes_bars=rng.randint(3, 5),
+            eave=round(rng.uniform(0.48, 0.95), 2),
+            roof_pitch_deg=round(rng.uniform(25.0, 37.0), 1),
+            palette=palet,
+        )
+        if kose:
+            p["facades"] = "sides"
+
+        etiket = (f"{kat}k {en:.1f}x{derin:.1f} m"
+                  + (" kose" if kose else "")
+                  + (" gayrimuslim" if palet == "nonmuslim" else ""))
+        cikti.append((f"Aile_{i:03d}",
+                      f"tohumlu aile uyesi — {etiket}", p))
+    return cikti
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--out-dir", default=os.path.join(
@@ -139,13 +252,22 @@ def main():
     ap.add_argument("--no-textures", action="store_true")
     ap.add_argument("--catalog", default=os.path.join("art", "blend", "variants",
                                                       "catalog.json"))
+    ap.add_argument("--aile", type=int, default=0,
+                    help="Tohumdan uretilecek ek varyant sayisi")
+    ap.add_argument("--tohum", type=int, default=1632,
+                    help="Aile tohumu — ayni tohum ayni aileyi verir")
     args = ap.parse_args(hz.argv_after_dashes())
 
     os.makedirs(args.out_dir, exist_ok=True)
     os.makedirs(args.blend_dir, exist_ok=True)
     catalog = []
 
-    for name, why, params in VARIANTS:
+    hepsi = list(VARIANTS)
+    if args.aile > 0:
+        hepsi += aile_uret(args.aile, args.tohum)
+        hz.log(f"aile: {args.aile} varyant, tohum {args.tohum}")
+
+    for name, why, params in hepsi:
         asset = f"House_{name}"
         hz.reset_scene()
         col = hz.collection(COLLECTION)

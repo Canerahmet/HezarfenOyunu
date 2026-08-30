@@ -303,6 +303,7 @@ namespace Hezarfen.Editor.Gis
         public static void ResetQuarterState()
         {
             taken.Clear();
+            yerlesenEvler.Clear();
             evKutulari.Clear();
             evIzgara.Clear();
             bahceler.Clear();
@@ -584,13 +585,16 @@ namespace Hezarfen.Editor.Gis
             {
                 float s = 1.5f;                            // eksen boyunca yol alinan mesafe
                 float total = PolylineLength(spine);
+                // Tekrar hafizasi SOKAK BASINA: karsi kaldirimda ayni
+                // evin durmasi sorun degil, yan yana durmasi sorundur.
+                var son = new List<string>();
 
                 // KURAL 7: kose evleri yalnizca ana sokakta ve uclara yakin.
                 // Varyant DONGUNUN DISINDA secilir cunku bir sonraki evin
                 // genisligi, bu evin ne kadar ilerleyecegini belirler
                 // (asagida `s +=`).
                 var v = Pick(variants, rng,
-                             corners && (s < 12f || s > total - 14f));
+                             corners && (s < 12f || s > total - 14f), son);
 
                 while (s < total - 2f)
                 {
@@ -604,6 +608,25 @@ namespace Hezarfen.Editor.Gis
 
                     float off = streetWidth * 0.5f + v.wall_depth * 0.5f + setback;
                     Vector2 c = new Vector2(pos.x, pos.z) + nrm * off;
+
+                    // AYNI VARYANT KOMSULUKTA IKI KEZ OLMASIN.
+                    //
+                    // Konum belli olduktan sonra sorulur, cunku komsuluk
+                    // konumla tanimlanir. Varyant degisince `wall_depth`
+                    // de degisir ve ev sokaktan biraz farkli uzaklikta
+                    // durur; o yuzden `c` yeniden hesaplanir.
+                    //
+                    // Alti deneme: 164 varyantli bir havuzda altisi da
+                    // tutmazsa orasi zaten cok sikisik bir kose demektir
+                    // ve tekrarsizlik ugruna evi hic koymamak daha kotu.
+                    for (int deneme = 0; deneme < 6
+                         && KomsudaAyniVar(c, v.prefab); deneme++)
+                    {
+                        v = Pick(variants, rng,
+                                 corners && (s < 12f || s > total - 14f), son);
+                        off = streetWidth * 0.5f + v.wall_depth * 0.5f + setback;
+                        c = new Vector2(pos.x, pos.z) + nrm * off;
+                    }
 
                     // KURAL 8 (ölçümden doğdu) — ev, ayak izinin EN YÜKSEK
                     // köşesine oturur ve altındaki boşluk taş kaideyle dolar.
@@ -654,7 +677,7 @@ namespace Hezarfen.Editor.Gis
                         skipped++;
                         s += v.wall_width * 0.5f + 1f;
                         v = Pick(variants, rng,
-                                 corners && (s < 12f || s > total - 14f));
+                                 corners && (s < 12f || s > total - 14f), son);
                         continue;
                     }
 
@@ -671,6 +694,7 @@ namespace Hezarfen.Editor.Gis
                                             * Quaternion.Euler(0f, yaw, 0f);
 
                     taken.Add((c, radius * 0.72f));
+                    yerlesenEvler.Add((c, v.prefab));
                     EvKutusuEkle(c, new Vector2(v.wall_width, v.wall_depth),
                                  dunyaYaw);
 
@@ -2659,13 +2683,77 @@ namespace Hezarfen.Editor.Gis
             return list;
         }
 
-        private static Variant Pick(List<Variant> all, System.Random rng, bool corner)
+        /// <summary>Sokak boyunca hatırlanan son seçim sayısı.</summary>
+        private const int TekrarHafizasi = 3;
+
+        /// <summary>Bu yarıçapta aynı varyant iki kez görünmemeli (m).</summary>
+        private const float TekrarYaricapi = 15f;
+
+        /// <summary>Mahallede yerleşen evler: konum + varyant.</summary>
+        private static readonly List<(Vector2 c, string prefab)> yerlesenEvler
+            = new List<(Vector2, string)>();
+
+        /// <summary>
+        /// Bu konumun <see cref="TekrarYaricapi"/> yakınında aynı varyant
+        /// var mı.
+        ///
+        /// Sokak başına tutulan tekrar hafızası yetmedi ve ölçüm bunu
+        /// söyledi: 2.616 evin <b>42'sinin</b> en yakın komşusu tıpatıp
+        /// aynı varyanttı. Sebep yapısal — hafıza sokağın bir TARAFINI
+        /// biliyordu, karşı kaldırımı ve arkadaki çıkmazı bilmiyordu.
+        /// Komşuluk bir çizgi değil bir <b>alan</b>dır.
+        /// </summary>
+        private static bool KomsudaAyniVar(Vector2 c, string prefab)
+        {
+            float r2 = TekrarYaricapi * TekrarYaricapi;
+            foreach (var e in yerlesenEvler)
+                if (e.prefab == prefab && (e.c - c).sqrMagnitude < r2)
+                    return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Bir sonraki evin varyantı. <paramref name="son"/> aynı sokakta
+        /// son seçilenleri tutar ve onlar tekrar seçilmez.
+        ///
+        /// ## Neden hafıza gerekiyor
+        ///
+        /// Seçim önce hafızasızdı: her ev havuzdan bağımsız çekiliyordu.
+        /// 26 varyantla bu, her yirmi beş evden birinin komşusunun
+        /// <b>tıpatıp aynısı</b> olması demek — ve göz tam olarak o çifti
+        /// yakalar. Caner'in isteği açıktı: <i>"benzerlik olsa bile
+        /// hiçbir ev birbirinin aynısı olmasın."</i>
+        ///
+        /// Varyant sayısını artırmak olasılığı düşürür ama sıfırlamaz;
+        /// sıfırlayan şey hafızadır. Üç ev geriye bakmak yeter: dördüncü
+        /// evde tekrar, sokakta okunacak bir örüntü kurmuyor.
+        /// </summary>
+        private static Variant Pick(List<Variant> all, System.Random rng,
+                                    bool corner, List<string> son = null)
         {
             var pool = new List<Variant>();
             foreach (var v in all)
                 if ((v.facades == "sides") == corner) pool.Add(v);
             if (pool.Count == 0) pool = all;
-            return pool[rng.Next(pool.Count)];
+
+            if (son != null && son.Count > 0)
+            {
+                var taze = new List<Variant>();
+                foreach (var v in pool)
+                    if (!son.Contains(v.prefab)) taze.Add(v);
+                // Havuz hafizadan kucukse (kose evleri az olabilir)
+                // eski havuz kullanilir: tekrarsizlik ugruna KOSE
+                // olmayan bir evi koseye koymak daha kotu olurdu.
+                if (taze.Count > 0) pool = taze;
+            }
+
+            var secilen = pool[rng.Next(pool.Count)];
+            if (son != null)
+            {
+                son.Add(secilen.prefab);
+                if (son.Count > TekrarHafizasi) son.RemoveAt(0);
+            }
+            return secilen;
         }
 
         private static float PolylineLength(List<Vector3> p)
