@@ -118,10 +118,13 @@ namespace Hezarfen.Editor.Diagnostics
                          .OrderBy(x => x))
             {
                 string semt = Path.GetFileNameWithoutExtension(yol);
-                // Tekneler semti bastan basa SUDA durur; adi kayik olmayan
-                // (pereme, mavna) tekneler de var ve hepsini ada gore
-                // elemek eninde sonunda birini kacirir.
-                if (semt == "D_Tekneler") continue;
+                // TEKNELER SUDA DURUR — SEMTE GORE DEGIL, KOKE GORE ELENIR.
+                //
+                // Once butun bir semt (`D_Tekneler`) atlaniyordu. Tekneler
+                // artik kendi sularinin semtine yaziliyor (D_Halic,
+                // D_Bogaz) ve o semtlerde iskele, sur, dukkan da var. Semti
+                // atlamak simdi gercek yapilari da denetimden cikarirdi;
+                // teknenin kendisini atlamak yeter (bkz. `TekneMi`).
                 var sahne = EditorSceneManager.OpenScene(
                     yol.Replace('\\', '/'), OpenSceneMode.Additive);
 
@@ -135,6 +138,7 @@ namespace Hezarfen.Editor.Diagnostics
                     {
                         var t = YapiKoku(mf.transform);
                         if (t == null || !gorulen.Add(t)) continue;
+                        if (TekneMi(t)) continue;          // suda durur
                         if (!Sayilir(t.name)) continue;
                         toplamYapi++;
                         var k = Yapiyi(t, semt, arazi);
@@ -253,7 +257,6 @@ namespace Hezarfen.Editor.Diagnostics
                                             .OrderBy(x => x))
             {
                 string semt = Path.GetFileNameWithoutExtension(yol);
-                if (semt == "D_Tekneler") continue;
                 var sahne = EditorSceneManager.OpenScene(
                     yol.Replace(Path.DirectorySeparatorChar, '/'),
                     OpenSceneMode.Additive);
@@ -388,6 +391,20 @@ namespace Hezarfen.Editor.Diagnostics
         ///
         /// Yapı olmayan şeyler açıkça sayılıyor; geri kalan her şey ölçülür.
         /// </summary>
+        /// <summary>
+        /// Bu nesne bir tekne mi — tekne suda durur, yere değmez.
+        ///
+        /// Ada göre elemek ("Kayik" ile başlıyorsa") denendi ve yanlıştı:
+        /// pereme ve mavna da tekne ve adları öyle başlamıyor. Kök nesne
+        /// <see cref="Gis.BoatScatter.RootName"/> ise soru bitiyor.
+        /// </summary>
+        private static bool TekneMi(Transform t)
+        {
+            for (var k = t; k != null; k = k.parent)
+                if (k.name == Gis.BoatScatter.RootName) return true;
+            return false;
+        }
+
         private static bool AnaSahneOlculur(string ad)
         {
             // Arazi, su, isik, gokyuzu ve sistem nesneleri yapi degildir.

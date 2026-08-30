@@ -48,13 +48,49 @@ namespace Hezarfen.Editor.Gis
 
         // --- doku ölçüleri (RESEARCH.md §4.1) ---
 
-        /// <summary>Ana sokak genişliği. 1848'de ana yollar 7,6 m'ye ÇIKARILMAYA
-        /// çalışıldı; öncesi bundan dardı. Fıkıhtaki alt sınır ~3,4-3,8 m
-        /// ("yüklü deve"). İkisinin arası seçildi — T2.</summary>
-        public const float StreetWidth = 4.6f;
+        /// <summary>
+        /// Ana sokak genişliği. <b>7,2 m — 4,6 değil</b> (ADR 0075).
+        ///
+        /// Eski sayı uydurma değildi: 1848'de ana yollar 7,6 m'ye
+        /// ÇIKARILMAYA çalışıldı, öncesi bundan dardı; fıkıhtaki alt sınır
+        /// ~3,4-3,8 m ("yüklü deve"). 4,6 ikisinin arasıydı ve
+        /// <b>tarihsel olarak doğruydu</b>.
+        ///
+        /// Caner (2026-08-30, oynarken): *"bina ve evler birbirine cok
+        /// yakin. daha genis olabilir yolar."* — ve gördüğü şey gerçekti:
+        /// karşılıklı iki duvar arası açıklık 4,4-5,4 m, cumba da üstten
+        /// taşıyor.
+        ///
+        /// Burada gerçekçilik ile oynanabilirlik <b>gerçekten</b> çatışıyor
+        /// (ADR 0074'teki gibi aynı yöne bakmıyorlar). Üçüncü şahıs kamerası
+        /// 3,2 m'lik kolla arkadan bakıyor ve dar sokakta o kol duvara
+        /// çarpıp kısalıyor — ölçüldü, turda üç durakta 1,40 m'ye çöktü.
+        /// Oyuncunun karakterini göremediği bir sokak.
+        ///
+        /// 7,2 keyfî değil: kol 3,2 m + çarpışma yarıçapı 0,25 m, yani
+        /// karşı duvara ~3,5 m ister; 7,2'de eksenden iki yana 3,6 m kalıyor.
+        ///
+        /// <b>Bu sayı artık ölçümden bilerek uzak.</b> Tarihsel ölçüden %57
+        /// geniş ve sebebi kaynak değil oynanabilirlik — ADR 0075 bunu
+        /// gizlemiyor. Geri almak isteyen tek sabiti değiştirir; bütün
+        /// türev mesafeler buradan ölçekleniyor.
+        /// </summary>
+        public const float StreetWidth = 7.2f;
 
-        /// <summary>Çıkmaz sokak hususi yoldur, ana yoldan dardır.</summary>
-        public const float AlleyWidth = 3.0f;
+        /// <summary>
+        /// Çıkmaz sokak hususi yoldur, ana yoldan dardır. Ana sokakla aynı
+        /// oranda genişledi (3,0 → 4,4).
+        /// </summary>
+        public const float AlleyWidth = 4.4f;
+
+        /// <summary>
+        /// Yolun enine eğimi — yarım genişlikte izin verilen en büyük kot
+        /// farkı (m). Bunun ötesi bordurun/istinat duvarının işidir.
+        ///
+        /// 0,45 m, 7,2 m'lik yolun yarısında ≈ %12,5 enine eğim: yürünür
+        /// ama düz terası kırmaya yeter.
+        /// </summary>
+        public const float CaprazEgim = 0.45f;
 
         [Serializable] private class Variant
         {
@@ -233,6 +269,8 @@ namespace Hezarfen.Editor.Gis
         public static void ResetQuarterState()
         {
             taken.Clear();
+            evKutulari.Clear();
+            evIzgara.Clear();
             podiums.Clear();
             pavingStrips.Clear();
         }
@@ -361,7 +399,20 @@ namespace Hezarfen.Editor.Gis
             {
                 Vector2 t = Tangent(spine, i);
                 Vector2 n = new Vector2(-t.y, t.x) * (rng.Next(2) == 0 ? 1f : -1f);
-                Vector3 start = spine[i] + new Vector3(n.x, 0f, n.y) * (StreetWidth * 0.5f + 6f);
+                // CIKMAZ, ANA SOKAGIN EV SIRASININ DISINDAN BASLAR.
+                //
+                // Sabit `+ 6f` sokak 4,6 m'yken ancak yetiyordu ve o zaman
+                // bile en derin evlerde yetmiyordu. Sokak 7,2 m'ye cikinca
+                // cikmazin agzi ana sokagin evlerinin TAM ICINDE kaldi.
+                // Sayi artik varyantlardan olculuyor: en derin evin ayak izi
+                // + 2 m pay.
+                // Katalogda derinlik yalniz `wall_depth` olarak var;
+                // sacak ondan 1 m kadar daha tasar (KURAL 6), pay ona gore.
+                float enDerin = 0f;
+                foreach (var vv in variants)
+                    enDerin = Mathf.Max(enDerin, vv.wall_depth);
+                Vector3 start = spine[i] + new Vector3(n.x, 0f, n.y)
+                              * (StreetWidth * 0.5f + enDerin + 3f);
                 // 3-6 eve hizmet eden kisa kol: 4-7 adim yeter.
                 var alley = TraceContour(terrain, start, n, 4 + rng.Next(4), 7.0f, rng);
                 if (alley.Count < 3) continue;
@@ -498,11 +549,15 @@ namespace Hezarfen.Editor.Gis
                 float s = 1.5f;                            // eksen boyunca yol alinan mesafe
                 float total = PolylineLength(spine);
 
+                // KURAL 7: kose evleri yalnizca ana sokakta ve uclara yakin.
+                // Varyant DONGUNUN DISINDA secilir cunku bir sonraki evin
+                // genisligi, bu evin ne kadar ilerleyecegini belirler
+                // (asagida `s +=`).
+                var v = Pick(variants, rng,
+                             corners && (s < 12f || s > total - 14f));
+
                 while (s < total - 2f)
                 {
-                    // KURAL 7: kose evleri yalnizca ana sokakta ve uclara yakin.
-                    bool wantCorner = corners && (s < 12f || s > total - 14f);
-                    var v = Pick(variants, rng, wantCorner);
 
                     SampleAt(spine, s, out Vector3 pos, out Vector2 tan);
                     Vector2 nrm = new Vector2(-tan.y, tan.x) * side;
@@ -540,10 +595,30 @@ namespace Hezarfen.Editor.Gis
                                      out float hiH, dunyaYaw);
                     float y = hiH;
                     float radius = Mathf.Max(v.footprint_x, v.wall_depth) * 0.5f;
-                    if (loH < 3f || Overlaps(taken, c, radius * 0.72f))
+                    // CAKISMA DENETIMI DIKDORTGENLEDIR.
+                    //
+                    // `taken` daireleri tutar ve daire evin sekli DEGIL.
+                    // Bir ev 5,6 x 6,0 m; onu 0,72 x en-buyuk-olcu yarical
+                    // bir daireyle temsil etmek iki secenek birakiyordu:
+                    // dairelerin buyugu bitisik nizami imkansiz kilar
+                    // (sira hic kurulmaz), kucugu capraz duran evlerin
+                    // birbirine girmesine izin verir. Kucugu secilmisti ve
+                    // olculdu: evlerin %17'si bir komsusunun duvarindan
+                    // geciyordu, en kotusu 2,44 m.
+                    //
+                    // Cozum sekli duzeltmek: dondurulmus dikdortgenler
+                    // ayrik eksen teoremiyle sinaniyor. Daire denetimi de
+                    // KALIYOR — mescit, turbe, cesme gibi ev olmayan
+                    // seyler `taken`da daire olarak duruyor.
+                    bool kutuCakisti = EvKutusuCakisiyor(
+                        c, new Vector2(v.wall_width, v.wall_depth), dunyaYaw);
+                    if (loH < 3f || kutuCakisti
+                        || Overlaps(taken, c, radius * 0.72f))
                     {
                         skipped++;
-                        s += v.wall_width * 0.6f + 1f;
+                        s += v.wall_width * 0.5f + 1f;
+                        v = Pick(variants, rng,
+                                 corners && (s < 12f || s > total - 14f));
                         continue;
                     }
 
@@ -560,6 +635,8 @@ namespace Hezarfen.Editor.Gis
                                             * Quaternion.Euler(0f, yaw, 0f);
 
                     taken.Add((c, radius * 0.72f));
+                    EvKutusuEkle(c, new Vector2(v.wall_width, v.wall_depth),
+                                 dunyaYaw);
                     // Kaide: evin tabanindan en alcak kose ALTINA kadar.
                     if (y - loH > 0.05f)
                         podiums.Add(new Podium
@@ -573,11 +650,35 @@ namespace Hezarfen.Editor.Gis
                         });
                     placed++;
 
-                    // Bitisik nizam: aralik kucuk. Arada bahce duvari/gecit olsun
-                    // diye ara sira daha buyuk bosluk birakilir.
-                    float gap = rng.Next(6) == 0 ? 2.5f + (float)rng.NextDouble() * 2.5f
-                                                 : 0.25f + (float)rng.NextDouble() * 0.7f;
-                    s += v.wall_width + gap;
+                    // ARALIK GENISLEDI (ADR 0075).
+                    //
+                    // Bitisik nizam donemin dokusuydu ve aralik %83
+                    // ihtimalle 0,25-0,95 m'ydi — yani evler neredeyse
+                    // yapisikti. Caner "bina ve evler birbirine cok yakin"
+                    // derken bunu goruyordu.
+                    //
+                    // Aralik artik 1,4-3,0 m; ara sira birakilan genis
+                    // bosluk (bahce duvari, gecit) 4,5-8,0 m. Doku
+                    // gevsiyor — istenen de bu.
+                    float gap = rng.Next(6) == 0 ? 4.5f + (float)rng.NextDouble() * 3.5f
+                                                 : 1.4f + (float)rng.NextDouble() * 1.6f;
+
+                    // ILERLEME IKI EVIN YARI GENISLIGIDIR.
+                    //
+                    // Onceki hali `s += v.wall_width + gap` idi ve bu, evi
+                    // MERKEZINDEN konumlandiran bir dongude yanlistir: iki
+                    // merkez arasi gereken mesafe (W1+W2)/2 + aralik iken
+                    // W1 + aralik kadar ilerleniyordu. Sonraki ev genisse
+                    // fark kadar GERI tasar ve komsusunun duvarindan gecer.
+                    // Aralik 0,25 m'yken bu her zaman kusurluydu ama gorunmez
+                    // sayilirdi: evler zaten neredeyse yapisikti. Sokaklar
+                    // genisleyip aralik acilinca, kaynayan catilar bir anda
+                    // dokunun kendisi gibi okunmaya basladi.
+                    var vSonraki = Pick(variants, rng,
+                        corners && (s + v.wall_width * 0.5f + gap < 12f
+                                    || s + v.wall_width * 0.5f + gap > total - 14f));
+                    s += (v.wall_width + vSonraki.wall_width) * 0.5f + gap;
+                    v = vSonraki;
                 }
             }
             return placed;
@@ -703,6 +804,7 @@ namespace Hezarfen.Editor.Gis
             // kaldirim havada asili kaliyordu. Olculdu: 68.864 hucrenin
             // %28,7'sinde altta hava vardi, en kotusu 2,52 m.
             var dipler = new float[n];
+            var capraz = new Vector2[n];      // sol/sag kenarin eksene gore kot farki
             int steps = 0;
 
             for (int i = 0; i < n; i++)
@@ -723,8 +825,26 @@ namespace Hezarfen.Editor.Gis
                     en = Mathf.Min(en, h); us = Mathf.Max(us, h);
                 }
 
-                // Kesitin EN YUKSEK noktasi: kaldirim gomulmesin.
-                ground[i] = us;
+                // YOL ENINE EGIMLIDIR, TERAS DEGIL.
+                //
+                // Onceki hali `ground[i] = us` — kesitin en yuksek
+                // noktasi. Gerekcesi "kaldirim gomulmesin"di ve 4,6 m'lik
+                // yolda dogruydu: medyan %14 egimde kesit farki 0,64 m.
+                // Sokak 7,2 m'ye cikinca ayni kural yolu asagi yanda
+                // ~1,0 m (p90 egimde ~2,1 m) havada duran bir TAS TERASA
+                // cevirdi; asagi sira evlerin kapisi kaldirimin altinda
+                // kaldi. Genisletmenin faturasini ODEMEDEN geciyordum.
+                //
+                // Gercek yamac sokagi eksen boyunca basamaklanir
+                // (merdivenli sokak) ama ENINE egimlidir. Eksen artik
+                // kesitin ORTASINI izliyor, iki kenar kendi kotuna dogru
+                // egiliyor. Egim yurunemez olmasin diye sinirli; kalan
+                // fark bordurun, yani istinat duvarinin isi.
+                float hOrta = Height(terrain, c);
+                capraz[i] = new Vector2(
+                    Mathf.Clamp(Height(terrain, a) - hOrta, -CaprazEgim, CaprazEgim),
+                    Mathf.Clamp(Height(terrain, b) - hOrta, -CaprazEgim, CaprazEgim));
+                ground[i] = hOrta;
                 // Kesitin EN ALCAK noktasi, biraz da altina: bordur
                 // araziye girsin ki kenari acikta kalmasin.
                 dipler[i] = en - 0.25f;
@@ -769,8 +889,8 @@ namespace Hezarfen.Editor.Gis
 
             for (int i = 0; i < n; i++)
             {
-                left[i].y = walk[i];
-                right[i].y = walk[i];
+                left[i].y = walk[i] + capraz[i].x;
+                right[i].y = walk[i] + capraz[i].y;
             }
             pavingStrips.Add(new[] { new Vector3(width, ds, 0f) });   // basligi
             for (int i = 0; i < n; i++)
@@ -1057,6 +1177,118 @@ namespace Hezarfen.Editor.Gis
         /// <summary>
         /// Yerleşimin dünya kutusu (XZ) + boyanacak geçiş payı. Boşsa null.
         /// </summary>
+        /// <summary>
+        /// <b>Yerleşim maskesini yazar ve o bölgenin zeminini boyar.</b>
+        ///
+        /// Tek mahallelik sahne yolu (<c>BuildQuarterScene</c>) bunu hep
+        /// yapıyordu; oyunun asıl kullandığı yol —
+        /// <see cref="DistrictFiller.Fill"/> — <b>hiç yapmıyordu</b>. Yani
+        /// sekiz akışlı semtin altındaki zemin, üstünde 10.708 ev dururken
+        /// hâlâ genel eğim/kot kuralıyla boyanmış çayırdı: evlerin,
+        /// avluların ve hazirenin arası çiğnenmiş toprak değil ot.
+        ///
+        /// Caner bunu üç kez ayrı ayrı bildirdi ("acik dunya zemini
+        /// gercekci degil ve cok fazla bos duruyor"). Ölçüldü: bir
+        /// mahallenin 200 m'lik karesinde zeminin %90,3'ü çıplak arazi,
+        /// %81,7'sinin 4 m yakınında hiçbir şey yok.
+        ///
+        /// İki giriş kapısından yalnız birinin bir işi yapması, bu
+        /// projedeki en tekrar eden kusur biçimi.
+        /// </summary>
+        public static void YerlesimiYazVeBoya(string ad)
+        {
+            if (taken.Count == 0)
+            {
+                Debug.LogWarning($"[Hezarfen] {ad}: yerlesim dairesi yok, "
+                                 + "zemin boyanmadi.");
+                return;
+            }
+            SettlementMask.Write(ad, taken);
+            var kutu = SettlementBounds(taken);
+            if (kutu.HasValue) TerrainCoverBuilder.RepaintSettlement(kutu.Value);
+            Debug.Log($"[Hezarfen] {ad}: yerlesim maskesi {taken.Count} daire, "
+                      + $"zemin boyandi {kutu}.");
+        }
+
+        // ------------------------------------------- ev kutulari (SAT)
+
+        private struct EvKutu
+        {
+            public Vector2 merkez, yari, eksenX, eksenZ;
+        }
+
+        private static readonly List<EvKutu> evKutulari = new();
+        private static readonly Dictionary<(int, int), List<int>> evIzgara = new();
+
+        /// <summary>Izgara hücresi (m) — en geniş evden büyük olmalı.</summary>
+        private const float EvHucre = 16f;
+
+        private static EvKutu KutuKur(Vector2 c, Vector2 olcu, float yawDeg)
+        {
+            float r = yawDeg * Mathf.Deg2Rad;
+            var ex = new Vector2(Mathf.Cos(r), -Mathf.Sin(r));
+            return new EvKutu
+            {
+                merkez = c,
+                yari = olcu * 0.5f,
+                eksenX = ex,
+                eksenZ = new Vector2(-ex.y, ex.x),
+            };
+        }
+
+        private static bool EvKutusuCakisiyor(Vector2 c, Vector2 olcu, float yawDeg)
+        {
+            var k = KutuKur(c, olcu, yawDeg);
+            int x0 = Mathf.FloorToInt((c.x - EvHucre) / EvHucre);
+            int x1 = Mathf.FloorToInt((c.x + EvHucre) / EvHucre);
+            int z0 = Mathf.FloorToInt((c.y - EvHucre) / EvHucre);
+            int z1 = Mathf.FloorToInt((c.y + EvHucre) / EvHucre);
+            for (int z = z0; z <= z1; z++)
+                for (int x = x0; x <= x1; x++)
+                {
+                    if (!evIzgara.TryGetValue((x, z), out var liste)) continue;
+                    foreach (int i in liste)
+                        if (Kesisiyor(k, evKutulari[i])) return true;
+                }
+            return false;
+        }
+
+        private static void EvKutusuEkle(Vector2 c, Vector2 olcu, float yawDeg)
+        {
+            evKutulari.Add(KutuKur(c, olcu, yawDeg));
+            int i = evKutulari.Count - 1;
+            int x = Mathf.FloorToInt(c.x / EvHucre);
+            int z = Mathf.FloorToInt(c.y / EvHucre);
+            if (!evIzgara.TryGetValue((x, z), out var l))
+            { l = new List<int>(); evIzgara[(x, z)] = l; }
+            l.Add(i);
+        }
+
+        /// <summary>
+        /// İki döndürülmüş dikdörtgen kesişiyor mu — ayrık eksen teoremi.
+        ///
+        /// <see cref="Diagnostics.EvCakismasi"/> aynı testi ölçmek için
+        /// yapıyor; burada <b>engellemek</b> için yapılıyor. Aynı soruyu
+        /// soran iki yer olması bilerek: biri kurar, öteki denetler.
+        /// </summary>
+        private static bool Kesisiyor(EvKutu a, EvKutu b)
+        {
+            // Duvarlar birbirine DEGEBILIR; bitisik nizam budur. Payin
+            // altindaki girisim cakisma sayilmaz.
+            const float Pay = 0.10f;
+            Vector2 d = b.merkez - a.merkez;
+            var eksenler = new[] { a.eksenX, a.eksenZ, b.eksenX, b.eksenZ };
+            foreach (var e in eksenler)
+            {
+                float ra = Mathf.Abs(Vector2.Dot(a.eksenX, e)) * a.yari.x
+                         + Mathf.Abs(Vector2.Dot(a.eksenZ, e)) * a.yari.y;
+                float rb = Mathf.Abs(Vector2.Dot(b.eksenX, e)) * b.yari.x
+                         + Mathf.Abs(Vector2.Dot(b.eksenZ, e)) * b.yari.y;
+                if (Mathf.Abs(Vector2.Dot(d, e)) >= ra + rb - Pay) return false;
+            }
+            return true;
+        }
+
         private static Rect? SettlementBounds(List<(Vector2 c, float r)> discs)
         {
             if (discs.Count == 0) return null;

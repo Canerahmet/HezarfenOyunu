@@ -150,9 +150,17 @@ namespace Hezarfen.Zaman
             double az = Math.Acos(Math.Clamp(cosAz, -1.0, 1.0)) * Mathf.Rad2Deg;
             if (h > 0) az = 360.0 - az;        // ogleden sonra bati yarisinda
 
-            // Unity: X donusu asagi bakis acisi, Y donusu kuzeyden azimut.
+            // ISIK GUNESIN BULUNDUGU YERE DEGIL, ORADAN GELDIGI YONE BAKAR.
+            //
+            // Yonlu isigin `forward`u isigin GITTIGI yondur. Gunes azimut
+            // `az`de duruyorsa isik `az + 180`e dogru gider. Once `az`
+            // yaziliyordu ve bu, gunesi tam 180 derece TERS yerlestirdi:
+            // sahne 1632'nin 122. gunu, saat 09:00'da basliyor, gercek
+            // azimut 110 (dogu-guneydogu) — ama golgeler gunesin BATI-
+            // KUZEYBATIDA oldugunu soyluyordu. Sabah gunesi batidan
+            // doguyordu ve hicbir test bunu okumuyordu.
             gunesIsigi.transform.rotation = Quaternion.Euler(
-                (float)(alt * Mathf.Rad2Deg), (float)az, 0f);
+                (float)(alt * Mathf.Rad2Deg), (float)(az + 180.0), 0f);
             gunesIsigi.enabled = alt > -0.10;   // ufkun cok altinda kapan
         }
 

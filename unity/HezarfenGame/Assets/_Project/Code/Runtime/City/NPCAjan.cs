@@ -88,6 +88,17 @@ namespace Hezarfen.Sehir
         /// </summary>
         public Replik replik;
 
+        /// <summary>
+        /// Hedefi en son hangi vakit için yenilendi (−1 = hiç).
+        ///
+        /// Yenileme kareye yayıldığı için (bkz. <c>NPCYonetici</c>'nin
+        /// <c>yenilemeButcesi</c>'si) bir sakinin sırası gelmemiş
+        /// olabilir. Görünür olan sakinlerin beklemesi kabul edilemez:
+        /// oyuncunun yanındaki adam repliksiz kalır ve <b>şehir susar</b>.
+        /// Bu damga, "sırasını bekle" ile "şimdi yenile" ayrımını verir.
+        /// </summary>
+        public int vakitDamgasi = -1;
+
         /// <summary>Yolun sonuna geldi mi.</summary>
         public bool Vardi => yol.Count == 0 || adim >= yol.Count;
 

@@ -226,6 +226,10 @@ namespace Hezarfen.Editor.Gis
                                      + $"kurulamadi: {e.Message}");
                 }
             }
+
+            // ZEMIN, USTUNE KONAN YAPILARLA AYNI TURDA BOYANIR.
+            // (Gerekcesi OttomanStreetBuilder.YerlesimiYazVeBoya'da.)
+            OttomanStreetBuilder.YerlesimiYazVeBoya(districtId);
             return kurulan;
         }
 

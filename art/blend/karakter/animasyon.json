@@ -15,22 +15,22 @@
   {
    "ad": "Yurume",
    "tur": "dongu",
-   "kare": 34,
-   "tempo": 109.1,
-   "sure": 1.1,
-   "hiz": 1.4,
+   "kare": 29,
+   "tempo": 128.6,
+   "sure": 0.933,
+   "hiz": 2.2,
    "dongu": true,
-   "kayma_cm": 0.67
+   "kayma_cm": 1.34
   },
   {
    "ad": "Kosma",
    "tur": "dongu",
-   "kare": 23,
-   "tempo": 163.6,
-   "sure": 0.733,
-   "hiz": 3.6,
+   "kare": 20,
+   "tempo": 189.5,
+   "sure": 0.633,
+   "hiz": 6.0,
    "dongu": true,
-   "kayma_cm": 1.78
+   "kayma_cm": 2.75
   },
   {
    "ad": "Merdiven",
@@ -40,7 +40,7 @@
    "sure": 1.267,
    "hiz": 0.41600000000000004,
    "dongu": true,
-   "kayma_cm": 0.41
+   "kayma_cm": 1.01
   },
   {
    "ad": "Kusanma",

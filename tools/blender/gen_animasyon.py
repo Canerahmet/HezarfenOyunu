@@ -17,6 +17,7 @@ import argparse
 import json
 import math
 import os
+import re
 import sys
 
 import bpy
@@ -31,6 +32,41 @@ import hz_blender as hz             # noqa: E402
 from export_fbx import export_fbx   # noqa: E402
 
 ANIM_COL = "AnimExport"
+
+#: Oyuncu hizlarinin TEK sahibi — C# tarafi.
+WALK_CS = os.path.join(
+    "unity", "HezarfenGame", "Assets", "_Project", "Code",
+    "Runtime", "Player", "WalkController.cs")
+
+
+def oyuncu_hizlari():
+    """`WalkController`taki yurume/kosma hizini **okur**.
+
+    ## Neden okunuyor, neden yazilmiyor
+
+    Bu sayilar bir kez elle kopyalanmisti ve yorumda "hiz
+    WalkController'dan gelir" yaziyordu — ama gelmiyordu, yazilmisti.
+    Caner hizi artirmak isteyince C# tarafi 1,4/3,6'dan 2,2/6,0'a
+    cikti, klipler yerinde kaldi ve karakter kosarken ayaklari yerde
+    **%67 kayarak** suzuldu. Bir sayinin iki sahibi varsa er ya da gec
+    iki degeri olur.
+
+    Bulunamazsa **patlar**. Sessizce eski degere donmek, ayni kusuru
+    ikinci kez gorunmez yapardi.
+    """
+    kok = os.path.abspath(os.path.join(_HERE, "..", ".."))
+    yol = os.path.join(kok, WALK_CS)
+    with open(yol, encoding="utf-8") as fh:
+        metin = fh.read()
+    cikti = []
+    for ad in ("VarsayilanYurume", "VarsayilanKosma"):
+        m = re.search(r"%s\s*=\s*([0-9]*\.?[0-9]+)f" % ad, metin)
+        if m is None:
+            raise RuntimeError(
+                "WalkController.%s okunamadi (%s). Sabit yeniden "
+                "adlandirildiysa burasi da guncellenmeli." % (ad, yol))
+        cikti.append(float(m.group(1)))
+    return cikti[0], cikti[1]
 
 #: Kaynak: rig'li uçuş karakteri.
 KAYNAK = os.path.join("art", "blend", "karakter", "SK_Hezarfen_Ucus.blend")
@@ -235,12 +271,20 @@ def klipleri_kur(arm):
            f"kalca-ayak {kalca_z - ayak_z:.3f} m (bacak {L1+L2:.3f} m — "
            "dinlenmede neredeyse tam acik)")
 
-    for ad, hiz, tempo, dikey in (("Yurume", 1.4, 110.0, 0.0),
-                                  ("Kosma", 3.6, 165.0, 0.0)):
+    # HIZ ELLE YAZILMAZ: C#'tan okunur (bkz. `oyuncu_hizlari`).
+    # Tempo yazilir cunku o insanin kendi araligindan gelir; adim
+    # uzunlugu ikisinin SONUCUDUR. 2,2 m/s hizli bir yuruyus (130
+    # adim/dk), 6,0 m/s hizli bir kosudur (190 adim/dk).
+    yuru_hiz, kos_hiz = oyuncu_hizlari()
+    hz.log(f"oyuncu hizlari WalkController'dan okundu: "
+           f"yurume {yuru_hiz:.2f} m/s, kosma {kos_hiz:.2f} m/s")
+    for ad, hiz, tempo, dikey in (("Yurume", yuru_hiz, 130.0, 0.0),
+                                  ("Kosma", kos_hiz, 190.0, 0.0)):
         kare, genlik, kayma0 = ak.dongu_coz(arm, ak.yurume_karesi, hiz, tempo)
         hz.log(f"{ad}: cozulen dongu {kare} kare "
                f"({kare / float(ak.FPS):.2f} s), genlik {genlik:.2f}, "
-               f"tempo {tempo:.0f} adim/dk, kayma {kayma0*100:.1f} cm")
+               f"tempo {tempo:.0f} adim/dk, adim {hiz/(tempo/60.0):.2f} m, "
+               f"kayma {kayma0*100:.1f} cm")
         act = ak.klip_kur(arm, ad)
         for i in range(kare + 1):
             ak.sifirla(arm)

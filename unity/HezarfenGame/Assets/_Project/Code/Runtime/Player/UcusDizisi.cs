@@ -161,16 +161,64 @@ namespace Hezarfen.Player
             Gec(Durum.Ucuyor);
         }
 
+        /// <summary>
+        /// Uçuşta açılan kapsül — yerde kapalıdır.
+        ///
+        /// <see cref="kapsul"/> (CharacterController) uçuşa geçerken
+        /// kapanır ve o an oyuncunun üzerinde <b>hiçbir çarpıştırıcı
+        /// kalmazdı</b>: Rigidbody araziden ve binalardan geçiyordu.
+        /// </summary>
+        public CapsuleCollider ucusKapsulu;
+
+        //: Bir onceki karenin konumu — temas taramasi bu aralikta yapilir.
+        private Vector3 _oncekiKonum;
+
         private void TemasDenetle()
         {
-            // Zeminle temas: ışın gövdenin ALTINDAN atılır, merkezden
-            // değil — merkezden atılan ışın karakterin kendi
-            // çarpıştırıcısına takılır.
-            Vector3 bas = transform.position + Vector3.up * 0.2f;
-            if (!Physics.Raycast(bas, Vector3.down,
-                                 temasMesafesi + 0.2f,
-                                 ~0, QueryTriggerInteraction.Ignore))
-                return;
+            // TEMAS, IKI KARE ARASINDAKI YOLUN TAMAMINDA ARANIR.
+            //
+            // Onceki hali tek bir Raycast'ti ve yalnizca [y-0,35, y+0,20]
+            // bandina, yani 0,55 m'ye bakiyordu. Serbest dususte iki
+            // Update arasindaki dusey yol bunu asar asmaz — 60 fps'te
+            // ~33 m/s, 30 fps'te ~16,5 m/s; 14 m'lik bir damdan atlamak
+            // yetiyor — isin zemini ISKALIYOR ve oyuncu araziyi delip
+            // sonsuza kadar dusuyordu. Durum kalici olarak `Ucuyor`da
+            // kaldigi ve WalkController kapali oldugu icin onun "dunyaya
+            // geri koy" kurtarmasi da hic calismiyordu: oyunu yeniden
+            // baslatmaktan baska cikis yoktu.
+            //
+            // Simdi onceki karenin konumundan bugunkune bir KURE taranir;
+            // ne kadar hizli dusulurse dusulsun aradaki zemin kacmaz.
+            Vector3 su = transform.position + Vector3.up * 0.2f;
+            Vector3 once = _oncekiKonum + Vector3.up * 0.2f;
+            _oncekiKonum = transform.position;
+
+            // (a) YAKINLIK: ayagin hemen altinda zemin var mi.
+            bool yakin = Physics.Raycast(su, Vector3.down,
+                                         temasMesafesi + 0.2f,
+                                         ~0, QueryTriggerInteraction.Ignore);
+
+            // (b) TUNEL: iki kare arasinda bir seyin ICINDEN gectik mi.
+            //
+            // (a) tek basina yeterli sanilmisti ve degildi: bandi yalnizca
+            // 0,55 m. Serbest dususte iki Update arasindaki dusey yol bunu
+            // asar asmaz — 60 fps'te ~33 m/s; 14 m'lik bir damdan atlamak
+            // yetiyor — zemin ISKALANIR. Oyuncu araziyi delip sonsuza
+            // kadar duser, durum kalici olarak `Ucuyor`da kalir ve
+            // WalkController kapali oldugu icin onun kurtarmasi da hic
+            // calismaz: oyunu yeniden baslatmaktan baska cikis yoktur.
+            //
+            // Bu, (a)'nin YERINE degil YANINA konuyor. Kure taramasiyla
+            // denendi ve yanlisti: kure zaten zemine degen bir noktadan
+            // basladigi icin atlayis karesinde "indik" diyordu — uc ucus
+            // testi birden kirmizi yandi. Cizgi ise iki KONUM arasini
+            // sorar; havalanma karesinde iki konum aynidir, yani sorusu
+            // bostur ve cevabi da.
+            bool tunel = (su - once).sqrMagnitude > 1e-6f
+                         && Physics.Linecast(once, su, ~0,
+                                             QueryTriggerInteraction.Ignore);
+
+            if (!yakin && !tunel) return;
 
             float dikey = govde != null ? govde.linearVelocity.y : 0f;
             bool sert = dikey < cakilmaHizi;
@@ -190,6 +238,10 @@ namespace Hezarfen.Player
             // konum yazicisi demek.
             if (yurume != null) yurume.enabled = false;
             if (kapsul != null) kapsul.enabled = false;
+            // Yurume kapsulu kapanirken UCUS kapsulu acilir; arada
+            // carpistiricisiz tek bir kare bile kalmaz.
+            if (ucusKapsulu != null) ucusKapsulu.enabled = true;
+            _oncekiKonum = transform.position;
             if (govde != null)
             {
                 govde.isKinematic = false;
@@ -209,6 +261,7 @@ namespace Hezarfen.Player
                 govde.isKinematic = true;
                 govde.useGravity = false;
             }
+            if (ucusKapsulu != null) ucusKapsulu.enabled = false;
             if (kapsul != null) kapsul.enabled = true;
             if (yurume != null) yurume.enabled = true;
         }

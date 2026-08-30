@@ -131,7 +131,16 @@ namespace Hezarfen.Player
 
         private void OnEnable() => Capture(true);
 
-        private void OnDisable() => Capture(false);
+        // KAPANIRKEN IMLEC BIRAKILMAZ.
+        //
+        // `UcusDizisi` atlayista bu bileseni kapatiyor ve OnDisable
+        // imleci serbest birakiyordu: kuleden atlar atlamaz Windows fare
+        // imleci ekranin ortasinda beliriyor ve butun ucus boyunca —
+        // oyunun en uzun izlenen sahnesinde — orada duruyordu. Penceredeki
+        // bir tiklama odagi oyundan cikariyordu.
+        //
+        // Imlecin sahibi duraklatma menusudur; yurume bileseni yalnizca
+        // ACILIRKEN yakalar.
 
         /// <summary>
         /// <b>Dünyanın dışına düşeni geri koyar.</b>
@@ -193,7 +202,21 @@ namespace Hezarfen.Player
 
         private Terrain _arazi;
 
-        private void Capture(bool on)
+        /// <summary>
+        /// Fare bakışını ve imleci açar/kapatır.
+        ///
+        /// <b>Public, çünkü tek sahibi var:</b> duraklatma menüsü. Eskiden
+        /// bu sınıf da Esc'i dinliyordu ve <see cref="UI.OyunHud"/> de —
+        /// ikisi aynı tuşa iki farklı anlam yüklüyordu. Sonucu şuydu:
+        /// Esc ile duraklat, menüden "Devam et"e tıkla; oyun devam eder,
+        /// imleç kilitlenir, <b>ama fare kamerayı bir daha döndürmez</b>.
+        /// Çünkü "Devam et" imleci geri kilitlerken bu sınıftaki
+        /// <c>looking</c> hâlâ Esc'in bıraktığı yerde, false'ta duruyordu.
+        ///
+        /// İmlecin de bakışın da tek yazarı olsun diye Esc buradan
+        /// kaldırıldı; artık HUD duraklatırken burayı da çağırıyor.
+        /// </summary>
+        public void Capture(bool on)
         {
             looking = on;
             Cursor.lockState = on ? CursorLockMode.Locked : CursorLockMode.None;
@@ -202,13 +225,22 @@ namespace Hezarfen.Player
 
         private void Update()
         {
+            // Duraklatilmisken girdi OKUNMAZ. Bakis blogu deltaTime
+            // kullanmadigi icin timeScale=0'da bile calisirdi ve karakter
+            // donmus menunun altinda fareyle donerdi.
+            if (Time.timeScale == 0f) return;
+
             var kb = Keyboard.current;
             var mouse = Mouse.current;
             if (kb == null) return;
 
-            // Esc: imleci birak — Editor'de pencereler arasi gecis icin sart.
-            if (kb.escapeKey.wasPressedThisFrame) Capture(!looking);
-            if (kb.fKey.wasPressedThisFrame) flying = !flying;
+            // Esc ARTIK BURADA DEGIL: duraklatmanin tek sahibi OyunHud.
+            // (Gerekcesi `Capture`in belgesinde.)
+
+            // Yercekimsiz inceleme kipi bir GELISTIRME araci: yayinlanan
+            // oyunda F'ye basan oyuncu sehrin uzerinde suzulmemeli.
+            if (Application.isEditor || Debug.isDebugBuild)
+                if (kb.fKey.wasPressedThisFrame) flying = !flying;
 
             // --- bakis ---
             if (looking && mouse != null)

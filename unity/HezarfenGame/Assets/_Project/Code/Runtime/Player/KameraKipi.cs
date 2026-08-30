@@ -199,7 +199,14 @@ namespace Hezarfen.Player
         /// </summary>
         private void LateUpdate()
         {
-            if (!Baglan() || !_yurume.enabled) return;
+            // UCUSTA DA CALISIR.
+            //
+            // Onceki hali `!_yurume.enabled` ise geri donuyordu ve
+            // `UcusDizisi` atlayista tam da o bileseni kapatiyor: kamera
+            // atlayisin oldugu karede DONUYORDU. Kol boyu, omuz kaymasi
+            // ve acisi neyse oyle kaliyor, fare hicbir sey yapmiyordu —
+            // oyuncu butun ucus boyunca etrafina bakamiyordu.
+            if (!Baglan()) return;
 
             float pitch = _yurume.Pitch;
 

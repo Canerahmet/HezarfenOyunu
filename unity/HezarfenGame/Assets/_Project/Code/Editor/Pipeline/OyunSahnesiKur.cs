@@ -312,16 +312,52 @@ namespace Hezarfen.Editor.Pipeline
 
             var rb = go.AddComponent<Rigidbody>();
             rb.mass = 78f; rb.isKinematic = true; rb.useGravity = false;
+            // UCUSTA HIZLI GIDILIR: ayrik carpisma ile 30 m/s'de kare
+            // basina yarim metre atlanir ve ince bir cati delinir.
+            rb.interpolation = RigidbodyInterpolation.Interpolate;
+            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+
+            // UCUS KAPSULU — yerde KAPALI, havada ACIK.
+            //
+            // `CharacterController` de bir Collider'dir ve ucusa gecerken
+            // kapatiliyordu (UcusDizisi.HavayaGec). Sonuc: ucus boyunca
+            // oyuncunun uzerinde HICBIR carpistirici kalmiyordu. Rigidbody
+            // hicbir seye carpmiyor, araziden ve binalardan geciyor,
+            // yalnizca 0,55 m'lik bir Update isinina yakalanirsa iniyordu.
+            // Yeterince hizli dusen (14 m'lik bir damdan atlamak yeter)
+            // o isini de kacirip SONSUZA KADAR dusuyordu.
+            var ucusKapsul = go.AddComponent<CapsuleCollider>();
+            ucusKapsul.height = cc.height;
+            ucusKapsul.radius = cc.radius;
+            ucusKapsul.center = cc.center;
+            ucusKapsul.enabled = false;
 
             var yurume = go.AddComponent<WalkController>();
             var suzulme = go.AddComponent<GlideController>();
             suzulme.enabled = false;
+            // AERODINAMIK AYARI OLMADAN KANAT HICBIR SEY YAPMAZ.
+            // `GlideController.FixedUpdate` ilk satirda `tuning == null`
+            // ise geri doner; yani ucus, tasima ve suruklenmesi olmayan
+            // bir SERBEST DUSUSTU. Animator ucus karisimini oynattigi icin
+            // ekranda suzuluyormus gibi gorunuyordu.
+            suzulme.tuning = AssetDatabase.LoadAssetAtPath<WindTuning>(
+                "Assets/_Project/Data/WindProfiles/WT_Faz0_Default.asset");
+            if (suzulme.tuning == null)
+                Debug.LogError("[Hezarfen] WT_Faz0_Default yok — ucus "
+                               + "aerodinamiksiz kalir.");
+
+            // GIRDI: bunlar olmadan havada W/A/S/D kanada hic ulasmaz.
+            go.AddComponent<PlayerFlightInput>();
+            var firlatma = go.AddComponent<FlightLaunch>();
+            firlatma.launchOnStart = false;     // atlayisi UcusDizisi baslatir
 
             var dizi = go.AddComponent<UcusDizisi>();
             dizi.kapsul = cc;
+            dizi.ucusKapsulu = ucusKapsul;
             dizi.govde = rb;
             dizi.suzulme = suzulme;
             dizi.yurume = yurume;
+            dizi.firlatma = firlatma;
 
             // Kamera oyuncunun GOZUNDE. Sahnedeki bagimsiz kamera
             // kaldirilir; iki kamera olursa hangisinin cizdigi belirsiz.

@@ -119,7 +119,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &1798974622
+--- !u!1 &756264245
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -127,8 +127,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1798974624}
-  - component: {fileID: 1798974623}
+  - component: {fileID: 756264247}
+  - component: {fileID: 756264246}
   m_Layer: 0
   m_Name: SEMT_D_Okmeydani
   m_TagString: Untagged
@@ -136,13 +136,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1798974623
+--- !u!114 &756264246
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1798974622}
+  m_GameObject: {fileID: 756264245}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6e60ea5c86c339049bcad6a3d68c5042, type: 3}
@@ -152,13 +152,13 @@ MonoBehaviour:
   sourceNote: 'Semt dokusu: mahalle cekirdekleri araziden turetildi (kot, egim, landmark
     uzakligi), sokak kurallari RESEARCH.md 4.1. Mahallelerin SAYISI ve YERI taslak
     (T2); kaynaklarda 1632 mahalle sinirlari yoktur.'
---- !u!4 &1798974624
+--- !u!4 &756264247
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1798974622}
+  m_GameObject: {fileID: 756264245}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -171,4 +171,4 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1798974624}
+  - {fileID: 756264247}

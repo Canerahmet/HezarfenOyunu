@@ -168,3 +168,47 @@ yolundan. Üçü de T2; Alibey ve Lykos'un kaynak satırı olmadığı
 **Eksik kalan:** kapı yolları, bostan parselleri, bağ/meyvelik ve servili
 mezarlık dokusu — yani ADR 0074'ün A seçeneğinin geri kalanı. "Boş
 duruyor" şikâyetinin asıl gövdesi orası ve sıradaki iş bu.
+
+---
+
+## Tur 4 — 2026-08-30, "hatalarin bazilari devam ediyor"
+
+Caner: *"hatalarin bazilari devam ediyor. duzelt. duzeltene kadar durma
+ayrica bina ve evler birbirine cok yakin. daha genis olabilir yolar."*
+
+51 ajanlı bir tarama 72 iddia üretti, 44'ü çürütüldü, **28'i ayakta
+kaldı**. Bu turda kapatılanlar ve ölçüleri:
+
+| kusur | önce | sonra |
+|---|---|---|
+| Evler komşusunun duvarından geçiyor | %20,0 (en kötü 2,34 m) | **%0,0** |
+| Kaldırım altında hava kalan hücre | %3,0 | **%0,6** |
+| Yapıların altında görünür boşluk | 0/17.060 | **0/17.220** |
+| Sokakta açık genişlik (ortanca) | 4,6 m hedef | **7,67 m ölçülen** |
+| Koşarken ayak kayması | döngü başına ~2,4 m | **2,0 cm** |
+| NPC gövdesi yüzeye oturuyor mu | ortalama 0,63 m havada, 15/60 gömülü | **0,00 m, 0/60 sapma** |
+| Vakit değişiminde donma | 40.000 A* tek karede | 400/kare, ~1,7 s'ye yayıldı |
+| Görünür 60 gövde | liste sırasına göre | **en yakın 60** |
+| Tekneler (373) | hiç yüklenmiyordu | Haliç ve Boğaz sahnelerinde |
+| Güneş azimutu | 180° ters (batıdan doğuyordu) | 113° — doğu-güneydoğu |
+| ESC | iki ayrı sahibi vardı, "Devam et" fare bakışını öldürüyordu | tek sahip: duraklatma menüsü |
+| Uçuşta çarpıştırıcı | **yok** — dünyadan düşülüyordu | uçuş kapsülü + sürekli temas taraması |
+| Uçuşta aerodinamik | `tuning` boş, serbest düşüş | WT_Faz0_Default bağlı |
+| Uçuşta girdi | `PlayerFlightInput` yok | eklendi |
+| Uçuşta imleç | ekranda kalıyordu | kilitli kalıyor |
+| Kayıt: aranma seviyesi | yazılıyor, okunmuyordu | geri yükleniyor |
+| Kayıt: Perde 2 ilerlemesi | alan vardı, dolduran yoktu | yazılıyor ve okunuyor |
+| Yükleme sonrası NPC | 60 donmuş gövde birikiyordu | havuza dönüyor |
+| Mahalle zemini | sekiz semtte hiç boyanmamıştı | yerleşim maskesi 5 semtte, 3.668 daireye kadar |
+
+Bu turda **kendi açtığım** iki kusur da ölçümle yakalandı ve kapatıldı:
+klipleri toptan yeniden üretmek karakteri parçaladı (ADR 0076), ve
+kalabalık dilimlemesinin tavanı normal bir kareden küçüktü.
+
+### Hâlâ açık
+
+- Şehir içi zemin: mahallenin 200 m'lik karesinde %90 çıplak arazi,
+  %82'sinin 4 m yakınında hiçbir şey yok. Zemin artık **boyanıyor** ama
+  avlu içi nesne (odun yığını, küp, çardak, kuyu) yok. Bir sonraki tur.
+- Kalan 28 bulgudan yükleme-ışınlaması (bulgu 17) ve görev üretimi
+  (bulgu 15'in görev kısmı) kapatılmadı.

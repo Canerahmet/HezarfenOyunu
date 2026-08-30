@@ -105,6 +105,24 @@ namespace Hezarfen.Player
 
         public event Action<Asama> AsamaDegisti;
 
+        /// <summary>
+        /// <b>Kayıttan gelen ilerlemeyi geri koyar.</b>
+        ///
+        /// Aşama ve talim sayısı yalnız okunurdu; kayıt dosyasındaki
+        /// <c>perde2Asama</c> ve <c>talimSayisi</c> alanları hiç
+        /// doldurulmuyordu. Sonuç: uçuşu tamamlayıp kaydeden oyuncu,
+        /// yükleyince Okmeydanı'nda talimin başında uyanıyordu.
+        /// </summary>
+        public void DurumuGeriYukle(int asama, int talimSayisi)
+        {
+            TalimSayisi = Mathf.Max(0, talimSayisi);
+            var yeni = (Asama)Mathf.Clamp(asama, 0,
+                                          Enum.GetValues(typeof(Asama)).Length - 1);
+            if (Simdiki == yeni) return;
+            Simdiki = yeni;
+            AsamaDegisti?.Invoke(Simdiki);
+        }
+
         private Vector3 _kalkis;
         private bool _ucusta;
 

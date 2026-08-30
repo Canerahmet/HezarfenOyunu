@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Hezarfen.Core;
+using Hezarfen.Streaming;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -63,18 +64,118 @@ namespace Hezarfen.Editor.Gis
             if (terrain == null) throw new Exception("TR_Istanbul yok.");
 
             int n = Scatter(terrain, 1632, out int bagliN);
-            var kok = GameObject.Find(RootName);
 
             EnsureFolder("Assets/_Project/Scenes/Districts");
-            var yeni = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,
-                                                   NewSceneMode.Additive);
-            if (kok != null) EditorSceneManager.MoveGameObjectToScene(kok, yeni);
-            EditorSceneManager.SaveScene(yeni, BoatScene);
+            // Tekneler KENDI SULARININ sahnesine gider; ayri bir
+            // "Tekneler" sahnesi YOK (gerekcesi asagida).
+            SulariylaBirlikteKaydet();
+
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene, TerrainScene);
 
             Debug.Log($"[Hezarfen] Tekneler: {n} adet ({bagliN} bagli, "
-                      + $"{n - bagliN} kurekli) -> {BoatScene}");
+                      + $"{n - bagliN} kurekli) su semtlerine dagitildi.");
+        }
+
+        /// <summary>
+        /// <b>Tekneleri kendi sularının semt sahnelerine dağıtır.</b>
+        ///
+        /// Sahne üretiliyordu (373 tekne, 1 MB YAML) ama <b>hiçbir yerden
+        /// yüklenmiyordu</b>: ne yapı ayarlarının sahne listesinde, ne
+        /// Addressables kataloğunda, ne <c>DistrictRegistry</c>'de vardı.
+        /// Haliç ve Boğaz'ın üstünde uçan oyuncu için su bomboştu —
+        /// 1632'de Haliç'te köprü yoktur ve tüm geçiş kayıkladır, yani
+        /// eksik olan şey dönemin <b>en görünür ulaşım trafiği</b>.
+        ///
+        /// ## Neden ayrı bir "Tekneler" semti DEĞİL
+        ///
+        /// İlk düzeltme tek bir <c>D_Tekneler</c> semti kurdu. Çalıştı ama
+        /// yanlıştı ve testi kırdı: tekneler Haliç'ten Boğaz'a yayılıyor,
+        /// yani tek bir semt olarak yarıçapı <b>10,6 km</b> çıkıyor ve
+        /// oyuncu Üsküdar'ın içinde otururken bile yüklü kalıyordu. Akış
+        /// testi bunu yakaladı — üç semt aynı anda çözülme kuyruğunda.
+        ///
+        /// Su zaten semtlere bölünmüş durumda (<c>D_Halic</c>,
+        /// <c>D_Bogaz</c>): tekne hangi suyun üstündeyse onun sahnesine
+        /// yazılır. Yeni semt yok, yeni adres yok, kayıt değişmiyor — ve
+        /// oyuncu o suya yaklaşınca tekneler onunla birlikte geliyor.
+        /// </summary>
+        static void SulariylaBirlikteKaydet()
+        {
+            var kok = GameObject.Find(RootName);
+            if (kok == null) return;
+
+            // Su semtleri: tanımları kayıttan okunur, elle yazılmaz.
+            var kayit = AssetDatabase.LoadAssetAtPath<DistrictRegistry>(
+                "Assets/_Project/Data/DistrictDefs/DistrictRegistry.asset");
+            var sular = new List<DistrictDef>();
+            if (kayit != null)
+                foreach (var d in kayit.districts)
+                    if (d != null && d.kind == DistrictKind.Water) sular.Add(d);
+            if (sular.Count == 0)
+            {
+                Debug.LogError("[Hezarfen] Su semti yok — tekneler "
+                               + "yuklenebilir bir yere yazilamadi.");
+                return;
+            }
+
+            // Her tekneyi ait olduğu suya ata. Poligonun dışında kalan
+            // (kıyı payı yüzünden) en yakın su semtine gider — ATILMAZ.
+            var gruplar = new Dictionary<string, GameObject>();
+            var sayilar = new Dictionary<string, int>();
+            var tekneler = new List<Transform>();
+            foreach (Transform t in kok.transform) tekneler.Add(t);
+
+            foreach (var t in tekneler)
+            {
+                DistrictDef sahip = null;
+                foreach (var d in sular)
+                    if (d.Contains(t.position)) { sahip = d; break; }
+                if (sahip == null)
+                {
+                    float en = float.MaxValue;
+                    foreach (var d in sular)
+                    {
+                        float m = Vector2.Distance(
+                            d.center, new Vector2(t.position.x, t.position.z));
+                        if (m < en) { en = m; sahip = d; }
+                    }
+                }
+                if (sahip == null) continue;
+
+                if (!gruplar.TryGetValue(sahip.districtId, out var g))
+                {
+                    g = new GameObject(RootName);
+                    var etiket = g.AddComponent<HistoricalTag>();
+                    var kaynak = kok.GetComponent<HistoricalTag>();
+                    if (kaynak != null)
+                    {
+                        etiket.tier = kaynak.tier;
+                        etiket.sourceNote = kaynak.sourceNote;
+                    }
+                    gruplar[sahip.districtId] = g;
+                    sayilar[sahip.districtId] = 0;
+                }
+                t.SetParent(g.transform, true);
+                sayilar[sahip.districtId]++;
+            }
+            UnityEngine.Object.DestroyImmediate(kok);
+
+            foreach (var kv in gruplar)
+            {
+                string yol = $"Assets/_Project/Scenes/Districts/{kv.Key}.unity";
+                var mevcut = EditorSceneManager.OpenScene(yol, OpenSceneMode.Additive);
+                // Eski tekneler once silinir: iki kez calistirmak sayiyi
+                // ikiye katlamamali.
+                foreach (var r in mevcut.GetRootGameObjects())
+                    if (r.name == RootName) UnityEngine.Object.DestroyImmediate(r);
+                EditorSceneManager.MoveGameObjectToScene(kv.Value, mevcut);
+                EditorSceneManager.MarkSceneDirty(mevcut);
+                EditorSceneManager.SaveScene(mevcut, yol);
+                EditorSceneManager.CloseScene(mevcut, true);
+                Debug.Log($"[Hezarfen] {sayilar[kv.Key]} tekne -> {kv.Key}");
+            }
+            AssetDatabase.SaveAssets();
         }
 
         public static int Scatter(Terrain terrain, int seed, out int bagliSayi)

@@ -122,6 +122,18 @@ namespace Hezarfen.Sehir
         /// <summary>Dilimin tek sahibi — sahne kurulumu bunu yazar.</summary>
         public const int VarsayilanDilim = 40;
 
+        /// <summary>
+        /// Vakit değiştiğinde kare başına kaç sakine yeni hedef verilir.
+        ///
+        /// 400: 40.000 sakin ~100 karede (1,7 s) yenilenir ve tek karede
+        /// 400 Dijkstra, ölçülen kare bütçesinin içinde kalır. Tümünü bir
+        /// karede yapmak her ezanda oyunu birkaç saniye kilitliyordu.
+        /// </summary>
+        [Range(50, 5000)] public int yenilemeButcesi = 400;
+
+        //: Yenileme kuyruğunda kaçıncı sakine gelindi.
+        private int _yenilemeDizini = int.MaxValue;
+
         /// <summary>Şu an gövdesi olan sakin sayısı — tanı ve test okur.</summary>
         public int GorunurSayisi { get; private set; }
 
@@ -155,7 +167,23 @@ namespace Hezarfen.Sehir
         /// <summary>Sakinleri dağıtır ve ilk hedeflerini verir.</summary>
         public void Kur()
         {
+            // ESKI GOVDELER ONCE HAVUZA DONER.
+            //
+            // `_sakinler.Clear()` yalniz LISTEYI bosaltiyordu; o sakinlerin
+            // sahnede duran gövdeleri hiçbir yere bağlı kalmıyordu.
+            // Kayıt yüklemek `Kur`u yeniden çağırır (F9, ya da duraklat
+            // menüsünden Yükle), yani her yüklemede o anda görünen ~60
+            // şehirli oldukları yerde DONUYOR: adım pozunda çakılı,
+            // yürüyen yeni kalabalığın içinden geçiliyor, hiç kaybolmuyor.
+            // İkinci yüklemede 60 tane daha ekleniyordu.
+            foreach (var a in _sakinler)
+            {
+                if (a.govde == null) continue;
+                GovdeBirak(a.govde);
+                a.govde = null;
+            }
             _sakinler.Clear();
+            _yenilemeDizini = int.MaxValue;
             if (graf == null || meslekler.Count == 0) return;
 
             foreach (var s in SehirGunu.Sakinler(graf, meslekler, sakinSayisi))
@@ -182,10 +210,30 @@ namespace Hezarfen.Sehir
             if (graf == null || _sakinler.Count == 0) return;
 
             // --- VAKIT DEGISTI MI: herkese yeni hedef ------------------
+            //
+            // HEDEFLER KARELERE YAYILIR.
+            //
+            // Onceki hali butun sakinleri AYNI KAREDE yeniliyordu ve her
+            // sakin icin iki `EnYakin` taramasi + bir `Yol` (Dijkstra)
+            // kosuyordu: 40.000 kisi, 1.543 dugumluk graf. Olculdu degil,
+            // gorulduydu — her ezanda oyun birkac saniye tamamen
+            // kilitleniyordu (kamera, girdi, ses). 30 dakikalik serbest
+            // dolasimda bu yedi kez oluyor.
+            //
+            // Yenileme artik bir kuyruk: kare basina `yenilemeButcesi`
+            // kisi. Sirasi gelmemis sakin eski yolunda yurumeye devam
+            // eder — gorunurde hicbir sey olmaz, cunku zaten yurumektedir.
             if (zaman != null && zaman.Vakit != _sonVakit)
             {
                 _sonVakit = zaman.Vakit;
-                HedefleriYenile();
+                _yenilemeDizini = 0;          // kuyruğu baştan başlat
+            }
+            if (_yenilemeDizini < _sakinler.Count)
+            {
+                int son = Mathf.Min(_sakinler.Count,
+                                    _yenilemeDizini + Mathf.Max(1, yenilemeButcesi));
+                HedefleriYenile(_yenilemeDizini, son);
+                _yenilemeDizini = son;
             }
 
             // --- SANAL: dilimlenmis ilerleme ---------------------------
@@ -209,22 +257,51 @@ namespace Hezarfen.Sehir
             int bas = _dilimSayaci;
             _dilimSayaci = (_dilimSayaci + 1) % dilim;
             // Dilimlenen sakin `dilim` kare bekledi; gectigi sure o kadar.
-            float dilimDt = dt * dilim;
+            //
+            // AMA CARPIM DA SINIRLANIR. `dt` 0,5 s'ye kirpilmis olsa bile
+            // `dilim` 40 iken carpim 20 SANIYE eder ve bir ajan tek karede
+            // 30 m ilerler: meydanin obur ucuna isinlayan bir adam. Her
+            // takilmadan sonra gorulen tam da buydu. Bir sayinin
+            // kirpilmasi, ondan turetilen sayinin kirpildigi anlamina
+            // gelmiyor.
+            //
+            // TAVAN NORMAL BIR KAREDEN BUYUK OLMALI. Ilk yazimda 1,0 s
+            // koydum ve bu YANLISTI: 20 fps'te dilim 40 iken normal
+            // carpim zaten 2,0 s'dir, yani tavan siradan yavas karelerde
+            // devreye girip butun kalabaligi yavaslatirdi. Testte
+            // goruldu — sakinler gun boyu evlerinden cikamadi ve gunun
+            // sonunda "kimse kimildamiyor" cikti. Kusuru duzeltirken
+            // saglam olani kirpmak, kusurun kendisinden daha sinsi.
+            //
+            // 4,0 s: 20 fps'in iki kati pay birakir, 20 saniyelik
+            // patolojik sicramayi ise hala kesip 5,6 m'ye indirir.
+            float dilimDt = Mathf.Min(dt * dilim, 4.0f);
             for (int i = bas; i < _sakinler.Count; i += dilim)
                 _sakinler[i].Ilerle(graf, dilimDt);
+
 
             // --- GORUNUR KADEME ----------------------------------------
             KademeYenile();
         }
 
-        private void HedefleriYenile()
+        /// <summary>
+        /// [<paramref name="bas"/>, <paramref name="son"/>) aralığındaki
+        /// sakinlere yeni hedef verir. Aralık, kare bütçesidir.
+        /// </summary>
+        private void HedefleriYenile(int bas, int son)
         {
             int yil = zaman != null ? zaman.yil : 1632;
             int gun = zaman != null ? zaman.yilinGunu : 121;
 
-            foreach (var a in _sakinler)
+            for (int i = bas; i < son; i++) AjaniYenile(_sakinler[i], yil, gun);
+        }
+
+        /// <summary>Bir sakine yeni hedef ve replik verir.</summary>
+        private void AjaniYenile(NPCAjan a, int yil, int gun)
+        {
             {
-                if (a.meslek == null) continue;
+                if (a.meslek == null) return;
+                a.vakitDamgasi = (int)_sonVakit;
                 // Canli sehir ve simulasyon AYNI islevi cagirir; takvim
                 // ve olaylar yalniz orada uygulanir (ADR 0071).
                 var tur = Rutin.Hedef(a.meslek, _sonVakit, a.tohum, yil, gun);
@@ -235,7 +312,7 @@ namespace Hezarfen.Sehir
                     a.meslek.tip, _sonVakit, yil, gun,
                     aranma != null && aranma.Seviye > 0f, a.tohum);
 
-                int bas = graf.EnYakin(a.konum);
+                int cikis = graf.EnYakin(a.konum);
                 int hedef = tur == SokakGrafi.Tur.Ev
                     ? a.evDugum
                     : graf.EnYakin(a.konum, tur);
@@ -244,7 +321,7 @@ namespace Hezarfen.Sehir
                 // Kayik KULLANILMAZ: rutin gundelik hayattir ve kimse
                 // her ogle namazi icin Bogaz'i gecmez. Kayik yolculugu
                 // bir GOREVDIR, rutin degil.
-                a.YolaKoy(graf.Yol(bas, hedef, kayikVar: false), hedef);
+                a.YolaKoy(graf.Yol(cikis, hedef, kayikVar: false), hedef);
             }
         }
 
@@ -267,13 +344,77 @@ namespace Hezarfen.Sehir
             // Sayac yoneticinin kendisine tasininca gercek sizinti
             // gorundu. Yanlis olcu, olmayan bir sorunu iki kez gosterip
             // gercegini gizledi.
-            int gorunur = 0;
+            // BUTCE EN YAKINLARA GIDER — LISTENIN BASINA DEGIL.
+            //
+            // Onceki hali menzildeki ilk `govdeButcesi` kisiyi aliyordu ve
+            // "ilk" demek LISTE SIRASI demekti: sakinler kurulus sirasina
+            // gore diziliydi, yani sehrin her yerinden karisik. Sonucu
+            // oyuncunun gordugu sey suydu — yanibasindaki adam aniden yok
+            // oluyor, ayni anda sokagin 110 m ilerisinde biri beliriyor.
+            // En yakin insanlar en guvenilmez sekilde ciziliyordu; tam
+            // tersi olmali.
+            //
+            // Butun menzili siralamak pahali (menzilde binlerce kisi
+            // olabilir), o yuzden `govdeButcesi` boyunda bir MAX-YIGIN
+            // tutuluyor: yigindaki en uzagi, gelen daha yakinsa atar.
+            // Maliyet O(n log k), k = 60.
+            if (_enYakinDizin == null || _enYakinDizin.Length != govdeButcesi)
+            {
+                _enYakinDizin = new int[govdeButcesi];
+                _enYakinD2 = new float[govdeButcesi];
+            }
+            int yigin = 0;
             for (int i = 0; i < _sakinler.Count; i++)
             {
                 var a = _sakinler[i];
-                a.gorunmeli = (a.konum - merkez).sqrMagnitude <= d2
-                              && gorunur < govdeButcesi;
-                if (a.gorunmeli) gorunur++;
+                a.gorunmeli = false;
+                float m2 = (a.konum - merkez).sqrMagnitude;
+                if (m2 > d2) continue;
+
+                if (yigin < govdeButcesi)
+                {
+                    _enYakinDizin[yigin] = i; _enYakinD2[yigin] = m2;
+                    int c = yigin++;
+                    while (c > 0)
+                    {
+                        int ana = (c - 1) >> 1;
+                        if (_enYakinD2[ana] >= _enYakinD2[c]) break;
+                        Takas(ana, c); c = ana;
+                    }
+                }
+                else if (m2 < _enYakinD2[0])
+                {
+                    _enYakinDizin[0] = i; _enYakinD2[0] = m2;
+                    int c = 0;
+                    while (true)
+                    {
+                        int sol = c * 2 + 1, sag = sol + 1, buyuk = c;
+                        if (sol < yigin && _enYakinD2[sol] > _enYakinD2[buyuk]) buyuk = sol;
+                        if (sag < yigin && _enYakinD2[sag] > _enYakinD2[buyuk]) buyuk = sag;
+                        if (buyuk == c) break;
+                        Takas(buyuk, c); c = buyuk;
+                    }
+                }
+            }
+            int gorunur = yigin;
+            int yil2 = zaman != null ? zaman.yil : 1632;
+            int gun2 = zaman != null ? zaman.yilinGunu : 121;
+            for (int i = 0; i < yigin; i++)
+            {
+                var a = _sakinler[_enYakinDizin[i]];
+                a.gorunmeli = true;
+                // GORUNEN BEKLEMEZ.
+                //
+                // Yenileme kuyrugu 40.000 kisiyi kare basina 400'er
+                // isliyor; sirasi gelmemis biri eski hedefiyle yurumeye
+                // devam eder ve bu gorunmez. Ama REPLIK oyle degil:
+                // yenilenmemis sakin `replik == null` tasir ve oyuncunun
+                // yanindaki adam susar. Olculdu — testte oyuncunun
+                // etrafinda konusan kimse kalmadi.
+                //
+                // Butce burada 60 govdeyle sinirli, yani bedeli sabit.
+                if (a.vakitDamgasi != (int)_sonVakit)
+                    AjaniYenile(a, yil2, gun2);
             }
 
             // BIRAK: gorunmeyecek herkes, alim yapilmadan once.
@@ -302,8 +443,23 @@ namespace Hezarfen.Sehir
                 var ileri = yon.sqrMagnitude > 1e-4f
                     ? yon.normalized : Vector3.forward;
                 var yanal = new Vector3(-ileri.z, 0f, ileri.x);
-                a.govde.position = a.konum + yanal * a.Sapma
-                                   + ileri * a.Boylamsal;
+                // SACILAN GOVDE YENIDEN ZEMINE OTURUR.
+                //
+                // Sapma gövdeyi YATAYDA kaydiriyor ama yukseklik sokak
+                // ekseninden geliyordu; yamacta bu, herkesi zeminden
+                // koparir. Olculdu: 60 govdenin ortalamasi 0,63 m HAVADA,
+                // 15 tanesi 25 cm'den fazla GOMULU — ayni anda ikisi.
+                //
+                // Isin yukaridan atiliyor cunku arazi kotu yetmez:
+                // kaldirim, kaide ve yol arazinin ustundedir. Kare basina
+                // en fazla `govdeButcesi` (60) isin — olculdu, kare
+                // suresine etkisi yok.
+                var yer = a.konum + yanal * a.Sapma + ileri * a.Boylamsal;
+                if (Physics.Raycast(yer + Vector3.up * 4f, Vector3.down,
+                                    out var vurus, 12f, ~0,
+                                    QueryTriggerInteraction.Ignore))
+                    yer.y = vurus.point.y;
+                a.govde.position = yer;
                 if (a.hiz > 0.05f && yon.sqrMagnitude > 1e-4f)
                     a.govde.rotation = Quaternion.LookRotation(yon);
                 var an = a.govde.GetComponentInChildren<Animator>();
@@ -333,6 +489,17 @@ namespace Hezarfen.Sehir
             var go = Instantiate(govdePrefab, transform);
             UretilenGovde++;
             return go.transform;
+        }
+
+        //: En yakin `govdeButcesi` kisiyi tutan max-yigin (kare basina
+        //: yeniden ayrilmasin diye alan).
+        private int[] _enYakinDizin;
+        private float[] _enYakinD2;
+
+        private void Takas(int a, int b)
+        {
+            (_enYakinDizin[a], _enYakinDizin[b]) = (_enYakinDizin[b], _enYakinDizin[a]);
+            (_enYakinD2[a], _enYakinD2[b]) = (_enYakinD2[b], _enYakinD2[a]);
         }
 
         private void GovdeBirak(Transform t)

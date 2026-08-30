@@ -89,6 +89,27 @@ namespace Hezarfen.Sehir
         /// <summary>Aranma seviyesi (0-1).</summary>
         public float Seviye { get; private set; }
 
+        /// <summary>
+        /// <b>Kayıttan gelen aranma seviyesini geri koyar.</b>
+        ///
+        /// <see cref="Seviye"/> yalnız okunurdu ve kayıt dosyasında
+        /// <c>aranmaSeviyesi</c> alanı vardı: yazılıyor, hiç okunmuyordu.
+        /// Asesler kovalarken kaydeden oyuncu, yükleyince tertemiz
+        /// uyanıyordu — HUD'daki aranma kutusu bile görünmüyordu, çünkü
+        /// o <c>Seviye > 0,01</c> ile çiziliyor. Kaçış gerilimi kaydın
+        /// içinde kayboluyordu.
+        ///
+        /// Ayrı bir metot, çünkü seviyeyi <b>oyun</b> içinde değiştiren
+        /// tek şey suç ve zaman olmalı; bu kapı yalnız yükleme içindir.
+        /// </summary>
+        public void SeviyeyiGeriYukle(float seviye)
+        {
+            Seviye = Mathf.Clamp01(seviye);
+            SuAn = Seviye <= 0.01f ? Durum.Temiz
+                 : Seviye < 0.35f ? Durum.FarkEdildi
+                 : Seviye < 0.70f ? Durum.Uyarildi : Durum.Kovalaniyor;
+        }
+
         /// <summary>Şu anki durum.</summary>
         public Durum SuAn { get; private set; } = Durum.Temiz;
 

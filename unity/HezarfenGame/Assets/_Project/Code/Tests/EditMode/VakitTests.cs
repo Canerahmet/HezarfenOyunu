@@ -197,5 +197,49 @@ namespace Hezarfen.Tests
                 "Aksam vaktine atlayinca ezani saat 12 civarinda olmali.");
             Object.DestroyImmediate(go);
         }
-    }
+    
+        /// <summary>
+        /// <b>Sabah güneşi doğudan doğar.</b>
+        ///
+        /// Vakitleri saniyesine kadar doğrulayan sekiz test vardı ve
+        /// hepsi yeşildi — ama hiçbiri <b>ışığa</b> bakmıyordu. Güneşin
+        /// açısı doğru hesaplanıp ışığa <b>180 derece ters</b> yazılmıştı:
+        /// yönlü ışığın <c>forward</c>'ı ışığın gittiği yöndür, güneşin
+        /// durduğu yön değil. Oyun 122. günün 09:00'ında başlıyor;
+        /// gölgeler güneşin batı-kuzeybatıda olduğunu söylüyordu.
+        ///
+        /// Hesap doğruyken çıktının ters olması, ölçmediğin şeyin
+        /// bozulduğunu görmemenin en temiz örneği.
+        /// </summary>
+        [Test]
+        public void TheMorningSunRisesInTheEast()
+        {
+            var go = new GameObject("ZAMAN_TEST");
+            var isik = new GameObject("GUNES").AddComponent<Light>();
+            isik.type = LightType.Directional;
+            var z = go.AddComponent<ZamanSistemi>();
+            z.gunesIsigi = isik;
+            z.gunesiSur = true;
+            z.yilinGunu = 122;          // 1 Mayis civari
+            z.saat = 9f;
+            z.Yenile();
+
+            // Gunesin BULUNDUGU yon: isigin geldigi yon, yani -forward.
+            Vector3 gunes = -isik.transform.forward;
+            Assert.Greater(gunes.y, 0.1f,
+                "Saat 09:00'da gunes ufkun USTUNDE olmali.");
+
+            // Azimut: kuzeyden (+Z) saat yonunde.
+            float azimut = Mathf.Repeat(
+                Mathf.Atan2(gunes.x, gunes.z) * Mathf.Rad2Deg, 360f);
+            // 1 Mayis, 09:00 Istanbul: ~110 derece (dogu-guneydogu).
+            Assert.That(azimut, Is.InRange(80f, 140f),
+                $"Sabah 09:00'da gunes azimutu {azimut:0} derece — "
+                + "dogu-guneydogu (80-140) olmali. 180 sapma varsa isik "
+                + "gunesin GITTIGI yone degil DURDUGU yone yazilmis.");
+
+            Object.DestroyImmediate(isik.gameObject);
+            Object.DestroyImmediate(go);
+        }
+}
 }

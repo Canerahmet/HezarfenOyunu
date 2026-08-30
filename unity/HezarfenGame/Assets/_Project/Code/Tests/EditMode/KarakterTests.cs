@@ -373,6 +373,24 @@ namespace Hezarfen.Tests
         /// Kaymayı sıfırlamak tek başına yetmez: adım uzunluğunu serbest
         /// bırakıp süreyi uzatarak da sıfırlanır, ve o zaman karakter
         /// 74 adım/dakika ile bir cenaze temposunda yürür. Gerçekten oldu.
+        ///
+        /// ## Bandın hıza bağlı olması gerekiyordu
+        ///
+        /// İlk yazımda tek bir bant vardı: 85-185 adım/dk. O bant
+        /// <b>yürüyüş için</b> doğruydu ve o gün bütün döngüler
+        /// yürüyüş hızındaydı. Koşu 6,0 m/s'ye çıkınca (21,6 km/h —
+        /// gerçekten bir sprint) çözülen tempo 190 oldu ve test kırmızı
+        /// yandı.
+        ///
+        /// Burada iki seçenek vardı ve yanlış olanı seçmek kolaydı:
+        /// tempoyu 180'e düşürüp testi memnun etmek. O, adımı 2,00 m'ye
+        /// uzatırdı — 6 m/s koşan bir insan 1,85-1,95 m adımla, 190-200
+        /// adım/dk ile koşar. Yani <b>animasyonu bozup ölçüyü
+        /// kurtarmak</b> olurdu.
+        ///
+        /// Bant hıza bağlandı: yavaşta bacak salınımı uzun, hızlıda
+        /// kısadır. Sınırlar hâlâ insanın kendi aralığı, sadece tek
+        /// sayı değil iki.
         /// </summary>
         [Test]
         public void TheWalkCadenceIsHuman()
@@ -382,8 +400,13 @@ namespace Hezarfen.Tests
                 if (k.tur != "dongu" || k.hiz < 0.01f || k.sure < 0.01f)
                     continue;
                 float tempo = 120f / k.sure;      // dongu = iki adim
-                Assert.That(tempo, Is.InRange(85f, 185f),
-                    $"{k.ad}: {tempo:0} adim/dk — insan 90-170 arasindadir.");
+                // 2,5 m/s alti yuruyus/tirmanma; ustu kosu.
+                bool kosu = k.hiz >= 2.5f;
+                float alt = kosu ? 150f : 85f;
+                float ust = kosu ? 205f : 145f;
+                Assert.That(tempo, Is.InRange(alt, ust),
+                    $"{k.ad}: {k.hiz:0.0} m/s'de {tempo:0} adim/dk — "
+                    + $"beklenen {alt:0}-{ust:0}.");
             }
         }
 
@@ -408,5 +431,87 @@ namespace Hezarfen.Tests
                 Assert.IsTrue(var_.Contains(z),
                     $"'{z}' yok — pitch/roll blend agaci kurulamaz.");
         }
-    }
+    
+        /// <summary>
+        /// <b>Klip hangi hız için yapıldıysa oyun o hızda gitmeli.</b>
+        ///
+        /// <see cref="PlantedFeetDoNotSkate"/> vardı ve <b>geçiyordu</b>
+        /// — çünkü kaymayı klibin <i>kendi</i> hızına göre ölçüyordu.
+        /// Klip 3,6 m/s için kurulmuş, kayması 2 cm; içinde tutarlı.
+        /// Ama <see cref="WalkController.VarsayilanKosma"/> 6,0 m/s idi
+        /// ve karakter koşarken ayakları yerde <b>%67 kayarak</b>
+        /// süzülüyordu. Caner bunu oynarken gördü:
+        ///
+        /// > "karakter gorunumundeyken kosmaya baslayinca problem oluyor"
+        ///
+        /// Yanlış olan ölçtüğüm şey değildi, <b>ölçme biçimimdi</b>: iki
+        /// sayının kendi içinde tutarlı olması, birbirleriyle tutarlı
+        /// olduğu anlamına gelmiyor. Bu test o ikisini karşılaştırır.
+        ///
+        /// Zincir üç halka: C# sabiti → klip kataloğu → animatörün
+        /// karışım eşiği. Üçü de aynı sayıyı söylemeli.
+        /// </summary>
+        [Test]
+        public void ClipSpeedsMatchController()
+        {
+            var beklenen = new Dictionary<string, float>
+            {
+                { "Yurume", WalkController.VarsayilanYurume },
+                { "Kosma",  WalkController.VarsayilanKosma  },
+            };
+
+            var bulunan = new Dictionary<string, float>();
+            foreach (var k in Klipler())
+                if (beklenen.ContainsKey(k.ad)) bulunan[k.ad] = k.hiz;
+
+            foreach (var kv in beklenen)
+            {
+                Assert.IsTrue(bulunan.ContainsKey(kv.Key),
+                    $"Klip katalogunda '{kv.Key}' yok.");
+                Assert.AreEqual(kv.Value, bulunan[kv.Key], 0.01f,
+                    $"'{kv.Key}' klibi {bulunan[kv.Key]:0.00} m/s icin "
+                    + $"uretilmis ama oyun {kv.Value:0.00} m/s gidiyor. "
+                    + "Klipleri yeniden uret: gen_animasyon.py hizi "
+                    + "WalkController'dan OKUR, elle yazilmaz.");
+            }
+        }
+
+        /// <summary>
+        /// Animatörün karışım eşiği de aynı sayıyı söyler.
+        ///
+        /// Eşik klibin hızından farklıysa Unity yanlış klipte durur:
+        /// eşik büyükse koşarken yürüme klibi oynar, küçükse yürürken
+        /// koşu. Katalog ile C# tutup animatör kaçarsa kusur yine
+        /// ekranda görünür ama iki test birden yeşil kalır.
+        /// </summary>
+        [Test]
+        public void BlendThresholdsMatchController()
+        {
+            const string yol =
+                "Assets/_Project/Art/Animation/AC_Hezarfen.controller";
+            var ac = UnityEditor.AssetDatabase
+                .LoadAssetAtPath<UnityEditor.Animations.AnimatorController>(yol);
+            Assert.IsNotNull(ac, $"Animator denetleyicisi yok: {yol}");
+
+            UnityEditor.Animations.BlendTree agac = null;
+            foreach (var katman in ac.layers)
+                foreach (var d in katman.stateMachine.states)
+                    if (d.state.motion is UnityEditor.Animations.BlendTree bt
+                        && bt.blendParameter == "hiz")
+                    { agac = bt; break; }
+            Assert.IsNotNull(agac,
+                "'hiz' ile surulen karisim agaci bulunamadi.");
+
+            float enBuyuk = float.MinValue, ikinci = float.MinValue;
+            foreach (var c in agac.children)
+            {
+                if (c.threshold > enBuyuk) { ikinci = enBuyuk; enBuyuk = c.threshold; }
+                else if (c.threshold > ikinci) ikinci = c.threshold;
+            }
+            Assert.AreEqual(WalkController.VarsayilanKosma, enBuyuk, 0.01f,
+                "En yuksek karisim esigi kosma hiziyla tutmuyor.");
+            Assert.AreEqual(WalkController.VarsayilanYurume, ikinci, 0.01f,
+                "Ikinci karisim esigi yurume hiziyla tutmuyor.");
+        }
+}
 }

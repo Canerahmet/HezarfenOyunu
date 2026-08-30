@@ -66,9 +66,21 @@ namespace Hezarfen.Arayuz
         {
             Duraklatildi = dur;
             Time.timeScale = dur ? 0f : 1f;
-            Cursor.lockState = dur ? CursorLockMode.None
-                                   : CursorLockMode.Locked;
-            Cursor.visible = dur;
+
+            // IMLECIN VE BAKISIN TEK SAHIBI BURASI.
+            //
+            // Once burasi yalniz `Cursor`u yaziyordu; `WalkController` ise
+            // kendi `looking` alanini Esc ile ayri ceviriyordu. Iki sahip,
+            // iki deger: "Devam et"e tiklayan oyuncunun imleci kilitleniyor
+            // ama bakisi olu kaliyordu. Artik ikisi birlikte set ediliyor.
+            var yurume = Object.FindAnyObjectByType<Player.WalkController>();
+            if (yurume != null) yurume.Capture(!dur);
+            else
+            {
+                Cursor.lockState = dur ? CursorLockMode.None
+                                       : CursorLockMode.Locked;
+                Cursor.visible = dur;
+            }
         }
 
         public void Kaydet()

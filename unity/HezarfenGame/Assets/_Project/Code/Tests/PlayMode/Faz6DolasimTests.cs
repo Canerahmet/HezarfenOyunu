@@ -185,7 +185,25 @@ namespace Hezarfen.Tests
                 + "buyur.");
 
             // SEHIR HALA YURUYOR MU: don ve hareket olctur.
+            //
+            // ÖLÇÜM GÜNDÜZ YAPILIR — YATSIDA DURMAK DOĞRUDUR.
+            //
+            // Bu ölçüm döngünün bıraktığı vakitte yapılıyordu ve o vakit
+            // enum'un sonuncusu, yani <b>Yatsı</b>. Yatsıda rutin herkesi
+            // EVE gönderir; evinde olan bir sakinin yolu tek düğümdür ve
+            // kımıldamaması <b>doğru davranıştır</b>. Test bunu yine de
+            // geçiyordu, çünkü gün boyunca kareler yavaştı: replik
+            // korpusu her sakin için 5.088 satır tarıyordu, kare uzuyordu,
+            // <c>dt</c> büyüyordu ve sakinler evlerinden uzaklaşacak kadar
+            // yol alıyordu. Korpus önbelleğe alınıp kareler hızlanınca
+            // sakinler evde kaldı ve test kırmızı yandı — <b>ölçtüğü şey
+            // yürüyüş değil, kendi yavaşlığıydı.</b>
+            //
+            // Ölçüm artık hedefin evden BAŞKA olduğu bir vakitte yapılır:
+            // "şehir hâlâ yürüyor mu" sorusu böyle sorulur.
+            z.VakteAtla(VakitHesabi.Vakit.Ogle);
             _oyuncuGo.transform.position = new Vector3(200f, 0f, 200f);
+            yield return null;
             yield return null;
             var once = y.Sakinler.Select(a => a.konum).ToList();
             float t = 0f;

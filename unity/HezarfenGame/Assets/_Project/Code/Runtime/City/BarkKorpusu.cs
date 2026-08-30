@@ -126,15 +126,38 @@ namespace Hezarfen.Sehir
         /// <summary>
         /// Bu bağlamda söylenebilecek replikler.
         /// </summary>
+        //: (meslek, vakit, yil, gun, aranma) -> havuz. Bkz. `Havuz`.
+        private static readonly Dictionary<(int, int, int, int, bool),
+                                           List<Replik>> _havuzlar = new();
+
+        /// <summary>
+        /// Bir bağlama uyan repliklerin listesi — <b>bellekte tutulur.</b>
+        ///
+        /// Önce her çağrıda 5.088 repliğin tamamı baştan taranıyordu ve
+        /// çağıran <see cref="Sec"/>, vakit değişiminde <b>40.000 sakinin
+        /// her biri için</b> bir kez çağrılıyordu: 203 milyon süzgeç
+        /// çağrısı ve 40.000 kısa ömürlü liste, hepsi tek karede. Oyuncu
+        /// için bu, her ezanda birkaç saniyelik donma demekti.
+        ///
+        /// Bağlam sayısı küçüktür (meslek × vakit × aranma), yani sonuç
+        /// tekrar tekrar hesaplanan ama <b>hiç değişmeyen</b> bir şeydi.
+        /// </summary>
         public static List<Replik> Havuz(NPCMeslek.Tip meslek,
                                          VakitHesabi.Vakit vakit,
                                          int yil, int gun, bool araniyor)
         {
+            var anahtar = ((int)meslek, (int)vakit, yil, gun, araniyor);
+            if (_havuzlar.TryGetValue(anahtar, out var hazir)) return hazir;
+
             var liste = new List<Replik>();
             foreach (var r in Hepsi)
                 if (Uygun(r, meslek, vakit, yil, gun, araniyor)) liste.Add(r);
+            _havuzlar[anahtar] = liste;
             return liste;
         }
+
+        /// <summary>Korpus yeniden yüklenirse önbellek de düşer.</summary>
+        public static void OnbellegiBosalt() => _havuzlar.Clear();
 
         /// <summary>
         /// Bir replik seçer; havuz boşsa <c>null</c>.
