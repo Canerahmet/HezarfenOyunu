@@ -114,6 +114,16 @@ namespace Hezarfen.Editor.Gis
         /// </summary>
         public const float BahceDuvarYukseklik = 1.95f;
 
+        /// <summary>
+        /// Bahçe kapısının açıklığı (m) — duvarda bırakılan boşluk.
+        ///
+        /// 1,4 m: bir kişinin yüklü geçebileceği en. Kapı kanadı
+        /// modellenmiyor; kapatılmış bir bahçe oynanabilir değil ve
+        /// oyuncunun 10.868 avlunun hiçbirine girememesi, avluyu
+        /// yapmamakla aynı kapıya çıkardı.
+        /// </summary>
+        public const float KapiAcikligi = 1.4f;
+
         [Serializable] private class Variant
         {
             public string name;
@@ -1069,7 +1079,32 @@ namespace Hezarfen.Editor.Gis
                     (new Vector3(-hw, 0f, 0f), Kalinlik, b.olcu.y),
                 };
 
-                foreach (var k in kenarlar)
+                // BAHCE KAPISI: bir yan duvarda acik birakilir.
+                //
+                // Kapatilmis bir bahce oynanabilir degil: oyuncu 10.868
+                // avlunun hicbirine giremez. Kapi TARIHSEL olarak da
+                // gerekli — avlunun kapisi vardir ve mahremiyeti saglayan
+                // sey duvarin sagirligi degil kapinin kendisidir.
+                //
+                // Kapi modellenmiyor, ACIKLIK birakiliyor: yan duvar iki
+                // parcaya bolunur ve arasinda `KapiAcikligi` kadar bosluk
+                // kalir. Hangi yan oldugu tohumdan turer.
+                bool kapiSagda = ((int)(b.c.x * 7.3f + b.c.y * 3.1f) & 1) == 0;
+                var kenarListesi = new List<(Vector3 yerel, float g, float d)>();
+                for (int ki = 0; ki < kenarlar.Length; ki++)
+                {
+                    var k0 = kenarlar[ki];
+                    bool buYanKapili = (ki == 1 && kapiSagda) || (ki == 2 && !kapiSagda);
+                    if (!buYanKapili) { kenarListesi.Add(k0); continue; }
+
+                    // Aciklik EVE YAKIN ucta: bahceye evin yanindan girilir.
+                    float kalanD = Mathf.Max(0.6f, k0.d - KapiAcikligi);
+                    float kaydir = (k0.d - kalanD) * 0.5f;
+                    kenarListesi.Add((k0.yerel + new Vector3(0f, 0f, -kaydir),
+                                      k0.g, kalanD));
+                }
+
+                foreach (var k in kenarListesi)
                 {
                     var merkez = new Vector3(b.c.x, 0f, b.c.y) + rot * k.yerel;
                     float dip = float.MaxValue;

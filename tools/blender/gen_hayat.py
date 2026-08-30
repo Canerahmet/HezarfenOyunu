@@ -21,6 +21,7 @@ for _p in (_HERE, os.path.join(_HERE, "lib")):
         sys.path.insert(0, _p)
 
 import hayat_kit as hk              # noqa: E402
+import nature_kit as nk             # noqa: E402
 import hz_blender as hz             # noqa: E402
 from export_fbx import export_fbx   # noqa: E402
 
@@ -49,6 +50,18 @@ VARIANTS = [
     ("Cardak_A",  "cardak",  1.00, 53, "asma cardagi — altindan gecilir"),
     ("Kuyu_A",    "kuyu",    1.00, 61, "avlu kuyusu, makarali"),
     ("Cit_A",     "cit",     1.00, 71, "bahce siniri — avlu duvari tas, bahce citi calidir"),
+    ("Sebze_A",   "sebze",   1.00, 83, "sebze tahtasi — bahcenin islenmis kismi"),
+    ("Sebze_B",   "sebze",   0.88, 89, "kucuk tahta"),
+]
+
+#: Bahce agaci AYRI uretilir: `nature_kit` zaten agac kuruyor ve
+#: burada yeniden yazmak ikinci bir agac tanimi demek olurdu.
+#: "Meyve agaci" DENMIYOR — meyve geometrisi yok ve kaynakta bahce
+#: agacinin turu yazmiyor; iddia edilen tek sey KUCUK, YUVARLAK TACLI
+#: bir agac oldugu.
+AGACLAR = [
+    ("BahceAgaci_A", 3.8, 101, "bahce agaci — evin arkasinda golge"),
+    ("BahceAgaci_B", 3.1, 103, "kucuk bahce agaci"),
 ]
 
 
@@ -72,6 +85,7 @@ def main():
         with open(args.catalog, encoding="utf-8") as fh:
             mevcut = json.load(fh).get("variants", [])
     yeni = {f"SM_{n}" for n, _, _, _, _ in VARIANTS}
+    yeni |= {f"SM_{n}" for n, _, _, _ in AGACLAR}
     catalog = [v for v in mevcut if v.get("name") not in yeni]
 
     for name, tur, olcek, tohum, why in VARIANTS:
@@ -107,10 +121,37 @@ def main():
                f"{info['footprint_y']:.2f} x {info['height']:.2f} m, "
                f"{info['tris_lod0']:4d} ucgen  {why}")
 
+    for name, boy, tohum, why in AGACLAR:
+        hz.reset_scene()
+        col = hz.collection(COLLECTION)
+        asset = f"SM_{name}"
+        lod0, lod1, ucx, info = nk.build_agac(
+            nk.AgacParams(kind="cinar", height=boy, seed=tohum, segments=8),
+            col, asset, textured=not args.no_textures)
+        _ = (lod0, lod1, ucx)
+        if abs(info["pivot_min_z"]) > 1e-3:
+            raise SystemExit(f"[HZ] HATA {name}: pivot tabanda degil "
+                             f"({info['pivot_min_z']})")
+        # Bahce agaci EV BOYUNU asmaz: ev ~8 m; 5 m'yi gecen bir agac
+        # bahcenin degil korunun agacidir.
+        if info["height"] > 5.0:
+            raise SystemExit(f"[HZ] HATA {name}: {info['height']} m — "
+                             "bahce agaci degil, koru agaci olur")
+        info.update(name=asset, prefab=f"PF_{name}", why=why,
+                    tier=TIER, source=SOURCE, kind="hayat_agac")
+        catalog.append(info)
+        hz.save_blend(os.path.join(args.blend_dir, f"{asset}.blend"))
+        if args.export:
+            export_fbx(os.path.join(args.out_dir, f"{asset}.fbx"),
+                       collection_name=COLLECTION)
+        hz.log(f"{name:12s} {info['height']:.2f} m, "
+               f"{info['tris_lod0']:4d} ucgen  {why}")
+
     catalog.sort(key=lambda v: v["name"])
     with open(args.catalog, "w", encoding="utf-8") as fh:
         json.dump({"variants": catalog}, fh, ensure_ascii=False, indent=1)
-    hz.log(f"{len(VARIANTS)} hayat donatisi; katalog: {args.catalog}")
+    hz.log(f"{len(VARIANTS) + len(AGACLAR)} hayat donatisi; "
+           f"katalog: {args.catalog}")
 
 
 if __name__ == "__main__":

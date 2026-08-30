@@ -50,7 +50,8 @@ KUYU_BILEZIK_Z = 0.80
 class HayatParams(object):
     """Tek bir hayat donatısı. `tur` hangi nesne olduğunu söyler."""
 
-    TURLER = ("odunluk", "kup", "sepet", "cardak", "kuyu", "cit")
+    TURLER = ("odunluk", "kup", "sepet", "cardak", "kuyu", "cit",
+              "sebze")
 
     def __init__(self, tur="odunluk", olcek=1.0, tohum=0, palette="default"):
         self.tur = tur
@@ -196,10 +197,26 @@ def _cardak(parts, l1, mats, col, s, tohum):
             f"Kafes_{k}", (d * 0.7, derin, d * 0.6),
             (t * en * 0.42, 0.0, yuk + d * 1.2), col),
             mats["timber_bare"]))
+    # ASMA: cardak bos bir iskele degil, uzerine asma sarilir.
+    #
+    # Iskeleti tek basina koymak "insaat" gibi okunuyordu; cardagin
+    # varlik sebebi golgedir ve golgeyi yaprak yapar. Yaprak orgusu
+    # kafesin USTUNE, hafif tasarak konur — asma kenardan sarkar.
+    parts.append(hz.assign(hz.make_box(
+        "Asma", (en * 1.06, derin * 1.06, d * 0.55),
+        (0.0, 0.0, yuk + d * 1.55), col), mats["foliage_cinar"]))
+    for k in range(4):
+        # Kenardan sarkan salkimlar: duz bir levha "tente" gibi okunur.
+        float_t = -1.0 + 2.0 * (k + 0.5) / 4.0
+        parts.append(hz.assign(hz.make_box(
+            f"AsmaSarkma_{k}", (d * 1.6, d * 1.6, d * 2.4),
+            (float_t * en * 0.40, derin * 0.52, yuk + d * 0.6), col),
+            mats["foliage_cinar"]))
+
     l1.append(hz.assign(hz.make_box(
         "L1_Cardak", (en, derin, yuk), (0.0, 0.0, yuk * 0.5), col),
         mats["timber_bare"]))
-    return en, derin, yuk + d * 1.5
+    return en * 1.06, derin * 1.06, yuk + d * 1.9
 
 
 # ------------------------------------------------------------------ kuyu
@@ -275,9 +292,54 @@ def _cit(parts, l1, mats, col, s, tohum):
     return en, d * 3, yuk
 
 
+# ----------------------------------------------------------------- sebze
+
+def _sebze(parts, l1, mats, col, s, tohum):
+    """
+    **Sebze tahtası.** Bahçenin işlenmiş kısmı: sürülmüş toprak sırtları
+    ve üstünde yeşil.
+
+    Ölçü insandan: sırt arası 0,55 m (iki sıra arasından geçilir), tahta
+    2,4 x 1,6 m (bir kişinin eğilmeden ulaşabileceği en), sırt 0,22 m
+    yüksek (çapayla atılan toprak).
+    """
+    en, derin = 2.40 * s, 1.60 * s
+    sirt_h = 0.22 * s
+    sira = 3
+    # EKILI TAHTA YESILDIR, KAHVERENGI DEGIL.
+    #
+    # Ilk yazimda sirtlar `bark` malzemesiyleydi — mantik "toprak
+    # kahverengidir" idi ama `bark` AGAC KABUGU dokusudur ve dokulu
+    # boru hattinda turuncu okuyor: bahcedeki 1.945 tahta, yerden
+    # bakinca turuncu sandiklara donmustu.
+    #
+    # Dogrusu daha basit: ekili bir sebze tahtasinin GORUNEN yuzeyi
+    # bitkidir. Toprak yalnizca kenarda, ince bir seritte gorunur.
+    for i in range(sira):
+        y = -derin * 0.5 + derin * (i + 0.5) / sira
+        # Toprak: alcak ve ince — yalnizca sirtin kenari gorunur.
+        parts.append(hz.assign(hz.make_box(
+            f"Sirt_{i}", (en, derin / sira * 0.72, sirt_h * 0.45),
+            (0.0, y, sirt_h * 0.225), col), mats["trim"]))
+        # Bitki: sirtin ustunu ortuyor.
+        for k in range(4):
+            x = -en * 0.5 + en * (k + 0.5) / 4.0
+            h = (0.22 + 0.12 * _rnd(tohum, i * 13 + k)) * s
+            parts.append(hz.assign(hz.make_box(
+                f"Yesil_{i}_{k}", (en / 4.0 * 0.82, derin / sira * 0.66, h),
+                (x, y, sirt_h * 0.45 + h * 0.5), col),
+                mats["foliage_cinar"]))
+
+    l1.append(hz.assign(hz.make_box(
+        "L1_Sebze", (en, derin, sirt_h * 2.0),
+        (0.0, 0.0, sirt_h), col), mats["bark"]))
+    return en, derin, sirt_h + 0.26 * s
+
+
 _YAPICILAR = {
     "odunluk": _odunluk, "kup": _kup, "sepet": _sepet,
     "cardak": _cardak, "kuyu": _kuyu, "cit": _cit,
+    "sebze": _sebze,
 }
 
 

@@ -140,6 +140,9 @@ namespace Hezarfen.Editor.Gis
             ("PF_Cardak_A", 3),                 // yer kaplar, seyrek
             ("PF_Kuyu_A", 2),                   // her avluda kuyu olmaz
             ("PF_Cit_A", 4),
+            // BAHCENIN KENDISI: duvar bir sinir cizdi, icini bunlar doldurur.
+            ("PF_Sebze_A", 6), ("PF_Sebze_B", 5),
+            ("PF_BahceAgaci_A", 4), ("PF_BahceAgaci_B", 3),
         };
 
         [MenuItem("Hezarfen/GIS/Hayat dokusunu kur")]

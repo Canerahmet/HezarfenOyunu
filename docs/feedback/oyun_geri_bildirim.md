@@ -277,3 +277,34 @@ arkasında çit yok, duvar yok" diye bitmişti. Artık her evin arkasında
    indirip sıklığı ızgaradan kazandım. Eleme **nerede**, ızgara **ne
    kadar** olduğunu ayarlıyor; ikisini tek sayıya yüklemek ikisini
    birden yanlış yapıyordu.
+
+### Tur 5b — bahçenin içi ve kapısı
+
+Parsel duvarı sınırı çizdi ama içi boştu ve **kapısı yoktu** — 10.868
+avlunun hiçbirine girilemiyordu.
+
+- **Kapı:** yan duvarda 1,4 m'lik açıklık, hangi yan olduğu tohumdan.
+  Kanat modellenmedi; kapatılmış bahçe, bahçe yapmamakla aynı kapıya
+  çıkıyordu.
+- **Dikim:** sebze tahtası (2 boy) ve bahçe ağacı (2 boy) eklendi;
+  çardağa asma sarıldı — boş iskele "inşaat" gibi okunuyordu.
+- Yerleşen: **22.050 eşya**, 1.945 sebze tahtası, 1.247 bahçe ağacı,
+  542 çardak.
+
+Sebze tahtasının ilk hâli `bark` malzemesindeydi ("toprak kahverengidir"
+diye) ve dokulu boru hattında **turuncu** okudu: bahçede oturan 1.945
+tahta, yerden bakınca turuncu sandıklara dönmüştü. Doğrusu daha basit —
+ekili bir tahtanın görünen yüzeyi bitkidir; toprak yalnız kenarda
+görünür.
+
+**Ağaç adı "meyve ağacı" DEĞİL:** meyve geometrisi yok ve kaynakta
+bahçe ağacının türü yazmıyor. İddia edilen tek şey küçük, yuvarlak taçlı
+bir ağaç olduğu — `BahceAgaci`.
+
+Denetim: 36.302 yapı, **0 boşluk**; yüzey (kaldırım + bahçe duvarı)
+%0,4 hava.
+
+> Açık kalan: editörde semt akışı bir turda takıldı (D_Galata 5+ dakika
+> yüklenmedi, kuyruk kilitlendi). Addressables kataloğu build'den kalma
+> olduğu için editöre özgü görünüyor; build kataloğu yeniden kuruyor.
+> Oynarken takılma görülürse ilk bakılacak yer burası.
