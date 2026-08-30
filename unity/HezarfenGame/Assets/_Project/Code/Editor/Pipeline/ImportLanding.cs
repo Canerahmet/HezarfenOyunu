@@ -171,10 +171,26 @@ namespace Hezarfen.Editor.Pipeline
         /// </summary>
         private static void AttachCollider(GameObject root)
         {
+            // IKI CARPISMA TURU, IKI ONEK.
+            //
+            //   UCX_   dolu kutle  -> convex
+            //   UCXB_  ici BOS     -> convex DEGIL
+            //
+            // Ayrim sart, cunku convex bir mesh collider **disbukey
+            // zarfi** alir: ici bos bir kabugu convex yapmak deligi
+            // kapatir ve ev yine girilmez olur. Bunu kapinin acikligini
+            // Blender'da acip Unity'de sessizce kapatarak ogrenmek
+            // kolaydi — onek, o sessizligi kaldiriyor.
+            //
+            // Convex yalnizca Rigidbody ile carpisacak collider'lar icin
+            // zorunlu; evler statiktir.
             MeshFilter ucx = null;
+            bool bos = false;
             foreach (var mf in root.GetComponentsInChildren<MeshFilter>(true))
             {
-                if (mf.gameObject.name.StartsWith("UCX_")) { ucx = mf; break; }
+                string ad = mf.gameObject.name;
+                if (ad.StartsWith("UCXB_")) { ucx = mf; bos = true; break; }
+                if (ad.StartsWith("UCX_")) { ucx = mf; break; }
             }
 
             if (ucx == null)
@@ -186,7 +202,7 @@ namespace Hezarfen.Editor.Pipeline
             var col = root.GetComponent<MeshCollider>();
             if (col == null) col = root.AddComponent<MeshCollider>();
             col.sharedMesh = ucx.sharedMesh;
-            col.convex = true;
+            col.convex = !bos;
 
             Object.DestroyImmediate(ucx.gameObject);
         }

@@ -255,7 +255,7 @@ namespace Hezarfen.Tests
             Assert.IsTrue(col.convex, "Rigidbody ile carpisabilmesi icin convex sart.");
 
             foreach (var mf in house.GetComponentsInChildren<MeshFilter>(true))
-                Assert.IsFalse(mf.gameObject.name.StartsWith("UCX_"),
+                Assert.IsFalse(mf.gameObject.name.StartsWith("UCX"),
                     "UCX_ yardimci nesnesi prefab'da kalmamali.");
         }
 

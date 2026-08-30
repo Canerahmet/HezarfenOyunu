@@ -1163,9 +1163,7 @@ def build_house(p, col, asset_name, textured=False):
     # --- Carpisma kutlesi ---
     # Siluetten DAR: ucus oyununda oyuncu "degmedim ama carpistim" hissini
     # affetmez. Sacak ve cumba collider'a girmez.
-    ucx = hz.make_box(f"UCX_{asset_name}", (p.width, p.depth, total_h * 0.98),
-                      (0.0, 0.0, total_h * 0.49), col)
-    hz.assign(ucx, mats["stone"])
+    ucx = _carpisma(p, col, mats, asset_name, total_h)
 
     # UV yalnizca gorunen mesh'lere. UCX cizilmez; UV'si bos kalabilir.
     # Sira onemli: UV, LOD'lar BIRLESTIRILDIKTEN sonra uretilir cunku malzeme
@@ -1199,6 +1197,95 @@ def build_house(p, col, asset_name, textured=False):
         "palette": p.palette,
     }
     return lod0, lod1, lod2, ucx, info
+
+
+def _carpisma(p, col, mats, asset_name, total_h):
+    """
+    Çarpışma kütlesi: **zemin katı boş, üstü dolu.**
+
+    ## Neden hiç girilemiyordu
+
+    Collider tek bir dolu kutuydu. Cephe `near` kipinde zaten delikti —
+    kapı gerçek bir açıklıktı, sövesi ve nişi vardı — ama oyuncu o
+    açıklıktan geçemiyordu, çünkü fizik evi katı bir blok sanıyordu.
+    Caner'in isteği (*"evlerin içi de erişilebilir olsun"*) bir geometri
+    işi gibi görünüyor; asıl engel fizikteydi.
+
+    ## Neden yalnız zemin kat boşaltılıyor
+
+    Üst katları da boşaltmak, süzülen oyuncunun evin **içinden geçmesine**
+    izin verirdi. Uçuş çarpışması bu oyunun yarısı. Zemin kat girilir,
+    üstü tek kütle kalır: iki gereksinim de karşılanır ve collider yedi
+    kutuya çıkar, yüzlerceye değil.
+
+    ## Kapı boşluğu ölçüden gelir
+
+    Kapının eni ve yeri `_opening_layout`'tan **okunur**, burada yeniden
+    hesaplanmaz. İki yerde iki formül olsaydı, cephedeki delikle
+    collider'daki boşluk er ya da geç birbirinden kayardı — ve o kayma
+    ancak oyuncu görünmez bir duvara toslayınca fark edilirdi.
+    """
+    t = max(p.wall_thickness, 0.25)
+    w, d = p.width, p.depth
+    z0 = p.plinth                      # zemin katin dosemesi
+    z1 = z0 + p.floor_height           # tavani
+    ust = total_h * 0.98
+
+    kapi = None
+    for o in _opening_layout(p, w * 0.86, True):
+        if o["kind"] == "door":
+            kapi = o
+            break
+
+    kutular = []
+
+    def kutu(ad, boyut, merkez):
+        kutular.append(hz.make_box(ad, boyut, merkez, col))
+
+    # 1) Subasman: dolu. Zemin dosemesi de budur.
+    kutu(f"{asset_name}_c_taban", (w, d, z0), (0.0, 0.0, z0 * 0.5))
+
+    # 2) On duvar: kapinin iki yani. Bosluk DOSEMEDEN baslar; esik
+    #    yalnizca 14 cm ve karakter denetleyicisi onu adim olarak gecer.
+    #    Boslugu esikten baslatmak, gorunmeyen 14 cm'lik bir bariyer
+    #    birakirdi.
+    yon = -d * 0.5 + t * 0.5
+    if kapi is None:
+        kutu(f"{asset_name}_c_on", (w, t, z1 - z0), (0.0, yon, (z0 + z1) * 0.5))
+    else:
+        gk = kapi["w"] + 0.10          # 5 cm pay, iki yanda
+        sol_en = (w - gk) * 0.5 + kapi["cu"]
+        sag_en = (w - gk) * 0.5 - kapi["cu"]
+        if sol_en > 0.05:
+            kutu(f"{asset_name}_c_on_sol", (sol_en, t, z1 - z0),
+                 (-w * 0.5 + sol_en * 0.5, yon, (z0 + z1) * 0.5))
+        if sag_en > 0.05:
+            kutu(f"{asset_name}_c_on_sag", (sag_en, t, z1 - z0),
+                 (w * 0.5 - sag_en * 0.5, yon, (z0 + z1) * 0.5))
+        # Kapinin USTU kapali: lento hizasindan tavana kadar duvar var.
+        lento = z0 + kapi["v1"]
+        if z1 - lento > 0.05:
+            kutu(f"{asset_name}_c_on_lento", (gk, t, z1 - lento),
+                 (kapi["cu"], yon, (lento + z1) * 0.5))
+
+    # 3) Arka ve yan duvarlar: tam.
+    kutu(f"{asset_name}_c_arka", (w, t, z1 - z0),
+         (0.0, d * 0.5 - t * 0.5, (z0 + z1) * 0.5))
+    for sx in (-1.0, 1.0):
+        kutu(f"{asset_name}_c_yan", (t, d - 2.0 * t, z1 - z0),
+             (sx * (w * 0.5 - t * 0.5), 0.0, (z0 + z1) * 0.5))
+
+    # 4) Ust kutle: zemin katin tavanindan catiya kadar DOLU.
+    if ust > z1 + 0.05:
+        kutu(f"{asset_name}_c_ust", (w, d, ust - z1), (0.0, 0.0, (z1 + ust) * 0.5))
+
+    ucx = hz.join(kutular, f"UCXB_{asset_name}", col)
+    # Parcalar birlestirmeden SONRA sahnede kaliyor ve kalirsa ihrac
+    # edilirler: ev basina sekiz gereksiz mesh. LOD kodu ayni sebeple
+    # `_purge` cagiriyor; burada da cagrilmali.
+    _purge(kutular)
+    hz.assign(ucx, mats["stone"])
+    return ucx
 
 
 # ------------------------------------------------------------------ yardımcı

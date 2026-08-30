@@ -150,7 +150,7 @@ namespace Hezarfen.Editor.Pipeline
             // adlandirma sozlesmesini (CLAUDE.md) Unity bilmez; renderer'i biz kapatiriz.
             foreach (var mf in root.GetComponentsInChildren<MeshFilter>(true))
             {
-                if (!mf.gameObject.name.StartsWith("UCX_")) continue;
+                if (!mf.gameObject.name.StartsWith("UCX")) continue;   // UCX_ ve UCXB_
                 var mr = mf.GetComponent<MeshRenderer>();
                 if (mr != null) mr.enabled = false;
             }
