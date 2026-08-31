@@ -137,7 +137,28 @@ namespace Hezarfen.Sehir
             // (grafta o turden durak yoksa) otekine gecilir. Sessizce
             // gorevsiz kalmak, bu projede tekrar eden "sistem var ama
             // ulasmiyor" kusurunun yeni bir hali olurdu.
+            // ARKETIP SIRAYLA DEGIL, YAKINLIGA GORE SECILIR.
+            //
+            // Once sirayla deneniyordu ve ilk uretilen alinıyordu.
+            // Olculdu: gorev basina 14,6 dakika yuruyus, cunku
+            // `Teslimat` ve `Tedarik` Han istiyor ve Galata
+            // bileseninde **tek han** var — o arketipler her seferinde
+            // sehrin obur ucuna gonderiyordu.
+            //
+            // Arketiplerin durak turleri tarihsel iddia tasiyor
+            // ("iskeleden yuku al, carsiya goturur — Halic'te kopru
+            // yok") ve onlari gevsetmek bir TARIH karari olur. Ama
+            // hangisinin secilecegi bir muhendislik karari: uygun olan
+            // hepsini uret, en yakinini ver.
+            //
+            // Sonuc: `Kayip` (mescit-cesme-ev; 130 mescit, 272 cesme)
+            // Galata'da bol, `Teslimat` seyrek — ve oyuncu yakindakini
+            // aliyor. Uzak arketipler kaybolmuyor, sirasi geldiginde
+            // ve yakininda karsiligi oldugunda cikiyor.
             var hepsi = (GorevArketip[])Enum.GetValues(typeof(GorevArketip));
+            Gorev enIyi = null;
+            float enIyiYol = float.MaxValue;
+
             for (int i = 0; i < hepsi.Length; i++)
             {
                 var a = hepsi[(_sayac + i) % hepsi.Length];
@@ -145,12 +166,36 @@ namespace Hezarfen.Sehir
                 var g = GorevUretici.Uret(graf, a, oyuncu.position,
                                           tohum + _sayac * 7919, yil, gun);
                 if (g == null || g.duraklar.Count == 0) continue;
-                Simdiki = g;
+
+                float yol = Yol(g);
+                if (yol >= enIyiYol) continue;
+                enIyi = g;
+                enIyiYol = yol;
+            }
+
+            if (enIyi != null)
+            {
+                Simdiki = enIyi;
                 _sayac++;
-                GorevBasladi?.Invoke(g);
+                GorevBasladi?.Invoke(enIyi);
                 return;
             }
             Debug.LogWarning("[Hezarfen] Uretilecek uygun gorev bulunamadi.");
+        }
+
+        /// <summary>Görevin kuş uçuşu toplam yolu (m).</summary>
+        private float Yol(Gorev g)
+        {
+            if (graf == null || oyuncu == null) return float.MaxValue;
+            float t = 0f;
+            var son = oyuncu.position;
+            foreach (int d in g.duraklar)
+            {
+                if (d < 0 || d >= graf.dugumler.Count) return float.MaxValue;
+                t += Vector3.Distance(son, graf.dugumler[d].konum);
+                son = graf.dugumler[d].konum;
+            }
+            return t;
         }
 
         private void Update() => Adimla();

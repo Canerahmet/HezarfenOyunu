@@ -211,5 +211,75 @@ namespace Hezarfen.Tests
                       + $"en uzun {enUzunGorev} m, {sayi} gorev.");
         }
 
+        /// <summary>
+        /// <b>Yönetici en yakın işi veriyor mu.</b>
+        ///
+        /// Üreteç her arketip için elinden geleni yapıyor ama bazı
+        /// arketipler bu bileşende zaten uzağa gitmek zorunda: Galata'da
+        /// tek han var ve `Teslimat` han istiyor. Sırayla denemek, her
+        /// beş görevden ikisini şehrin öbür ucuna göndermek demekti.
+        ///
+        /// Bu, üretecin değil <b>seçimin</b> işi — ve arketiplerin
+        /// durak türleri tarihsel iddia taşıdığı için doğru müdahale
+        /// yeri de burası.
+        /// </summary>
+        [Test]
+        public void TheManagerHandsOutTheNearestJob()
+        {
+            var gercek = UnityEditor.AssetDatabase
+                .LoadAssetAtPath<SokakGrafi>(
+                    "Assets/_Project/Data/SG_Sehir.asset");
+            Assert.IsNotNull(gercek);
+
+            var oyuncuGo = new GameObject("OYUNCU_T");
+            oyuncuGo.transform.position = new Vector3(8f, 70f, 296f);
+            oyuncuGo.AddComponent<Envanter>();
+
+            var yGo = new GameObject("GOREV_T");
+            var y = yGo.AddComponent<GorevYonetici>();
+            y.graf = gercek;
+            y.oyuncu = oyuncuGo.transform;
+            y.envanter = oyuncuGo.GetComponent<Envanter>();
+
+            float toplam = 0f;
+            int n = 0;
+            for (int i = 0; i < 10; i++)
+            {
+                y.YeniGorev();
+                if (y.Simdiki == null) continue;
+                float yol = 0f;
+                var son = oyuncuGo.transform.position;
+                foreach (int d in y.Simdiki.duraklar)
+                {
+                    yol += Vector3.Distance(son, gercek.dugumler[d].konum);
+                    son = gercek.dugumler[d].konum;
+                }
+                toplam += yol; n++;
+            }
+
+            Assert.Greater(n, 5, "Yonetici gorev veremedi.");
+            float ort = toplam / n;
+            Debug.Log($"[Hezarfen] Yonetici gorev yolu: ortalama "
+                      + $"{ort:F0} m ({ort / 2.2f / 60f:F1} dk yuruyus), "
+                      + $"{n} gorev.");
+
+            // KAPI, CIRCIR DEGIL: hedef 900 m'ydi ve tutuldu (882 m).
+            //
+            // Dort olculu adim: 3.724 -> 2.206 (aday suzgeci mesafeye)
+            // -> 1.923 (ureteca yol butcesi) -> 882 (yonetici en yakin
+            // arketipi seciyor). 28,2 dakikadan 6,7 dakikaya.
+            //
+            // En buyuk kazanc sonuncusundan geldi ve sebebi su: uzak
+            // olan sey arketipin KENDISIYDI, uretecin secimi degil.
+            // Galata'da tek han var; `Teslimat` her seferinde sehrin
+            // obur ucuna gonderiyordu. Ureteci akillandirmak bunu
+            // cozemezdi — hangi isin verilecegini secmek cozdu.
+            Assert.Less(ort, 900f,
+                $"Yonetici ortalama {ort:F0} m veriyor, kapi 900 m.");
+
+            Object.DestroyImmediate(yGo);
+            Object.DestroyImmediate(oyuncuGo);
+        }
+
     }
 }
