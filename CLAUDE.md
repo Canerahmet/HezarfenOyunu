@@ -73,8 +73,13 @@ Bu, "sadece sohbette var olan varlık yasak" kuralını GEVŞETMEZ — her kalı
 - GeoJSON (ADR 0008): projeksiyon dönüşümü **yalnızca Python'da**; Unity yerel metre okur.
   `refs/maps/*.geojson` WGS84 ve kendi telifimizdir. Kaynak niteliksel olduğunda metrik
   geometri UYDURMA — alanı kaba kutu + T2 + `status: draft` olarak işaretle ve Caner'e sor.
-- Unity testleri: `Unity.exe -batchmode -projectPath unity/HezarfenGame -runTests -testResults results.xml -quit`
-  (MCP'siz geçmek zorunda.)
+- Unity testleri: `Unity.exe -batchmode -projectPath unity/HezarfenGame -runTests -testPlatform EditMode -testResults results.xml -logFile test.log`
+  (MCP'siz geçmek zorunda.) **`-quit` KOYMA:** `-runTests` ile birlikte
+  verilince Unity testleri koşmadan çıkıyor — "Exiting batchmode
+  successfully" yazar, sonuç dosyası hiç yazılmaz. Komut yıllardır
+  `-quit` ile yazılıydı ve bu yüzden batch testi hiç çalışmamıştı;
+  yeşil sayılar hep Editor içinden geliyordu. `-runTests` zaten
+  bitince çıkar.
 - Unity build (Faz 7+): `-batchmode -executeMethod BuildPipelineEntry.BuildWindows -quit`
 
 ## Kurallar

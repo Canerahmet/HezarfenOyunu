@@ -534,7 +534,27 @@ namespace Hezarfen.Editor.Pipeline
             // Kamerayi KameraKipi yerlestirir (goz ya da omuz ustu);
             // burada bir yer yazmak ayni transforma iki sahip vermek olur.
             kamGo.transform.localPosition = Vector3.zero;
-            kamGo.AddComponent<Camera>();
+            var kam = kamGo.AddComponent<Camera>();
+
+            // SEHIR 1 KM'DE BITIYORDU.
+            //
+            // Kameranin uzak kirpma duzlemi Unity'nin varsayilani olan
+            // 1000 m'de duruyordu ve olculdu: dogum noktasindan
+            // Suleymaniye 1.359 m, Ayasofya 1.984 m, Sultanahmet
+            // 2.298 m, Kiz Kulesi 2.560 m, Uskudar Mihrimah 3.512 m.
+            // Yani 39 nirenginin 34'u HIC cizilmiyordu. Oyuncu
+            // Galata'da yarim kilometrelik bir kutuda yasiyor ve
+            // sehrin geri kalaninin var oldugunu goremiyordu.
+            //
+            // Kirpan sey sis degildi: sis 1.400 m'de
+            // (`KaliciAydinlatma`), yani sisin oteledigi seyi kamera
+            // zaten kesmisti. Isaretsiz kesif nirengiyle yapilir ve
+            // gorunmeyen nirengi yol gostermez.
+            //
+            // 6.000 m: ucus kamerasinin zaten kullandigi deger
+            // (`HezarfenSpawner`). Kuleden Dogancilar 3.336 m, yani
+            // ucusun iki ucu ayni karede gorunebilir.
+            kam.farClipPlane = 6000f;
             kamGo.AddComponent<AudioListener>();
 
             // UCUS GOSTERGESI: gostergesiz bir ucus modeli ogrenilemez.

@@ -56,6 +56,23 @@ namespace Hezarfen.Sehir
 
         private readonly List<Vector3> _ekran = new List<Vector3>();
 
+        /// <summary>
+        /// Repliğin ekrandaki kabaca genişliği (piksel).
+        ///
+        /// Gerçek ölçü <c>Renderer.bounds</c>'un ekrana izdüşümü olurdu
+        /// ama etiket bu karede henüz yerleştirilmedi; metinden tahmin
+        /// etmek, sabit bir sayı kullanmaktan ölçülebilir biçimde iyi.
+        /// </summary>
+        private float MetinEni(NPCAjan a, Vector3 ekranNoktasi)
+        {
+            int harf = a.replik != null && a.replik.metin != null
+                ? a.replik.metin.Length : 0;
+            // Etiket dunya uzayinda `uzak/12` olcekli ve ekrandaki boyu
+            // bu yuzden mesafeden bagimsiz; 1080p'de harf basina ~11 px
+            // olcuduk.
+            return Mathf.Clamp(harf * 11f, 40f, Screen.width * 0.8f);
+        }
+
         private readonly List<(NPCAjan ajan, float d2)> _adaylar = new();
         private Camera _kamera;
 
@@ -119,13 +136,39 @@ namespace Hezarfen.Sehir
                         _adaylar[i].ajan.konum + Vector3.up * yukseklik);
                     if (d.z <= 0f) { _adaylar.RemoveAt(i); continue; }
 
+                    // AYRISMA YAZININ GENISLIGINE BAKAR, CAPAYA DEGIL.
+                    //
+                    // Sabit 300 px kullaniliyordu ve replikler farkli
+                    // uzunlukta: 800 px genisligindeki bir yazi,
+                    // 301 px otedeki komsusunu gecirip ustune biniyordu.
+                    // Capalar ayrik, yazilar ic ice.
+                    //
+                    // Genislik metinden turetiliyor: karakter basina
+                    // kabaca 0,55 punto ve etiket ortalanmis, yani
+                    // yarisi her yana tasar. Kaba ama olcunun kendisi
+                    // metne bagli ve bu, sabit bir sayidan iyi.
+                    float benimEn = MetinEni(_adaylar[i].ajan, d);
                     bool cakisti = false;
                     foreach (var e in _ekran)
+                    {
+                        float pay = (benimEn + e.z) * 0.5f + 16f;
                         if (Mathf.Abs(e.y - d.y) < EkranAyrikY
-                            && Mathf.Abs(e.x - d.x) < EkranAyrikX)
+                            && Mathf.Abs(e.x - d.x) < pay)
                         { cakisti = true; break; }
+                    }
+                    d.z = benimEn;   // z artik derinlik degil GENISLIK
 
-                    if (cakisti) _adaylar.RemoveAt(i);
+                    // EKRAN KENARINDAN TASAN YAZI DA ELENIR.
+                    //
+                    // Karelerde iki replik sol kenardan kesikti: capa
+                    // ekranin icindeydi ama yazi disari tasiyordu.
+                    // Yarisi gorunmeyen bir replik, gorunmeyen bir
+                    // repliktir.
+                    float yari = benimEn * 0.5f;
+                    bool tasti = d.x - yari < 8f
+                                 || d.x + yari > Screen.width - 8f;
+
+                    if (cakisti || tasti) _adaylar.RemoveAt(i);
                     else _ekran.Add(d);
                 }
             }
@@ -150,8 +193,19 @@ namespace Hezarfen.Sehir
                     // ekranin ucte birini kapliyordu ("Selamunaleykum"
                     // karenin yarisi kadardi). Olcek mesafeyle buyur,
                     // boylece yazi uzakta okunur, yakinda ekrani yemez.
-                    // Alt sinir 6 m: daha yakinda buyumesin.
-                    float uzak = Mathf.Max(6f, bakis.magnitude);
+                    // KELEPCE YORUMUN TAM TERSINI YAPIYORDU.
+                    //
+                    // "Alt sinir 6 m: daha yakinda buyumesin" yaziyordu
+                    // ve `Mathf.Max(6f, uzak)` tam olarak buyumesine
+                    // sebep oluyordu: 6 m'nin altinda olcek 0,5'te
+                    // sabitleniyor ama mesafe kuculmeye devam ediyor,
+                    // yani ekrandaki boy BUYUYOR. Karelerde bir replik
+                    // karenin yarisini kapliyordu.
+                    //
+                    // Olcek mesafeyle DOGRU ORANTILI oldugunda ekrandaki
+                    // boy her mesafede sabit kalir — istenen buydu ve
+                    // kelepce onu bozan seydi. Kaldirmak yeterli.
+                    float uzak = Mathf.Max(0.5f, bakis.magnitude);
                     t.transform.localScale = Vector3.one * (uzak / 12f);
                 }
                 t.gameObject.SetActive(true);

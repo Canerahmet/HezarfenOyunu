@@ -20,6 +20,8 @@ namespace Hezarfen.Arayuz
         private const string AnhKademe = "hz_kademe";
         private const string AnhSes = "hz_ses";
         private const string AnhTamEkran = "hz_tamekran";
+        private const string AnhHassasiyet = "hz_hassasiyet";
+        private const string AnhYTers = "hz_yters";
 
         /// <summary>Kademe açıklamaları — ölçümden geliyor, tahminden değil.</summary>
         public static readonly string[] KademeAciklamasi =
@@ -62,6 +64,37 @@ namespace Hezarfen.Arayuz
                 PlayerPrefs.SetInt(AnhTamEkran, value ? 1 : 0);
                 Screen.fullScreen = value;
             }
+        }
+
+        /// <summary>
+        /// Fare bakış hassasiyeti (derece / piksel).
+        ///
+        /// <c>WalkController</c> içinde <b>sabit 0,08</b> olarak
+        /// duruyordu ve hiçbir menüye bağlı değildi. Fare hassasiyeti
+        /// ayarı olmayan bir oyun, Steam incelemelerinde ilk gün
+        /// karşılığını bulur — ve bu bir tasarım tercihi değil, eksik
+        /// iş.
+        ///
+        /// Aralık 0,02–0,30: alt uç nişan alan bir oyuncu için, üst uç
+        /// düşük DPI'lı bir fare için. Varsayılan bugüne kadar
+        /// kullanılan değer, yani kimsenin alışkanlığı bozulmuyor.
+        /// </summary>
+        public static float Hassasiyet
+        {
+            get => Mathf.Clamp(
+                PlayerPrefs.GetFloat(AnhHassasiyet, 0.08f), 0.02f, 0.30f);
+            set
+            {
+                PlayerPrefs.SetFloat(AnhHassasiyet,
+                                     Mathf.Clamp(value, 0.02f, 0.30f));
+            }
+        }
+
+        /// <summary>Dikey bakış ters çevrilsin mi.</summary>
+        public static bool YTers
+        {
+            get => PlayerPrefs.GetInt(AnhYTers, 0) != 0;
+            set => PlayerPrefs.SetInt(AnhYTers, value ? 1 : 0);
         }
 
         /// <summary>

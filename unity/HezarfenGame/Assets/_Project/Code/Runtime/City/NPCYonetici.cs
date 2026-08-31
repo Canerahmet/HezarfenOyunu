@@ -363,6 +363,13 @@ namespace Hezarfen.Sehir
                 _enYakinDizin = new int[govdeButcesi];
                 _enYakinD2 = new float[govdeButcesi];
             }
+            // Tarih yigin dongusunden ONCE okunur: `Disarida` takvime
+            // bakiyor (kahvehane 1633 Eylul'unde kapaniyor) ve bunu
+            // dongunun icinde her sakin icin yeniden sormak, ayni
+            // cevabi kirk bin kez hesaplamak olurdu.
+            int yil0 = zaman != null ? zaman.yil : 1632;
+            int gun0 = zaman != null ? zaman.yilinGunu : 121;
+
             int yigin = 0;
             for (int i = 0; i < _sakinler.Count; i++)
             {
@@ -370,6 +377,27 @@ namespace Hezarfen.Sehir
                 a.gorunmeli = false;
                 float m2 = (a.konum - merkez).sqrMagnitude;
                 if (m2 > d2) continue;
+
+                // ICERIDEKI ADAM CIZILMEZ — VE BU TEK SATIR SEHRIN
+                // GUNUNU ILK KEZ GORUNUR KILIYOR.
+                //
+                // Yigin secimi yalniz MESAFEYE bakiyordu. Simulasyon ise
+                // gercek bir gun tutuyor: on meslek cizelgesinden
+                // hesaplandi, disarudaki nufus oglen %43,5, yatsida
+                // %4,0 — **on kat** fark. Oyuncu bunun sifirini
+                // goruyordu, cunku `Rutin.Disarida` calisma zamaninda
+                // hicbir yerden cagrilmiyordu.
+                //
+                // Gece karesinde yatsi vakti sokakta on kisi dikiliyor
+                // ve bu, `SehirGunu` + `Rutin` + `Kronoloji` katmaninin
+                // tamamini oyuncu acisindan olu kod yapiyordu. Pahali
+                // olan yarisi bitmisti; eksik olan tel buydu.
+                //
+                // Kare butcesi de DUSER: gece cizilen govde azalir.
+                if (a.meslek != null
+                    && !Rutin.Disarida(a.meslek, _sonVakit, a.tohum,
+                                       yil0, gun0))
+                    continue;
 
                 if (yigin < govdeButcesi)
                 {

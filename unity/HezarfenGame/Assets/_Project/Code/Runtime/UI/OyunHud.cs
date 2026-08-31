@@ -163,8 +163,34 @@ namespace Hezarfen.Arayuz
             _ => t.ToString(),
         };
 
+        /// <summary>Sanal ekran genişliği — bütün koordinatlar buna göre.</summary>
+        private const float SanalEn = 1920f;
+
+        /// <summary>Sanal ekran yüksekliği.</summary>
+        private const float SanalBoy = 1080f;
+
+        private float _en, _boy;
+
         private void OnGUI()
         {
+            // HUD SABIT PIKSELDEYDI — MENU DEGILDI.
+            //
+            // Acilis menusu `ScaleWithScreenSize` ile 1920x1080'e
+            // gore olcekleniyor; oyun ici HUD ise sabit piksel
+            // kullaniyordu. Sonuc: 330 px'lik bir kutu 1280x800'de
+            // ekran genisliginin %26'si, 3840x2160'ta %8,6; 14 punto
+            // yazi 4K'da ~7 puntoya duser. Iki arayuz iki ayri
+            // dunyada yasiyordu.
+            //
+            // Tek satirlik cozum: cizimi sanal bir 1920x1080 uzayina
+            // al ve matrisle olcekle. Koordinatlar oldugu gibi kalir,
+            // yalniz artik bir ORANI ifade ederler.
+            float k = Screen.height / SanalBoy;
+            var eskiMatris = GUI.matrix;
+            GUI.matrix = Matrix4x4.Scale(new Vector3(k, k, 1f));
+            _boy = SanalBoy;
+            _en = Screen.width / k;
+
             _kutu ??= new GUIStyle(GUI.skin.box) { alignment = TextAnchor.UpperLeft, padding = new RectOffset(10, 10, 8, 8) };
             _yazi ??= new GUIStyle(GUI.skin.label) { fontSize = 14 };
 
@@ -232,8 +258,8 @@ namespace Hezarfen.Arayuz
                 string ip = etkilesim.Ipucu;
                 if (ip.Length > 0)
                 {
-                    var ir = new Rect(Screen.width * 0.5f - 90f,
-                                      Screen.height * 0.5f + 40f, 180f, 30f);
+                    var ir = new Rect(_en * 0.5f - 90f,
+                                      _boy * 0.5f + 40f, 180f, 30f);
                     GUI.Box(ir, "", _kutu);
                     var eski = _yazi.alignment;
                     _yazi.alignment = TextAnchor.MiddleCenter;
@@ -249,7 +275,7 @@ namespace Hezarfen.Arayuz
             if (envanter != null && envanter.TurSayisi > 0)
             {
                 float ky = 10f;
-                var kr = new Rect(Screen.width - 250f, 34f, 240f,
+                var kr = new Rect(_en - 250f, 34f, 240f,
                                   22f * envanter.TurSayisi + 14f);
                 GUI.Box(kr, "", _kutu);
                 foreach (EsyaTuru t in System.Enum.GetValues(typeof(EsyaTuru)))
@@ -263,13 +289,13 @@ namespace Hezarfen.Arayuz
             }
 
             if (Time.unscaledTime < _mesajSonu)
-                GUI.Box(new Rect(10, Screen.height - 46, 260, 32),
+                GUI.Box(new Rect(10, _boy - 46, 260, 32),
                         _mesaj, _kutu);
 
             // --- duraklat ---
             if (!Duraklatildi)
             {
-                GUI.Label(new Rect(Screen.width - 250, 10, 240, 20),
+                GUI.Label(new Rect(_en - 250, 10, 240, 20),
                           "ESC duraklat · E al · G kanat · V bakış · Shift koş" + "\n"
                           + "F5 kaydet · F9 yükle",
                           _yazi);
@@ -277,8 +303,8 @@ namespace Hezarfen.Arayuz
             }
 
             float g = 320f, y = 240f;
-            var r = new Rect((Screen.width - g) * 0.5f,
-                             (Screen.height - y) * 0.5f, g, y);
+            var r = new Rect((_en - g) * 0.5f,
+                             (_boy - y) * 0.5f, g, y);
             GUI.Box(r, "DURAKLATILDI", _kutu);
             if (GUI.Button(new Rect(r.x + 30, r.y + 50, g - 60, 36),
                            "Devam et")) Duraklat(false);
@@ -292,6 +318,7 @@ namespace Hezarfen.Arayuz
                 Time.timeScale = 1f;
                 UnityEngine.SceneManagement.SceneManager.LoadScene("Acilis");
             }
+            GUI.matrix = eskiMatris;
         }
     }
 }

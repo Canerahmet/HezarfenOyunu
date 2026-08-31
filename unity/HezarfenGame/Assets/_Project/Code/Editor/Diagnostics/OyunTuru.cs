@@ -115,6 +115,29 @@ namespace Hezarfen.Editor.Diagnostics
         /// </summary>
         public class TurKosucu : MonoBehaviour
         {
+            /// <summary>
+            /// Oyuncunun 40 m çevresindeki <b>sakin</b> sayısı.
+            ///
+            /// Önce `NPCYonetici.GorunurSayisi` yazılıyordu ve tablo on
+            /// durağın sekizinde <b>60</b> diyordu — çünkü 60,
+            /// `govdeButcesi`nin kendisi. Yani ölçüm kalabalığı değil
+            /// <b>bütçeyi</b> ölçüyor, her yerde doyuyor ve hiçbir şey
+            /// söylemiyordu.
+            ///
+            /// Doygun bir ölçü ölçü değildir. Bu sayı bütçeden
+            /// bağımsız: kalabalık gerçekten seyreldiğinde düşer —
+            /// gece, kırsal, ya da rutin sakinleri içeri aldığında.
+            /// </summary>
+            private static int YakindakiNpc(Sehir.NPCYonetici npc, Vector3 p)
+            {
+                if (npc == null || npc.Sakinler == null) return 0;
+                const float R2 = 40f * 40f;
+                int n = 0;
+                foreach (var a in npc.Sakinler)
+                    if ((a.konum - p).sqrMagnitude <= R2) n++;
+                return n;
+            }
+
             internal IEnumerator Kos(Durak[] duraklar)
             {
                 Directory.CreateDirectory(Cikti);
@@ -125,7 +148,7 @@ namespace Hezarfen.Editor.Diagnostics
                 satirlar.Add("sayilar yazildi. Kare bir GOZLEM, sayi bir KANIT.");
                 satirlar.Add("");
                 satirlar.Add("| durak | ayak altinda | arazi farki | kamera kolu "
-                             + "| gorunur NPC | replik | kare (ms) | neden |");
+                             + "| 40 m'de NPC | replik | kare (ms) | neden |");
                 satirlar.Add("|---|---|---:|---:|---:|---:|---:|---|");
 
                 var oyuncu = Object.FindAnyObjectByType<WalkController>();
@@ -304,12 +327,12 @@ namespace Hezarfen.Editor.Diagnostics
                     satirlar.Add($"| {d.ad} | {altinda} | "
                                  + $"{p.y - araziKot:+0.0;-0.0} | "
                                  + $"{(kip != null ? kip.SonMesafe.ToString("0.00") : "?")} | "
-                                 + $"{(npc != null ? npc.GorunurSayisi : 0)} | "
+                                 + $"{YakindakiNpc(npc, oyuncu.transform.position)} | "
                                  + $"{(bark != null ? bark.GorunurReplik : 0)} | "
                                  + $"{ms:0.0} | {d.neden} |");
                     Debug.Log($"[Hezarfen] tur {d.ad}: {altinda}, "
                               + $"kol {(kip != null ? kip.SonMesafe : 0f):0.0}, "
-                              + $"npc {(npc != null ? npc.GorunurSayisi : 0)}, "
+                              + $"npc {YakindakiNpc(npc, oyuncu.transform.position)}, "
                               + $"{ms:0.0} ms");
                 }
 

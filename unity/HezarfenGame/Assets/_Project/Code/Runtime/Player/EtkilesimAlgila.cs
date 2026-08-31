@@ -75,8 +75,27 @@ namespace Hezarfen.Player
         public IEtkilesim EnIyiHedef()
         {
             var goz = bakis != null ? bakis : transform;
+
+            // KURE OYUNCUDA, YON KAMERADA — IKISI AYRI SORU.
+            //
+            // Ikisi de kameradaydi ve ucuncu sahista etkilesim HIC
+            // calismiyordu. Geometri: kamera oyuncunun 3,2 m gerisinde
+            // (`KameraKipi.mesafe`), menzil 2,4 m. Oyuncunun 1 m
+            // onundeki bir kup kameradan 4,2 m uzakta, yani kureye hic
+            // girmiyor. Etkilesim ancak kamera kolu duvara carpip
+            // 1,4 m'ye coktugunde — dar sokakta — geri geliyordu.
+            //
+            // Yani `EtkilesimKur`'un 15.815 esyaya collider takmasi,
+            // `Envanter`, `GorevYonetici` ve `Ekonomi` zinciri
+            // varsayilan kamerada kopuyordu: kurulmus ama erisilemez.
+            //
+            // "Neye uzanabiliyorum" bir GOVDE sorusu, "neye bakiyorum"
+            // bir GOZ sorusu. Ikisini tek noktaya bagladigim icin
+            // ikisini birden yanlis yaptim.
+            var elMerkezi = transform.position + Vector3.up * 1.4f;
+
             int n = Physics.OverlapSphereNonAlloc(
-                goz.position, menzil, _tampon, katman,
+                elMerkezi, menzil, _tampon, katman,
                 QueryTriggerInteraction.Collide);
             TamponDoldu = n >= _tampon.Length;
 
@@ -99,7 +118,7 @@ namespace Hezarfen.Player
                 var e = c.GetComponentInParent<IEtkilesim>();
                 if (e == null || !e.Hazir) continue;
 
-                var d = c.bounds.center - goz.position;
+                var d = c.bounds.center - elMerkezi;
                 d.y *= 0.5f;                    // dikey fark daha az onemli
                 if (d.sqrMagnitude < 1e-4f) continue;
                 float puan = Vector3.Dot(goz.forward, d.normalized);
@@ -115,7 +134,7 @@ namespace Hezarfen.Player
                 //
                 // Yalnizca EN IYI ADAY icin isin atiliyor: her adaya
                 // atmak, kalabalik avluda karede yirmi isin ederdi.
-                if (Engelli(goz.position, c)) continue;
+                if (Engelli(elMerkezi, c)) continue;
 
                 enIyiPuan = puan;
                 enIyi = e;
