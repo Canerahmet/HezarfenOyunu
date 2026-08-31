@@ -66,6 +66,8 @@ namespace Hezarfen.Editor.Diagnostics
             var rng = new System.Random(1632);
             int adim = Mathf.Max(1, evler.Count / Ornek);
             int denenen = 0, giren = 0, colliderYok = 0;
+            float odaToplam = 0f;
+            int odaOlculen = 0;
             var basarisiz = new List<string>();
 
             for (int i = 0; i < evler.Count; i += adim)
@@ -74,7 +76,12 @@ namespace Hezarfen.Editor.Diagnostics
                 var col = ev.GetComponentInChildren<Collider>();
                 if (col == null) { colliderYok++; continue; }
                 denenen++;
-                if (Girilebilir(ev, col.bounds)) giren++;
+                if (Girilebilir(ev, col.bounds))
+                {
+                    giren++;
+                    float oran = IcErisim(ev, col.bounds);
+                    if (oran >= 0f) { odaToplam += oran; odaOlculen++; }
+                }
                 else if (basarisiz.Count < 8)
                     basarisiz.Add($"{ev.name} @ {ev.position:F0}");
             }
@@ -83,12 +90,130 @@ namespace Hezarfen.Editor.Diagnostics
             sb.AppendLine($"  {evler.Count} ev, {denenen} ornek denendi");
             sb.AppendLine($"  GIRILEBILEN: {giren} "
                           + $"(%{(denenen == 0 ? 0f : 100f * giren / denenen):0.0})");
+            if (odaOlculen > 0)
+                sb.AppendLine($"  ic hacmin erisilen orani: "
+                    + $"%{100f * odaToplam / odaOlculen:0.0} "
+                    + $"({odaOlculen} evde olculdu)");
             if (colliderYok > 0)
                 sb.AppendLine($"  collider'i olmayan: {colliderYok}");
             foreach (var b in basarisiz) sb.AppendLine($"  girilemedi: {b}");
             Debug.Log("[Hezarfen] " + sb);
 
             EditorSceneManager.CloseScene(sahne, true);
+        }
+
+        /// <summary>
+        /// <b>İçeri girdikten sonra ne kadarına ulaşılıyor.</b>
+        ///
+        /// Kapıdan girebilmek yetmez: bölme duvarları oda kapılarını
+        /// tutturamazsa oyuncu hayatta kalır ve odalar ölü hacim olur.
+        /// Bölme planı hem görünen geometriyi hem collider'ı besliyor
+        /// (<c>ic_bolmeler</c>, tek sahip) — bu ölçüm o iddianın sınavı.
+        ///
+        /// Yöntem taşma dolgusu: zemin katın kesitine 0,5 m'lik ızgara
+        /// kurulur, kapının hemen içinden başlanır ve kapsülün sığdığı
+        /// hücrelere yayılır. Dönüş, boş hücrelerin kaçta kaçına
+        /// ulaşıldığı. −1 = ölçülemedi.
+        /// </summary>
+        private static float IcErisim(Transform ev, Bounds kutu)
+        {
+            // HUCRE 0,25 m — ve sebebi olculdu.
+            //
+            // 0,5 m ile "ic hacmin %31,1'i erisilebilir" cikti, yani
+            // odalar kapali gorunuyordu. Ama oda kapisi 0,95 m ve
+            // kapsul capi 0,54 m: bosluga sigmasi icin hucre merkezinin
+            // bosluk eksenine 0,2 m'den yakin olmasi gerek. 0,5 m'lik
+            // izgarada merkez 0,25 m'ye kadar kayabiliyor — yani olcum
+            // kapiyi degil kendi izgarasini olcuyordu.
+            const float H = 0.25f;                   // hucre (m)
+
+            // KOT TAHMIN EDILMEZ, BULUNUR.
+            //
+            // Ilk yazimda kot = kutu.min.y + 1,05 idi ve kapsul
+            // (1,75 m boy) dosemenin ALTINA, subasmanin icine sarkiyordu:
+            // her hucre dolu cikti ve 322 evin 320'si "olculemedi"
+            // dondu. Subasman varyanta gore 0,30-0,95 m degisiyor, yani
+            // tek bir kot dogru olamaz.
+            //
+            // Onun yerine birkac kot denenir ve EN COK BOSLUK verenki
+            // secilir: kat ici orasidir. Ayrica kapsul degil KURE
+            // kullanilir — oda baglantisi yatay bir sorudur, govdenin
+            // boyu tavanla zaten sinirlidir.
+            var mn = new Vector2(kutu.min.x + 0.4f, kutu.min.z + 0.4f);
+            int en = Mathf.Max(2, Mathf.FloorToInt((kutu.size.x - 0.8f) / H));
+            int boy = Mathf.Max(2, Mathf.FloorToInt((kutu.size.z - 0.8f) / H));
+            if (en * boy > 16000) return -1f;
+
+            bool[] bos = null;
+            int bosSayi = 0;
+            float kot = 0f;
+            for (float dy = 0.85f; dy <= 2.10f; dy += 0.25f)
+            {
+                float k = kutu.min.y + dy;
+                var aday = new bool[en * boy];
+                int say = 0;
+                for (int j = 0; j < boy; j++)
+                    for (int i = 0; i < en; i++)
+                    {
+                        var c = new Vector3(mn.x + (i + 0.5f) * H, k,
+                                            mn.y + (j + 0.5f) * H);
+                        if (!Physics.CheckSphere(c, Yaricap, ~0,
+                                                 QueryTriggerInteraction.Ignore))
+                        {
+                            aday[j * en + i] = true;
+                            say++;
+                        }
+                    }
+                if (say > bosSayi) { bos = aday; bosSayi = say; kot = k; }
+            }
+            if (bos == null || bosSayi < 4) return -1f;
+
+            // Baslangic: kapinin hemen ICI. Kapi cephenin ortasinda ve
+            // cephe +forward'a bakiyor, yani ic taraf -forward yonunde.
+            Vector3 ic = ev.position - ev.forward * 0.8f;
+            ic.y = kot;
+            int si = Mathf.RoundToInt((ic.x - mn.x) / H - 0.5f);
+            int sj = Mathf.RoundToInt((ic.z - mn.y) / H - 0.5f);
+            si = Mathf.Clamp(si, 0, en - 1);
+            sj = Mathf.Clamp(sj, 0, boy - 1);
+            if (!bos[sj * en + si])
+            {
+                // Kapinin ici doluysa en yakin bos hucreden basla.
+                bool bulundu = false;
+                for (int r = 1; r < 6 && !bulundu; r++)
+                    for (int dj = -r; dj <= r && !bulundu; dj++)
+                        for (int di = -r; di <= r && !bulundu; di++)
+                        {
+                            int i2 = si + di, j2 = sj + dj;
+                            if (i2 < 0 || i2 >= en || j2 < 0 || j2 >= boy) continue;
+                            if (!bos[j2 * en + i2]) continue;
+                            si = i2; sj = j2; bulundu = true;
+                        }
+                if (!bulundu) return -1f;
+            }
+
+            var yigin = new Stack<int>();
+            var gorulen = new bool[en * boy];
+            yigin.Push(sj * en + si);
+            gorulen[sj * en + si] = true;
+            int erisilen = 0;
+            while (yigin.Count > 0)
+            {
+                int k = yigin.Pop();
+                erisilen++;
+                int i0 = k % en, j0 = k / en;
+                for (int d = 0; d < 4; d++)
+                {
+                    int i2 = i0 + (d == 0 ? 1 : d == 1 ? -1 : 0);
+                    int j2 = j0 + (d == 2 ? 1 : d == 3 ? -1 : 0);
+                    if (i2 < 0 || i2 >= en || j2 < 0 || j2 >= boy) continue;
+                    int k2 = j2 * en + i2;
+                    if (gorulen[k2] || !bos[k2]) continue;
+                    gorulen[k2] = true;
+                    yigin.Push(k2);
+                }
+            }
+            return (float)erisilen / bosSayi;
         }
 
         /// <summary>

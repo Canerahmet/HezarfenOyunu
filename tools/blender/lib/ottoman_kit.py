@@ -1049,6 +1049,8 @@ def build_house(p, col, asset_name, textured=False):
         parts += _build_floor(p, mats, col, asset_name, f"L{i}", z,
                               p.width, p.depth, 0.0, mats["plaster"],
                               ground=(i == 0))
+        if i == 0 and p.detail == "near":
+            parts += _ic_bolme_geometri(p, mats, col, asset_name, z)
         z += p.floor_height
 
     # 3) Ust kat — cumbali. Cumba bu tipolojinin imzasi: alt ayak izini
@@ -1075,6 +1077,9 @@ def build_house(p, col, asset_name, textured=False):
     parts += _build_floor(p, mats, col, asset_name, "Top", z, top_w, top_d, top_cy,
                           mats["timber"] if p.floors > 1 else mats["plaster"],
                           ground=(p.floors == 1))
+    # Tek katli evde zemin kat "Top" olarak kuruluyor; bolme oraya gelir.
+    if p.floors == 1 and p.detail == "near":
+        parts += _ic_bolme_geometri(p, mats, col, asset_name, z)
 
     # 3b) Payandalar — yalnizca 'corbel' ve yeterli derinlikte.
     if p.cumba_type == "corbel" and cumba_d >= MIN_CORBEL_DEPTH:
@@ -1215,6 +1220,126 @@ def build_house(p, col, asset_name, textured=False):
     return lod0, lod1, lod2, ucx, info
 
 
+def ic_bolmeler(p):
+    """
+    Zemin katın bölme duvarları. **Tek sahip.**
+
+    Aynı liste hem görünen geometriyi hem çarpışma kütlesini besler.
+    İki ayrı yerde iki plan olsaydı, biri ötekinden birkaç santim
+    kayardı ve o kayma ancak oyuncu görünmez bir duvara toslayınca fark
+    edilirdi — bu oturumda tam bu tür üç kusur ölçüldü.
+
+    Dönüş: `[{eksen, konum, kapi, kapi_en}]`
+      * `eksen` — duvarın uzandığı eksen: `"x"` (enine) ya da `"y"` (boyuna)
+      * `konum` — duvarın öteki eksendeki yeri (yerel, ev merkezine göre)
+      * `kapi` — kapı boşluğunun merkezi (duvarın kendi ekseninde)
+      * `kapi_en` — boşluğun eni (m)
+
+    ## Plan nereden geliyor
+
+    RESEARCH.md §4.1(e): 17. yy evinde **ortalama 4,12 oda**. Bu, evin
+    tamamı için — zemin katta iki-üç hacim, üst katta gerisi. Buradaki
+    plan zemin katı kuruyor.
+
+    Osmanlı konutunun planı odaların bir koridora dizilmesi değil,
+    **hayat**ın merkezde olması ve odaların ona açılmasıdır (RESEARCH
+    §4.1: *hayatlı*). O yüzden geniş evde iki boyuna bölme kapı
+    aksından geçer ve ortada bir hayat bırakır; odalar hayata açılır.
+
+    Dar evde bu olmaz: 6,2 m'nin altında iki bölme koyunca hayat
+    1,5 m'ye, odalar 1,8 m'ye iner — koridor genişliğinde "oda" oda
+    değildir. Orada tek enine bölme kullanılır: sokağa bakan ön hacim,
+    arkada ikinci hacim. Bu da dönemin dar parsel evidir.
+    """
+    #: Hayatın eni (m). Kapı 1,05 m; hayat ondan dar olamaz.
+    HAYAT = 2.10
+    #: Bölme kalınlığı (m) — ahşap bölme, taşıyıcı değil.
+    KALIN = 0.12
+    #: İç kapı boşluğu (m).
+    KAPI = 0.95
+
+    out = []
+    if p.width >= 6.2:
+        # Geniş ev: hayat ortada, iki yanında oda.
+        for sx in (-1.0, 1.0):
+            out.append(dict(eksen="y", konum=sx * HAYAT * 0.5,
+                            kapi=p.depth * 0.12, kapi_en=KAPI,
+                            kalin=KALIN))
+    else:
+        # Dar ev: tek enine bölme. Kapı hayat aksında, yani ortada.
+        out.append(dict(eksen="x", konum=p.depth * 0.10, kapi=0.0,
+                        kapi_en=KAPI, kalin=KALIN))
+    return out
+
+
+def _bolme_parcalari(p, bolme, z0, z1):
+    """Bir bölmeyi kapı boşluğuyla birlikte kutu listesine çevirir.
+
+    Dönüş: `[(ad_soneki, (sx, sy, sz), (cx, cy, cz))]`
+    """
+    kalin = bolme["kalin"]
+    kapi_en = bolme["kapi_en"]
+    yuk = z1 - z0
+    cz = (z0 + z1) * 0.5
+    #: Kapı boşluğunun üstü kapalı: lento hizası.
+    lento = min(2.05, yuk - 0.25)
+
+    parca = []
+    if bolme["eksen"] == "y":
+        # Duvar y boyunca uzanir; konum x'te.
+        cx = bolme["konum"]
+        boy = p.depth
+        k0 = bolme["kapi"] - kapi_en * 0.5
+        k1 = bolme["kapi"] + kapi_en * 0.5
+        alt = k0 + boy * 0.5                    # -boy/2 referansindan uzunluk
+        ust = boy * 0.5 - k1
+        if alt > 0.05:
+            parca.append(("a", (kalin, alt, yuk),
+                          (cx, -boy * 0.5 + alt * 0.5, cz)))
+        if ust > 0.05:
+            parca.append(("b", (kalin, ust, yuk),
+                          (cx, boy * 0.5 - ust * 0.5, cz)))
+        if yuk - lento > 0.05:
+            parca.append(("l", (kalin, kapi_en, yuk - lento),
+                          (cx, bolme["kapi"], z0 + (lento + yuk) * 0.5)))
+    else:
+        cy = bolme["konum"]
+        boy = p.width
+        k0 = bolme["kapi"] - kapi_en * 0.5
+        k1 = bolme["kapi"] + kapi_en * 0.5
+        sol = k0 + boy * 0.5
+        sag = boy * 0.5 - k1
+        if sol > 0.05:
+            parca.append(("a", (sol, kalin, yuk),
+                          (-boy * 0.5 + sol * 0.5, cy, cz)))
+        if sag > 0.05:
+            parca.append(("b", (sag, kalin, yuk),
+                          (boy * 0.5 - sag * 0.5, cy, cz)))
+        if yuk - lento > 0.05:
+            parca.append(("l", (kapi_en, kalin, yuk - lento),
+                          (bolme["kapi"], cy, z0 + (lento + yuk) * 0.5)))
+    return parca
+
+
+def _ic_bolme_geometri(p, mats, col, asset_name, level_z):
+    """Bölme duvarlarının görünen hâli. Plan: :func:`ic_bolmeler`.
+
+    Yalnızca `near` kipinde kurulur, yani yalnız LOD0'da. Bu, planın
+    "iç mekân 40 m içinde" bütçesini ayrı bir çalışma zamanı sistemi
+    yazmadan verir: LOD zaten mesafeye göre eliyor. Uzaktaki ev
+    bölmesini taşımaz çünkü LOD1'e düşmüştür.
+    """
+    z0 = level_z
+    z1 = level_z + p.floor_height
+    out = []
+    for i, b in enumerate(ic_bolmeler(p)):
+        for son, boyut, merkez in _bolme_parcalari(p, b, z0, z1):
+            o = hz.make_box(f"{asset_name}_Bolme{i}{son}", boyut, merkez, col)
+            hz.assign(o, mats["plaster"])
+            out.append(o)
+    return out
+
+
 def _carpisma(p, col, mats, asset_name, total_h):
     """
     Çarpışma kütlesi: **zemin katı boş, üstü dolu.**
@@ -1291,7 +1416,12 @@ def _carpisma(p, col, mats, asset_name, total_h):
         kutu(f"{asset_name}_c_yan", (t, d - 2.0 * t, z1 - z0),
              (sx * (w * 0.5 - t * 0.5), 0.0, (z0 + z1) * 0.5))
 
-    # 4) Ust kutle: zemin katin tavanindan catiya kadar DOLU.
+    # 4) IC BOLMELER — gorunen geometriyle AYNI listeden.
+    for i, b in enumerate(ic_bolmeler(p)):
+        for son, boyut, merkez in _bolme_parcalari(p, b, z0, z1):
+            kutu(f"{asset_name}_c_bolme{i}{son}", boyut, merkez)
+
+    # 5) Ust kutle: zemin katin tavanindan catiya kadar DOLU.
     if ust > z1 + 0.05:
         kutu(f"{asset_name}_c_ust", (w, d, ust - z1), (0.0, 0.0, (z1 + ust) * 0.5))
 

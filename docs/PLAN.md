@@ -124,7 +124,8 @@ kanadı → iç kabuk (zemin, tavan, bölme) → merdiven → tohumdan iç plan
 mobilyası (sedir, minder, sandık, rahle, mangal, kilim, yüklük, ocak).
 
 **Kapı:** ölçülen evlerin ≥ %95'i girilebilir → **%97,0** ✅
-(332 örnek, `EvErisimi`) · iç kabuk: kat döşemesi ✅, bölme/merdiven **⬜** ·
+(332 örnek, `EvErisimi`) · iç kabuk: kat döşemesi ✅, **bölme duvarları ✅**
+(iç hacmin **%80,0**'ı erişilebilir, 322 evde ölçüldü), merdiven **⬜** ·
 tohumdan iç plan **⬜** · dönem mobilyası **⬜** · determinizm testi **⬜** ·
 40 m'de kare ≤ 16,7 ms **⬜**.
 
