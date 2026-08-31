@@ -126,7 +126,7 @@ mobilyası (sedir, minder, sandık, rahle, mangal, kilim, yüklük, ocak).
 **Kapı:** ölçülen evlerin ≥ %95'i girilebilir → **%97,0** ✅
 (332 örnek, `EvErisimi`) · iç kabuk: kat döşemesi ✅, **bölme duvarları ✅**
 (zemin katta erişilen hacim **%100,0**), merdiven **⚠️ AÇIK** — geometri
-ve çarpışma yerinde ama üst kata çıkılabilen **%3,9** (ADR 0081) ·
+ve çarpışma yerinde; üst kata çıkılabilen **%13,6** (ADR 0081) ·
 tohumdan iç plan **⬜** · dönem mobilyası **⬜** · determinizm testi **⬜** ·
 40 m'de kare ≤ 16,7 ms **⬜**.
 

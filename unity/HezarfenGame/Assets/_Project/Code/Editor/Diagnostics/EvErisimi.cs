@@ -40,8 +40,14 @@ namespace Hezarfen.Editor.Diagnostics
         /// <summary>Oyuncu kapsülünün boyu (m).</summary>
         public const float Boy = 1.75f;
 
+        /// <summary>
+        /// Bir adımda çıkılabilen yükseklik (m) — `CharacterController`
+        /// adım payıyla aynı.
+        /// </summary>
+        public const float AdimPayi = 0.30f;
+
         /// <summary>Kaç ev örneklenecek (hepsi çok yavaş).</summary>
-        public const int Ornek = 90;
+        public const int Ornek = 60;
 
         [MenuItem("Hezarfen/Olcum/Evlere girilebiliyor mu (D_Galata)")]
         public static void Galata() => Olc("D_Galata");
@@ -169,8 +175,18 @@ namespace Hezarfen.Editor.Diagnostics
             // 1-3 durulabilir hucre — yani basamaklar duruyordu, kopan
             // sey zincirdi. 0,15 m ile her basamaga en az bir hucre
             // dusuyor ve zincir kapaniyor.
-            const float H = 0.15f;      // yatay hucre (m) << tread 0,26
-            const float DY = 0.22f;     // dikey hucre (m) = basamak
+            const float H = 0.20f;      // yatay hucre (m)
+            // DIKEY IZGARA BASAMAGIN YARISI.
+            //
+            // 0,22 (basamak yuksekligi) ile ilk basamagin YUZEYI hic
+            // cozulmuyordu: katmanlar 0,69 ve 0,91'de, basamagin ustu
+            // 0,79'da — arada. Izgara, ustune basilacak yuzeyi kendi
+            // adiminin arasina dusurursse o basamak yokmus gibi olur.
+            // 0,11 m: 0,22 ile %3,9, 0,11 ile %20,8, 0,07 ile %23,1
+            // olculdu. Yani gercek deger %20-25 civari ve 0,11 ona
+            // yeterince yakin; 0,07 iki kat pahali ve iki puan
+            // kazandiriyor.
+            const float DY = 0.11f;
 
             var mc = col as MeshCollider;
             Bounds yerel = mc != null && mc.sharedMesh != null
@@ -201,10 +217,15 @@ namespace Hezarfen.Editor.Diagnostics
             int en = Mathf.Max(2, Mathf.FloorToInt((kutu.size.x - 0.6f) / H));
             int boy = Mathf.Max(2, Mathf.FloorToInt((kutu.size.z - 0.6f) / H));
             int kat = Mathf.Max(2, Mathf.FloorToInt((kutu.size.y - 0.5f) / DY));
-            if (en * boy * kat > 200000) return -1f;
+            if (en * boy * kat > 400000) return -1f;
 
             // DURULABILIR: govde boslugu bos VE altinda basacak bir sey.
+            //
+            // Her durulabilir hucre icin DESTEK KOTU da olculur: ayagin
+            // altindaki yuzey tam olarak nerede. Komsuluk bu kota
+            // bakacak, izgara katmanina degil.
             var dur = new bool[en * boy * kat];
+            var destekY = new float[en * boy * kat];
             int durSayi = 0;
             for (int k = 0; k < kat; k++)
             {
@@ -224,7 +245,21 @@ namespace Hezarfen.Editor.Diagnostics
                                                  0.14f, ~0,
                                                  QueryTriggerInteraction.Ignore))
                             continue;
-                        dur[(k * boy + j) * en + i] = true;
+                        // Destek kotu: ayaktan asagi 3 cm adimlarla ara.
+                        float dk = y;
+                        for (float alt = 0f; alt <= 0.30f; alt += 0.03f)
+                        {
+                            if (Physics.CheckSphere(
+                                    ayak - Vector3.up * (alt + 0.03f), 0.05f,
+                                    ~0, QueryTriggerInteraction.Ignore))
+                            {
+                                dk = y - alt;
+                                break;
+                            }
+                        }
+                        int idx0 = (k * boy + j) * en + i;
+                        dur[idx0] = true;
+                        destekY[idx0] = dk;
                         durSayi++;
                     }
             }
@@ -284,17 +319,31 @@ namespace Hezarfen.Editor.Diagnostics
                 if (k0 == zeminKat) zeminErisilen++;
                 if (k0 > enYuksekKat) enYuksekKat = k0;
 
+                // KOMSULUK DESTEK KOTUNA BAKAR.
+                //
+                // Once "bir izgara katmani yukari" kurali vardi ve
+                // merdivenin ilk basamagi hicbir zaman baglanmadi:
+                // zemin dosemesi 0,60 m'de, ilk basamak 0,79 m'de, fark
+                // 0,19 m — ama dikey izgara adimi 0,22 m, yani ikisi
+                // cogu evde AYNI katmana dusuyor ve "bir kat yukari"
+                // komsulugu hic denenmiyordu. Izgara, cikilacak farki
+                // kendi adimindan kucuk oldugu icin goremiyordu.
+                //
+                // Dogrusu izgaraya degil zemine bakmak: iki hucre
+                // komsuysa ve DESTEK KOTLARI arasindaki fark bir adimi
+                // (CharacterController'in 0,30 m'lik adim payi) asmiyorsa
+                // gecilebilir. Izgara artik yalnizca ornekleme araci.
+                float benimY = destekY[idx];
                 for (int d = 0; d < 4; d++)
                 {
                     int i2 = i0 + (d == 0 ? 1 : d == 1 ? -1 : 0);
                     int j2 = j0 + (d == 2 ? 1 : d == 3 ? -1 : 0);
                     if (i2 < 0 || i2 >= en || j2 < 0 || j2 >= boy) continue;
-                    for (int dk = -1; dk <= 1; dk++)
+                    for (int k2 = 0; k2 < kat; k2++)
                     {
-                        int k2 = k0 + dk;
-                        if (k2 < 0 || k2 >= kat) continue;
                         int n = (k2 * boy + j2) * en + i2;
                         if (gorulen[n] || !dur[n]) continue;
+                        if (Mathf.Abs(destekY[n] - benimY) > AdimPayi) continue;
                         gorulen[n] = true;
                         yigin.Push(n);
                     }

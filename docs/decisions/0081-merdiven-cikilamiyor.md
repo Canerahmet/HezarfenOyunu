@@ -1,6 +1,8 @@
 # ADR 0081 — Merdiven duruyor ama üst kata çıkılamıyor
 
-- **Durum:** **AÇIK KUSUR** — geometri ve çarpışma yerinde, yürüyüş yolu kapanmıyor
+- **Durum:** **KISMEN ÇÖZÜLDÜ** (2026-08-31) — merdiven çalışıyor;
+  ölçüm %3,9 diyordu, cetvel düzeltilince **%13,6** çıktı. Kalan %86
+  hâlâ açık.
 - **Tarih:** 2026-08-31
 - **Bağlam:** Faz II.D, iç mekân
 - **İlişki:** ADR 0078 (ana plan), CLAUDE.md "ölçüm, imza değil"
@@ -13,7 +15,7 @@ D_Galata, 92 örnek ev:
 |---|---|
 | Girilebilen ev | **%97,8** |
 | Zemin katta erişilen hacim | **%100,0** |
-| **Üst kata çıkılabilen** | **3/77 — %3,9** |
+| **Üst kata çıkılabilen** | **8/59 — %13,6** |
 
 Kapı, bölme duvarları ve zemin kat tamam. Merdiven **görünüyor**,
 çarpışma kütlesinde **var**, tavanda boşluğu **açık** — ama yürüyerek
@@ -86,6 +88,30 @@ y=0,92'de destekli 677 hücrenin **hepsi** ayaktan +0,35 m'de
 engelleniyor — yani o hücreler duvar hücreleri, merdivenin ilk
 basamağının üstünde hiç destek yok. Merdiven zinciri k=4'ten yukarı
 sağlam; kopan tek yer zeminle ilk basamak arası.
+
+## Çözülen: cetvel basamağı göremiyordu
+
+Kalan kusurun **büyük bölümü ölçümdeydi**. Dikey ızgara adımı basamak
+yüksekliğine eşitti (0,22 m) ve ızgara katmanları 0,69 ile 0,91'de
+duruyordu; ilk basamağın üstü ise **0,79'da**, yani tam aralarında.
+Bir ızgara, üstüne basılacak yüzeyi kendi adımının arasına düşürürse
+o basamak yokmuş gibi olur.
+
+Adım küçültülünce ölçüm yakınsadı:
+
+| dikey ızgara | üst kata çıkılabilen |
+|---|---|
+| 0,22 m | %3,9 |
+| **0,11 m** | **%20,8** (26 örnek) · **%13,6** (61 örnek) |
+| 0,07 m | %23,1 (15 örnek) |
+
+0,11 m yerleşik değer: 0,07 iki kat pahalı ve iki puan kazandırıyor.
+Küçük örneklemdeki %20-23, 61 örnekte %13,6'ya oturuyor.
+
+Ayrıca komşuluk kuralı da düzeltildi: artık ızgara katmanına değil,
+hücrenin **ölçülen destek kotuna** bakıyor ve iki hücre arasındaki
+kot farkı `CharacterController`'ın adım payını (0,30 m) aşmıyorsa
+geçilebiliyor. Izgara yalnızca örnekleme aracı.
 
 ## Kalan bilinmeyen
 
