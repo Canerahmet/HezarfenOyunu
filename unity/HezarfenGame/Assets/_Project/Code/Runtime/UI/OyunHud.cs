@@ -1,3 +1,4 @@
+using Hezarfen.Player;
 using Hezarfen.Sehir;
 using Hezarfen.Zaman;
 using UnityEngine;
@@ -29,6 +30,8 @@ namespace Hezarfen.Arayuz
         public ZamanSistemi zaman;
         public KayitBaglayici kayit;
         public AranmaSistemi aranma;
+        public EtkilesimAlgila etkilesim;
+        public Envanter envanter;
 
         [Tooltip("Duraklat tuşu.")]
         public Key duraklatTusu = Key.Escape;
@@ -36,6 +39,9 @@ namespace Hezarfen.Arayuz
         [Tooltip("Hızlı kaydet / hızlı yükle.")]
         public Key kaydetTusu = Key.F5;
         public Key yukleTusu = Key.F9;
+
+        [Tooltip("Etkileşim tuşu.")]
+        public Key etkilesimTusu = Key.E;
 
         /// <summary>Oyun duraklatıldı mı — test okur.</summary>
         public bool Duraklatildi { get; private set; }
@@ -49,6 +55,9 @@ namespace Hezarfen.Arayuz
             if (zaman == null) zaman = FindAnyObjectByType<ZamanSistemi>();
             if (kayit == null) kayit = FindAnyObjectByType<KayitBaglayici>();
             if (aranma == null) aranma = FindAnyObjectByType<AranmaSistemi>();
+            if (etkilesim == null)
+                etkilesim = FindAnyObjectByType<EtkilesimAlgila>();
+            if (envanter == null) envanter = FindAnyObjectByType<Envanter>();
         }
 
         private void Update()
@@ -59,6 +68,17 @@ namespace Hezarfen.Arayuz
             if (kb[duraklatTusu].wasPressedThisFrame) Duraklat(!Duraklatildi);
             if (kb[kaydetTusu].wasPressedThisFrame) Kaydet();
             if (kb[yukleTusu].wasPressedThisFrame) Yukle();
+
+            // DURAKLATILMISKEN ETKILESIM YOK: menu acikken imlec serbest,
+            // bakis olu ve "onunde duran sey" artik oyuncunun secimi
+            // degil, duraklattigi andan kalma bir kaza.
+            if (!Duraklatildi && etkilesim != null
+                && kb[etkilesimTusu].wasPressedThisFrame)
+            {
+                string neydi = etkilesim.Ipucu;
+                if (etkilesim.Tetikle()) Bildir(neydi + " · alindi");
+                else if (neydi.Length > 0) Bildir("Kese dolu.");
+            }
         }
 
         /// <summary>Duraklatır ya da devam eder.</summary>
@@ -102,6 +122,17 @@ namespace Hezarfen.Arayuz
             _mesajSonu = Time.unscaledTime + 3f;
         }
 
+        /// <summary>Envanter kaleminin oyuncuya görünen adı.</summary>
+        private static string EsyaAdi(EsyaTuru t) => t switch
+        {
+            EsyaTuru.Su => "su",
+            EsyaTuru.Odun => "odun",
+            EsyaTuru.Sebze => "sebze",
+            EsyaTuru.Ekmek => "ekmek",
+            EsyaTuru.KanatParcasi => "kanat parçası",
+            _ => t.ToString(),
+        };
+
         private void OnGUI()
         {
             _kutu ??= new GUIStyle(GUI.skin.box) { alignment = TextAnchor.UpperLeft, padding = new RectOffset(10, 10, 8, 8) };
@@ -129,6 +160,45 @@ namespace Hezarfen.Arayuz
                           + $"({aranma.SuAn})", _yazi);
             }
 
+            // --- ETKILESIM IPUCU: ekranin ortasinin biraz altinda ---
+            //
+            // Ortada degil, altinda: nisangahin oldugu yere yazi koymak
+            // tam bakilan seyi kapatir.
+            if (!Duraklatildi && etkilesim != null)
+            {
+                string ip = etkilesim.Ipucu;
+                if (ip.Length > 0)
+                {
+                    var ir = new Rect(Screen.width * 0.5f - 90f,
+                                      Screen.height * 0.5f + 40f, 180f, 30f);
+                    GUI.Box(ir, "", _kutu);
+                    var eski = _yazi.alignment;
+                    _yazi.alignment = TextAnchor.MiddleCenter;
+                    GUI.Label(ir, $"[E]  {ip}", _yazi);
+                    _yazi.alignment = eski;
+                }
+            }
+
+            // --- KESE: yalniz doluyken ---
+            //
+            // Bos bir envanter kutusu ekranin kosesinde surekli durursa
+            // oyuncu ona bakmayi birakir; o zaman doldugunda da bakmaz.
+            if (envanter != null && envanter.TurSayisi > 0)
+            {
+                float ky = 10f;
+                var kr = new Rect(Screen.width - 250f, 34f, 240f,
+                                  22f * envanter.TurSayisi + 14f);
+                GUI.Box(kr, "", _kutu);
+                foreach (EsyaTuru t in System.Enum.GetValues(typeof(EsyaTuru)))
+                {
+                    int n = envanter.Adet(t);
+                    if (n == 0) continue;
+                    GUI.Label(new Rect(kr.x + 12f, kr.y + ky - 4f, 220f, 22f),
+                              $"{EsyaAdi(t)}  ×{n}", _yazi);
+                    ky += 22f;
+                }
+            }
+
             if (Time.unscaledTime < _mesajSonu)
                 GUI.Box(new Rect(10, Screen.height - 46, 260, 32),
                         _mesaj, _kutu);
@@ -137,7 +207,8 @@ namespace Hezarfen.Arayuz
             if (!Duraklatildi)
             {
                 GUI.Label(new Rect(Screen.width - 250, 10, 240, 20),
-                          "ESC duraklat · F5 kaydet · F9 yükle", _yazi);
+                          "ESC duraklat · E al · F5 kaydet · F9 yükle",
+                          _yazi);
                 return;
             }
 

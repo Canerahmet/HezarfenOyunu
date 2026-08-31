@@ -1,4 +1,5 @@
 using Hezarfen.Player;
+using Hezarfen.Sehir;
 using NUnit.Framework;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -97,5 +98,35 @@ namespace Hezarfen.Tests
                 "Oyuncu yok.");
             Assert.IsNotNull(Kamera(), "Kamera yok.");
         }
+        /// <summary>
+        /// <b>Oyuncu bir seye uzanabiliyor mu.</b>
+        ///
+        /// Etkilesim iki parcadan olusuyor ve ikisi de sahnede kurulur:
+        /// kese govdede, nisan GOZDE. Sahne kurulumunda birinin
+        /// unutulmasi sessiz bir kayiptir — sehirde 15.815 dokunulabilir
+        /// esya durur, oyuncu hicbirine dokunamaz ve hicbir hata mesaji
+        /// cikmaz. Testin sordugu soru tam bu: eksiklik gurultu
+        /// cikarmiyorsa test cikarmali.
+        /// </summary>
+        [Test]
+        public void ThePlayerCanCarryThingsAndReachForThem()
+        {
+            var oyuncu = GameObject.Find("OYUNCU");
+            Assert.IsNotNull(oyuncu, "Sahnede OYUNCU yok.");
+
+            Assert.IsNotNull(oyuncu.GetComponent<Envanter>(),
+                "Oyuncunun kesesi yok — aldigi sey hicbir yere gitmez.");
+
+            var uzan = oyuncu.GetComponent<EtkilesimAlgila>();
+            Assert.IsNotNull(uzan,
+                "Etkilesim algilayici yok — sehirdeki hicbir esya "
+                + "cevap vermez.");
+            Assert.IsNotNull(uzan.bakis,
+                "Nisan yonu bos — govdenin ileri yonune duser ve omuz "
+                + "ustu kamerada bakilan seyle uzanilan sey ayrilir.");
+            Assert.AreEqual("Main Camera", uzan.bakis.name,
+                "Nisan GOZDE olmali.");
+        }
+
     }
 }

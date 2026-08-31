@@ -20,6 +20,7 @@ namespace Hezarfen.Sehir
         public Transform oyuncu;
         public AranmaSistemi aranma;
         public NPCYonetici sehir;
+        public Envanter envanter;
 
         [Tooltip("Oyuncunun kesesi — akçe buradan okunur.")]
         public int akce = 0;
@@ -34,6 +35,7 @@ namespace Hezarfen.Sehir
             if (zaman == null) zaman = FindAnyObjectByType<ZamanSistemi>();
             if (aranma == null) aranma = FindAnyObjectByType<AranmaSistemi>();
             if (sehir == null) sehir = FindAnyObjectByType<NPCYonetici>();
+            if (envanter == null) envanter = FindAnyObjectByType<Envanter>();
             if (oyuncu == null)
             {
                 var go = GameObject.Find("OYUNCU");
@@ -66,6 +68,7 @@ namespace Hezarfen.Sehir
                 v.yasakMal = aranma.YasakMalTasiyor;
             }
             v.akce = akce;
+            if (envanter != null) v.envanter = envanter.Serilestir();
             return v;
         }
 
@@ -99,6 +102,7 @@ namespace Hezarfen.Sehir
             }
             if (aranma != null) aranma.YasakMalTasiyor = v.yasakMal;
             akce = v.akce;
+            if (envanter != null) envanter.Yukle(v.envanter);
 
             // SEHIR YENIDEN KURULUR: sakinler tarihten ve tohumdan doğar,
             // kayıt dosyasından değil (ADR 0070).

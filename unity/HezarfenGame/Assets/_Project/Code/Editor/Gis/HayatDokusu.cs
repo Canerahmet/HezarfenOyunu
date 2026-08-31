@@ -255,6 +255,15 @@ namespace Hezarfen.Editor.Gis
 
             var rng = new System.Random(1632);
 
+            // SEMT BASINA DEFTER.
+            //
+            // Toplam sayilar "24.177 esya kondu" der ve memnun eder;
+            // ama etkilesim gecisi D_Galata'da SIFIR esya buldu — yani
+            // REFERANS SEMT bostu ve toplam bunu sakliyordu. Ortalama,
+            // bir semtin hic payini almadigini asla soylemez. Defter
+            // semt semt tutuluyor ki bir daha saklayamasin.
+            var defter = SemtDefteri();
+
             for (float wx = kokPos.x; wx < kokPos.x + genis; wx += Izgara)
             for (float wz = kokPos.z; wz < kokPos.z + boy; wz += Izgara)
             {
@@ -278,7 +287,9 @@ namespace Hezarfen.Editor.Gis
                 // 2) EGIM
                 float u = (jx - kokPos.x) / genis, v = (jz - kokPos.z) / boy;
                 if (u < 0f || u > 1f || v < 0f || v > 1f) continue;
-                if (data.GetSteepness(u, v) > EnCokEgim) { egimElendi++; continue; }
+                Say(defter, p2, "aday");
+                if (data.GetSteepness(u, v) > EnCokEgim)
+                { egimElendi++; Say(defter, p2, "egim"); continue; }
 
                 // 3) ARALIK
                 if (CokYakin(konanIzgara, konanlar, p2)) { cakismaElendi++; continue; }
@@ -327,6 +338,7 @@ namespace Hezarfen.Editor.Gis
                 konanlar.Add(p2);
                 Ekle(konanIzgara, konanlar.Count - 1, p2);
                 konan++;
+                Say(defter, p2, "kondu");
             }
 
             // ESYA KOMSUSUYLA BIRLIKTE AKAR.
@@ -351,6 +363,60 @@ namespace Hezarfen.Editor.Gis
                       + $"cevrili degil {acikElendi}. "
                       + $"Kapalilik dagilimi [{string.Join(",", kapaliDagilim)}]. "
                       + $"{kutular.Count} bina kutusu tarandi.");
+            DefteriYaz(defter);
+        }
+
+        // --- SEMT BASINA DEFTER ---------------------------------------
+        //
+        // Ayri tutuluyor cunku sordugu soru yerlestirmenin degil
+        // DENETIMIN sorusu: "hangi semt payini almadi".
+
+        private sealed class SemtSayaci
+        {
+            public Streaming.DistrictDef def;
+            public int aday, egim, kondu;
+        }
+
+        private static List<SemtSayaci> SemtDefteri()
+        {
+            var l = new List<SemtSayaci>();
+            var kayit = AssetDatabase.LoadAssetAtPath<Streaming.DistrictRegistry>(
+                "Assets/_Project/Data/DistrictDefs/DistrictRegistry.asset");
+            if (kayit == null) return l;
+            foreach (var d in kayit.districts)
+                if (d != null && d.kind == Streaming.DistrictKind.Land)
+                    l.Add(new SemtSayaci { def = d });
+            return l;
+        }
+
+        private static void Say(List<SemtSayaci> defter, Vector2 p, string ne)
+        {
+            var nokta = new Vector3(p.x, 0f, p.y);
+            foreach (var s in defter)
+            {
+                if (!s.def.Contains(nokta)) continue;
+                if (ne == "aday") s.aday++;
+                else if (ne == "egim") s.egim++;
+                else s.kondu++;
+                return;
+            }
+        }
+
+        private static void DefteriYaz(List<SemtSayaci> defter)
+        {
+            if (defter.Count == 0) return;
+            var sb = new System.Text.StringBuilder(
+                "[Hezarfen] Hayat dokusu — semt defteri" + "\n");
+            foreach (var s in defter)
+            {
+                float oran = s.aday > 0 ? 100f * s.egim / s.aday : 0f;
+                sb.AppendLine($"  {s.def.districtId,-16} aday {s.aday,6}  "
+                              + $"egim eledi {s.egim,6} (%{oran:0.0})  "
+                              + $"kondu {s.kondu,5}"
+                              + (s.kondu == 0 && s.aday > 0
+                                 ? "   << SIFIR" : ""));
+            }
+            Debug.Log(sb.ToString());
         }
 
         /// <summary>

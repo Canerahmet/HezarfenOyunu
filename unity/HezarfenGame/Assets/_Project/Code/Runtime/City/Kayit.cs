@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -29,8 +30,16 @@ namespace Hezarfen.Sehir
     [Serializable]
     public class KayitVerisi
     {
-        /// <summary>Kayıt biçimi sürümü. Artmadan alan silinmez.</summary>
-        public int surum = 1;
+        /// <summary>
+        /// Kayıt biçimi sürümü. Artmadan alan silinmez.
+        ///
+        /// <b>2</b>: envanter eklendi. Eski (1) kayıtlar hâlâ okunur —
+        /// alan eklemek geriye dönük kırıcı değildir, çünkü eksik alan
+        /// varsayılanıyla gelir ve boş envanter doğru cevaptır. Sürümü
+        /// yine de artırıyoruz: dosyaya bakan biri hangi biçim olduğunu
+        /// tahmin etmek zorunda kalmasın.
+        /// </summary>
+        public int surum = 2;
 
         /// <summary>Kaydın alındığı gerçek zaman (görüntüleme için).</summary>
         public string damga = "";
@@ -63,6 +72,16 @@ namespace Hezarfen.Sehir
         public int perde2Asama;
         public int talimSayisi;
 
+        // --- ENVANTER ---
+        /// <summary>
+        /// <c>tur, adet, tur, adet …</c> düz listesi.
+        ///
+        /// Sözlük değil liste, çünkü <see cref="JsonUtility"/> sözlük
+        /// serileştirmez ve envanter için ayrı bir sarmalayıcı sınıf
+        /// yazmak, beş kalemlik bir keseye fazla gelirdi.
+        /// </summary>
+        public List<int> envanter = new List<int>();
+
         // --- SEHIR ---
         /// <summary>
         /// Sakinlerin dağıtıldığı tohum. <b>Şehrin tamamı bu sayıdan
@@ -88,7 +107,13 @@ namespace Hezarfen.Sehir
     {
         public const string DosyaAdi = "hezarfen_kayit.json";
 
-        /// <summary>Kayıt biçiminin bu sürümde okuyabildiği en eski hâli.</summary>
+        /// <summary>
+        /// Kayıt biçiminin bu sürümde okuyabildiği en eski hâli.
+        ///
+        /// Güncel sürüm 2 ama bu 1 kalıyor: 1→2 yalnız alan EKLEDİ,
+        /// hiçbir alanın anlamını değiştirmedi. Oyuncunun eski kaydını
+        /// yalnız sayı arttı diye çöpe atmak, kaydı bozmakla aynı şey.
+        /// </summary>
         public const int EnEskiOkunabilirSurum = 1;
 
         public static string Yol =>

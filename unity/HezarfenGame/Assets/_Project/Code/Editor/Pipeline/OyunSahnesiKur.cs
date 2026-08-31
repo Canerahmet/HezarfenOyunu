@@ -435,6 +435,17 @@ namespace Hezarfen.Editor.Pipeline
             kamGo.AddComponent<Camera>();
             kamGo.AddComponent<AudioListener>();
 
+            // ETKILESIM: kese oyuncuda, nisan kamerada.
+            //
+            // Ikisi ayri nesnede cunku ayri sorulara cevap veriyorlar.
+            // Kese "neyi tasiyorum" der ve govdeye aittir; nisan
+            // "neye bakiyorum" der ve GOZE aittir. Nisani govdeye
+            // baglamak, omuz ustu kamerada oyuncunun baktigi seyle
+            // uzandigi seyi ayirirdi.
+            go.AddComponent<Envanter>();
+            var uzan = go.AddComponent<EtkilesimAlgila>();
+            uzan.bakis = kamGo.transform;
+
             // ORTAM SESI — dinleyiciyle ayni nesnede.
             //
             // Oyun bugune kadar tamamen sessizdi: sahnede tek bir
