@@ -1,7 +1,7 @@
 # ADR 0081 — Merdiven duruyor ama üst kata çıkılamıyor
 
 - **Durum:** **ÇÖZÜLDÜ** (2026-08-31) — üst kata çıkılabilen
-  **%70,7** (Unity NavMesh ile ölçüldü).
+  **%75,6** (Unity NavMesh ile ölçüldü).
 - **Tarih:** 2026-08-31
 - **Bağlam:** Faz II.D, iç mekân
 - **İlişki:** ADR 0078 (ana plan), CLAUDE.md "ölçüm, imza değil"
@@ -201,18 +201,20 @@ açıklığı iki yandan yiyor.
 |---|---|---|
 | İç kapı 0,95 → **1,15 m** | 0,95'ten geriye 0,35 m kalıyordu; arka oda (ve merdiven) kopuyordu | %58,5 → **%65,9** |
 | En < 5,8 m'de bölme **yok** | 5,2 m'lik iç genişlikte bölme önde 2,3 m, arkada 2,4 m bırakıyor; arka sokağın küçük evi zaten tek hacimdir | %65,9 → **%70,7** |
+| Sahanlık 1,30 → **1,55**, duvar payı 0,50 → **0,60** | aynı aşınma kuralı, kolun iki ucunda | %70,7 → **%75,6** |
+| Sahanlık 1,80, duvar payı 0,70 | — | **%75,6** — değişmedi, kaldıraç tükendi |
 
 Kanıt dağılımdan geldi: kapı genişletilince başarısızların ortanca eni
 6,55 → 6,13 m'ye indi, yani kalanlar en dar uca yığıldı.
 
-## Kalan %29,3 — ölçüldü, sebep bulunamadı
+## Kalan %24,4 — ölçüldü, sebep bulunamadı
 
-Genişlikle ilişki **var ama zayıf**:
+Genişlikle ilişki **var ama zayıf** (son ölçüm):
 
 | | n | ortalama en | ortanca | en az | en çok |
 |---|---|---|---|---|---|
-| çıkılan | 24 | 7,47 m | 7,50 | 5,50 | 9,66 |
-| çıkılamayan | 17 | 6,62 m | 6,55 | 5,25 | 9,79 |
+| çıkılan | 31 | 7,21 m | 7,07 | 5,25 | 9,66 |
+| çıkılamayan | 9 | 6,72 m | 6,55 | 5,40 | 9,79 |
 
 Aralıklar iç içe: 9,79 m'lik bir ev de başarısız oluyor, 5,50 m'lik bir
 ev de başarılı. Yani darlık tek başına açıklamıyor.

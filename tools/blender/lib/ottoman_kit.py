@@ -1449,9 +1449,14 @@ def merdiven_plani(p):
     #: (0,30 m) kadar asindirir, basamak derinligi ise 0,26 m — yani
     #: ilk basamak butunuyle asinip yok oluyordu. Merdiven navmesh'i
     #: zemin kattan kopuk kaliyor, yol da kapidan sokaga iniyordu.
-    DUVAR_PAYI = 0.50
+    DUVAR_PAYI = 0.60
 
-    SAHANLIK = 1.30
+    #: Kolun ucundaki sahanlık (m).
+    #:
+    #: 1,30 → 1,55 ölçümü %70,7'den %75,6'ya taşıdı. 1,80 denendi ve
+    #: **aynı** sonucu verdi (%75,6, aynı evler) — yani kaldıraç 1,55'te
+    #: tükeniyor. Daha büyüğü yalnız zemin kattan yer yer.
+    SAHANLIK = 1.55
     ic_en = p.width - 2.0 * p.wall_thickness
     if kosu > ic_en - SAHANLIK - DUVAR_PAYI:
         kosu = ic_en - SAHANLIK - DUVAR_PAYI
