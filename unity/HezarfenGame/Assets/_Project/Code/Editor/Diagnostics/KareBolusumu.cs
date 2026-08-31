@@ -168,7 +168,24 @@ namespace Hezarfen.Editor.Diagnostics
                     enIyi = Mathf.Min(enIyi, su);
                     bool akisBosta = akis == null || akis.LoadsInFlight == 0;
                     bool tabanaYakin = su <= enIyi * 1.25f;
-                    if (akisBosta && tabanaYakin && onceki > 0f
+
+                    // MUTLAK TAVAN — GORECE OLCU DORDUNCU KEZ KANDI.
+                    //
+                    // "Simdiye kadarki en iyiye yakin miyiz" testi, EN
+                    // IYININ KENDISI kotuyse calismiyor: ilk pencerelerin
+                    // hepsi yukleme platosuna dustugunde kosan minimum da
+                    // sisiyor ve "195,1 ms; gorulen en iyi 193,6 ms" diye
+                    // memnun bir sekilde oturuyor.
+                    //
+                    // Bir goreceli olcu, karsilastirdigi seyin dogrulugunu
+                    // hic sorgulamaz. Yanina mutlak bir sinir gerekiyor ve
+                    // o sinir uydurulmuyor: butce 16,7 ms, yukleme platosu
+                    // ~190 ms. 45 ms ikisinin arasinda genis bir yerde
+                    // duruyor — bir kare 45 ms'nin altindaysa sahne
+                    // yuklenmeyi bitirmistir, 16,7'yi asiyor olsa bile.
+                    bool makul = su < 45f;
+
+                    if (akisBosta && tabanaYakin && makul && onceki > 0f
                         && Mathf.Abs(su - onceki) <= onceki * 0.08f)
                     {
                         Debug.Log($"[Hezarfen] Isinma: {gecen} karede "
