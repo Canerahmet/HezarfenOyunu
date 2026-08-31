@@ -42,6 +42,20 @@ namespace Hezarfen.Sehir
         public int GorunurReplik { get; private set; }
 
         private readonly List<TextMesh> _havuz = new();
+        /// <summary>
+        /// İki replik ekranda bu kadar yakınsa biri gizlenir (piksel).
+        ///
+        /// Y daha dar, X daha geniş: yazı yatay uzanır, yani yan yana
+        /// iki replik birbirine değmeden durabilir ama üst üste gelen
+        /// iki satır kesin okunmaz olur. 1080p'ye göre; ekran
+        /// yüksekliğiyle ölçeklenmesi HUD'un ölçek işiyle birlikte
+        /// gelecek.
+        /// </summary>
+        private const float EkranAyrikY = 46f;
+        private const float EkranAyrikX = 300f;
+
+        private readonly List<Vector3> _ekran = new List<Vector3>();
+
         private readonly List<(NPCAjan ajan, float d2)> _adaylar = new();
         private Camera _kamera;
 
@@ -85,20 +99,34 @@ namespace Hezarfen.Sehir
             // En yakinlar konusur — kalabalikta duyulan da odur.
             _adaylar.Sort((x, y) => x.d2.CompareTo(y.d2));
 
-            // EKRANDA AYRI DURSUNLAR.
+            // EKRANDA AYRI DURSUNLAR — VE OLCU EKRANDA ALINIR.
             //
-            // Kalabalikta en yakin dort kisi genellikle YAN YANA duruyor
-            // ve dort replik ust uste binip okunmaz bir lekeye donusuyor.
-            // Doğum yerinde cekilen karede tam olarak bu goruldu.
-            // Birbirine 3 m'den yakin konusanlardan yalniz biri konusur.
-            for (int i = _adaylar.Count - 1; i >= 0; i--)
+            // Once kural dunya uzayindaydi: "birbirine 3 m'den yakin
+            // konusanlardan yalniz biri konusur". Yanlis cetveldi ve
+            // uc ayri karede ayni kusuru birakti — bakis ekseni
+            // boyunca dizilmis iki konusmaci dunyada 20 m ayriktir ama
+            // EKRANDA ust uste biner. Yazi dunyada degil ekranda
+            // okunuyor; ayrik olmasi gereken yer de orasi.
+            //
+            // Elenen aday susmaz, yalnizca YAZISI gorunmez: konusma
+            // sesi ve rutini yerinde kalir.
+            if (_kamera != null)
             {
-                for (int j = 0; j < i; j++)
+                _ekran.Clear();
+                for (int i = _adaylar.Count - 1; i >= 0; i--)
                 {
-                    if ((_adaylar[i].ajan.konum
-                         - _adaylar[j].ajan.konum).sqrMagnitude > 9f) continue;
-                    _adaylar.RemoveAt(i);
-                    break;
+                    var d = _kamera.WorldToScreenPoint(
+                        _adaylar[i].ajan.konum + Vector3.up * yukseklik);
+                    if (d.z <= 0f) { _adaylar.RemoveAt(i); continue; }
+
+                    bool cakisti = false;
+                    foreach (var e in _ekran)
+                        if (Mathf.Abs(e.y - d.y) < EkranAyrikY
+                            && Mathf.Abs(e.x - d.x) < EkranAyrikX)
+                        { cakisti = true; break; }
+
+                    if (cakisti) _adaylar.RemoveAt(i);
+                    else _ekran.Add(d);
                 }
             }
 

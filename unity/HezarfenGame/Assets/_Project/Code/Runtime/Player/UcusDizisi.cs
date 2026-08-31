@@ -84,7 +84,14 @@ namespace Hezarfen.Player
         /// sessizdir, hata ancak oyun koşarken çıkar. PlayMode testi
         /// yazılmasaydı bu, ilk oynayışta ortaya çıkardı.
         /// </summary>
-        public Key kusanTusu = Key.E;
+        // E DEGIL.
+        //
+        // E ayni karede hem "su al" hem "kanadi kusan" demeye
+        // basladi: `OyunHud.etkilesimTusu` da E idi. Su kupune uzanan
+        // oyuncu 2,5 saniyelik kusanma animasyonunu baslatiyor ve
+        // girdisi kilitleniyordu. Iki AYRI fiil, iki ayri tus —
+        // etkilesim surekli, kusanma bir kez yapilan bir sey.
+        public Key kusanTusu = Key.G;
 
         public Key atlaTusu = Key.Space;
 
@@ -121,6 +128,11 @@ namespace Hezarfen.Player
                     break;
 
                 case Durum.Hazir:
+                    // ZIPLAMA KAPALI: `Hazir` durumunda Space firlatir.
+                    // Ikisi acikken tek basis hem ziplatiyor hem
+                    // atlatiyordu ve firlatma ivmesi ziplama hizinin
+                    // ustune biniyordu.
+                    if (yurume != null) yurume.atlayabilir = false;
                     if (Basildi(atlaTusu)) Atla();
                     break;
 
@@ -253,6 +265,8 @@ namespace Hezarfen.Player
 
         private void YereGec()
         {
+            // Ziplama geri acilir: yerde Space yine ziplamadir.
+            if (yurume != null) yurume.atlayabilir = true;
             if (suzulme != null) suzulme.enabled = false;
             if (govde != null)
             {

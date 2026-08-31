@@ -207,7 +207,8 @@ namespace Hezarfen.Arayuz
             if (!Duraklatildi)
             {
                 GUI.Label(new Rect(Screen.width - 250, 10, 240, 20),
-                          "ESC duraklat · E al · F5 kaydet · F9 yükle",
+                          "ESC duraklat · E al · G kanat · V bakış · Shift koş" + "\n"
+                          + "F5 kaydet · F9 yükle",
                           _yazi);
                 return;
             }

@@ -96,6 +96,17 @@ namespace Hezarfen.Player
         public float runSpeed = VarsayilanKosma;
         public float flySpeed = 12f;           // ucus kipi
         public float jumpSpeed = 3.6f;
+
+        /// <summary>
+        /// Zıplama açık mı.
+        ///
+        /// <see cref="UcusDizisi"/> kanat kuşanılınca kapatır: o
+        /// durumda Space fırlatma tuşudur ve ikisi birden açıkken tek
+        /// basış hem zıplatıp hem atlatıyor, fırlatma ivmesi zıplama
+        /// hızının üstüne biniyordu. Tuşun bir sahibi olmalı ve o
+        /// sahip duruma göre değişir.
+        /// </summary>
+        [System.NonSerialized] public bool atlayabilir = true;
         public float gravity = -9.81f;
 
         [Header("Bakış")]
@@ -282,7 +293,8 @@ namespace Hezarfen.Player
                 // Kucuk bir negatif hiz: tam sifir olursa `isGrounded` yamacta
                 // titriyor ve karakter basamaklarda takiliyor.
                 vSpeed = -1.5f;
-                if (kb.spaceKey.isPressed) vSpeed = jumpSpeed;
+                if (atlayabilir && kb.spaceKey.wasPressedThisFrame)
+                    vSpeed = jumpSpeed;
             }
             else
             {

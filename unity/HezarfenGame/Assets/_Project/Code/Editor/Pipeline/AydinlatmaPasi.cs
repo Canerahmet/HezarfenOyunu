@@ -128,19 +128,39 @@ namespace Hezarfen.Editor.Pipeline
         }
 
         /// <summary>
-        /// Bileşeni bulur; yoksa ekler ve <b>söyler</b>. Sessizce
-        /// eklemek, profilde ne olduğunu bilmeden ayar yapmaktır.
+        /// Bileşeni bulur; yoksa ekler, <b>diske yazar</b> ve söyler.
+        ///
+        /// ## AddObjectToAsset olmadan bu geçiş HİÇBİR ŞEY yapmıyordu
+        ///
+        /// <c>VolumeProfile.Add&lt;T&gt;()</c> bileşeni yalnız bellekte
+        /// kurar. <c>SaveAssets</c> onu yazmaz, çünkü bileşen henüz
+        /// varlığın bir parçası değildir — profil dosyasında hiç
+        /// görünmez. Geçiş "eklendi" diye altı satır log yazdı,
+        /// diskteki profil <b>beş</b> bileşende kaldı ve ortam örtme,
+        /// temas gölgesi, bloom, renk derecelendirme ve vinyet oyuna
+        /// hiç girmedi.
+        ///
+        /// Bu tuzak bu depoda İKİNCİ kez kuruldu: <c>KaliciAydinlatma</c>
+        /// aynı hatayı yaşamış ve <c>Ensure&lt;T&gt;</c> deyimini yazıp
+        /// gerekçesini de yanına koymuş. Yeni dosya o deyimi kullanmadı.
+        /// Bir dersi yazmak, onu uygulamak değildir — bu yüzden aşağıda
+        /// deyim tekrarlanmıyor, <b>testle</b> tutuluyor
+        /// (<c>AydinlatmaProfiliTests</c>).
         /// </summary>
         private static T Al<T>(VolumeProfile vp, StringBuilder sb, string ad)
             where T : VolumeComponent
         {
-            if (vp.TryGet(out T c))
+            if (vp.TryGet(out T c) && c != null)
             {
                 sb.AppendLine($"  {ad}: vardi, guncellendi");
                 return c;
             }
-            sb.AppendLine($"  {ad}: YOKTU, eklendi");
-            return vp.Add<T>(true);
+            c = vp.Add<T>(true);
+            c.hideFlags = HideFlags.HideInHierarchy;
+            if (AssetDatabase.Contains(vp))
+                AssetDatabase.AddObjectToAsset(c, vp);
+            sb.AppendLine($"  {ad}: YOKTU, eklendi ve diske yazildi");
+            return c;
         }
     }
 }

@@ -61,7 +61,25 @@ namespace Hezarfen.Editor.Lighting
         /// </summary>
         public const float OgleEV = 14.5f;
 
-        /// <summary>Alacakaranlık pozu — otomatik pozun alt sınırı.</summary>
+        /// <summary>
+        /// Otomatik pozun <b>alt</b> sınırı (EV100).
+        ///
+        /// 6,0 ile başladı ve adı doğruydu — 6 EV alacakaranlıktır.
+        /// Ama sınır alacakaranlıkta durunca <b>gece hiç açılmadı</b>:
+        /// ay ışığı 0,24 lüks, yani kabaca −3 EV; kamera 6 EV'de
+        /// kilitliyken o sahne siyahtır. Gece karesi ölçüldü, 78 KB'lık
+        /// tek renk bir PNG çıktı ve sebebi ışığın yokluğu sanıldı.
+        /// Işık eklendi, kare 367 KB'a çıktı ve <b>hâlâ</b> karanlıktı:
+        /// eksik olan ikinci parça buydu.
+        ///
+        /// −1,0, gerçekçi gecenin (−3 EV) biraz üstünde duruyor ve bu
+        /// bilerek: göz karanlığa yirmi dakikada uyum sağlar, oyuncu
+        /// yirmi dakika bekleyemez. Oyun burada tarihe değil <b>göze</b>
+        /// uyuyor ve fark bir seçim olarak yazılı duruyor.
+        /// </summary>
+        public const float GeceEV = -1.0f;
+
+        /// <summary>Alacakaranlık pozu — artık yalnız belge değeri.</summary>
         public const float AlacakaranlikEV = 6.0f;
 
         /// <summary>
@@ -304,7 +322,7 @@ namespace Hezarfen.Editor.Lighting
             poz.mode.overrideState = true;
             poz.mode.value = ExposureMode.AutomaticHistogram;
             poz.limitMin.overrideState = true;
-            poz.limitMin.value = AlacakaranlikEV;
+            poz.limitMin.value = GeceEV;
             poz.limitMax.overrideState = true;
             poz.limitMax.value = OgleEV + 2.0f;
             poz.adaptationMode.overrideState = true;

@@ -41,7 +41,16 @@ namespace Hezarfen.Zaman
         public ZamanSistemi zaman;
 
         [Tooltip("Dolunayda ışık şiddeti (lüks).")]
-        public float dolunayLuks = 0.28f;
+        //
+        // Gercek dolunay 0,25 luks verir ve 0,28 o degerdi. Olculdu:
+        // fenerin yaninda hic gorunmuyordu — poz yakindaki alevi
+        // takip edince uzak alan tekrar siyaha dustu. Iki care vardi:
+        // feneri kismak ve ayi yukseltmek. Ikisi de yapildi, cunku
+        // tek basina hicbiri dengeyi kurmuyordu.
+        //
+        // 0,55 gercegin iki kati ve bu bir SECIM: goz karanliga
+        // yirmi dakikada uyum saglar, oyuncu yirmi dakika bekleyemez.
+        public float dolunayLuks = 0.55f;
 
         [Tooltip("Yeni ayda bile kalan gök parıltısı (lüks).")]
         public float tabanLuks = 0.045f;

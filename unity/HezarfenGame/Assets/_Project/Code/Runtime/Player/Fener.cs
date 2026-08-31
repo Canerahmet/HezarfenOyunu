@@ -34,7 +34,18 @@ namespace Hezarfen.Player
         public ZamanSistemi zaman;
 
         [Tooltip("Fenerin ışık şiddeti (lümen).")]
-        public float lumen = 42f;
+        //
+        // 42 ILE BASLADI VE POZLAMAYI KACIRDI.
+        //
+        // Otomatik poz kamerayi en parlak seye gore ayarlar; fener
+        // kameranin 30 cm yanindaydi ve sahnedeki her seyden parlakti.
+        // Sonuc: yakin cevre turuncu, uzak alan yine simsiyah, ve
+        // ayin mavisi hic gorunmedi. Yani fener gecenin CARESI degil,
+        // gecenin YENI SEBEBI olmustu.
+        //
+        // 18 lumen, elde tasinan bir mum fenerinin gercek buyuklugune
+        // de daha yakin: iki adim otesini secersiniz, sokagi degil.
+        public float lumen = 18f;
 
         [Tooltip("Işığın eriştiği yarıçap (m).")]
         public float menzil = 7.5f;

@@ -520,12 +520,11 @@ namespace Hezarfen.Sehir
             {
                 var m = r.sharedMaterial;
                 if (m == null || !m.HasProperty(TonKimlik)) continue;
+                if (!Boyanir(m.name)) continue;
+
                 r.GetPropertyBlock(_tonBlok);
                 var taban = m.GetColor(TonKimlik);
-                // Ton bir CARPAN: dokunun kendi deseni korunur, yalniz
-                // rengi kayar. Dogrudan atamak butun giysiyi duz renge
-                // cevirirdi.
-                _tonBlok.SetColor(TonKimlik, taban * dna.ton * 1.6f);
+                _tonBlok.SetColor(TonKimlik, Boya(taban, dna.ton));
                 r.SetPropertyBlock(_tonBlok);
             }
 
@@ -538,6 +537,51 @@ namespace Hezarfen.Sehir
                 // Faz kaymasi: herkes ayni ayakla yurumesin.
                 anim.Play(0, 0, dna.faz);
             }
+        }
+
+        /// <summary>
+        /// Bu malzeme kişiden kişiye renk değiştirir mi.
+        ///
+        /// ## Neden hepsi değil
+        ///
+        /// Çarpan önce <b>her</b> renderer'a uygulanıyordu ve sonuç
+        /// karede görüldü: ten, sarık, mest ve kaftan aynı tona
+        /// kayıyor, figürler tek renk turuncu/pembe lekeler hâline
+        /// geliyordu. Kalabalık çeşitlensin diye eklenen şey,
+        /// kalabalığı DAHA tekdüze yapmıştı — çünkü bir insanı
+        /// okunur kılan şey renk çeşitliliği değil, üstündeki
+        /// renkler arasındaki <b>karşıtlık</b>: koyu kaftan, açık
+        /// gömlek, beyaz sarık, ten.
+        ///
+        /// Boyanan yalnız dış giysi. Gömlek ham keten, sarık beyaz,
+        /// ten ten, mest deri kalır — hepsi dönemin kendi kuralı,
+        /// hepsi ayrıca siluetin okunmasını sağlayan şey.
+        /// </summary>
+        private static bool Boyanir(string malzemeAdi)
+        {
+            if (string.IsNullOrEmpty(malzemeAdi)) return false;
+            return malzemeAdi.StartsWith("M_Cloth_Entari")
+                || malzemeAdi.StartsWith("M_Cloth_Salvar")
+                || malzemeAdi.StartsWith("M_Cloth_Kusak");
+        }
+
+        /// <summary>
+        /// Tabanı DNA tonuna kaydırır — <b>parlaklığını bozmadan</b>.
+        ///
+        /// Düz çarpma (<c>taban * ton * 1.6f</c>) rengi kaydırırken
+        /// parlaklığı da kaydırıyordu ve 1,6 katsayısı çoğu figürü
+        /// beyaza doğru patlatıyordu. Burada tondan yalnız <b>renk
+        /// yönü</b> alınıyor, parlaklık tabandan geliyor: kaftan koyu
+        /// kalıyor, yalnız hangi koyu olduğu değişiyor.
+        /// </summary>
+        private static Color Boya(Color taban, Color ton)
+        {
+            float tonIsik = ton.r * 0.299f + ton.g * 0.587f + ton.b * 0.114f;
+            if (tonIsik < 1e-3f) return taban;
+            var yon = new Color(ton.r / tonIsik, ton.g / tonIsik,
+                                ton.b / tonIsik, 1f);
+            return new Color(taban.r * yon.r, taban.g * yon.g,
+                             taban.b * yon.b, taban.a);
         }
 
         private MaterialPropertyBlock _tonBlok;
