@@ -1,8 +1,7 @@
 # ADR 0081 — Merdiven duruyor ama üst kata çıkılamıyor
 
-- **Durum:** **KISMEN ÇÖZÜLDÜ** (2026-08-31) — merdiven çalışıyor;
-  ölçüm %3,9 diyordu, cetvel düzeltilince **%13,6** çıktı. Kalan %86
-  hâlâ açık.
+- **Durum:** **ÇÖZÜLDÜ** (2026-08-31) — üst kata çıkılabilen
+  **%58,5** (Unity NavMesh ile ölçüldü). Kalan %41,5 kayda geçti.
 - **Tarih:** 2026-08-31
 - **Bağlam:** Faz II.D, iç mekân
 - **İlişki:** ADR 0078 (ana plan), CLAUDE.md "ölçüm, imza değil"
@@ -140,3 +139,61 @@ tabanına değil, **ölçülen döşeme kotuna** göre başlatmak).
 3. Bir sonraki adım tahmin değil **ölçüm** olacak: merdiven kolunun
    üstündeki baş boşluğu kot kot ölçülecek ve zincirin koptuğu hücre
    adıyla bulunacak.
+
+
+---
+
+# Çözüm (2026-08-31, ikinci gün)
+
+## Ölçüyü Unity'ye devretmek
+
+El yapımı ızgara sekiz farklı cevap verdi (%100, %97,2, %0, %9, %1,3,
+%3,9, %13,6, %1,6). "Bir insan buradan oraya yürüyebilir mi" sorusunun
+Unity'de zaten bir sahibi var: **NavMesh**. Ev başına bir navmesh
+pişirilip (`NavMeshBuilder.BuildNavMeshData`) kapıdan üst kata yol
+isteniyor; ajan yarıçapı, boyu, adım payı motorun kendi tanımları.
+Araç `EvMerdeveni` — ve aynı pişirme Faz II.G'deki NPC gezinmesinin
+temeli olacak.
+
+Bu araç da üç kez yanlış kuruldu ve üçü de kayda değer:
+
+| kusur | belirti |
+|---|---|
+| `localBounds` yerine dünya kutusu verildi | 41 evin 41'inde "kapıda navmesh yok" |
+| başlangıç ışını evin **tepesinden** bırakıldı | ilk çarptığı yüzey çatı; `bas` çatıya oturdu |
+| üst kat araması merkezin ±1,5 m'sine baktı | üst kattaki yüzey merdiven boşluğunun çevresinde, arka duvara yakın |
+
+## Asıl kusur: aşınma
+
+Recast yürünebilir alanı ajan yarıçapı (0,30 m) kadar **aşındırır**.
+Merdiven yan duvara bitişik başlıyordu ve basamak derinliği 0,26 m —
+yani **ilk basamak bütünüyle aşınıp yok oluyordu**. Merdiven navmesh'i
+zemin kattan kopuk kalıyor, yol da kapıdan sokağa iniyordu.
+
+Aynı şey kolun ucunda da vardı: merdiven boşluğu tam kolun ayak izi
+kadar, kolun ucuyla duvar arası 0,8 m; iki yandan aşınınca sahanlık
+0,2 m'ye iniyordu — çıkanın basacağı yer yok.
+
+Üç ölçü **birlikte** ayrıldı:
+
+| kol eni | duvar payı | sahanlık | üst kata çıkılabilen |
+|---|---|---|---|
+| 1,10 | 0,00 | 0,30 | **%0** |
+| 1,10 | 0,40 | 1,30 | %17,1 |
+| **1,35** | **0,50** | **1,30** | **%58,5** |
+| 1,60 | 0,60 | 1,30 | %46,3 |
+
+## Daha önce yazdığım bir yargıyı düzeltiyorum
+
+"Kolu genişletmek kötüleştirdi (%3,9 → %0), yani kısıt kolun eni
+değil" demiştim. Yanlıştı: o sırada sahanlık ve duvar payı yoktu,
+geniş kol onları yiyordu. **Bir değişken tek başına denendiğinde
+yanıltır**; kısıt üçünün birleşimiydi.
+
+## Kalan %41,5
+
+Başarısızların hepsi aynı deseni gösteriyor: yol kapıdan sokağa iniyor,
+yani merdiven yine bağlanmamış. En güçlü aday, dar evlerde koşunun
+(`kosu = ic_en − sahanlık − duvar payı`) kırpılıp basamağın
+dikleşmesi. Ölçülebilir: varyantın `width` değeriyle başarı
+korelasyonuna bakmak yeter.

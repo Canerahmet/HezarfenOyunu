@@ -1354,13 +1354,21 @@ BASAMAK_YUKSEK = 0.19
 BASAMAK_DERIN = 0.30
 #: Merdiven kolunun eni (m).
 #:
-#: 0,95 iki yandan duvara sürtüyordu; 1,10 ölçülen en iyi değer.
+#: Ölçülen en iyi değer 1,35. Trend, sahanlık ve duvar payı ayrı ayrı
+#: ayrıldıktan SONRA ortaya çıktı:
 #:
-#: 1,40 da denendi ve **kötüleşti** (üst kata çıkılabilen %3,9 → %0).
-#: Yani kısıt kolun eni değil; geniş kol yalnız arka odayı yiyor ve
-#: tavandaki boşluğu büyütüyor. Bir sayıyı büyütmek işe yaramıyorsa
-#: ölçülen şey o sayı değildir.
-MERDIVEN_EN = 1.10
+#: | kol eni | duvar payı | üst kata çıkılabilen |
+#: |---|---|---|
+#: | 1,10 | 0,00 | %0 |
+#: | 1,10 | 0,40 | %17,1 |
+#: | **1,35** | **0,50** | **%58,5** |
+#: | 1,60 | 0,60 | %46,3 |
+#:
+#: Daha önce 1,10 → 1,40 denendiğinde kötüleşmişti (%3,9 → %0) ve
+#: "kısıt en değil" diye yazmıştım. Yanlıştı: o sırada sahanlık ve
+#: duvar payı yoktu, geniş kol onları yiyordu. Bir değişken tek
+#: başına denendiğinde yanıltır; kısıt üçünün birleşimiydi.
+MERDIVEN_EN = 1.35
 
 
 def merdiven_plani(p):
@@ -1397,14 +1405,37 @@ def merdiven_plani(p):
     kosu = n * BASAMAK_DERIN
 
     # ARKA DUVARDA, ENINE — her iki planda da.
+    #
+    # SAHANLIK: kolun ucunda basacak yer BIRAKILIR.
+    #
+    # Once yalniz 0,30 m pay birakiliyordu ve merdivenin ucu duvara
+    # dayaniyordu. Tepeden bakinca gorundu: merdiven boslugu tam kolun
+    # ayak izi kadar, kolun ucuyla duvar arasi 0,8 m. Ajan yaricapi
+    # (0,30 m) iki yandan yeyince sahanlik 0,2 m'ye iniyor — yani
+    # merdiveni cikan kisinin basacagi yer yok. Unity'nin kendi
+    # gezinme agi da tam bunu soyledi: navmesh basamaklari 2,0 m'ye
+    # kadar tirmaniyor ve orada bitiyor, ust katta hic yuzey yok.
+    #
+    # Kolu GENISLETMEK bu yuzden kotulestirmisti (%3,9 -> %0): genis
+    # kol sahanligi yiyor.
+    #: Kolun yan duvardan uzakligi (m).
+    #:
+    #: Merdiven duvara BITISIK basliyordu ve Unity'nin gezinme agi ilk
+    #: basamagi hic gormuyordu: Recast yurunebilir alani ajan yaricapi
+    #: (0,30 m) kadar asindirir, basamak derinligi ise 0,26 m — yani
+    #: ilk basamak butunuyle asinip yok oluyordu. Merdiven navmesh'i
+    #: zemin kattan kopuk kaliyor, yol da kapidan sokaga iniyordu.
+    DUVAR_PAYI = 0.50
+
+    SAHANLIK = 1.30
     ic_en = p.width - 2.0 * p.wall_thickness
-    if kosu > ic_en - 0.3:
-        kosu = ic_en - 0.3
+    if kosu > ic_en - SAHANLIK - DUVAR_PAYI:
+        kosu = ic_en - SAHANLIK - DUVAR_PAYI
     if kosu < 1.2:
         return None
     y1 = p.depth * 0.5 - p.wall_thickness
     y0 = y1 - MERDIVEN_EN
-    x0 = -ic_en * 0.5
+    x0 = -ic_en * 0.5 + DUVAR_PAYI
     return dict(eksen="x", x0=x0, x1=x0 + kosu, y0=y0, y1=y1,
                 n=n, kosu=kosu)
 
