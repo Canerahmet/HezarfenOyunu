@@ -822,7 +822,7 @@ def _dress_near(p, mats, col, tag, o, pos, size, thick, sill_mat):
 # ------------------------------------------------------------- kat kabuğu
 
 def _build_floor(p, mats, col, asset_name, tag, level_z, w, d, cy, body_mat,
-                 ground):
+                 ground, bosluk=None):
     """
     Bir katın dört cephesini kurar.
 
@@ -857,10 +857,12 @@ def _build_floor(p, mats, col, asset_name, tag, level_z, w, d, cy, body_mat,
         # Doseme ayni zamanda ust katin ZEMINI. Iki ayri levha koymak
         # ayni yuzeyi iki kez cizmek olurdu; bir tanesi iki isi de
         # goruyor ve 12 ucgen tutuyor.
-        tavan = hz.make_box(f"{asset_name}_{tag}_Doseme", (w, d, 0.18),
-                            (0.0, cy, level_z + p.floor_height - 0.09), col)
-        hz.assign(tavan, mats["timber"])
-        parts.append(tavan)
+        for son, boyut, merkez in _tavan_parcalari(
+                w, d, cy, 0.18, level_z + p.floor_height - 0.09, bosluk):
+            tavan = hz.make_box(f"{asset_name}_{tag}_Doseme{son}",
+                                boyut, merkez, col)
+            hz.assign(tavan, mats["timber"])
+            parts.append(tavan)
 
     for face in ("front", "back", "left", "right"):
         u_axis, n_axis, (fx, fy), span = _wall_axes(face, w, d, cy)
@@ -1045,12 +1047,20 @@ def build_house(p, col, asset_name, textured=False):
     z += p.plinth
 
     # 2) Alt katlar — tam ayak izi, kagir + kirec badana.
+    merdiven = merdiven_plani(p) if p.detail == "near" else None
     for i in range(p.floors - 1):
         parts += _build_floor(p, mats, col, asset_name, f"L{i}", z,
                               p.width, p.depth, 0.0, mats["plaster"],
-                              ground=(i == 0))
+                              ground=(i == 0),
+                              bosluk=merdiven if i == 0 else None)
         if i == 0 and p.detail == "near":
             parts += _ic_bolme_geometri(p, mats, col, asset_name, z)
+            if merdiven is not None:
+                for son, boyut, merkez in _merdiven_parcalari(merdiven, p, z):
+                    o = hz.make_box(f"{asset_name}_Merdiven_{son}",
+                                    boyut, merkez, col)
+                    hz.assign(o, mats["timber"])
+                    parts.append(o)
         z += p.floor_height
 
     # 3) Ust kat — cumbali. Cumba bu tipolojinin imzasi: alt ayak izini
@@ -1261,10 +1271,16 @@ def ic_bolmeler(p):
     out = []
     if p.width >= 6.2:
         # Geniş ev: hayat ortada, iki yanında oda.
+        #
+        # BOLME MERDIVENDEN ONCE BITER. Ilk yazimda boydan boya
+        # uzaniyordu ve merdiven kolunu kesiyordu: iki plan ayni hacmi
+        # paylasamaz. Bolmenin arka ucu, merdiven kolunun on yuzunde
+        # durur; arkasi merdiven sahanligidir.
+        arka_sinir = p.depth * 0.5 - p.wall_thickness - MERDIVEN_EN - 0.15
         for sx in (-1.0, 1.0):
             out.append(dict(eksen="y", konum=sx * HAYAT * 0.5,
                             kapi=p.depth * 0.12, kapi_en=KAPI,
-                            kalin=KALIN))
+                            kalin=KALIN, y_son=arka_sinir))
     else:
         # Dar ev: tek enine bölme. Kapı hayat aksında, yani ortada.
         out.append(dict(eksen="x", konum=p.depth * 0.10, kapi=0.0,
@@ -1289,16 +1305,18 @@ def _bolme_parcalari(p, bolme, z0, z1):
         # Duvar y boyunca uzanir; konum x'te.
         cx = bolme["konum"]
         boy = p.depth
+        # Duvarin arka ucu: verilmisse merdivenden once biter.
+        y_son = bolme.get("y_son", boy * 0.5)
         k0 = bolme["kapi"] - kapi_en * 0.5
         k1 = bolme["kapi"] + kapi_en * 0.5
         alt = k0 + boy * 0.5                    # -boy/2 referansindan uzunluk
-        ust = boy * 0.5 - k1
+        ust = max(0.0, y_son - k1)
         if alt > 0.05:
             parca.append(("a", (kalin, alt, yuk),
                           (cx, -boy * 0.5 + alt * 0.5, cz)))
         if ust > 0.05:
             parca.append(("b", (kalin, ust, yuk),
-                          (cx, boy * 0.5 - ust * 0.5, cz)))
+                          (cx, y_son - ust * 0.5, cz)))
         if yuk - lento > 0.05:
             parca.append(("l", (kalin, kapi_en, yuk - lento),
                           (cx, bolme["kapi"], z0 + (lento + yuk) * 0.5)))
@@ -1319,6 +1337,109 @@ def _bolme_parcalari(p, bolme, z0, z1):
             parca.append(("l", (kapi_en, kalin, yuk - lento),
                           (bolme["kapi"], cy, z0 + (lento + yuk) * 0.5)))
     return parca
+
+
+#: Basamak yüksekliği (m). Osmanlı evinin merdiveni diktir; 0,22
+#: modern yönetmeliğin üstünde ama dönemin altında değil.
+BASAMAK_YUKSEK = 0.22
+#: Basamak genişliği (m).
+BASAMAK_DERIN = 0.26
+#: Merdiven kolunun eni (m).
+MERDIVEN_EN = 0.95
+
+
+def merdiven_plani(p):
+    """
+    Üst kata çıkan merdiven. Tek katlı evde `None`.
+
+    **Tek sahip:** basamakların görünen hâli, çarpışma kütlesi ve
+    tavandaki boşluk hep buradan türer. Üçü ayrı hesaplansaydı, biri
+    ötekinden kayınca oyuncu ya havada yürür ya da görünmeyen bir
+    tavana çarpardı.
+
+    ## Merdiven arkada, bölmeler ondan önce biter
+
+    Kol arka duvara dayalı ve **enine** (x) uzanır. Geniş evde bölme
+    duvarları boyuna (y) gidiyor, yani merdivene **dik**; ilk yazımda
+    bölmeler boydan boya uzanıyor ve basamakları kesiyordu — ölçüm
+    "üst kata çıkılabilen %5" dedi ve sebep ölçümde değildi, iki plan
+    aynı hacmi paylaşıyordu.
+
+    Merdiveni hayatın içine almak da denendi ve daha kötüydü: hayatı
+    ikiye bölünce zemin katta erişilen hacim %99,7'den %82,8'e düştü.
+    Bir sorunu çözerken ötekini açmak çözüm değil.
+
+    Doğrusu iş bölümü: **odalar önde, merdiven sahanlığı arkada.**
+    Bölmeler merdiven kolunun önünde biter (bkz. `ic_bolmeler`), kol
+    arka duvar boyunca serbest kalır. Osmanlı planında da merdiven
+    hayatın arka ucundan çıkar.
+
+    Dönüş: `dict(eksen, x0, x1, y0, y1, n, kosu)`.
+    """
+    if p.floors < 2:
+        return None
+    n = max(2, int(round(p.floor_height / BASAMAK_YUKSEK)))
+    kosu = n * BASAMAK_DERIN
+
+    # ARKA DUVARDA, ENINE — her iki planda da.
+    ic_en = p.width - 2.0 * p.wall_thickness
+    if kosu > ic_en - 0.3:
+        kosu = ic_en - 0.3
+    if kosu < 1.2:
+        return None
+    y1 = p.depth * 0.5 - p.wall_thickness
+    y0 = y1 - MERDIVEN_EN
+    x0 = -ic_en * 0.5
+    return dict(eksen="x", x0=x0, x1=x0 + kosu, y0=y0, y1=y1,
+                n=n, kosu=kosu)
+
+
+def _merdiven_parcalari(m, p, z0):
+    """Basamakları kutu listesine çevirir: `[(sonek, boyut, merkez)]`.
+
+    Rıhtlı merdiven: her basamak tabandan kendi kotuna kadar dolu bir
+    kutudur. İç içe geçen kutular birleşince tek kütle olur ve altında
+    boşluk kalmaz — oyuncunun basamağın içine düşmesi mümkün değil.
+    """
+    out = []
+    derin = m["kosu"] / m["n"]
+    yuk = p.floor_height / m["n"]
+    for i in range(m["n"]):
+        h = (i + 1) * yuk
+        if m["eksen"] == "x":
+            cx = m["x0"] + (i + 0.5) * derin
+            cy = (m["y0"] + m["y1"]) * 0.5
+            boyut = (derin, m["y1"] - m["y0"], h)
+        else:
+            # Boyuna kol: basamaklar ondan ARKAYA dogru yukselir,
+            # yani cikis arka duvarda biter ve hayatin onu acik kalir.
+            cx = (m["x0"] + m["x1"]) * 0.5
+            cy = m["y1"] - (i + 0.5) * derin
+            boyut = (m["x1"] - m["x0"], derin, h)
+        out.append((f"b{i:02d}", boyut, (cx, cy, z0 + h * 0.5)))
+    return out
+
+
+def _tavan_parcalari(w, d, cy, kalin, cz, bosluk):
+    """Döşemeyi (varsa) merdiven boşluğunu bırakarak kutulara böler."""
+    if bosluk is None:
+        return [("", (w, d, kalin), (0.0, cy, cz))]
+    bx0, bx1 = bosluk["x0"], bosluk["x1"]
+    by0, by1 = bosluk["y0"] + cy, bosluk["y1"] + cy
+    y0, y1 = cy - d * 0.5, cy + d * 0.5
+    x0, x1 = -w * 0.5, w * 0.5
+    out = []
+
+    def ekle(ad, ax0, ax1, ay0, ay1):
+        if ax1 - ax0 > 0.02 and ay1 - ay0 > 0.02:
+            out.append((ad, (ax1 - ax0, ay1 - ay0, kalin),
+                        ((ax0 + ax1) * 0.5, (ay0 + ay1) * 0.5, cz)))
+
+    ekle("on", x0, x1, y0, by0)
+    ekle("arka", x0, x1, by1, y1)
+    ekle("sol", x0, bx0, by0, by1)
+    ekle("sag", bx1, x1, by0, by1)
+    return out
 
 
 def _ic_bolme_geometri(p, mats, col, asset_name, level_z):
@@ -1368,6 +1489,15 @@ def _carpisma(p, col, mats, asset_name, total_h):
     """
     t = max(p.wall_thickness, 0.25)
     w, d = p.width, p.depth
+    # Ust katin ayak izi: cumba varsa buyur. build_house ile AYNI
+    # formul; ikisi ayrilirsa collider cumbanin altini bos birakir.
+    cumba_d = 0.0 if p.cumba_type == "none" else p.cumba
+    yan = 0.0 if p.cumba_type == "none" else p.jetty_side
+    if p.cumba_type == "corner":
+        yan = max(yan, p.cumba * 0.6)
+    ust_w = p.width + 2.0 * yan
+    ust_d = p.depth + cumba_d
+    ust_cy = -cumba_d * 0.5
     z0 = p.plinth                      # zemin katin dosemesi
     z1 = z0 + p.floor_height           # tavani
     ust = total_h * 0.98
@@ -1421,9 +1551,70 @@ def _carpisma(p, col, mats, asset_name, total_h):
         for son, boyut, merkez in _bolme_parcalari(p, b, z0, z1):
             kutu(f"{asset_name}_c_bolme{i}{son}", boyut, merkez)
 
-    # 5) Ust kutle: zemin katin tavanindan catiya kadar DOLU.
-    if ust > z1 + 0.05:
-        kutu(f"{asset_name}_c_ust", (w, d, ust - z1), (0.0, 0.0, (z1 + ust) * 0.5))
+    # 5) MERDIVEN — gorunen basamaklarla AYNI plandan.
+    m = merdiven_plani(p)
+    if m is not None:
+        for son, boyut, merkez in _merdiven_parcalari(m, p, z0):
+            kutu(f"{asset_name}_c_mrd_{son}", boyut, merkez)
+
+    # 5b) ZEMIN KATIN TAVANI — merdiven bosluguyla birlikte.
+    #
+    # Bu atlanmisti ve kesit acikca gosterdi: collider'da zemin katla
+    # ust kat arasinda HICBIR SEY yoktu, y=1,10'dan 5,35'e kadar
+    # kesintisiz bosluk. Gorunen geometride doseme vardi. Yani ust kat
+    # bakilinca vardi, basilinca yoktu.
+    #
+    # Bolme ve merdivende uygulanan kural burada da gecerli: doseme
+    # parcalari gorunen tavanla AYNI fonksiyondan (`_tavan_parcalari`)
+    # ve AYNI bosluktan turer.
+    for son, boyut, merkez in _tavan_parcalari(w, d, 0.0, 0.20,
+                                               z1 - 0.10, m):
+        kutu(f"{asset_name}_c_tavan{son}", boyut, merkez)
+
+    # 6) UST KATLAR DA BOSALTILIR.
+    #
+    # Ilk yazimda ust kutle tek dolu blok, icinden yalniz merdiven
+    # boslugu geciyordu. Yani oyuncu basamaklari cikip **kati bir
+    # blogun icindeki bir safta** sikisirdi — merdivensiz halinden
+    # daha kotusu. Kat, cikilabiliyorsa yasanabilir de olmali.
+    #
+    # Ucus carpismasi bundan zarar gormuyor: dis duvarlar duruyor,
+    # bosalan sey yalniz onlarin arasi. Suzulen oyuncu eve pencereden
+    # girebilir — bu bir kusur degil, `near` kipinde pencerenin
+    # gercekten delik olmasinin sonucu.
+    z_alt = z1
+    for kat in range(1, p.floors):
+        z_ust_kat = min(ust, z_alt + p.floor_height)
+        if z_ust_kat - z_alt < 0.3:
+            break
+        # Son kat cumbali olabilir: kendi ayak izini kullanir.
+        son_kat = (kat == p.floors - 1)
+        kw = ust_w if son_kat else w
+        kd = ust_d if son_kat else d
+        kcy = ust_cy if son_kat else 0.0
+
+        # Duvarlar
+        kutu(f"{asset_name}_c_k{kat}_on", (kw, t, z_ust_kat - z_alt),
+             (0.0, kcy - kd * 0.5 + t * 0.5, (z_alt + z_ust_kat) * 0.5))
+        kutu(f"{asset_name}_c_k{kat}_arka", (kw, t, z_ust_kat - z_alt),
+             (0.0, kcy + kd * 0.5 - t * 0.5, (z_alt + z_ust_kat) * 0.5))
+        for sx in (-1.0, 1.0):
+            kutu(f"{asset_name}_c_k{kat}_yan", (t, kd - 2.0 * t,
+                                                z_ust_kat - z_alt),
+                 (sx * (kw * 0.5 - t * 0.5), kcy,
+                  (z_alt + z_ust_kat) * 0.5))
+        # Tavan/doseme — bu katin ustu. Merdiven boslugu yalnizca
+        # ZEMIN katin tavaninda; ust katlar arasi bosluk yok (tek
+        # merdiven kolu var).
+        if z_ust_kat < ust - 0.05:
+            kutu(f"{asset_name}_c_k{kat}_doseme", (kw, kd, 0.20),
+                 (0.0, kcy, z_ust_kat - 0.10))
+        z_alt = z_ust_kat
+
+    # 7) Cati kutlesi: son katin ustunden tepeye kadar DOLU.
+    if ust > z_alt + 0.05:
+        kutu(f"{asset_name}_c_cati", (ust_w, ust_d, ust - z_alt),
+             (0.0, ust_cy, (z_alt + ust) * 0.5))
 
     ucx = hz.join(kutular, f"UCXB_{asset_name}", col)
     # Parcalar birlestirmeden SONRA sahnede kaliyor ve kalirsa ihrac
