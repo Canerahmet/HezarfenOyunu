@@ -1,7 +1,7 @@
 # ADR 0081 — Merdiven duruyor ama üst kata çıkılamıyor
 
 - **Durum:** **ÇÖZÜLDÜ** (2026-08-31) — üst kata çıkılabilen
-  **%58,5** (Unity NavMesh ile ölçüldü). Kalan %41,5 kayda geçti.
+  **%70,7** (Unity NavMesh ile ölçüldü).
 - **Tarih:** 2026-08-31
 - **Bağlam:** Faz II.D, iç mekân
 - **İlişki:** ADR 0078 (ana plan), CLAUDE.md "ölçüm, imza değil"
@@ -190,7 +190,22 @@ değil" demiştim. Yanlıştı: o sırada sahanlık ve duvar payı yoktu,
 geniş kol onları yiyordu. **Bir değişken tek başına denendiğinde
 yanıltır**; kısıt üçünün birleşimiydi.
 
-## Kalan %41,5 — ölçüldü, sebep bulunamadı
+## %58,5'ten %70,7'ye — darlığın iki ayrı yüzü
+
+Başarısızların dağılımı, kusurun **darlık** olduğunu söylüyordu ama
+darlığın nesi olduğunu söylemiyordu. İki ayrı yer çıktı ve ikisi de
+gezinme ağının aynı kuralına takılıyordu: ajan yarıçapı (0,30 m) her
+açıklığı iki yandan yiyor.
+
+| değişiklik | gerekçe | sonuç |
+|---|---|---|
+| İç kapı 0,95 → **1,15 m** | 0,95'ten geriye 0,35 m kalıyordu; arka oda (ve merdiven) kopuyordu | %58,5 → **%65,9** |
+| En < 5,8 m'de bölme **yok** | 5,2 m'lik iç genişlikte bölme önde 2,3 m, arkada 2,4 m bırakıyor; arka sokağın küçük evi zaten tek hacimdir | %65,9 → **%70,7** |
+
+Kanıt dağılımdan geldi: kapı genişletilince başarısızların ortanca eni
+6,55 → 6,13 m'ye indi, yani kalanlar en dar uca yığıldı.
+
+## Kalan %29,3 — ölçüldü, sebep bulunamadı
 
 Genişlikle ilişki **var ama zayıf**:
 

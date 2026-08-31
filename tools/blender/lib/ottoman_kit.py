@@ -1266,9 +1266,33 @@ def ic_bolmeler(p):
     #: Bölme kalınlığı (m) — ahşap bölme, taşıyıcı değil.
     KALIN = 0.12
     #: İç kapı boşluğu (m).
-    KAPI = 0.95
+    #:
+    #: 0,95 ile başladı ve dar evlerde arka odayı — dolayısıyla
+    #: merdiveni — gezinme ağından koparıyor gibi görünüyor: başarısız
+    #: bir evin zemin kat navmesh'i 53 köşe, başarılı olanınki 139.
+    #: Ajan yarıçapı (0,30 m) iki yandan yiyince 0,95'lik kapıdan
+    #: geriye 0,35 m kalıyor — sınırda.
+    #:
+    #: 1,15 m dönem için de doğru: iç kapı sokak kapısından dar ama
+    #: sedir taşınacak kadar geniştir.
+    KAPI = 1.15
 
     out = []
+
+    # ÇOK DAR EVDE BÖLME YOK.
+    #
+    # 5,8 m'nin altında iç genişlik 5,2 m'ye iner; bir enine bölme
+    # koyduğunuzda önde 2,3 m, arkada merdivenle paylaşılan 2,4 m
+    # kalır. Ölçüm de bunu söylüyor: üst kata çıkılamayan evlerin
+    # ortanca eni 6,13 m ve en dar uçta yığılıyorlar — bölme, arka
+    # odayı ve dolayısıyla merdiveni gezinme ağından koparıyor.
+    #
+    # Dönem için de doğru: RESEARCH'teki 4,12 oda ortalaması evin
+    # TAMAMI içindir; arka sokağın küçük evi tek hacim + merdiven
+    # sahanlığıdır, bölünmüş değil.
+    if p.width < 5.8:
+        return out
+
     if p.width >= 6.2:
         # Geniş ev: hayat ortada, iki yanında oda.
         #
