@@ -1396,13 +1396,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2224427388541756435, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9548978}
   m_SourcePrefab: {fileID: 100100000, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
 --- !u!4 &9548976 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2690564345742683222, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
   m_PrefabInstance: {fileID: 9548975}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &9548977 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2224427388541756435, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
+  m_PrefabInstance: {fileID: 9548975}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &9548978
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9548977}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &9579828
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2735,13 +2761,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5214422469817879948, guid: fc0996ce532e5af4d9ec7613bd7ae173, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 21061243}
   m_SourcePrefab: {fileID: 100100000, guid: fc0996ce532e5af4d9ec7613bd7ae173, type: 3}
 --- !u!4 &21061241 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8110393672923007015, guid: fc0996ce532e5af4d9ec7613bd7ae173, type: 3}
   m_PrefabInstance: {fileID: 21061240}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &21061242 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5214422469817879948, guid: fc0996ce532e5af4d9ec7613bd7ae173, type: 3}
+  m_PrefabInstance: {fileID: 21061240}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &21061243
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 21061242}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 3
 --- !u!1001 &22405021
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8197,13 +8249,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2224427388541756435, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 56743613}
   m_SourcePrefab: {fileID: 100100000, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
 --- !u!4 &56743611 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2690564345742683222, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
   m_PrefabInstance: {fileID: 56743610}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &56743612 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2224427388541756435, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
+  m_PrefabInstance: {fileID: 56743610}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &56743613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 56743612}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &57514778
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8801,13 +8879,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5214422469817879948, guid: fc0996ce532e5af4d9ec7613bd7ae173, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 60384568}
   m_SourcePrefab: {fileID: 100100000, guid: fc0996ce532e5af4d9ec7613bd7ae173, type: 3}
 --- !u!4 &60384566 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8110393672923007015, guid: fc0996ce532e5af4d9ec7613bd7ae173, type: 3}
   m_PrefabInstance: {fileID: 60384565}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &60384567 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5214422469817879948, guid: fc0996ce532e5af4d9ec7613bd7ae173, type: 3}
+  m_PrefabInstance: {fileID: 60384565}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &60384568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 60384567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 3
 --- !u!1001 &60476845
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10425,13 +10529,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5214422469817879948, guid: fc0996ce532e5af4d9ec7613bd7ae173, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 69577139}
   m_SourcePrefab: {fileID: 100100000, guid: fc0996ce532e5af4d9ec7613bd7ae173, type: 3}
 --- !u!4 &69577137 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8110393672923007015, guid: fc0996ce532e5af4d9ec7613bd7ae173, type: 3}
   m_PrefabInstance: {fileID: 69577136}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &69577138 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5214422469817879948, guid: fc0996ce532e5af4d9ec7613bd7ae173, type: 3}
+  m_PrefabInstance: {fileID: 69577136}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &69577139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 69577138}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 3
 --- !u!1001 &69766041
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -30603,13 +30733,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2224427388541756435, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 233329839}
   m_SourcePrefab: {fileID: 100100000, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
 --- !u!4 &233329837 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2690564345742683222, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
   m_PrefabInstance: {fileID: 233329836}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &233329838 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2224427388541756435, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
+  m_PrefabInstance: {fileID: 233329836}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &233329839
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 233329838}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &233388778
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -38561,13 +38717,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2224427388541756435, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 299360953}
   m_SourcePrefab: {fileID: 100100000, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
 --- !u!4 &299360951 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2690564345742683222, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
   m_PrefabInstance: {fileID: 299360950}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &299360952 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2224427388541756435, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
+  m_PrefabInstance: {fileID: 299360950}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &299360953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 299360952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &299419486
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -41361,13 +41543,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2224427388541756435, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 318062428}
   m_SourcePrefab: {fileID: 100100000, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
 --- !u!4 &318062426 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2690564345742683222, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
   m_PrefabInstance: {fileID: 318062425}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &318062427 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2224427388541756435, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
+  m_PrefabInstance: {fileID: 318062425}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &318062428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 318062427}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &318174498
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -63334,13 +63542,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 492959445}
   m_SourcePrefab: {fileID: 100100000, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
 --- !u!4 &492959443 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 594861483047238376, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
   m_PrefabInstance: {fileID: 492959442}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &492959444 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+  m_PrefabInstance: {fileID: 492959442}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &492959445
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 492959444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &492986580
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -78252,13 +78486,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2224427388541756435, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 620284007}
   m_SourcePrefab: {fileID: 100100000, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
 --- !u!4 &620284005 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2690564345742683222, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
   m_PrefabInstance: {fileID: 620284004}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &620284006 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2224427388541756435, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
+  m_PrefabInstance: {fileID: 620284004}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &620284007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 620284006}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &620514280
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -90608,13 +90868,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 715166330}
   m_SourcePrefab: {fileID: 100100000, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
 --- !u!4 &715166328 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 594861483047238376, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
   m_PrefabInstance: {fileID: 715166327}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &715166329 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+  m_PrefabInstance: {fileID: 715166327}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &715166330
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 715166329}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &716820580
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -101676,13 +101962,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5214422469817879948, guid: fc0996ce532e5af4d9ec7613bd7ae173, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 819775555}
   m_SourcePrefab: {fileID: 100100000, guid: fc0996ce532e5af4d9ec7613bd7ae173, type: 3}
 --- !u!4 &819775553 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8110393672923007015, guid: fc0996ce532e5af4d9ec7613bd7ae173, type: 3}
   m_PrefabInstance: {fileID: 819775552}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &819775554 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5214422469817879948, guid: fc0996ce532e5af4d9ec7613bd7ae173, type: 3}
+  m_PrefabInstance: {fileID: 819775552}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &819775555
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 819775554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 3
 --- !u!1 &819996807
 GameObject:
   m_ObjectHideFlags: 0
@@ -118415,13 +118727,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2224427388541756435, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 943081906}
   m_SourcePrefab: {fileID: 100100000, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
 --- !u!4 &943081904 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2690564345742683222, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
   m_PrefabInstance: {fileID: 943081903}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &943081905 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2224427388541756435, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
+  m_PrefabInstance: {fileID: 943081903}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &943081906
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 943081905}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &943363008
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -118902,13 +119240,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5214422469817879948, guid: fc0996ce532e5af4d9ec7613bd7ae173, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 947571170}
   m_SourcePrefab: {fileID: 100100000, guid: fc0996ce532e5af4d9ec7613bd7ae173, type: 3}
 --- !u!4 &947571168 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8110393672923007015, guid: fc0996ce532e5af4d9ec7613bd7ae173, type: 3}
   m_PrefabInstance: {fileID: 947571167}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &947571169 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5214422469817879948, guid: fc0996ce532e5af4d9ec7613bd7ae173, type: 3}
+  m_PrefabInstance: {fileID: 947571167}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &947571170
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 947571169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 3
 --- !u!1001 &947585887
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -119800,13 +120164,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 955000533}
   m_SourcePrefab: {fileID: 100100000, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
 --- !u!4 &955000531 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 594861483047238376, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
   m_PrefabInstance: {fileID: 955000530}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &955000532 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+  m_PrefabInstance: {fileID: 955000530}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &955000533
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 955000532}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &956510514
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -126502,13 +126892,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1006887286}
   m_SourcePrefab: {fileID: 100100000, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
 --- !u!4 &1006887284 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 594861483047238376, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
   m_PrefabInstance: {fileID: 1006887283}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1006887285 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+  m_PrefabInstance: {fileID: 1006887283}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1006887286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1006887285}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &1007020898
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -136460,13 +136876,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1094076790}
   m_SourcePrefab: {fileID: 100100000, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
 --- !u!4 &1094076788 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 594861483047238376, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
   m_PrefabInstance: {fileID: 1094076787}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1094076789 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+  m_PrefabInstance: {fileID: 1094076787}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1094076790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1094076789}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &1095784729
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -141121,13 +141563,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1007396947754166645, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1137111389}
   m_SourcePrefab: {fileID: 100100000, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
 --- !u!4 &1137111387 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1538433503404789719, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
   m_PrefabInstance: {fileID: 1137111386}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1137111388 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1007396947754166645, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
+  m_PrefabInstance: {fileID: 1137111386}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1137111389
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1137111388}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &1138208726
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -144408,13 +144876,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1166709536}
   m_SourcePrefab: {fileID: 100100000, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
 --- !u!4 &1166709534 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 594861483047238376, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
   m_PrefabInstance: {fileID: 1166709533}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1166709535 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+  m_PrefabInstance: {fileID: 1166709533}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1166709536
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1166709535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &1168394223
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -150710,13 +151204,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1007396947754166645, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1217631610}
   m_SourcePrefab: {fileID: 100100000, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
 --- !u!4 &1217631608 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1538433503404789719, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
   m_PrefabInstance: {fileID: 1217631607}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1217631609 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1007396947754166645, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
+  m_PrefabInstance: {fileID: 1217631607}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1217631610
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1217631609}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &1217647310
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -152497,13 +153017,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2224427388541756435, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1232224333}
   m_SourcePrefab: {fileID: 100100000, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
 --- !u!4 &1232224331 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2690564345742683222, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
   m_PrefabInstance: {fileID: 1232224330}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1232224332 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2224427388541756435, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
+  m_PrefabInstance: {fileID: 1232224330}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1232224333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1232224332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &1232264634
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -156720,13 +157266,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2224427388541756435, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1261024249}
   m_SourcePrefab: {fileID: 100100000, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
 --- !u!4 &1261024247 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2690564345742683222, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
   m_PrefabInstance: {fileID: 1261024246}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1261024248 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2224427388541756435, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
+  m_PrefabInstance: {fileID: 1261024246}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1261024249
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1261024248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &1261273285
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -163457,13 +164029,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1007396947754166645, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1314285892}
   m_SourcePrefab: {fileID: 100100000, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
 --- !u!4 &1314285890 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1538433503404789719, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
   m_PrefabInstance: {fileID: 1314285889}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1314285891 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1007396947754166645, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
+  m_PrefabInstance: {fileID: 1314285889}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1314285892
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1314285891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &1315095763
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -178519,13 +179117,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1007396947754166645, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1445058021}
   m_SourcePrefab: {fileID: 100100000, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
 --- !u!4 &1445058019 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1538433503404789719, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
   m_PrefabInstance: {fileID: 1445058018}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1445058020 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1007396947754166645, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
+  m_PrefabInstance: {fileID: 1445058018}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1445058021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1445058020}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &1445883327
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -178666,13 +179290,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1448431960}
   m_SourcePrefab: {fileID: 100100000, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
 --- !u!4 &1448431958 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 594861483047238376, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
   m_PrefabInstance: {fileID: 1448431957}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1448431959 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+  m_PrefabInstance: {fileID: 1448431957}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1448431960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1448431959}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &1449192527
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -185577,13 +186227,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1007396947754166645, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1512089317}
   m_SourcePrefab: {fileID: 100100000, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
 --- !u!4 &1512089315 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1538433503404789719, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
   m_PrefabInstance: {fileID: 1512089314}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1512089316 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1007396947754166645, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
+  m_PrefabInstance: {fileID: 1512089314}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1512089317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1512089316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &1512092953
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -186674,13 +187350,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2224427388541756435, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1521527436}
   m_SourcePrefab: {fileID: 100100000, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
 --- !u!4 &1521527434 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2690564345742683222, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
   m_PrefabInstance: {fileID: 1521527433}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1521527435 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2224427388541756435, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
+  m_PrefabInstance: {fileID: 1521527433}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1521527436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1521527435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &1523341325
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -187803,13 +188505,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1007396947754166645, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1530221691}
   m_SourcePrefab: {fileID: 100100000, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
 --- !u!4 &1530221689 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1538433503404789719, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
   m_PrefabInstance: {fileID: 1530221688}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1530221690 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1007396947754166645, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
+  m_PrefabInstance: {fileID: 1530221688}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1530221691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1530221690}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &1531585901
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -189852,13 +190580,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1007396947754166645, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1544734414}
   m_SourcePrefab: {fileID: 100100000, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
 --- !u!4 &1544734412 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1538433503404789719, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
   m_PrefabInstance: {fileID: 1544734411}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1544734413 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1007396947754166645, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
+  m_PrefabInstance: {fileID: 1544734411}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1544734414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1544734413}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &1545080923
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -196656,13 +197410,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1577697904}
   m_SourcePrefab: {fileID: 100100000, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
 --- !u!4 &1577697902 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 594861483047238376, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
   m_PrefabInstance: {fileID: 1577697901}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1577697903 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+  m_PrefabInstance: {fileID: 1577697901}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1577697904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1577697903}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &1579800825
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -205549,13 +206329,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1651687481}
   m_SourcePrefab: {fileID: 100100000, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
 --- !u!4 &1651687479 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 594861483047238376, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
   m_PrefabInstance: {fileID: 1651687478}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1651687480 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+  m_PrefabInstance: {fileID: 1651687478}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1651687481
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1651687480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &1651921638
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -218914,13 +219720,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1007396947754166645, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1770256478}
   m_SourcePrefab: {fileID: 100100000, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
 --- !u!4 &1770256476 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1538433503404789719, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
   m_PrefabInstance: {fileID: 1770256475}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1770256477 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1007396947754166645, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
+  m_PrefabInstance: {fileID: 1770256475}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1770256478
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1770256477}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &1770425401
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -226126,13 +226958,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1007396947754166645, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1825238253}
   m_SourcePrefab: {fileID: 100100000, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
 --- !u!4 &1825238251 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1538433503404789719, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
   m_PrefabInstance: {fileID: 1825238250}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1825238252 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1007396947754166645, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
+  m_PrefabInstance: {fileID: 1825238250}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1825238253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1825238252}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &1826431709
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -229671,13 +230529,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1007396947754166645, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1858838870}
   m_SourcePrefab: {fileID: 100100000, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
 --- !u!4 &1858838868 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1538433503404789719, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
   m_PrefabInstance: {fileID: 1858838867}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1858838869 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1007396947754166645, guid: d8bbe309abf0a684aa91ad5cbb0a8b5e, type: 3}
+  m_PrefabInstance: {fileID: 1858838867}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1858838870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1858838869}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &1859537931
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -237077,13 +237961,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1915333546}
   m_SourcePrefab: {fileID: 100100000, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
 --- !u!4 &1915333544 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 594861483047238376, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
   m_PrefabInstance: {fileID: 1915333543}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1915333545 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+  m_PrefabInstance: {fileID: 1915333543}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1915333546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1915333545}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &1916114645
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -241593,13 +242503,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1952641100}
   m_SourcePrefab: {fileID: 100100000, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
 --- !u!4 &1952641098 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 594861483047238376, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
   m_PrefabInstance: {fileID: 1952641097}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1952641099 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+  m_PrefabInstance: {fileID: 1952641097}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1952641100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1952641099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &1952775802
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -243666,13 +244602,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2224427388541756435, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1964266275}
   m_SourcePrefab: {fileID: 100100000, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
 --- !u!4 &1964266273 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2690564345742683222, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
   m_PrefabInstance: {fileID: 1964266272}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1964266274 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2224427388541756435, guid: 32c48b55e6ae4c54faa3497d203b3818, type: 3}
+  m_PrefabInstance: {fileID: 1964266272}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1964266275
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1964266274}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &1964856999
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -255422,13 +256384,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2057178589}
   m_SourcePrefab: {fileID: 100100000, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
 --- !u!4 &2057178587 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 594861483047238376, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
   m_PrefabInstance: {fileID: 2057178586}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2057178588 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+  m_PrefabInstance: {fileID: 2057178586}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2057178589
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2057178588}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &2057321383
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -258651,13 +259639,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2098303542}
   m_SourcePrefab: {fileID: 100100000, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
 --- !u!4 &2098303540 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 594861483047238376, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
   m_PrefabInstance: {fileID: 2098303539}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2098303541 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+  m_PrefabInstance: {fileID: 2098303539}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2098303542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2098303541}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &2098535841
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -261575,13 +262589,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2125291879}
   m_SourcePrefab: {fileID: 100100000, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
 --- !u!4 &2125291877 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 594861483047238376, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
   m_PrefabInstance: {fileID: 2125291876}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2125291878 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+  m_PrefabInstance: {fileID: 2125291876}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2125291879
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2125291878}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &2125473249
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -262163,13 +263203,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2128746003}
   m_SourcePrefab: {fileID: 100100000, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
 --- !u!4 &2128746001 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 594861483047238376, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
   m_PrefabInstance: {fileID: 2128746000}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2128746002 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2134496725202522829, guid: 55fabd08f868c2c4f84604103da3523e, type: 3}
+  m_PrefabInstance: {fileID: 2128746000}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2128746003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2128746002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76711def42ea5ae41897d16c2fc149e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Dukkan
+  gorev: {fileID: 0}
+  envanter: {fileID: 0}
+  zaman: {fileID: 0}
+  acilis: 6.5
+  kapanis: 19.5
+  satilan: 2
 --- !u!1001 &2129362788
 PrefabInstance:
   m_ObjectHideFlags: 0

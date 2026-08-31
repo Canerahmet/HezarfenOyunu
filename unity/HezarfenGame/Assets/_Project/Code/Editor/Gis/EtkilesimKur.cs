@@ -50,6 +50,26 @@ namespace Hezarfen.Editor.Gis
         /// </summary>
         private static readonly string[] Iskeleler = { "PF_Iskele" };
 
+        /// <summary>
+        /// Dükkân önekleri — bunlara <see cref="Dukkan"/> takılır.
+        ///
+        /// Ekonominin tek gideri kayık biletiydi ve kese şişip
+        /// duruyordu; `Ekonomi`'nin narh defterinden türetilmiş bütün
+        /// özeni oyuncuya hiç görünmüyordu. Bir dükkân, kazanmayı ilk
+        /// kez bir anlama bağlıyor.
+        /// </summary>
+        //
+        // Adlar sahneden OKUNDU, tahmin edilmedi: semt sahnelerinde
+        // 565 `PF_Dukkan` ve 47 `PF_Firin` duruyor — ve hicbiri bir sey
+        // satmiyordu. Once `PF_Arasta` ve `PF_Bedesten` yazmistim ve
+        // sahnede sifir tanesi var; bir onek listesi, sahnenin
+        // kendisine sorulmadan yazilirsa bos calisir.
+        private static readonly (string onek, EsyaTuru satar)[] Dukkanlar =
+        {
+            ("PF_Firin", EsyaTuru.Ekmek),
+            ("PF_Dukkan", EsyaTuru.Sebze),
+        };
+
         [MenuItem("Hezarfen/GIS/Etkilesimleri kur (D_Galata)")]
         public static void Galata() => Kur("D_Galata");
 
@@ -107,6 +127,30 @@ namespace Hezarfen.Editor.Gis
                     }
                 }
 
+            // --- DUKKANLAR ---
+            int dukkan = 0;
+            foreach (var go in sahne.GetRootGameObjects())
+                foreach (var t in go.GetComponentsInChildren<Transform>())
+                {
+                    foreach (var (onek, satar) in Dukkanlar)
+                    {
+                        if (!t.name.StartsWith(onek)) continue;
+                        if (t.GetComponent<Dukkan>() != null) break;
+                        var d = t.gameObject.AddComponent<Dukkan>();
+                        d.satilan = satar;
+                        dukkan++;
+                        if (t.GetComponentInChildren<Collider>() == null)
+                        {
+                            var k = t.gameObject.AddComponent<BoxCollider>();
+                            k.isTrigger = true;
+                            var b = Sinir(t);
+                            k.center = t.InverseTransformPoint(b.center);
+                            k.size = t.InverseTransformVector(b.size);
+                        }
+                        break;
+                    }
+                }
+
             // --- ISKELELER: PERME ---
             int perme = 0;
             foreach (var go in sahne.GetRootGameObjects())
@@ -141,6 +185,7 @@ namespace Hezarfen.Editor.Gis
             sb.AppendLine($"  {eklenen} esya isaretlendi ({vardi} zaten vardi)");
             sb.AppendLine($"  {colliderEklenen} tetikleyici collider eklendi");
             sb.AppendLine($"  {perme} iskeleye perme takildi");
+            sb.AppendLine($"  {dukkan} dukkan acildi");
             Debug.Log("[Hezarfen] " + sb);
         }
 
