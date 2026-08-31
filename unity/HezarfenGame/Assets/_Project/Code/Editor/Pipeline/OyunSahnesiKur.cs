@@ -239,6 +239,18 @@ namespace Hezarfen.Editor.Pipeline
             gorevY.graf = sehir.graf;
             rapor.Add("Gorev: yonetici kuruldu");
 
+            // 5c-2) VAKIT BILDIRIMI — `VakitGirdi`'nin ILK abonesi.
+            //
+            // Olayin calisma zamaninda hicbir dinleyicisi yoktu; yani
+            // `VakitHesabi`'nin butun dogrulugu — Hanefi ikindi, gercek
+            // sapma, batistan kurulan ezani saat — oyuncuya kosede bir
+            // yazi olarak ulasiyordu.
+            var vakitB = Tekil<VakitBildirimi>("VAKIT");
+            vakitB.zaman = zaman;
+            vakitB.graf = sehir.graf;
+            vakitB.oyuncu = oyuncu.transform;
+            rapor.Add("Vakit: bildirim bagli");
+
             // 5d) PERME — karsiya gecis.
             //
             // Iskeleler ARAZI sahnesinde duruyor, semt sahnelerinde

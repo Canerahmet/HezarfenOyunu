@@ -33,6 +33,7 @@ namespace Hezarfen.Arayuz
         public EtkilesimAlgila etkilesim;
         public Envanter envanter;
         public GorevYonetici gorev;
+        public VakitBildirimi vakit;
 
         [Tooltip("Duraklat tuşu.")]
         public Key duraklatTusu = Key.Escape;
@@ -60,6 +61,7 @@ namespace Hezarfen.Arayuz
                 etkilesim = FindAnyObjectByType<EtkilesimAlgila>();
             if (envanter == null) envanter = FindAnyObjectByType<Envanter>();
             if (gorev == null) gorev = FindAnyObjectByType<GorevYonetici>();
+            if (vakit == null) vakit = FindAnyObjectByType<VakitBildirimi>();
             if (_oyuncuT == null)
             {
                 var go = GameObject.Find("OYUNCU");
@@ -260,6 +262,27 @@ namespace Hezarfen.Arayuz
                 GUI.Label(new Rect(20, ust + 5, 320, 22),
                           $"aranma: %{aranma.Seviye * 100f:F0} "
                           + $"({aranma.SuAn})", _yazi);
+            }
+
+            // --- VAKIT BILDIRIMI: ekranin ust ortasi ---
+            //
+            // Ezani saat oyunun kimligi ve bugune kadar yalniz kosede
+            // kucuk bir yaziydi. Bir oyun gunu 24 gercek dakika, yani
+            // oyuncu her 24 dakikada bes vakit yasiyor ve hicbirini
+            // fark etmiyordu.
+            if (!Duraklatildi && vakit != null && vakit.Bildirim.Length > 0)
+            {
+                var eskiRenk = GUI.color;
+                GUI.color = new Color(1f, 1f, 1f, vakit.Tazelik);
+                var vr = new Rect(_en * 0.5f - 130f, _boy * 0.16f, 260f, 34f);
+                var eskiH = _yazi.alignment;
+                var eskiP = _yazi.fontSize;
+                _yazi.alignment = TextAnchor.MiddleCenter;
+                _yazi.fontSize = 22;
+                GUI.Label(vr, $"— {vakit.Bildirim} —", _yazi);
+                _yazi.alignment = eskiH;
+                _yazi.fontSize = eskiP;
+                GUI.color = eskiRenk;
             }
 
             // --- ETKILESIM IPUCU: ekranin ortasinin biraz altinda ---
