@@ -181,6 +181,51 @@ namespace Hezarfen.Editor.Pipeline
             rapor.Add(KalabalikVar ? "Replik: gosterici kuruldu"
                                    : "Replik: KAPALI (kalabalik yok)");
 
+            // 5b) RUZGAR ALANI — OYUNUN KALBI, VE SAHNEDE HIC YOKTU.
+            //
+            // PLAN'in bir numarali tasarim diregi: "Ruzgari hissettir.
+            // Ucus, oyunun kalbidir." Bes sinif bunun icin yazilmis —
+            // `WindField`, `WindVolume`, `TerrainThermal`,
+            // `UcusKamerasi`, `FlightHud` — ve BESI DE sahnede yoktu.
+            // `GlideController` ruzgar alani bulamayinca
+            // `tuning.globalWind`e dusuyor: her yerde, her irtifada,
+            // her an sabit 9 m/s.
+            //
+            // Bedeli aritmetikle olculdu. Kule (52 m) ile Dogancilar
+            // (46,6 m) arasi 3.336 m yatay, 5,4 m kot: gereken suzulme
+            // orani 618:1. Kanat 11,56:1 veriyor. Sabit ruzgarla
+            // gidilen 1.037 m, gereken 3.336 m. Yani oyunun FINALI
+            // aritmetik olarak bitirilemezdi ve bunu hicbir test
+            // sormamisti.
+            //
+            // Acigi kapatacak sey zaten yazili: termik. `TerrainThermal`
+            // kaldiraci araziden turetiyor — guneye bakan yamacta
+            // yukselir, su ustunde coker. Ucus rotasi da tam olarak
+            // bunu istiyor: once Galata yamacinda yuksel, sonra Bogaz'i
+            // gec.
+            var ruzgarGo = GameObject.Find("RUZGAR");
+            if (ruzgarGo == null) ruzgarGo = new GameObject("RUZGAR");
+            var alan = ruzgarGo.GetComponent<WindField>();
+            if (alan == null) alan = ruzgarGo.AddComponent<WindField>();
+            alan.tuning = AssetDatabase.LoadAssetAtPath<WindTuning>(
+                "Assets/_Project/Data/WindProfiles/WT_Faz0_Default.asset");
+            alan.autoCollectVolumes = true;
+
+            var araziGo = Object.FindAnyObjectByType<Terrain>();
+            if (araziGo != null)
+            {
+                var termik = araziGo.GetComponent<TerrainThermal>();
+                if (termik == null)
+                    termik = araziGo.gameObject.AddComponent<TerrainThermal>();
+                alan.terrainThermal = termik;
+                rapor.Add($"Ruzgar: termik tavan {termik.ceilingMeters:F0} m, "
+                          + $"tepe {termik.peakLift:F1} m/s");
+            }
+            else
+            {
+                rapor.Add("Ruzgar: arazi yok, TERMIK KURULAMADI");
+            }
+
             // 6a) AY — gecenin TEK kaynagi.
             //
             // Gece karesi yakalandi ve tamamen siyahti: 78 KB'lik bir
@@ -372,10 +417,25 @@ namespace Hezarfen.Editor.Pipeline
                                              QueryTriggerInteraction.Ignore))
                             puan++;
                     }
+
+                    // BASIN USTU DE SAYILIR.
+                    //
+                    // Aciklik yalniz YATAY olculuyordu ve dogum yeri
+                    // ust uste uc turda bir cardagin altina dustu:
+                    // sekiz yonde 5/8 acik, ama tepede bir kiris ve
+                    // dort direk. Oyuncunun oyunda gordugu ILK kare,
+                    // kirmizi direklerle kapali bir kadrajdi.
+                    //
+                    // Bes puan degerinde, cunku tek bir yatay yonden
+                    // agir basmali: bir sokak dort duvarla cevrili
+                    // olabilir, ama ustu kapaliysa orasi sokak degil.
+                    if (!Physics.Raycast(goz, Vector3.up, 8f, ~0,
+                                         QueryTriggerInteraction.Ignore))
+                        puan += 5;
                     if (puan <= enIyiPuan) continue;
                     enIyiPuan = puan;
                     secilen = ayak;
-                    if (puan == 8) break;      // tam acik, daha iyisi yok
+                    if (puan == 13) break;    // tam acik, daha iyisi yok
                 }
 
                 if (secilen.HasValue)
@@ -383,7 +443,7 @@ namespace Hezarfen.Editor.Pipeline
                     float uzak = Vector3.Distance(secilen.Value, baslangic);
                     baslangic = secilen.Value;
                     Debug.Log($"[Hezarfen] Dogum yeri: {uzak:F0} m otede, "
-                              + $"aciklik {enIyiPuan}/8, kot {baslangic.y:F1}.");
+                              + $"aciklik {enIyiPuan}/13, kot {baslangic.y:F1}.");
                 }
                 else
                 {
@@ -463,6 +523,19 @@ namespace Hezarfen.Editor.Pipeline
             kamGo.transform.localPosition = Vector3.zero;
             kamGo.AddComponent<Camera>();
             kamGo.AddComponent<AudioListener>();
+
+            // UCUS GOSTERGESI: gostergesiz bir ucus modeli ogrenilemez.
+            //
+            // `FlightHud` kendi belgesinde bunu yaziyor ve yalnizca
+            // `FlightSlice` sahnesinde duruyordu; oyunda oyuncu neden
+            // dustugunu ya da neden yukseldigini goremiyordu.
+            var ucusHud = go.AddComponent<FlightHud>();
+            // BAGLANMAMIS BIR GOSTERGE HIC CIZMEZ: `FlightHud.OnGUI`
+            // ilk satirda `glider == null` ise geri donuyor. Bilesen
+            // sahnede olup gostergenin gorunmemesi, hicbir hata
+            // vermeyen bir eksikliktir — tam da testin tutmasi
+            // gereken cins.
+            ucusHud.glider = suzulme;
 
             // FENER: gece sokakta fenersiz dolasilmaz (RESEARCH 6).
             //

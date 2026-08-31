@@ -26,7 +26,23 @@ namespace Hezarfen.Flight
                  "sahnede aranir.")]
         public TerrainThermal terrainThermal;
 
-        bool autoFindThermal = true;
+        /// <summary>
+        /// Arazi termiği sahnede kendiliğinden aransın mı.
+        ///
+        /// Alan <b>public</b>, çünkü testin buna hayır diyebilmesi
+        /// gerekiyor. Termik oyun sahnesine bağlandığı gün üç
+        /// <c>WindFieldTests</c> kırmızı yandı ve sebep testlerin
+        /// yanlışlığı değildi: Editor'de yüklü duran oyun sahnesindeki
+        /// termiği buluyorlardı ve "hacmin dışında hiçbir katkı yok"
+        /// diye sorulan yere su çökelmesi (−0,54 m/s) geliyordu.
+        ///
+        /// Hacimler için bu kapı zaten vardı
+        /// (<see cref="autoCollectVolumes"/>); termik eklenirken
+        /// yanına konmamıştı. Bir sınıfa yeni bir <b>küresel arama</b>
+        /// eklerken, onu kapatma yolunu da eklemek gerekiyor — yoksa
+        /// yalıtılmış olması gereken her ölçüm sessizce sahneye bağlanır.
+        /// </summary>
+        public bool autoFindThermal = true;
 
         private void Awake()
         {

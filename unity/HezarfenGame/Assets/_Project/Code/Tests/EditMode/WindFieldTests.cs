@@ -24,6 +24,15 @@ namespace Hezarfen.Tests
             field = root.AddComponent<WindField>();
             field.tuning = tuning;
             field.autoCollectVolumes = false;   // testler hacimleri elle ekler
+            // ARAZI TERMIGI DE ARANMASIN.
+            //
+            // Termik oyun sahnesine baglandigi gun bu dosyadaki uc test
+            // kirmizi yandi: Editor'de yuklu duran sahnedeki termik
+            // bulunuyordu ve "hacmin disinda katki yok" diye sorulan
+            // noktaya su cokelmesi (-0,54 m/s) geliyordu. Testin sordugu
+            // sey HACIMLERIN davranisi; arazininki baska bir sorudur ve
+            // baska bir yerde sorulur.
+            field.autoFindThermal = false;
         }
 
         [TearDown]

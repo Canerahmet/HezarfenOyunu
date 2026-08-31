@@ -185,6 +185,35 @@ namespace Hezarfen.Player
         //: Bir onceki karenin konumu — temas taramasi bu aralikta yapilir.
         private Vector3 _oncekiKonum;
 
+        /// <summary>
+        /// Kalkış payı (s) — bu süre boyunca <b>yakınlık</b> denetimi
+        /// susar.
+        ///
+        /// ## Neden gerekli
+        ///
+        /// Kalkış anında zemin, tanımı gereği ayağın hemen altındadır.
+        /// Yakınlık denetimi 0,55 m'ye bakıyor ve kalkışın ilk karesinde
+        /// o mesafede zemin <b>her zaman</b> var. Fırlatma 12,4 m/s
+        /// yatay hız veriyor ama bir karede aldığı yol 0,2 m: dam
+        /// kenarına yetişemiyor.
+        ///
+        /// Sonuç ölçüldü: yirmi otomatik uçuşun yirmisi de kalkıştan
+        /// bir kare sonra "indi" dedi. Ama bu bir ölçüm kusuru değil —
+        /// <b>oyunun kendisi</b> öyle: düz bir damın ortasından
+        /// kalkan oyuncu anında iner. Kule şerefesi de düz bir dam.
+        ///
+        /// Pay yalnız <b>yakınlığı</b> susturur; tünel denetimi açık
+        /// kalır. Yani "zemin yakın" göz ardı edilir ama "zeminin
+        /// İÇİNDEN geçtik" edilmez — geometriyi delip düşme kusuru
+        /// (bu dosyanın en pahalı hatası) geri gelmez.
+        ///
+        /// 0,40 s, 12,4 m/s'de ~5 m yol demek: her damın kenarını
+        /// geçmeye yeter, hiçbir binanın içine girmeye yetmez.
+        /// </summary>
+        public float kalkisPayi = 0.40f;
+
+        private float _kalkisSayaci;
+
         private void TemasDenetle()
         {
             // TEMAS, IKI KARE ARASINDAKI YOLUN TAMAMINDA ARANIR.
@@ -206,9 +235,14 @@ namespace Hezarfen.Player
             _oncekiKonum = transform.position;
 
             // (a) YAKINLIK: ayagin hemen altinda zemin var mi.
-            bool yakin = Physics.Raycast(su, Vector3.down,
-                                         temasMesafesi + 0.2f,
-                                         ~0, QueryTriggerInteraction.Ignore);
+            //
+            // Kalkis payi boyunca bu soru sorulmaz: kalkis aninda cevap
+            // her zaman "evet"tir ve bu bir inis degil, bir kalkistir.
+            _kalkisSayaci -= Time.deltaTime;
+            bool yakin = _kalkisSayaci <= 0f
+                         && Physics.Raycast(su, Vector3.down,
+                                            temasMesafesi + 0.2f,
+                                            ~0, QueryTriggerInteraction.Ignore);
 
             // (b) TUNEL: iki kare arasinda bir seyin ICINDEN gectik mi.
             //
@@ -261,6 +295,7 @@ namespace Hezarfen.Player
             }
             if (suzulme != null) suzulme.enabled = true;
             if (firlatma != null) firlatma.Launch();
+            _kalkisSayaci = kalkisPayi;
         }
 
         private void YereGec()

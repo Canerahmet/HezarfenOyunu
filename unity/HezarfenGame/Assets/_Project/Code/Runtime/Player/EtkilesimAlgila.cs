@@ -87,6 +87,15 @@ namespace Hezarfen.Player
             {
                 var c = _tampon[i];
                 if (c == null) continue;
+                // ARAZI HICBIR ZAMAN ETKILESILEBILIR DEGIL.
+                //
+                // Menzil 2,4 m ve oyuncu her zaman yerin ustunde
+                // duruyor, yani TerrainCollider tampona HER karede
+                // giriyor ve 24 yuvadan birini bosa yiyor. Ustelik
+                // Unity terrain'i bazi sorgularda desteklemedigini
+                // konsola yaziyor ve o gurultu gercek uyarilari
+                // ortuyor.
+                if (c is TerrainCollider) continue;
                 var e = c.GetComponentInParent<IEtkilesim>();
                 if (e == null || !e.Hazir) continue;
 

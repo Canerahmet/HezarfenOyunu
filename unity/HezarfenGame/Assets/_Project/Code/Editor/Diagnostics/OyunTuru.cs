@@ -188,11 +188,21 @@ namespace Hezarfen.Editor.Diagnostics
                                         Vector3.down, out var vv, 20f, ~0,
                                         QueryTriggerInteraction.Ignore))
                                     yz = vv.point.y;
-                                // Cati degil, zemin kati: yuzey araziden
-                                // 2 m'den fazla yukaridaysa orasi damdir.
-                                // Aksi halde tur mektebin catisindan olcuyor
-                                // (olculdu: +5,8 m).
-                                if (yz - ak2 > 2f) continue;
+                                // ZEMIN, EVIN YA DA CESMENIN USTU DEGIL.
+                                //
+                                // Esik once 2 m idi ve mektebin catisini
+                                // (+5,8 m) eledi — ama sadirvani elemedi:
+                                // kenari araziden 1,0 m yukarida ve tur
+                                // dort durakta birden oyuncuyu cesmenin
+                                // USTUNE koydu. Karelerde adam suyun
+                                // uzerinde duruyor.
+                                //
+                                // 0,35 m secildi cunku olculebilir bir
+                                // seye dayaniyor: kaldirim bir rihtta
+                                // 0,17 m yukselir (kaldirim_denetimi.md),
+                                // iki riht 0,34. Yani kaldirim gecer,
+                                // cesme kenari gecmez.
+                                if (yz - ak2 > 0.35f) continue;
                                 if (Physics.CheckCapsule(
                                         new Vector3(aday.x, yz + 0.45f, aday.z),
                                         new Vector3(aday.x, yz + 1.55f, aday.z),
