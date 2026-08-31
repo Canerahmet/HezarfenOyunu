@@ -383,7 +383,26 @@ namespace Hezarfen.Editor.Diagnostics
                 }
                 else
                 {
-                    istenen = KaldiracaDogru(p, hedefYon);
+                    // DONMEYE DEGIYORSA DON.
+                    //
+                    // Kaldiraci aramak tek basina olcumu KOTULESTIRDI:
+                    // ortalama yatay 1.206 m -> 210 m, kazanc yine 0.
+                    // Pilot kulenin dibinde termik kovalayip hic yol
+                    // almiyordu.
+                    //
+                    // Sebep aritmetik: bu arazideki en iyi kaldirac
+                    // +1,87 m/s, 33 derece yatista batis 2,12 m/s.
+                    // Yani EN IYI termikte bile donmek net -0,25 m/s.
+                    // Donus verimi kaldiracin altinda kaldigi surece
+                    // termik aramak, yalnizca yol kaybetmektir.
+                    //
+                    // Gercek bir planorcu de boyle yapar: zayif termige
+                    // durup girmez, suzulup gecer. Esik donus batisidir
+                    // ve `SustainedBank_DoesNotSpiralDive` onu olcuyor
+                    // — dusunce oradan gelir, buraya elle yazilmaz.
+                    istenen = hedefYon;
+                    var enIyi = KaldiracaDogru(p, hedefYon, out float kaldirac);
+                    if (kaldirac > DonusBatisi) istenen = enIyi;
                 }
 
                 float aci = Vector3.SignedAngle(oyuncu.transform.forward,
@@ -419,24 +438,37 @@ namespace Hezarfen.Editor.Diagnostics
             /// ~160 m geniş; daha kısa bir kol bandın içinde kalır ve
             /// hiçbir fark göremez, daha uzunu suyun üstüne taşar.
             /// </summary>
-            private static Vector3 KaldiracaDogru(Vector3 p, Vector3 hedefYon)
+            private static Vector3 KaldiracaDogru(Vector3 p, Vector3 hedefYon,
+                                                  out float kaldirac)
             {
+                kaldirac = 0f;
                 var alan = Object.FindAnyObjectByType<WindField>();
                 if (alan == null) return hedefYon;
 
-                float enIyi = alan.Sample(p + hedefYon * 120f).y;
+                kaldirac = alan.Sample(p + hedefYon * 120f).y;
                 var yon = hedefYon;
                 for (int i = 0; i < 8; i++)
                 {
                     float a = i * 45f * Mathf.Deg2Rad;
                     var d = new Vector3(Mathf.Sin(a), 0f, Mathf.Cos(a));
                     float v = alan.Sample(p + d * 120f).y;
-                    if (v <= enIyi) continue;
-                    enIyi = v;
+                    if (v <= kaldirac) continue;
+                    kaldirac = v;
                     yon = d;
                 }
                 return yon;
             }
+
+            /// <summary>
+            /// 33° yatışta ölçülen batış (m/s) — dönmeye değer kaldıracın
+            /// alt sınırı.
+            ///
+            /// Sayı `SustainedBank_DoesNotSpiralDive` testinden geliyor
+            /// ve elle yazılmıyor olması önemli: dönüş verimi iyileşince
+            /// bu eşik de düşmeli, yoksa pilot iyileşmeyi kullanmaz.
+            /// Bugün 2,12; ADR 0083'ün hedefi 1,40 civarı.
+            /// </summary>
+            private const float DonusBatisi = 2.12f;
 
             private void Yaz(List<Sonuc> l, WindField alan)
             {

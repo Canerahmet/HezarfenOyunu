@@ -116,14 +116,6 @@ PrefabInstance:
       propertyPath: m_LODs.Array.data[0].screenRelativeHeight
       value: 0.22
       objectReference: {fileID: 0}
-    - target: {fileID: 5866666021909216657, guid: 64b47f7848bb753468c5185f63f0dd7d, type: 3}
-      propertyPath: m_Controller
-      value: 
-      objectReference: {fileID: 9100000, guid: 03e4a326de9ab51429ad0ca6e94aada2, type: 2}
-    - target: {fileID: 5866666021909216657, guid: 64b47f7848bb753468c5185f63f0dd7d, type: 3}
-      propertyPath: m_ApplyRootMotion
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
