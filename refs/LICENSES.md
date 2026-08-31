@@ -238,3 +238,15 @@ Poly Haven **CC0**'dır: hukuken atıf zorunlu değildir. Yine de plan gereği k
 Yeniden indirme: `python tools/textures/fetch_polyhaven.py --res 2k --hdris`
 
 <!-- POLYHAVEN:END -->
+
+### Ortam sesi — kendi üretimimiz
+
+`tools/audio/gen_ortam.py` dört ortam yatağını **sentezle** üretir
+(deniz, rüzgâr, gece, çarşı). İndirilen ses dosyası yoktur; izlenecek
+lisans da yoktur. Doku hattının kararının aynısı: ticari yayın her
+varlığı bağlıyor ve indirilen bir dalga sesinin lisansını takip etmek,
+üretmekten pahalı.
+
+| varlık | kaynak | lisans | ticari |
+|---|---|---|---|
+| `Assets/_Project/Audio/Ortam/*.wav` | `tools/audio/gen_ortam.py` — kendi işimiz | proje telifi | ✔ |

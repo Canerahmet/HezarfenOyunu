@@ -38,6 +38,17 @@ namespace Hezarfen.Editor.Pipeline
     /// </summary>
     public static class OyunSahnesiKur
     {
+        /// <summary>Ortam sesi yatağını yükler; yoksa uyarır.</summary>
+        private static AudioClip SesYatagi(string ad)
+        {
+            var k = AssetDatabase.LoadAssetAtPath<AudioClip>(
+                $"Assets/_Project/Audio/Ortam/{ad}.wav");
+            if (k == null)
+                Debug.LogWarning($"[Hezarfen] Ses yatagi yok: {ad}. "
+                    + "Once: python tools/audio/gen_ortam.py");
+            return k;
+        }
+
         /// <summary>
         /// <b>Şehirde insan var mı?</b>
         ///
@@ -409,6 +420,19 @@ namespace Hezarfen.Editor.Pipeline
             kamGo.transform.localPosition = Vector3.zero;
             kamGo.AddComponent<Camera>();
             kamGo.AddComponent<AudioListener>();
+
+            // ORTAM SESI — dinleyiciyle ayni nesnede.
+            //
+            // Oyun bugune kadar tamamen sessizdi: sahnede tek bir
+            // AudioSource yoktu. Ortam sesi bir noktadan gelmez, her
+            // yerdedir; o yuzden kaynaklar dinleyiciye bagli ve 2B.
+            // Yataklar sentezle uretiliyor (tools/audio/gen_ortam.py) —
+            // indirilen ses yok, izlenecek lisans yok.
+            var ses = kamGo.AddComponent<Hezarfen.City.OrtamSesi>();
+            ses.deniz = SesYatagi("SFX_Ortam_Deniz");
+            ses.ruzgar = SesYatagi("SFX_Ortam_Ruzgar");
+            ses.carsi = SesYatagi("SFX_Ortam_Carsi");
+            ses.gece = SesYatagi("SFX_Ortam_Gece");
             var kamVeri = kamGo.AddComponent<UnityEngine.Rendering
                 .HighDefinition.HDAdditionalCameraData>();
 

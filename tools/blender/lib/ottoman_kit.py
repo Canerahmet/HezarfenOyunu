@@ -48,6 +48,7 @@ import bpy
 from mathutils import Vector
 
 import hz_blender as hz
+import mobilya_kit as mob
 import materials as mtl
 
 # Palet anahtari -> Poly Haven varlik kimligi (ve varsa boya tonu).
@@ -274,6 +275,11 @@ PALETTES = {
         "trim":    ((0.30, 0.22, 0.16), 0.80, "M_Timber_Trim"),
         "timber_bare": ((0.265, 0.245, 0.212), 0.88, "M_Timber_Weathered"),
         "paving":  ((0.30, 0.29, 0.27), 0.88, "M_Paving_Kaldirim"),
+        # IC MEKAN (Faz II.5). Kilim ve minderin rengi dokuma boyasidir:
+        # kok boya kirmizisi donemin en yaygin ic tekstil rengi. Mangal
+        # ve kaplar bakir.
+        "cloth":   ((0.42, 0.15, 0.13), 0.88, "M_Cloth_Kilim"),
+        "metal":   ((0.45, 0.26, 0.14), 0.42, "M_Metal_Bakir"),
         "bark":    ((0.115, 0.092, 0.070), 0.92, "M_Bark"),
         "bark_cinar": ((0.175, 0.160, 0.130), 0.88, "M_Bark_Cinar"),
         # Deri ve tuy: Faz 5 (kanat aygiti + kiyafet). Cemaate gore
@@ -326,6 +332,11 @@ PALETTES = {
         "trim":    ((0.22, 0.16, 0.12), 0.82, "M_Timber_TrimDark"),
         "timber_bare": ((0.265, 0.245, 0.212), 0.88, "M_Timber_Weathered"),
         "paving":  ((0.30, 0.29, 0.27), 0.88, "M_Paving_Kaldirim"),
+        # IC MEKAN (Faz II.5). Kilim ve minderin rengi dokuma boyasidir:
+        # kok boya kirmizisi donemin en yaygin ic tekstil rengi. Mangal
+        # ve kaplar bakir.
+        "cloth":   ((0.42, 0.15, 0.13), 0.88, "M_Cloth_Kilim"),
+        "metal":   ((0.45, 0.26, 0.14), 0.42, "M_Metal_Bakir"),
         "bark":    ((0.115, 0.092, 0.070), 0.92, "M_Bark"),
         "bark_cinar": ((0.175, 0.160, 0.130), 0.88, "M_Bark_Cinar"),
         # Deri ve tuy: Faz 5 (kanat aygiti + kiyafet). Cemaate gore
@@ -1055,6 +1066,7 @@ def build_house(p, col, asset_name, textured=False):
                               bosluk=merdiven if i == 0 else None)
         if i == 0 and p.detail == "near":
             parts += _ic_bolme_geometri(p, mats, col, asset_name, z)
+            parts += _mobilya(p, mats, col, asset_name, z)
             if merdiven is not None:
                 for son, boyut, merkez in _merdiven_parcalari(merdiven, p, z):
                     o = hz.make_box(f"{asset_name}_Merdiven_{son}",
@@ -1090,6 +1102,7 @@ def build_house(p, col, asset_name, textured=False):
     # Tek katli evde zemin kat "Top" olarak kuruluyor; bolme oraya gelir.
     if p.floors == 1 and p.detail == "near":
         parts += _ic_bolme_geometri(p, mats, col, asset_name, z)
+        parts += _mobilya(p, mats, col, asset_name, z)
 
     # 3b) Payandalar — yalnizca 'corbel' ve yeterli derinlikte.
     if p.cumba_type == "corbel" and cumba_d >= MIN_CORBEL_DEPTH:
@@ -1293,6 +1306,21 @@ def ic_bolmeler(p):
     if p.width < 5.8:
         return out
 
+    # PLAN TOHUMDAN TÜRER.
+    #
+    # Önce yalnız enden türüyordu: aynı genişlikteki her evin içi
+    # birbirinin aynısıydı. Dışarıda 201 varyant ve örnek başına ton
+    # varken içeride tek bir plan olması, kapı açıldığı anda tekrarı
+    # görünür kılardı.
+    #
+    # Tohum evin **kendi** parametrelerinden gelir (en, derinlik, kat
+    # yüksekliği): aynı varyant her üretimde aynı planı taşır — bu
+    # projenin her yerindeki determinizm kuralı.
+    import random
+    tohum = int(round(p.width * 1000) * 31 + round(p.depth * 1000) * 17
+                + round(p.floor_height * 1000) * 7)
+    rng = random.Random(tohum)
+
     if p.width >= 6.2:
         # Geniş ev: hayat ortada, iki yanında oda.
         #
@@ -1301,13 +1329,38 @@ def ic_bolmeler(p):
         # paylasamaz. Bolmenin arka ucu, merdiven kolunun on yuzunde
         # durur; arkasi merdiven sahanligidir.
         arka_sinir = p.depth * 0.5 - p.wall_thickness - MERDIVEN_EN - 0.15
+
+        # Hayat eni: dar hayat (2,0) ile geniş sofa (2,9) arasında.
+        # RESEARCH §4.1 "hayatlı" der, ölçü vermez — T2.
+        hayat = HAYAT + rng.uniform(-0.10, 0.80)
+        # Çok geniş evde hayat da genişler; oda 2,2 m'nin altına inmesin.
+        en_cok = (p.width - 2.0 * p.wall_thickness) - 2.0 * 2.2
+        hayat = min(hayat, max(2.0, en_cok))
+
+        # Oda kapıları BAĞIMSIZ yerleşir: iki oda aynı hizada
+        # açılmak zorunda değil.
         for sx in (-1.0, 1.0):
-            out.append(dict(eksen="y", konum=sx * HAYAT * 0.5,
-                            kapi=p.depth * 0.12, kapi_en=KAPI,
-                            kalin=KALIN, y_son=arka_sinir))
+            out.append(dict(eksen="y", konum=sx * hayat * 0.5,
+                            kapi=p.depth * rng.uniform(0.02, 0.22),
+                            kapi_en=KAPI, kalin=KALIN, y_son=arka_sinir))
+
+        # EK BÖLME: derin evde ön oda ikiye ayrılır.
+        #
+        # RESEARCH §4.1(e): ortalama **4,12 oda**. İki yan oda + hayat
+        # üç hacim eder; dördüncüsü ya üst kattadır ya da derin evde
+        # ön odanın bölünmesiyle. Derinlik 8 m'yi geçince bir oda
+        # 8 x 2,5 m olurdu — oda değil koridor.
+        if p.depth >= 8.0 and rng.random() < 0.55:
+            yan = -1.0 if rng.random() < 0.5 else 1.0
+            out.append(dict(eksen="x", konum=-p.depth * 0.10,
+                            kapi=yan * (hayat * 0.5 + 1.1),
+                            kapi_en=KAPI, kalin=KALIN,
+                            x_bas=yan * hayat * 0.5,
+                            x_son=yan * p.width * 0.5))
     else:
         # Dar ev: tek enine bölme. Kapı hayat aksında, yani ortada.
-        out.append(dict(eksen="x", konum=p.depth * 0.10, kapi=0.0,
+        out.append(dict(eksen="x", konum=p.depth * rng.uniform(0.02, 0.20),
+                        kapi=rng.uniform(-0.5, 0.5),
                         kapi_en=KAPI, kalin=KALIN))
     return out
 
@@ -1347,16 +1400,22 @@ def _bolme_parcalari(p, bolme, z0, z1):
     else:
         cy = bolme["konum"]
         boy = p.width
+        # Kismi duvar: yalnizca x_bas..x_son arasinda uzanir. Ek oda
+        # bolmesi hayatin bir yanini boler, karsi yani acik birakir.
+        x_bas = bolme.get("x_bas", -boy * 0.5)
+        x_son = bolme.get("x_son", boy * 0.5)
+        if x_bas > x_son:
+            x_bas, x_son = x_son, x_bas
         k0 = bolme["kapi"] - kapi_en * 0.5
         k1 = bolme["kapi"] + kapi_en * 0.5
-        sol = k0 + boy * 0.5
-        sag = boy * 0.5 - k1
+        sol = max(0.0, min(k0, x_son) - x_bas)
+        sag = max(0.0, x_son - max(k1, x_bas))
         if sol > 0.05:
             parca.append(("a", (sol, kalin, yuk),
-                          (-boy * 0.5 + sol * 0.5, cy, cz)))
+                          (x_bas + sol * 0.5, cy, cz)))
         if sag > 0.05:
             parca.append(("b", (sag, kalin, yuk),
-                          (boy * 0.5 - sag * 0.5, cy, cz)))
+                          (x_son - sag * 0.5, cy, cz)))
         if yuk - lento > 0.05:
             parca.append(("l", (kapi_en, kalin, yuk - lento),
                           (bolme["kapi"], cy, z0 + (lento + yuk) * 0.5)))
@@ -1554,6 +1613,140 @@ def _ic_bolme_geometri(p, mats, col, asset_name, level_z):
     return out
 
 
+def _mobilya(p, mats, col, asset_name, level_z):
+    """
+    Zemin katın döşenmesi. Parçalar: :mod:`mobilya_kit`.
+
+    ## Neden duvar boyunca
+
+    Osmanlı odasında mobilya ortada durmaz; **duvara yaslanır** ve
+    orta boş kalır — oturulan yer sedirdir, sofra yere serilir. Bu
+    yalnız bir yerleşim tercihi değil, odanın nasıl kullanıldığının
+    kendisi: aynı hacim gündüz oturma, gece yatak odası olur ve bunu
+    ancak ortası boş bir oda yapabilir (yatak takımı yüklüğe girer).
+
+    ## Neden LOD0
+
+    Bölme duvarlarıyla aynı sebep: `near` kipinde kurulur, yani
+    yalnız yakındaki evde çizilir. Planın "iç mekân 40 m içinde"
+    bütçesini ayrı bir çalışma zamanı sistemi yazmadan verir.
+
+    ## Tohum
+
+    Plan hangi tohumdan türüyorsa döşeme de ondan (`ic_bolmeler`).
+    Aynı ev her açılışta aynı şekilde döşenir.
+    """
+    import random
+    tohum = int(round(p.width * 1000) * 31 + round(p.depth * 1000) * 17
+                + round(p.floor_height * 1000) * 7)
+    rng = random.Random(tohum + 4242)
+
+    t = p.wall_thickness
+    ic_w = p.width - 2.0 * t
+    ic_d = p.depth - 2.0 * t
+    z = level_z
+    out = []
+    n = 0
+
+    def ad(kok):
+        return f"{asset_name}_Mob_{kok}{n:02d}"
+
+    # --- OCAK: arka duvarda, merdiven kolunun karşı ucunda -----------
+    # Ocak bacaya bağlıdır ve baca duvardadır; ortada ocak olmaz.
+    m = merdiven_plani(p)
+    ocak_x = (-ic_w * 0.5 + 0.9) if (m is None or m["x0"] > 0) else (ic_w * 0.5 - 0.9)
+    out += mob.ocak(ad("Ocak"), col, mats,
+                    (ocak_x, ic_d * 0.5 - mob.YUKLUK_DERIN * 0.5, z),
+                    (0.0, 1.0), p.floor_height)
+    n += 1
+
+    # --- SEDIR: yan duvar boyunca, cephe tarafında --------------------
+    # Sokağa bakan pencerenin altı: oturan kişi sokağı görür. Kafes
+    # pencerenin varlık sebebi de budur.
+    sedir_boy = min(ic_d * 0.55, 2.6)
+    for sx in (-1.0, 1.0):
+        if rng.random() > 0.75:
+            continue
+        out += mob.sedir(ad("Sedir"), col, mats, sedir_boy,
+                         (sx * (ic_w * 0.5 - mob.SEDIR_DERIN * 0.5),
+                          -ic_d * 0.5 + sedir_boy * 0.5 + 0.3, z),
+                         (sx, 0.0))
+        n += 1
+
+    # --- YÜKLÜK: arka duvar, ocağın karşı yanı ------------------------
+    out += mob.yukluk(ad("Yukluk"), col, mats,
+                      (-ocak_x, ic_d * 0.5 - mob.YUKLUK_DERIN * 0.5, z),
+                      min(1.8, ic_w * 0.35), (0.0, 1.0), p.floor_height)
+    n += 1
+
+    # --- KİLİM: odanın ortası. Mobilyanın yokluğunu görünür kılan şey.
+    kil_w = min(ic_w * 0.5, 2.6)
+    kil_d = min(ic_d * 0.42, 3.2)
+    out += mob.kilim(ad("Kilim"), col, mats, (0.0, -ic_d * 0.10, z),
+                     (kil_w, kil_d))
+    n += 1
+
+    # --- SANDIK, RAHLE, MANGAL: tohuma göre --------------------------
+    if rng.random() < 0.8:
+        out += mob.sandik(ad("Sandik"), col, mats,
+                          (rng.uniform(-0.3, 0.3) + ic_w * 0.25,
+                           ic_d * 0.5 - 0.75, z))
+        n += 1
+    if rng.random() < 0.55:
+        out += mob.rahle(ad("Rahle"), col, mats,
+                         (rng.uniform(-0.6, 0.6), -ic_d * 0.10, z))
+        n += 1
+    if rng.random() < 0.65:
+        out += mob.mangal(ad("Mangal"), col, mats,
+                          (rng.uniform(-0.5, 0.5), -ic_d * 0.05, z))
+        n += 1
+    return out
+
+
+def _mobilya_kutulari(p, asset_name, level_z):
+    """Çarpışacak mobilya kutuları — görünen döşemeyle **aynı plandan**.
+
+    `_mobilya` geometriyi kurar; bu, aynı yerleşimi kutu listesi olarak
+    döndürür. İkisi ayrı hesaplansaydı oyuncu görünmeyen bir sedire
+    çarpardı — bu oturumda tam bu türden üç kusur ölçüldü.
+
+    Kilim ve mangal DIŞARIDA: biri yerde 1 cm, öteki küçük ve odanın
+    ortasında; ikisini de çarpıştırmak dolaşımı gereksiz daraltırdı.
+    """
+    import random
+    tohum = int(round(p.width * 1000) * 31 + round(p.depth * 1000) * 17
+                + round(p.floor_height * 1000) * 7)
+    rng = random.Random(tohum + 4242)
+
+    t = p.wall_thickness
+    ic_w = p.width - 2.0 * t
+    ic_d = p.depth - 2.0 * t
+    out = []
+    m = merdiven_plani(p)
+    ocak_x = (-ic_w * 0.5 + 0.9) if (m is None or m["x0"] > 0) else (ic_w * 0.5 - 0.9)
+
+    # ARKA DUVARDAKI MOBILYA CARPISMAZ.
+    #
+    # Ocak, yukluk ve sandik arka duvarda durur — merdivenin de
+    # bulundugu duvarda. Hepsine carpisma verilince ust kata cikilabilen
+    # %75,6'dan **%56,1'e** dustu: mobilya merdivenin onunu kapatiyor.
+    #
+    # Secim acik: bir sedirin icinden gecmek kotu, ama merdiveni
+    # kapatmak daha kotu. Yan duvardaki sedir carpisir (dolasima
+    # engel degil), arka duvardakiler gorunur ama gecirir.
+    # Sedirler — geometriyle AYNI kur'a sirasi
+    sedir_boy = min(ic_d * 0.55, 2.6)
+    for sx in (-1.0, 1.0):
+        if rng.random() > 0.75:
+            continue
+        out.append((f"{asset_name}_c_sedir",
+                    (0.70, sedir_boy, 0.50),
+                    (sx * (ic_w * 0.5 - 0.35),
+                     -ic_d * 0.5 + sedir_boy * 0.5 + 0.3,
+                     level_z + 0.25)))
+    return out
+
+
 def _carpisma(p, col, mats, asset_name, total_h):
     """
     Çarpışma kütlesi: **zemin katı boş, üstü dolu.**
@@ -1649,6 +1842,22 @@ def _carpisma(p, col, mats, asset_name, total_h):
     if m is not None:
         for son, boyut, merkez in _merdiven_parcalari(m, p, z0):
             kutu(f"{asset_name}_c_mrd_{son}", boyut, merkez)
+
+    # 5a) MOBILYA CARPISMAZ — ve bu bilincli bir odun.
+    #
+    # Sedirin icinden gecmek kotu. Ama olculdu: mobilyaya carpisma
+    # verince ust kata cikilabilen **%75,6'dan %56,1'e** dustu; yalniz
+    # yan duvardaki sedire verince **%61,0**. Arka duvardaki ocak ve
+    # yukluk merdivenin onunu, yandaki sedir de merdivenin duvar payini
+    # yiyor.
+    #
+    # Iki kusurdan birini secmek gerekiyorsa, gecilemeyen bir merdiven
+    # gecilebilen bir sedirden kotudur. Mobilya gorunur, gecirir; kayit
+    # ADR 0081'de.
+    #
+    # Kalici cozum mobilyayi merdiven ve kapi hatlarina gore
+    # yerlestirmek — yani `_mobilya`nin yerlesim kurallarini `merdiven_plani`
+    # ile konusturmak. O, Faz II.D'nin ikinci turudur.
 
     # 5b) ZEMIN KATIN TAVANI — merdiven bosluguyla birlikte.
     #

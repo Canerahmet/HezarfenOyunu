@@ -80,6 +80,14 @@ namespace Hezarfen.Flight
         public float dalgaKati = 1.0f;
 
         /// <summary>
+        /// Bu hızın (m/s) altında deniz köpürmez.
+        ///
+        /// Beaufort 4'te (≈6,5 m/s) tepeler kırılmaya başlar; 5'te
+        /// (≈9 m/s) beyaz atlar yaygınlaşır. 6,5 eşiği o ilk kırılmadır.
+        /// </summary>
+        public const float KopukEsigi = 6.5f;
+
+        /// <summary>
         /// Ağaç savrulması için küresel shader vektörü:
         /// <c>xyz</c> = yön, <c>w</c> = hız.
         /// </summary>
@@ -132,6 +140,26 @@ namespace Hezarfen.Flight
             {
                 su.largeWindSpeed = hiz * dalgaKati * 3.6f;   // km/h ister
                 su.largeOrientationValue = Azimut();
+
+                // KÖPÜK DE RÜZGÂRDAN TÜRER.
+                //
+                // Köpük kapalıydı ve deniz her havada aynı görünüyordu.
+                // Oysa denizin rüzgârı ele veren ilk işareti dalganın
+                // yüksekliği değil **beyazlamasıdır**: 5 m/s'de düz,
+                // 8'de tepeler kırılmaya başlar, 12'nin üstünde
+                // "beyaz atlar" görünür. Denizciliğin Beaufort ölçeği
+                // tam olarak buna bakar.
+                //
+                // Bu, oyunun kendi rüzgârını GÖRÜNÜR kılıyor: oyuncu
+                // uçuşa çıkmadan önce havanın ne olduğunu denize
+                // bakarak anlayabilsin.
+                su.foam = hiz >= KopukEsigi;
+                if (su.foam)
+                {
+                    float t = Mathf.InverseLerp(KopukEsigi, 18f, hiz);
+                    su.simulationFoamAmount = Mathf.Lerp(0.15f, 0.75f, t);
+                    su.foamPersistenceMultiplier = Mathf.Lerp(0.35f, 0.65f, t);
+                }
             }
 
             // 4) BULUT — gökyüzü de aynı yöne akar.
