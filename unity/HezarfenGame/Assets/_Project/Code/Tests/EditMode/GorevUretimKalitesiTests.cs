@@ -190,16 +190,22 @@ namespace Hezarfen.Tests
             Assert.Greater(sayi, 5, "Gercek grafta gorev uretilemedi.");
             float ort = toplam / sayi;
 
-            // CIRCIR: 3.724 m -> 2.206 m (28,2 dk -> 16,7 dk).
+            // CIRCIR: 3.724 -> 2.206 -> 1.923 m (28,2 -> 14,6 dk).
             //
-            // Aday suzgeci sayidan mesafeye cevrilince yol yarilandi.
-            // Kalan acik icin gereken sey ureteca bir YOL BUTCESI
-            // vermek: durak dizisinin `SokakGrafi.Yol` uzunlugunu
-            // toplayip 900 m'yi asarsa farkli tohumla yeniden denemek.
-            // Ayri bir is; bu esik o gune kadar gerilemeyi tutar.
-            Assert.Less(ort, 2300f,
+            // Iki duzeltme: aday suzgeci sayidan mesafeye cevrildi
+            // (3.724 -> 2.206) ve ureteca yol butcesi verildi
+            // (2.206 -> 1.923). Ikincisi beklenenden az kazandirdi ve
+            // sebebi ogretici: Galata bileseninde **tek han ve tek
+            // iskele** var, yani sekiz aday dizinin cogu ayni duguma
+            // dusuyor.
+            //
+            // Yani kalan darbogaz uretecte degil **sehrin kendisinde**.
+            // 900 m hedefine inmenin yolu daha akilli bir ureteç
+            // degil, Galata'ya gidilecek yer koymak — ya da gorev
+            // arketiplerinin Han/Iskele sartini gevsetmek.
+            Assert.Less(ort, 2000f,
                 $"Gorev basina ortalama {ort:F0} m — KOTULESTI. "
-                + "Olculen taban 2.206 m, hedef 900 m.");
+                + "Olculen taban 1.923 m, hedef 900 m.");
             Debug.Log($"[Hezarfen] Gercek grafta gorev: ortalama "
                       + $"{ort:F0} m ({ort / 2.2f / 60f:F1} dk yuruyus), "
                       + $"en uzun {enUzunGorev} m, {sayi} gorev.");

@@ -136,16 +136,48 @@ namespace Hezarfen.Sehir
             if (bas < 0) return null;
             int b = bilesen[bas];
 
-            var duraklar = new List<int>();
-            Vector3 son = yakininda;
-            foreach (var tur in turler)
+            // YOL BUTCESI: EN IYISINI SEC, ILKINI DEGIL.
+            //
+            // Aday suzgeci her duragi TEK BASINA yakin tutuyor ama
+            // dizinin TOPLAMINI hic sormuyordu. Uc yakin durak
+            // birbirinden uzaga dizilirse gorev yine uzun olur —
+            // olculdu, gercek grafta 2.206 m.
+            //
+            // Cozum bir kisit degil bir SECIM: ayni tohum ailesinden
+            // birkac aday dizi uretilir ve en kisasi alinir. Kisit
+            // koymak ureteci bogardi (dar bilesende hicbir dizi
+            // butceyi tutmayabilir); secmek her zaman bir cevap verir
+            // ve cevabin iyi olma ihtimalini artirir.
+            List<int> enIyiDizi = null;
+            float enIyiYol = float.MaxValue;
+
+            for (int deneme = 0; deneme < DiziDenemesi; deneme++)
             {
-                int d = RastgeleAyniBilesende(graf, bilesen, b, tur, son, rng,
-                                              duraklar);
-                if (d < 0) return null;          // o yer bu semtte yok
-                duraklar.Add(d);
-                son = graf.dugumler[d].konum;
+                var aday = new List<int>();
+                var adayRng = new System.Random(tohum + deneme * 7919);
+                Vector3 nokta = yakininda;
+                float yol = 0f;
+                bool tam = true;
+
+                foreach (var tur in turler)
+                {
+                    int d = RastgeleAyniBilesende(graf, bilesen, b, tur,
+                                                  nokta, adayRng, aday);
+                    if (d < 0) { tam = false; break; }
+                    yol += (graf.dugumler[d].konum - nokta).magnitude;
+                    aday.Add(d);
+                    nokta = graf.dugumler[d].konum;
+                }
+
+                if (!tam) continue;
+                if (yol >= enIyiYol) continue;
+                enIyiYol = yol;
+                enIyiDizi = aday;
+                if (yol <= YolButcesi) break;   // yeterince iyi
             }
+
+            if (enIyiDizi == null) return null;   // o yer bu semtte yok
+            var duraklar = enIyiDizi;
 
             var g = new Gorev
             {
@@ -262,6 +294,26 @@ namespace Hezarfen.Sehir
         /// düzeltmez, sistemi susturur.
         /// </summary>
         public const float UygunDurakUzakligi = 400f;
+
+        /// <summary>
+        /// Bir görevin kuş uçuşu toplam yolu, hedef (m).
+        ///
+        /// Gerçek yolda ölçülen orana (medyan 1,48) göre ~1.330 m
+        /// yürüyüş, koşarak 3,7 dakika. Bir işin bir turu bu kadar
+        /// sürmeli; 28 dakika süren bir tur, tur değil yürüyüştür.
+        /// </summary>
+        public const float YolButcesi = 900f;
+
+        /// <summary>
+        /// Kaç aday dizi denenir.
+        ///
+        /// Sekiz: dar bir bileşende (Galata'da tek han) çoğu deneme
+        /// aynı düğüme düşer ve fark yaratmaz; geniş bileşende sekiz
+        /// deneme bütçeyi tutan bir dizi bulmaya yeter. Daha fazlası
+        /// üretim maliyetini görev başına birkaç yüz mikrosaniyeden
+        /// milisaniyeye çıkarır ve karşılığı yok.
+        /// </summary>
+        public const int DiziDenemesi = 8;
 
         private static int RastgeleAyniBilesende(
             SokakGrafi graf, int[] bilesen, int b, SokakGrafi.Tur tur,
