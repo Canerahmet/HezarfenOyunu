@@ -287,6 +287,22 @@ PALETTES = {
         # tuy daha da pürüzsüz cunku yagli.
         "leather": (LEATHER, 0.74, "M_Leather"),
         "skin":    (SKIN, 0.58, "M_Skin"),
+        # SAKAL PALETE GIRER — CUNKU ARTIK OPAK.
+        #
+        # Sac palete giremiyor: alfa kesme istiyor ve `hair_material`
+        # ayri dugumlerle kuruluyor. Sakal ise kart olmaktan cikip
+        # cene bolgesinden kopyalanan bir KABUK oldu, yani opak.
+        #
+        # Girmemis olmasinin bedeli olculdu: FBX'in icinde `M_Beard`
+        # adli bir malzeme var ama `Art/Materials/Ottoman/M_Beard.mat`
+        # yoktu; `ModelImportPolicy.OnAssignMaterialModel` ada gore
+        # arayip null donuyor ve Unity gomulu varsayilani birakiyordu —
+        # maskesiz, normalsiz, sozlesme disi ve her yeniden import'ta
+        # sessizce yeniden uretilen bir malzeme.
+        #
+        # Renk `sac_kit.sakal_material` ile ayni: tam siyah bir sakal
+        # isik almadigi icin yuzde delik gibi okunuyordu.
+        "beard":   ((0.105, 0.072, 0.052), 0.72, "M_Beard"),
         "entari":  (CLOTH_ENTARI, 0.80, "M_Cloth_Entari"),
         "salvar":  (CLOTH_SALVAR, 0.82, "M_Cloth_Salvar"),
         "gomlek":  (CLOTH_GOMLEK, 0.86, "M_Cloth_Gomlek"),
@@ -344,6 +360,22 @@ PALETTES = {
         # tuy daha da pürüzsüz cunku yagli.
         "leather": (LEATHER, 0.74, "M_Leather"),
         "skin":    (SKIN, 0.58, "M_Skin"),
+        # SAKAL PALETE GIRER — CUNKU ARTIK OPAK.
+        #
+        # Sac palete giremiyor: alfa kesme istiyor ve `hair_material`
+        # ayri dugumlerle kuruluyor. Sakal ise kart olmaktan cikip
+        # cene bolgesinden kopyalanan bir KABUK oldu, yani opak.
+        #
+        # Girmemis olmasinin bedeli olculdu: FBX'in icinde `M_Beard`
+        # adli bir malzeme var ama `Art/Materials/Ottoman/M_Beard.mat`
+        # yoktu; `ModelImportPolicy.OnAssignMaterialModel` ada gore
+        # arayip null donuyor ve Unity gomulu varsayilani birakiyordu —
+        # maskesiz, normalsiz, sozlesme disi ve her yeniden import'ta
+        # sessizce yeniden uretilen bir malzeme.
+        #
+        # Renk `sac_kit.sakal_material` ile ayni: tam siyah bir sakal
+        # isik almadigi icin yuzde delik gibi okunuyordu.
+        "beard":   ((0.105, 0.072, 0.052), 0.72, "M_Beard"),
         "entari":  (CLOTH_ENTARI, 0.80, "M_Cloth_Entari"),
         "salvar":  (CLOTH_SALVAR, 0.82, "M_Cloth_Salvar"),
         "gomlek":  (CLOTH_GOMLEK, 0.86, "M_Cloth_Gomlek"),

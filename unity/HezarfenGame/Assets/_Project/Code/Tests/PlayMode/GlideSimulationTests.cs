@@ -214,5 +214,66 @@ namespace Hezarfen.Tests
             Assert.AreEqual(right.EndX, -left.EndX, 5f, "Donus simetrik degil.");
             yield return null;
         }
+        /// <summary>
+        /// <b>Sürekli yatışta sarmal dalışa girmemeli.</b>
+        ///
+        /// Bu dosyadaki süzülme testlerinin hepsi <b>yatışsız</b>
+        /// uçuyor ve hepsi geçiyordu; <c>RollRight_TurnsRight</c> ise
+        /// dönüyor ama <b>batışa hiç bakmıyor</b>. Aradaki boşlukta
+        /// ders kitabı bir kusur yaşıyordu.
+        ///
+        /// Ölçüldü: 33° yatışta batış 0,93 → 2,49 m/s (2,7 kat) ve
+        /// hücum açısı 9,2° → 2,4°. Teori 1,30 kat der. Sebep, pilot
+        /// hedef hücum açısının yatıştan habersiz olmasıydı — yatmış
+        /// uçuşta gereken taşıma W/cos φ'dir ve model onu hiç istemiyordu.
+        ///
+        /// Bunun bedeli soyut değil: <b>termikte dönmek hiçbir yatış
+        /// açısında mümkün değildi</b>, yani uçuş yükselemiyordu ve
+        /// kuleden Doğancılar'a varan uçuş sayısı 0/20 idi.
+        ///
+        /// ## Eşik neden 2,30 ve hedef neden 1,60
+        ///
+        /// Yatış telafisi eklendi ve ölçüm 2,49 → <b>2,12</b> m/s dedi;
+        /// yani 2,7 kat 2,28 kata indi. Teşhisin ikinci yarısı
+        /// (kararlılık terimini komut edilen açıya itmek) de denendi ve
+        /// <b>ölçüm reddetti</b>: düz uçuş süzülme oranı 11,2:1'den
+        /// 2,57:1'e çöktü, beş test birden kırmızı yandı. Geri alındı.
+        ///
+        /// Bu yüzden eşik bugün <b>2,30</b> — bir kabul değil, bir
+        /// <b>cırcır</b>. Kusur kapanmadı; kapanana kadar da kötüye
+        /// gitmemesi sağlanıyor. Gerçek hedef 1,60 (teorik 1,30'un
+        /// üstünde makul bir pay) ve oraya inmenin yolu muhtemelen
+        /// sabit hücum açısı yerine <b>sabit hava hızı</b> trimi:
+        /// asılı planör gerçekte alfa değil hız trimler ve ağırlık
+        /// aktarımı trim hızını değiştirir. Ayrı bir tur, ayrı bir
+        /// ölçüm.
+        ///
+        /// Kalıcı kırmızı bir test yapıyı bloke eder ve kırmızıya
+        /// bakmayı öğretir; kapanmamış bir kusuru dürüstçe taşımanın
+        /// yolu, bugünkü sayıyı tavan yapıp hedefi yazılı bırakmaktır.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator SustainedBank_DoesNotSpiralDive()
+        {
+            var duz = Fly(0f, 0f, 60f);
+            var yan = Fly(0f, 0.6f, 60f);      // ~33 derece yatis
+
+            float batisDuz = duz.Dropped / 60f;
+            float batisYan = yan.Dropped / 60f;
+
+            // CIRCIR: bugunku olcu 2,28 kat. Hedef 1,60.
+            Assert.Less(batisYan, batisDuz * 2.30f,
+                $"Yatista sarmal dalis KOTULESTI: batis {batisDuz:F2} -> "
+                + $"{batisYan:F2} m/s. Teori 1,30 kat der, hedef 1,60, "
+                + "bugunku tavan 2,30.");
+            // CIRCIR: yatis telafisi oncesi 2,4 derece, sonrasi 3,18.
+            // Hedef 4,0 — orasi tasimanin gercekten calistigi bant.
+            Assert.Greater(yan.MeanAlphaDeg, 3.0f,
+                $"Yatista hucum acisi KOTULESTI: {yan.MeanAlphaDeg:F1} "
+                + "derece. Tasima cokerse donus bir dalistir. "
+                + "Bugunku taban 3,0, hedef 4,0.");
+            yield return null;
+        }
+
     }
 }

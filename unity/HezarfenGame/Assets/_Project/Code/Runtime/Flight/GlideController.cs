@@ -158,11 +158,49 @@ namespace Hezarfen.Flight
             float pitchIn = Mathf.Clamp(input?.Pitch ?? 0f, -1f, 1f);
             float rollIn = Mathf.Clamp(input?.Roll ?? 0f, -1f, 1f);
 
+            // Yatış açısı ÖNCE hesaplanır: hedef hücum açısı ona bağlı.
+            BankAngleDeg = ComputeBankAngleDeg();
+
             // Pilot hedef hücum açısı komut eder.
             float targetAlpha = Mathf.Lerp(
                 tuning.minCommandAlphaDeg,
                 tuning.maxCommandAlphaDeg,
                 (pitchIn + 1f) * 0.5f);
+
+            // YATIŞTA DAHA ÇOK TAŞIMA GEREKİR — VE MODEL BUNU İSTEMİYORDU.
+            //
+            // Yatmış uçuşta taşımanın dikey bileşeni cos φ kadar
+            // azalır; düz uçuşu sürdürmek için gereken taşıma
+            // W / cos φ olur (55°'de 1,74 katı). Pilot hedef hücum
+            // açısı komut ediyordu ve o hedef <b>yatıştan habersizdi</b>.
+            //
+            // Sonuç ölçüldü ve ders kitabı: uçuş yolu, gövdenin
+            // dönebileceğinden hızlı dikleşiyor, hücum açısı çöküyor,
+            // taşıma çöküyor, dalış dikleşiyor — <b>sarmal ıraksaması</b>.
+            //
+            // | yatış | ölçülen batış | teorik |
+            // |------:|--------------:|-------:|
+            // |    0° |          0,93 |   1,08 |
+            // |   33° |          2,49 |   1,40 |
+            // |   55° |         10,39 |   2,48 |
+            //
+            // 55°'de teorinin 4,2 katı ve hücum açısı −0,1°. Yani
+            // termikte dönmek hiçbir yatış açısında mümkün değildi.
+            // Hiçbir test bunu görmedi çünkü süzülme oranını ölçen
+            // test yalnız <b>yatışsız</b> uçuyor.
+            //
+            // Telafi, gerçek bir pilotun dönüşte yaptığı şeyin ta
+            // kendisi: <b>çekmek</b>. Yük katsayısı 2,5'te kırpılır —
+            // kırpma olmadan 80°+ yatışta hedef açı komut sınırını
+            // aşıp stall'a sokardı.
+            //
+            // Yatışsız uçuşta cos 0 = 1, yani bu terim <b>etkisizdir</b>:
+            // mevcut süzülme testleri aynen geçer.
+            float cosBank = Mathf.Cos(BankAngleDeg * Mathf.Deg2Rad);
+            float yukKatsayisi = Mathf.Min(2.5f, 1f / Mathf.Max(0.25f,
+                                                                 cosBank));
+            targetAlpha = Mathf.Min(targetAlpha * yukKatsayisi,
+                                    tuning.maxCommandAlphaDeg);
 
             float alphaErrorRad = (targetAlpha - AngleOfAttackDeg) * Mathf.Deg2Rad;
             float sideslipRad = SideslipDeg * Mathf.Deg2Rad;
@@ -170,7 +208,6 @@ namespace Hezarfen.Flight
             // Pilot bank AÇISI komut eder, bank HIZI değil.
             // Bank hızı komut edilseydi sabit girdi aygıtı durmadan yuvarlardı —
             // ilk sürümde tam olarak bu oldu ve RollCommand_TurnsTheCraft testi yakaladı.
-            BankAngleDeg = ComputeBankAngleDeg();
             float targetBank = rollIn * tuning.maxBankAngleDeg;
             float bankErrorRad = (targetBank - BankAngleDeg) * Mathf.Deg2Rad;
 
@@ -186,6 +223,29 @@ namespace Hezarfen.Flight
             // Aerodinamik pitch kararlılığı: hücum açısını sıfıra geri iter.
             // Stall aşıldığında ek "kırılma" momenti burnu kesin biçimde aşağı atar.
             // Bu terim olmadan aygıt takla atıyordu (bkz. GlideSimulationTests).
+            // KARARLILIK SIFIRA ITER — VE OYLE KALIYOR.
+            //
+            // Teshis, bu terimin hucum acisini komut edilen aciya
+            // itmesini onerdi: yatista pilot 1/cos φ kadar buyuk bir
+            // aci istiyor ve sabit geri cekme telafinin yarisini geri
+            // aliyor. Mantik dogru gorunuyordu.
+            //
+            // DENENDI VE OLCUM REDDETTI. `(AngleOfAttackDeg -
+            // targetAlpha) * pitchStability` yazildiginda duz ucus
+            // coktu: suzulme orani 11,2:1 -> **2,57:1**, notr girdide
+            // hucum acisi 15,5 derece (stall), donus 20 dereceden 9,7
+            // dereceye dustu. Bes test birden kirmizi yandi.
+            //
+            // Sebep: alfa-orantili geri yukleme egimi, bu modelde pitch
+            // dongusunun TEK kararlilik kaynagi. Onu hedefe kaydirmak
+            // egimi korumus gibi gorunuyor ama komut edilen aci hava
+            // hizina bagli olarak kaydigi icin dongu marjinal kararli
+            // hale geliyor.
+            //
+            // Yatis telafisi (yukarida) tek basina 2,49 -> 2,12 m/s
+            // kazandirdi ve hicbir seyi kirmadi. Kalan acik icin dogru
+            // yol muhtemelen sabit ALFA yerine sabit HAVA HIZI trimi —
+            // ayri bir tur ve ayri bir olcum isi.
             float stabilizingDeg = AngleOfAttackDeg * tuning.pitchStability;
             float overStall = Mathf.Abs(AngleOfAttackDeg) - tuning.stallAngleDeg;
             if (overStall > 0f)

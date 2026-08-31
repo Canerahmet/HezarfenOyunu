@@ -142,17 +142,60 @@ namespace Hezarfen.Editor.Diagnostics
                 float eskiYakala = Time.captureDeltaTime;
                 Time.captureDeltaTime = 1f / 60f;
 
+                // KALABALIK VE AGACLAR KAPATILIR — OLCUM ZAMANI ICIN.
+                //
+                // `captureDeltaTime` ile benzetim, cizilen her karede
+                // 1/60 s ilerler; yani olcumun GERCEK suresi kare
+                // hizina baglidir. Kalabalik 1,2 ms, agac cizici 0,3 ms
+                // ve sarmal dalis duzeltilince ucuslar uzadigi icin
+                // deneme saatlere ciktı.
+                //
+                // Ikisi de ucusun fizigine dokunmuyor: NPC yerde
+                // yuruyor, agac cizici yalniz ciziyor. Kapatmak
+                // olculen seyi degistirmez, olcumun BEDELINI degistirir.
+                //
+                // Saatler suren bir olcum bir daha kosulmaz; kosulmayan
+                // olcum de kapi tutmaz.
+                var kalabalik = Object.FindAnyObjectByType<Sehir.NPCYonetici>();
+                var agac = Object.FindAnyObjectByType<Tani.AgacCizici>();
+                bool kalabalikAcikti = kalabalik != null && kalabalik.enabled;
+                bool agacAcikti = agac != null && agac.enabled;
+                if (kalabalik != null) kalabalik.enabled = false;
+                if (agac != null) agac.enabled = false;
+
+                // KONTROL DENEMESI — ONCE BU.
+                //
+                // Ilk alti kosumda "ucus calismiyor" denip pilota,
+                // termige ve durum makinesine bakildi. Tek bir eller
+                // serbest ucus bu turu ilk dakikada bitirirdi: kanat
+                // teorik oranini veriyorsa supheyi dogrudan pilota
+                // goturur. Bir olcum, olctugu seyi AKLAYABILMELIDIR.
+                var kontrol = new Sonuc { no = 0 };
+                yield return Uc(oyuncu, dizi, govde, 0f, kontrol,
+                                ellerSerbest: true);
+                sonuclar.Add(kontrol);
+
                 for (int i = 0; i < Deneme; i++)
                 {
                     // Baslangic yonu: kuleden yelpaze halinde bes yon,
                     // her yonde dort tekrar (turbulans ve faz farki).
-                    float yaw = -40f + (i % 5) * 20f;
+                    // BES DEGIL YIRMI AYRI UCUS.
+                    //
+                    // Once `yaw = -40 + (i % 5) * 20` idi: bes yon,
+                    // dort kez tekrar. Ama sahnede turbulans yok ve
+                    // `captureDeltaTime` sabit — tekrarlari
+                    // farklilastiracak HICBIR kaynak yoktu. Tablodaki
+                    // 15 satir bayt bayt kopyaydi ve arac bes orneklik
+                    // bir istatistigi yirmi diye rapor ediyordu.
+                    float yaw = -40f + i * (80f / (Deneme - 1));
                     var s = new Sonuc { no = i + 1 };
                     yield return Uc(oyuncu, dizi, govde, yaw, s);
                     sonuclar.Add(s);
                 }
 
                 Time.captureDeltaTime = eskiYakala;
+                if (kalabalik != null) kalabalik.enabled = kalabalikAcikti;
+                if (agac != null) agac.enabled = agacAcikti;
                 Yaz(sonuclar, alan);
             }
 
@@ -178,7 +221,8 @@ namespace Hezarfen.Editor.Diagnostics
             /// bir yerde sorulmalı.
             /// </summary>
             private IEnumerator Uc(GameObject oyuncu, UcusDizisi dizi,
-                                   Rigidbody govde, float yaw, Sonuc s)
+                                   Rigidbody govde, float yaw, Sonuc s,
+                                   bool ellerSerbest = false)
             {
                 var cc = oyuncu.GetComponent<CharacterController>();
                 var yurume = oyuncu.GetComponent<Hezarfen.Player.WalkController>();
@@ -224,12 +268,18 @@ namespace Hezarfen.Editor.Diagnostics
                 float t = 0f, enYuksek = bas.y;
                 var arazi = Terrain.activeTerrain;
 
-                while (t < 900f)
+                // 300 s TAVAN.
+                //
+                // 900 idi ve termik calisinca bir ucus tavana kadar
+                // donebiliyordu: 21 ucus x 900 s, saatler. 300 s,
+                // 12,4 m/s trim hiziyla ~3,7 km yol demek — gereken
+                // 3.336 m'nin ustunde, yani basarili bir ucusu kesmez.
+                while (t < 300f)
                 {
                     t += Time.deltaTime;
                     var p = oyuncu.transform.position;
                     enYuksek = Mathf.Max(enYuksek, p.y);
-                    Pilotla(oyuncu, govde, pilot);
+                    if (!ellerSerbest) Pilotla(oyuncu, govde, pilot);
 
                     // YERE DEGDI MI: arazi kotunun 1,5 m altina inen
                     // ucus bitmistir. Carpistirici degil KOT sorulur —
@@ -252,7 +302,7 @@ namespace Hezarfen.Editor.Diagnostics
                     new Vector2(son.x, son.z),
                     new Vector2(Dogancilar.x, Dogancilar.z));
                 s.vardi = s.hedefeUzak <= InisYaricapi;
-                if (t >= 900f) s.hata = "sure doldu";
+                if (t >= 300f) s.hata = "sure doldu";
 
                 // --- yurume fizigine don ---
                 govde.linearVelocity = Vector3.zero;
@@ -282,9 +332,21 @@ namespace Hezarfen.Editor.Diagnostics
                 var hedefYon = new Vector3(Dogancilar.x - p.x, 0f,
                                            Dogancilar.z - p.z).normalized;
 
-                // Tirmaniyor muyuz: dikey hiz pozitifse termiktesin,
-                // daire ciz ve yuksel.
-                bool tirmaniyor = govde.linearVelocity.y > 0.15f;
+                // TIRMANIS HAVA EKSENINDE OLCULUR.
+                //
+                // Once `govde.linearVelocity.y > 0.15f` deniyordu ve bu
+                // YER eksenli: sarmal dalistan cikarken dikey hiz
+                // +7,9 m/s'ye ciktigi icin pilot ortada hic kaldirac
+                // yokken "termikteyim" saniyor, 55 derece donuyor,
+                // tekrar daliyordu. Ucus 8. saniyeden sonra bir
+                // dal-zoom-don limit cevrimine giriyordu.
+                //
+                // Dogru soru: HAVA yukseliyor mu. Havanin kendi dikey
+                // hizini cikarinca fugoid salinimi termik sanilmaz.
+                float havaDikey = 0f;
+                var alan = Object.FindAnyObjectByType<WindField>();
+                if (alan != null) havaDikey = alan.Sample(p).y;
+                bool tirmaniyor = govde.linearVelocity.y - havaDikey > 0.15f;
 
                 // Yeterince yuksekse termikte oyalanma, yola cik.
                 float ground = 0f;
@@ -301,7 +363,23 @@ namespace Hezarfen.Editor.Diagnostics
                 float aci = Vector3.SignedAngle(oyuncu.transform.forward,
                                                 istenen, Vector3.up);
                 pilot.Pitch = tirmaniyor && !yeter ? 0.10f : 0f;
-                pilot.Roll = Mathf.Clamp(aci / 45f, -1f, 1f);
+
+                // YATIS KIRPILIR — SARMAL DALIS BURADAN BASLIYORDU.
+                //
+                // `Clamp(aci / 45f, -1, 1)` idi. Kalkis yonleri
+                // -40..+40, hedef 101 derecede: baslangic yon hatasi
+                // 62-142 derece, yani roll ILK KAREDE +-1'e doyuyor ve
+                // 55 derece yatis komut ediliyor.
+                //
+                // Olculdu: 22 derece yatista batis teorinin %14
+                // ustunde (kabul edilebilir), 33 derecede %78 ustunde,
+                // 55 derecede 4,2 KATI. Yani pilot her ucusu ilk
+                // karede sarmal dalisa sokuyordu.
+                //
+                // 120'ye bolmek ve 0,4'te kirpmak ~22 dereceyle
+                // sinirlar. Donus yaricapi 39 m; en iyi kaldirac
+                // bandi ~160 m genisliginde, rahat sigar.
+                pilot.Roll = Mathf.Clamp(aci / 120f, -0.4f, 0.4f);
             }
 
             private void Yaz(List<Sonuc> l, WindField alan)
