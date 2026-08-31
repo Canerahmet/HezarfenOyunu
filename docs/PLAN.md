@@ -87,7 +87,7 @@ listesinden alınan mantık, bizim coğrafyamıza uyarlanmış):
 **Kapı:** bina içinde ağaç **0** ✅ · yol ekseninin 4 m'sinde ağaç **0** ✅
 (1.671 ağaç elendi) · su kenarı yoğunluğu — **AÇIK**: Galata'nın kıyısı
 liman, kural doğal kıyı için ve semt niteleyicisi bekliyor · Galata karesi
-≤ 16,7 ms — ölçüm bekliyor · araç `AgacOznitelikDenetimi` ✅
+≤ 16,7 ms → **14,9 ms** ✅ (kalabalık dahil) · araç `AgacOznitelikDenetimi` ✅
 
 ---
 
@@ -112,7 +112,7 @@ dükkân üstü konut, konak, köşe evi, gayrimüslim varyantı.
 **Kapı:** varyant ≥ 150 → **201** ✅ · yan yana özdeş çift **0** ✅
 (en yakın komşusu aynı varyant olan ev: 0/2.651) · örnek başına ton
 değişimi ✅ (`EvTonu`) · kir/yaşlanma/prop katmanları **⬜** ·
-kare ≤ 16,7 ms — ölçüm bekliyor.
+kare ≤ 16,7 ms → **14,9 ms** ✅.
 
 ---
 

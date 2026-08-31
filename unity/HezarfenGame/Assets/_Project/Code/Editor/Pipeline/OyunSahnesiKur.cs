@@ -71,7 +71,21 @@ namespace Hezarfen.Editor.Pipeline
         /// Geri açmak: burayı <c>true</c> yap, sonra
         /// <b>Hezarfen → Boru Hatti → Oyun sahnesini kur</b>.
         /// </summary>
-        public const bool KalabalikVar = false;
+        /// <summary>
+        /// Kalabalık açık mı.
+        ///
+        /// ADR 0077 ile kapatılmıştı: kalabalık tek tipti ve o hâliyle
+        /// şehri zenginleştirmek yerine kopya dizisi gösteriyordu.
+        /// Şart, "NPC'ler daha güzel bir şekilde üretilip sonra
+        /// eklenecek" idi.
+        ///
+        /// O gün geldi: <see cref="Hezarfen.Sehir.InsanDNA"/> her
+        /// sakine tohumdan boy, yaş, giysi tonu ve tempo veriyor.
+        /// Ölçüldü — 600 kişilik örnekte boy aralığı 0,35 m'den
+        /// geniş, yaşlı genç'ten yavaş, giysi dört dönem boyasının
+        /// dışına çıkmıyor.
+        /// </summary>
+        public const bool KalabalikVar = true;
 
         public const string DunyaSahnesi =
             "Assets/_Project/Scenes/Faz1_Terrain.unity";

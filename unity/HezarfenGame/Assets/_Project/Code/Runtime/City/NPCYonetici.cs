@@ -430,8 +430,16 @@ namespace Hezarfen.Sehir
             foreach (var a in _sakinler)
             {
                 if (!a.gorunmeli) continue;
-                if (a.govde == null) a.govde = GovdeAl();
+                bool yeniGovde = a.govde == null;
+                if (yeniGovde) a.govde = GovdeAl();
                 if (a.govde == null) continue;
+                // DNA GOVDE DEGISTIGINDE UYGULANIR.
+                //
+                // Govde havuzdan geliyor, yani bir onceki sahibinin
+                // olcegini ve tonunu tasiyor. Her karede uygulamak
+                // israf, hic uygulamamak ise kalabaligi yine tek tip
+                // yapar — uygulama ani, govdenin el degistirdigi andir.
+                if (yeniGovde) DNAUygula(a);
 
                 // SAPMA: eksenin tam ustunde durmasinlar.
                 //
@@ -490,6 +498,51 @@ namespace Hezarfen.Sehir
             UretilenGovde++;
             return go.transform;
         }
+
+        /// <summary>
+        /// Ajanın DNA'sını gövdeye işler: ölçek, giysi tonu, adım hızı.
+        ///
+        /// Kalabalık kapatılmadan önce 40.000 sakin tek gövdeydi —
+        /// aynı boy, aynı renk, aynı tempo. Evlerde bu kusur ölçülüp
+        /// 26 varyanttan 201'e çıkarıldı; insanda hiç ele alınmamıştı.
+        /// Burada çözüm mesh çoğaltmak değil (insan yürür, deri
+        /// hesabı pahalıdır): <see cref="InsanDNA"/> tohumdan ölçek,
+        /// ton ve tempo türetir. `EvTonu` ile aynı fikir.
+        /// </summary>
+        private void DNAUygula(NPCAjan a)
+        {
+            var dna = InsanDNA.Uret(a.tohum);
+            a.govde.localScale = Vector3.one * dna.olcek;
+            a.yurumeHizi = dna.hiz;
+
+            if (_tonBlok == null) _tonBlok = new MaterialPropertyBlock();
+            foreach (var r in a.govde.GetComponentsInChildren<Renderer>(true))
+            {
+                var m = r.sharedMaterial;
+                if (m == null || !m.HasProperty(TonKimlik)) continue;
+                r.GetPropertyBlock(_tonBlok);
+                var taban = m.GetColor(TonKimlik);
+                // Ton bir CARPAN: dokunun kendi deseni korunur, yalniz
+                // rengi kayar. Dogrudan atamak butun giysiyi duz renge
+                // cevirirdi.
+                _tonBlok.SetColor(TonKimlik, taban * dna.ton * 1.6f);
+                r.SetPropertyBlock(_tonBlok);
+            }
+
+            var anim = a.govde.GetComponentInChildren<Animator>();
+            if (anim != null)
+            {
+                // Adim hizi boyla olceklenir: kisa adam ayni mesafeyi
+                // daha cok adimda alir.
+                anim.speed = dna.hiz / 1.42f / Mathf.Max(0.6f, dna.olcek);
+                // Faz kaymasi: herkes ayni ayakla yurumesin.
+                anim.Play(0, 0, dna.faz);
+            }
+        }
+
+        private MaterialPropertyBlock _tonBlok;
+        private static readonly int TonKimlik =
+            Shader.PropertyToID("_BaseColor");
 
         //: En yakin `govdeButcesi` kisiyi tutan max-yigin (kare basina
         //: yeniden ayrilmasin diye alan).
