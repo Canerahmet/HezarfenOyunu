@@ -248,6 +248,21 @@ namespace Hezarfen.Sehir
         /// </summary>
         public const float EnAzDurakArasi = 60f;
 
+        /// <summary>
+        /// Bir sonraki durağın <b>tercihen</b> bu kadar yakın olması
+        /// (m).
+        ///
+        /// Kuş uçuşu 400 m, gerçek yolda ölçülen orana (Galata'da
+        /// medyan 1,48) göre ~590 m yürüyüş — koşarak iki dakika.
+        /// Üç duraklı bir görev böylece 5-7 dakikada biter; bugün
+        /// ölçülen 28,2 dakikaydı.
+        ///
+        /// <b>Tercihen</b>, çünkü bu bant boş kalırsa üretici yine de
+        /// bir durak bulmalı. Bir kısıt üreteci boğarsa kusuru
+        /// düzeltmez, sistemi susturur.
+        /// </summary>
+        public const float UygunDurakUzakligi = 400f;
+
         private static int RastgeleAyniBilesende(
             SokakGrafi graf, int[] bilesen, int b, SokakGrafi.Tur tur,
             Vector3 yakininda, System.Random rng,
@@ -284,13 +299,36 @@ namespace Hezarfen.Sehir
             }
             if (adaylar.Count == 0) return -1;
 
-            // Yakindakileri yegle ama hep en yakini secme: ayni arketip
-            // hep ayni yeri kullanirsa varyasyon olmaz.
             adaylar.Sort((x, y) =>
                 (graf.dugumler[x].konum - yakininda).sqrMagnitude.CompareTo(
                 (graf.dugumler[y].konum - yakininda).sqrMagnitude));
-            int havuz = Mathf.Min(adaylar.Count, 8);
-            return adaylar[rng.Next(havuz)];
+
+            // HAVUZ SAYIYLA DEGIL MESAFEYLE KAPANIR.
+            //
+            // Once `Min(adaylar.Count, 8)` yaziliyordu ve gerekcesi
+            // "yakindakileri yegle" idi. Ama Galata bileseninde Han
+            // **1**, Iskele **1**, Firin 9 — yani aday sayisi 8'in
+            // altinda olan her tur icin bu kural HICBIR SEY yapmiyor,
+            // havuz butun kumeye esit oluyordu.
+            //
+            // Bedeli olculdu: gorev basina **3.724 m / 28,2 dakika**
+            // yuruyus, ve 20 gorevin 12'si ayni dugumden geciyordu.
+            // Oyunun tek tekrarlayan dongusu bir turda yarim saat
+            // suruyordu.
+            //
+            // Mesafe suzgeci once denenir: 45 m'den uzak, 400 m'den
+            // yakin. Bos donerse en yakin sekize duser — kisit
+            // ureteci BOGMAMALI, yalnizca yonlendirmeli.
+            var yakin = new List<int>();
+            foreach (int i in adaylar)
+            {
+                float d = (graf.dugumler[i].konum - yakininda).magnitude;
+                if (d > EnAzDurakArasi * 0.75f && d <= UygunDurakUzakligi)
+                    yakin.Add(i);
+            }
+            var havuzListe = yakin.Count > 0 ? yakin : adaylar;
+            int havuz = Mathf.Min(havuzListe.Count, 8);
+            return havuzListe[rng.Next(havuz)];
         }
 
         private static int[] BilesenEtiketleri(SokakGrafi graf)

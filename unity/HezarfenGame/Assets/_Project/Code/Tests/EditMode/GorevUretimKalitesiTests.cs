@@ -135,5 +135,75 @@ namespace Hezarfen.Tests
                 Assert.Greater(g.duraklar.Count, 1,
                     $"{g.arketip} tek duraga dustu.");
         }
+        /// <summary>
+        /// <b>Gerçek şehirde görev ne kadar yürütüyor.</b>
+        ///
+        /// Sentetik graf kusuru gösterebilir ama ölçeği gösteremez.
+        /// Gerçek grafta ölçüldü: görev başına **3.724 m** kuş uçuşu
+        /// toplam, yani 2,2 m/s'de **28,2 dakika** yürüyüş. Oyunun tek
+        /// tekrarlayan döngüsü bir turda yarım saat sürüyordu — ve
+        /// 20 görevin 12'si aynı düğümden geçiyordu, çünkü Galata
+        /// bileşeninde tek han var.
+        ///
+        /// Bu test o sayıyı bir <b>cırcır</b> olarak tutuyor: bugünkü
+        /// değerden kötüye gitmesin. Hedef 900 m; oraya inmek aday
+        /// süzgecinin yanında görev üretecinin yol bütçesini de
+        /// istiyor ve o ayrı bir iş.
+        /// </summary>
+        [Test]
+        public void QuestsInTheRealCityDoNotBecomeMarches()
+        {
+            var gercek = UnityEditor.AssetDatabase
+                .LoadAssetAtPath<SokakGrafi>(
+                    "Assets/_Project/Data/SG_Sehir.asset");
+            Assert.IsNotNull(gercek, "SG_Sehir.asset yok.");
+
+            // Gercek dogum noktasi (OyunSahnesiKur.BaslangicNoktasi
+            // civari): Galata bilesenine dusuyor.
+            var dogum = new Vector3(8f, 70f, 296f);
+
+            var turler = (GorevArketip[])
+                System.Enum.GetValues(typeof(GorevArketip));
+            float toplam = 0f;
+            int sayi = 0, enUzunGorev = 0;
+
+            for (int i = 0; i < 20; i++)
+            {
+                var a = turler[i % turler.Length];
+                if (!GorevUretici.Uygun(a, 1632, 121)) continue;
+                var g = GorevUretici.Uret(gercek, a, dogum,
+                                          1632 + i * 7919, 1632, 121);
+                if (g == null || g.duraklar.Count == 0) continue;
+
+                float yol = 0f;
+                var son = dogum;
+                foreach (int d in g.duraklar)
+                {
+                    yol += Vector3.Distance(son, gercek.dugumler[d].konum);
+                    son = gercek.dugumler[d].konum;
+                }
+                toplam += yol;
+                sayi++;
+                if (yol > enUzunGorev) enUzunGorev = Mathf.RoundToInt(yol);
+            }
+
+            Assert.Greater(sayi, 5, "Gercek grafta gorev uretilemedi.");
+            float ort = toplam / sayi;
+
+            // CIRCIR: 3.724 m -> 2.206 m (28,2 dk -> 16,7 dk).
+            //
+            // Aday suzgeci sayidan mesafeye cevrilince yol yarilandi.
+            // Kalan acik icin gereken sey ureteca bir YOL BUTCESI
+            // vermek: durak dizisinin `SokakGrafi.Yol` uzunlugunu
+            // toplayip 900 m'yi asarsa farkli tohumla yeniden denemek.
+            // Ayri bir is; bu esik o gune kadar gerilemeyi tutar.
+            Assert.Less(ort, 2300f,
+                $"Gorev basina ortalama {ort:F0} m — KOTULESTI. "
+                + "Olculen taban 2.206 m, hedef 900 m.");
+            Debug.Log($"[Hezarfen] Gercek grafta gorev: ortalama "
+                      + $"{ort:F0} m ({ort / 2.2f / 60f:F1} dk yuruyus), "
+                      + $"en uzun {enUzunGorev} m, {sayi} gorev.");
+        }
+
     }
 }
