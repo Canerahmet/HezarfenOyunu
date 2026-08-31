@@ -34,7 +34,18 @@ namespace Hezarfen.Sehir
         public float duyulmaMesafesi = 12f;
 
         [Tooltip("Aynı anda en çok kaç replik görünsün.")]
-        [Range(1, 12)] public int ayniAndaEnCok = 4;
+        //: DORT COKTU. IKI.
+        //
+        // Karelerde ayni anda ALTI replik sayildi (dordu sinir olsa da:
+        // ayrisma suzgeci elenenleri listeden cikariyor ama liste zaten
+        // dolmus oluyordu). Sonuc `isik_gunbatimi.png`'de goruldu —
+        // ekranin yarisi dev punto dunya yazisi, ust uste binmis,
+        // duvarin icinden gecmis, hicbiri okunmuyor.
+        //
+        // Bir kalabaligin canli duyulmasi icin herkesin ayni anda
+        // konusmasi gerekmiyor; tersine, herkes konusursa kimse
+        // duyulmaz. Iki replik bir sokak sesidir, alti bir gurultudur.
+        [Range(1, 12)] public int ayniAndaEnCok = 2;
 
         [Tooltip("Yazının başın üstündeki yüksekliği (m).")]
         public float yukseklik = 1.95f;
@@ -181,6 +192,11 @@ namespace Hezarfen.Sehir
                 var t = Etiket(i);
                 var a = _adaylar[i].ajan;
                 t.text = a.replik.metin;
+                // Golge yaziyi izler: metin degisince ikisi birlikte
+                // degismeli, yoksa kontur bir onceki repligi gosterir.
+                var g = t.transform.childCount > 0
+                    ? t.transform.GetChild(0).GetComponent<TextMesh>() : null;
+                if (g != null) g.text = t.text;
                 t.transform.position = a.konum + Vector3.up * yukseklik;
                 if (_kamera != null)
                 {
@@ -226,6 +242,30 @@ namespace Hezarfen.Sehir
                 tm.anchor = TextAnchor.LowerCenter;
                 tm.alignment = TextAlignment.Center;
                 tm.color = new Color(1f, 0.96f, 0.86f, 1f);
+
+                // KONTUR: BEYAZ YAZI BEYAZ SIVANIN USTUNDE OKUNMUYOR.
+                //
+                // Tek renk bir yazi, arka plani ne olursa olsun ayni
+                // parlaklikta ciziliyordu. `isik_ogle.png`'de "Bre
+                // ignelikci geldi!" acik siva uzerinde eriyip gidiyor,
+                // `isik_gunbatimi.png`'de turuncu gokyuzunde kayboluyor.
+                //
+                // Cozum ayri bir sader: aynı yazidan koyu bir kopya,
+                // birkaç santim geride. Kamera yaziya bakiyor, yani
+                // "geride" kameradan uzakta demek — koyu kopya her
+                // acidan yazinin arkasinda kalir ve bir kontur gibi
+                // okunur. TextMesh'in kendi kontur destegi yok ve
+                // TMP'ye gecmek ayri bir is (HUD'un tamami IMGUI).
+                var golgeGo = new GameObject("golge");
+                golgeGo.transform.SetParent(go.transform, false);
+                golgeGo.transform.localPosition = new Vector3(0f, 0f, 0.03f);
+                var golge = golgeGo.AddComponent<TextMesh>();
+                golge.characterSize = tm.characterSize;
+                golge.fontSize = tm.fontSize;
+                golge.anchor = tm.anchor;
+                golge.alignment = tm.alignment;
+                golge.color = new Color(0f, 0f, 0f, 0.85f);
+
                 _havuz.Add(tm);
             }
             return _havuz[i];

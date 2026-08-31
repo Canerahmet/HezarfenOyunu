@@ -135,10 +135,26 @@ namespace Hezarfen.Arayuz
                 case AranmaSistemi.Durum.Yakalandi:
                     Bildir("Yakalandın"); break;
             }
-            if (_oyuncuT == null)
+        }
+
+        /// <summary>
+        /// Oyuncunun gövdesi — ilk sorulduğunda bulunur.
+        ///
+        /// Önce yalnız <c>AranmaDurumu</c> olayında atanıyordu; yani
+        /// görev pusulası (<see cref="YonAdi"/>) ases seni <b>fark
+        /// edene kadar</b> "—" gösteriyordu. Oyuncunun ilk görevi,
+        /// suçsuzken, yönsüzdü.
+        /// </summary>
+        private Transform OyuncuT
+        {
+            get
             {
-                var go = GameObject.Find("OYUNCU");
-                if (go != null) _oyuncuT = go.transform;
+                if (_oyuncuT == null)
+                {
+                    var go = GameObject.Find("OYUNCU");
+                    if (go != null) _oyuncuT = go.transform;
+                }
+                return _oyuncuT;
             }
         }
 
@@ -252,8 +268,9 @@ namespace Hezarfen.Arayuz
         /// </summary>
         private string YonAdi(Vector3? hedef)
         {
-            if (hedef == null || _oyuncuT == null) return "—";
-            var d = hedef.Value - _oyuncuT.position;
+            var oy = OyuncuT;
+            if (hedef == null || oy == null) return "—";
+            var d = hedef.Value - oy.position;
             float aci = Mathf.Atan2(d.x, d.z) * Mathf.Rad2Deg;
             if (aci < 0f) aci += 360f;
             string[] ad = { "kuzey", "kuzeydoğu", "doğu", "güneydoğu",
@@ -431,6 +448,13 @@ namespace Hezarfen.Arayuz
                           "ESC duraklat · E al · G kanat · V bakış · Shift koş" + "\n"
                           + "F5 kaydet · F9 yükle",
                           _yazi);
+                // OLCEK GERI VERILIR.
+                //
+                // Bu erken donus `GUI.matrix`i olcekli birakiyordu ve
+                // ayni karede cizen her OnGUI (Editor teshis
+                // pencereleri, FlightHud) yanlis olcekte ciziyordu.
+                // Bir kaynak alindiysa erken donuste de birakilir.
+                GUI.matrix = eskiMatris;
                 return;
             }
 

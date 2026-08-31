@@ -391,7 +391,18 @@ namespace Hezarfen.Editor.Gis
                 }
         }
 
-        private static SokakGrafi.Tur TuruBul(string ad)
+        /// <summary>
+        /// Bu adı taşıyan nesne şehir grafında hangi türdür.
+        ///
+        /// <b>Public, çünkü bir tanımın tek sahibi olmalı.</b> Oyun
+        /// sahnesi kurulurken iskeleler ayrı bir yerde
+        /// <c>StartsWith("PF_Iskele")</c> ile aranıyordu ve
+        /// <c>PF_UskudarIskelesi</c> o öneğe uymuyordu: Üsküdar'ın 329
+        /// düğümüne kayıkla varılıyor ama geri dönülemiyordu — oyuncu
+        /// için tek yönlü bir kapan. Graf onu doğru tanıyordu; sahne
+        /// kurulumu kendi ikinci tanımını yazmıştı.
+        /// </summary>
+        public static SokakGrafi.Tur TuruBul(string ad)
         {
             // UZUN onek once: "PF_UskudarIskelesi" hem "PF_Iskele"ye hem
             // kendisine uyuyor gibi gorunebilir; siralamak yerine en uzun

@@ -131,7 +131,17 @@ namespace Hezarfen.Sehir
             var turler = Duraklar(arketip);
             if (turler == null) return null;
 
-            var bilesen = BilesenEtiketleri(graf);
+            // KAYIK GOREVI KAYIGI KULLANABILIR.
+            //
+            // Bilesen etiketleri `kayikVar: false` ile cikariliyordu —
+            // yani "yalniz yuruyerek erisilebilen" kumeler. Bu dogru
+            // varsayilan, ama `KayikYolcu` icin yanlisti: "karsiya
+            // yolcu gotur" gorevi, tanimi geregi kayik kenarini
+            // gecmelidir. Ayni yuruyus bileseninde iki iskele
+            // arayinca Galata'daki TEK iskeleyi buluyor ve gorev
+            // ya uretilemiyor ya da karsiya hic gitmiyordu.
+            var bilesen = BilesenEtiketleri(
+                graf, arketip == GorevArketip.KayikYolcu);
             int bas = graf.EnYakin(yakininda);
             if (bas < 0) return null;
             int b = bilesen[bas];
@@ -196,8 +206,21 @@ namespace Hezarfen.Sehir
         {
             // Iskeleden yuku al, carsiya goturr — Halic'te kopru yok,
             // yuk boyle akar.
+            //
+            // HAN ARADAN CIKTI (ADR 0085). Olculdu: bu arketip dogum
+            // noktasindan **2.731 m** uretiyordu ve bu yuzden hic
+            // secilmiyordu — 20 gorevin 20'si `Kayip` cikmisti.
+            // Sebep grafta: Galata'nin yuruyus bileseninde TEK han var.
+            //
+            // Ve bu bir dunya kusuru DEGIL. RESEARCH §Yapi envanteri
+            // 1632'de buyuk hanlarin yoklugunu acikca kayda geciyor
+            // (Buyuk Yeni Han ~1761, Buyuk Valide Han tartismali).
+            // Yani han kitligi tarihsel olarak DOGRU; uyarlanacak olan
+            // gorev, dunya degil. Iddia zaten "yuk sudan gelir,
+            // carsiya gider" — ve o iddia hansiz da ayakta.
             GorevArketip.Teslimat => new[]
-            { SokakGrafi.Tur.Iskele, SokakGrafi.Tur.Han, SokakGrafi.Tur.Dukkan },
+            { SokakGrafi.Tur.Iskele, SokakGrafi.Tur.Dukkan,
+              SokakGrafi.Tur.Dukkan },
 
             // Yolcuyu iskeleden al, obur iskeleye birak.
             GorevArketip.KayikYolcu => new[]
@@ -213,8 +236,15 @@ namespace Hezarfen.Sehir
             { SokakGrafi.Tur.Han, SokakGrafi.Tur.Ev },
 
             // Esnaf tedariki: firindan dukkana, degirmenden firina.
+            //
+            // YORUM ILE KOD AYRI SEY SOYLUYORDU. Yorum "firindan
+            // dukkana" diyor, kod ilk durak olarak **Han** istiyordu —
+            // ve han Galata'da bir tane. Olculen sonuc 1.985 m'ydi,
+            // yani arketip hic secilmiyordu. Kodu kendi yazili
+            // niyetine getirmek, hem daha kisa hem daha dogru.
             GorevArketip.Tedarik => new[]
-            { SokakGrafi.Tur.Han, SokakGrafi.Tur.Firin, SokakGrafi.Tur.Dukkan },
+            { SokakGrafi.Tur.Dukkan, SokakGrafi.Tur.Firin,
+              SokakGrafi.Tur.Dukkan },
 
             _ => null,
         };
@@ -383,9 +413,40 @@ namespace Hezarfen.Sehir
             return havuzListe[rng.Next(havuz)];
         }
 
-        private static int[] BilesenEtiketleri(SokakGrafi graf)
+        /// <summary>Son hesaplanan bileşen etiketleri (graf, kayık) → dizi.</summary>
+        private static SokakGrafi _onbellekGraf;
+        private static int _onbellekDugum = -1;
+        private static readonly int[][] _onbellek = new int[2][];
+
+        /// <summary>
+        /// Grafın yürüme (ya da kayıklı) bağlantı bileşenleri.
+        ///
+        /// <b>Önbellekli, çünkü ölçüldü.</b> Görev üretimi uygun her
+        /// arketip için bir kez çağırıyor ve her çağrı grafın
+        /// <b>1.541 düğümü</b> için ayrı bir <c>List&lt;int&gt;</c>
+        /// ayırıyordu — görev başına dört arketip = 6.164 liste, hepsi
+        /// aynı cevabı veriyor. Bu, görev bittiği karede bir çöp
+        /// fırtınası demekti; yani oyuncunun bir işi <b>bitirdiği</b>
+        /// an takılıyordu.
+        ///
+        /// Graf çalışma zamanında değişmez. Değişirse (düğüm sayısı
+        /// başka) önbellek kendini atar — bir önbellek, geçersiz
+        /// olduğunu anlayamıyorsa önbellek değil hatadır.
+        /// </summary>
+        private static int[] BilesenEtiketleri(SokakGrafi graf,
+                                               bool kayikVar = false)
         {
-            var kom = graf.Komsuluk(kayikVar: false);
+            int k = kayikVar ? 1 : 0;
+            if (!ReferenceEquals(_onbellekGraf, graf)
+                || _onbellekDugum != graf.dugumler.Count)
+            {
+                _onbellekGraf = graf;
+                _onbellekDugum = graf.dugumler.Count;
+                _onbellek[0] = null; _onbellek[1] = null;
+            }
+            if (_onbellek[k] != null) return _onbellek[k];
+
+            var kom = graf.Komsuluk(kayikVar);
             var etiket = new int[graf.dugumler.Count];
             for (int i = 0; i < etiket.Length; i++) etiket[i] = -1;
             int c = 0;
@@ -402,6 +463,7 @@ namespace Hezarfen.Sehir
                 }
                 c++;
             }
+            _onbellek[k] = etiket;
             return etiket;
         }
     }

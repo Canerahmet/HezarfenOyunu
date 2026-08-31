@@ -51,6 +51,17 @@ namespace Hezarfen.Sehir
 
         /// <summary>Karşıya geçilebilecek iskeleler.</summary>
         private readonly List<int> _karsilar = new();
+
+        /// <summary>
+        /// Karşı iskelelerin okunur adları — <see cref="Kur"/>'da bir kez.
+        ///
+        /// <see cref="Ipucu"/> her karede okunuyor (HUD çizerken) ve
+        /// <see cref="YerAdi"/> grafın <b>1.541 düğümünün tamamını</b>
+        /// tarıyordu. Doğru cevabı hesaplıyordu; yalnızca saniyede altmış
+        /// kez, hiç değişmeyen bir şey için. Bir ad, iskele taşınmadıkça
+        /// değişmez — bu yüzden kurulumda bir kez sorulur.
+        /// </summary>
+        private readonly List<string> _adlar = new();
         private int _secili;
 
         private void Awake() => Kur();
@@ -88,6 +99,9 @@ namespace Hezarfen.Sehir
                 if (k.a == Dugum && !_karsilar.Contains(k.b)) _karsilar.Add(k.b);
                 else if (k.b == Dugum && !_karsilar.Contains(k.a)) _karsilar.Add(k.a);
             }
+
+            _adlar.Clear();
+            foreach (int h in _karsilar) _adlar.Add(YerAdi(h));
         }
 
         /// <summary>Şu an geçilecek iskele; yoksa −1.</summary>
@@ -120,7 +134,9 @@ namespace Hezarfen.Sehir
                 int h = Hedef;
                 if (h < 0) return "";
                 if (Gece) return "Kayık gece işlemez";
-                return $"{YerAdi(h)}'ya geç · {Ucret} akçe";
+                int i = Mathf.Abs(_secili) % _karsilar.Count;
+                string ad = i < _adlar.Count ? _adlar[i] : YerAdi(h);
+                return $"{ad}'ya geç · {Ucret} akçe";
             }
         }
 
@@ -222,10 +238,38 @@ namespace Hezarfen.Sehir
             if (acikti) cc.enabled = false;
 
             var kok = cc != null ? cc.transform : aktor.transform;
-            kok.position = varis + Vector3.up * 0.2f;
+            kok.position = Iner(varis);
 
             if (acikti) cc.enabled = true;
             return true;
+        }
+
+        /// <summary>
+        /// Karşı iskelede ayağın basacağı nokta.
+        ///
+        /// ## Neden düğümün konumu yetmiyor
+        ///
+        /// Graf düğümleri <b>y = 0</b>'da duruyor (deniz seviyesi), ama
+        /// iskele bir <b>tahta platform</b>: <c>PF_Iskele</c>'nin güvertesi
+        /// 1,60 m yukarıda. Düğüme ışınlanmak oyuncuyu güvertenin 1,4 m
+        /// <b>altına</b>, denizin içine bırakıyordu — ve karakter
+        /// denetleyicisi oradan yukarı çıkamıyor, çünkü tahta tavan
+        /// oluyor. Yani geçiş çalışıyor, varış çalışmıyordu.
+        ///
+        /// Doğru nokta hesaplanmaz, <b>sorulur</b>: yukarıdan aşağı bir
+        /// ışın iskelenin üstünü bulur. Bulamazsa (iskele kaldırılmışsa)
+        /// eski davranışa döner — bir ölçüm başarısız olduğunda oyunu
+        /// kilitlemek yerine bilinen hâle düşmek.
+        /// </summary>
+        private static Vector3 Iner(Vector3 dugum)
+        {
+            const float Yukari = 6f;     // guvertenin (1,6 m) uzerinden
+            const float Menzil = 10f;
+            var basla = dugum + Vector3.up * Yukari;
+            if (Physics.Raycast(basla, Vector3.down, out var v, Menzil, ~0,
+                                QueryTriggerInteraction.Ignore))
+                return v.point + Vector3.up * 0.15f;
+            return dugum + Vector3.up * 0.2f;
         }
     }
 }

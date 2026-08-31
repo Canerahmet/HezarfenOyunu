@@ -116,6 +116,14 @@ namespace Hezarfen.Player
 
         private void Update()
         {
+            // DURAKLATILMISKEN KANAT TAKILMAZ.
+            //
+            // `WalkController` bu dersi zaten yaziyordu ama uçuş
+            // dizisi onu paylasmiyordu: menü açıkken G'ye basmak
+            // kanadı kuşandırıyor, hatta kuleden atlatıyordu —
+            // duraklatılmış bir oyunda oyuncu düşmeye başlıyordu.
+            if (Time.timeScale == 0f) return;
+
             switch (Simdiki)
             {
                 case Durum.Yerde:

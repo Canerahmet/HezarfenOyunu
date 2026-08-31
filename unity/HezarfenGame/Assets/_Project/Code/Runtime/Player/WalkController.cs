@@ -323,11 +323,14 @@ namespace Hezarfen.Player
                 x = (kb.dKey.isPressed ? 1f : 0f) - (kb.aKey.isPressed ? 1f : 0f);
                 z = (kb.wKey.isPressed ? 1f : 0f) - (kb.sKey.isPressed ? 1f : 0f);
             }
+            // Cubugun kendi itilme miktari AYRI tutulur: klavyeyle
+            // toplanmis hali kosma esigi icin kullanilamaz (asagida).
+            float kolItme = 0f;
             if (kol != null)
             {
                 var sol = kol.leftStick.ReadValue();
                 if (sol.sqrMagnitude > KolOluBolge * KolOluBolge)
-                { x += sol.x; z += sol.y; }
+                { x += sol.x; z += sol.y; kolItme = sol.magnitude; }
             }
             var wish = transform.right * x + transform.forward * z;
             if (wish.sqrMagnitude > 1f) wish.Normalize();
@@ -337,9 +340,17 @@ namespace Hezarfen.Player
             // Klavye ikili: yuru ya da kos, arada hicbir sey yok. Kol
             // analog ve bu bedava bir kazanc — cubuk yarim itilirse
             // yuruyus, sonuna kadar itilirse kosu. Shift yine calisir.
+            // ...AMA CUBUGUN ITILMESI, CUBUKTAN OKUNUR.
+            //
+            // Once `itme` BIRLESIK yondan (x, z) hesaplaniyordu ve
+            // klavye o yone tam 1,0 katiyor. Sonuc: **kol takiliyken
+            // W'ye basmak kosmak oluyordu** — cubuk hic dokunulmamis
+            // olsa bile, cunku 1,0 > 0,85. Oyuncunun yurume hakki bir
+            // aygitin varligiyla elinden aliniyordu.
+            //
+            // Analog esik yalnizca analog girdinin sorusudur.
             bool kosuTusu = kb != null && kb.leftShiftKey.isPressed;
-            float itme = new Vector2(x, z).magnitude;
-            bool kolKosu = kol != null && itme > 0.85f;
+            bool kolKosu = kolItme > 0.85f;
             float speed = (kosuTusu || kolKosu) ? runSpeed : walkSpeed;
 
             if (flying)

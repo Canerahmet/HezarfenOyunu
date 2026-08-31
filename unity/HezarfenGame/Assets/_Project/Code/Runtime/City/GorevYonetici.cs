@@ -125,6 +125,20 @@ namespace Hezarfen.Sehir
         /// arasından seçilir: kaçakçılık 1633 Eylül'ünden önce yoktur
         /// ve olmayan bir görevi üretmeye çalışmak <c>null</c> döner.
         /// </summary>
+        /// <summary>
+        /// Bir görevin kabul edilebilir en uzun kuş uçuşu yolu (m).
+        ///
+        /// 1.200 m ≈ gerçek yolda 1.780 m ≈ 2,2 m/s'de <b>13,5 dakika
+        /// yürüyüş, koşarak yaklaşık 5</b>. Ölçülen üç hâl:
+        /// 3.724 m (28,2 dk, hiçbir kısıt yok) → 882 m (6,7 dk, hep en
+        /// yakını — ve 20/20 aynı görev) → bu.
+        ///
+        /// Sayı bir uzlaşma ve öyle olduğu yazılsın: en kısa turu değil,
+        /// <b>her turu farklı ve hâlâ makul</b> olanı seçiyor. Tek tip
+        /// 6,7 dakikalık bir tur, çeşitli 9 dakikalıktan kötüdür.
+        /// </summary>
+        public const float YuruyusTavani = 1200f;
+
         public void YeniGorev()
         {
             Simdiki = null;
@@ -155,8 +169,20 @@ namespace Hezarfen.Sehir
             // Galata'da bol, `Teslimat` seyrek — ve oyuncu yakindakini
             // aliyor. Uzak arketipler kaybolmuyor, sirasi geldiginde
             // ve yakininda karsiligi oldugunda cikiyor.
+            // ...VE SONRA BU OLCULDU: 20 gorevin 20'si `Kayip` cikti.
+            //
+            // "En yakini ver" kurali yuruyusu 3.724 m'den 882 m'ye
+            // indirdi ve **cesitliligi sifirladi**. Cunku en yakin
+            // olan hep aynidir: Galata'da 130 mescit ve 272 cesme var,
+            // 1 han ve 1 iskele. Bir siralama kuralinin birincisi
+            // degismiyorsa o kural bir secim degil bir sabittir.
+            //
+            // Ucuncu hal: **siraya gore don, ama tavani asani atla.**
+            // Rotasyon cesitliligi, tavan yuruyusu tutar. Hicbiri
+            // tavani tutmuyorsa en kisasi verilir — bir kisit oyunu
+            // gorevsiz birakmamali.
             var hepsi = (GorevArketip[])Enum.GetValues(typeof(GorevArketip));
-            Gorev enIyi = null;
+            Gorev enIyi = null, siradaki = null;
             float enIyiYol = float.MaxValue;
 
             for (int i = 0; i < hepsi.Length; i++)
@@ -168,10 +194,13 @@ namespace Hezarfen.Sehir
                 if (g == null || g.duraklar.Count == 0) continue;
 
                 float yol = Yol(g);
+                if (siradaki == null && yol <= YuruyusTavani) siradaki = g;
                 if (yol >= enIyiYol) continue;
                 enIyi = g;
                 enIyiYol = yol;
             }
+
+            if (siradaki != null) enIyi = siradaki;
 
             if (enIyi != null)
             {

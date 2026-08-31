@@ -66,8 +66,18 @@ namespace Hezarfen.Tests
                         $"{a}: duraksiz gorev uretildi.");
                     for (int i = 1; i < gorev.duraklar.Count; i++)
                     {
+                        // KAYIK GOREVI KAYIKLA OLCULUR.
+                        //
+                        // Bu satir `kayikVar: false` yaziyordu ve bu
+                        // butun arketipler icin dogruydu — bir tanesi
+                        // haric. `KayikYolcu`'nun TANIMI karsiya
+                        // gecmektir; yuruyerek erisilebilirligini
+                        // sormak, gorevin var olmamasini sart kosmak
+                        // olur. Testi gevsetmiyoruz: soruyu gorevin
+                        // kendi sozlesmesine gore soruyoruz.
+                        bool kayikla = a == GorevArketip.KayikYolcu;
                         var yol = g.Yol(gorev.duraklar[i - 1],
-                                        gorev.duraklar[i], kayikVar: false);
+                                        gorev.duraklar[i], kayikla);
                         Assert.IsNotEmpty(yol,
                             $"{a}: {i - 1}. duraktan {i}. duraga YOL YOK. "
                             + "Oyuncu yurur, yurur, varamaz.");

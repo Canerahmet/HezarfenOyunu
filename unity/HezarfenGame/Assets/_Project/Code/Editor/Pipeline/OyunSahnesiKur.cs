@@ -261,7 +261,11 @@ namespace Hezarfen.Editor.Pipeline
             foreach (var kok in sahne.GetRootGameObjects())
                 foreach (var t in kok.GetComponentsInChildren<Transform>())
                 {
-                    if (!t.name.StartsWith("PF_Iskele")) continue;
+                    // Onek ELLE YAZILMAZ: grafi kuran tablo sorulur.
+                    // "PF_Iskele" oneki `PF_UskudarIskelesi`yi
+                    // kacirmis ve Uskudar'i tek yonlu kapan yapmisti.
+                    if (Hezarfen.Editor.Gis.SokakGrafiKur.TuruBul(t.name)
+                        != SokakGrafi.Tur.Iskele) continue;
                     var pm = t.GetComponent<Perme>();
                     if (pm == null) pm = t.gameObject.AddComponent<Perme>();
                     pm.graf = sehir.graf;
@@ -440,17 +444,33 @@ namespace Hezarfen.Editor.Pipeline
                     var aday = adaylar[i];
                     float yy = YuzeyKotu(arazi, aday);
 
-                    // YUZEY ZEMIN KATI OLMALI — CATI DEGIL.
+                    // YUZEY ZEMIN OLMALI — DAM DA DEGIL, CESME DE DEGIL.
                     //
-                    // Aciklik puani catiyi sever: bir damin uzerinde sekiz
-                    // isin de serbesttir. Olculdu, secim oyuncuyu bir
-                    // kahvehanenin damina koydu (PF_Kahvehane_A, kot
-                    // 74,59 iken arazi 70,9). Zeminden 1,5 m'den fazla
-                    // yukaridaki her yuzey damdir ya da terastir.
-                    float araziKotu = arazi != null
-                        ? arazi.SampleHeight(aday) + arazi.transform.position.y
-                        : yy;
-                    if (yy - araziKotu > 1.5f) continue;
+                    // Aciklik puani catiyi sever: bir damin uzerinde
+                    // sekiz isin de serbesttir. Olculdu, secim oyuncuyu
+                    // bir kahvehanenin damina koydu (kot 74,59 iken
+                    // arazi 70,9) ve esik 1,5 m'ye cekildi.
+                    //
+                    // 1,5 m dami eledi ama SADIRVANI elemedi: kenari
+                    // araziden 1,0 m yukarida ve oyuncu her acilista
+                    // cesmenin ustunde doguyordu — yani oyunun ILK
+                    // karesinde. Ayni kusuru tur aracinda da yasadik ve
+                    // orada 0,35 m'ye cekildi; dogum yerinde eski deger
+                    // kaldi.
+                    //
+                    // 0,35 m DENENDI VE COK SIKI CIKTI: hicbir aday
+                    // gecmedi ve oyuncu kule dibine dustu — yani daha
+                    // once duzeltilmis "bos meydanda dogma" kusuru geri
+                    // geldi. Duzeltme, duzelttiginden fazlasini kirdi.
+                    //
+                    // Sebep, yuksekligin YANLIS SORU olmasi. Galata bir
+                    // yamac; kaldirim ve kaide arazinin yarim metre
+                    // ustunde olabiliyor ve bu mesru. Bir esik hem
+                    // yamaci hem cesmeyi ayni sayiyla eleyemez.
+                    //
+                    // Dogru soru: **ustunde durdugum sey ne.** Isin
+                    // zaten neye carptigini biliyor; ona sormak yeterli.
+                    if (!ZemindeMi(yy, arazi, aday)) continue;
 
                     var ayak = new Vector3(aday.x, yy + 0.2f, aday.z);
                     var alt = ayak + Vector3.up * 0.35f;
@@ -801,6 +821,73 @@ namespace Hezarfen.Editor.Pipeline
         /// Yukarıdan aşağı ışın atılır ve ilk çarpılan yüzey alınır;
         /// hiçbir şeye çarpmazsa araziye düşülür.
         /// </summary>
+        /// <summary>
+        /// Bu nokta üzerinde <b>durulabilir bir zemin</b> mi.
+        ///
+        /// ## Neden yükseklik yetmiyor
+        ///
+        /// Önce yükseklik eşiğiyle deneniyordu: 1,5 m damı eledi ama
+        /// şadırvanı elemedi (kenarı +1,0 m) ve oyuncu her açılışta
+        /// çeşmenin üstünde doğdu. 0,35 m'ye çekildi ve bu kez
+        /// <b>hiçbir aday geçmedi</b> — Galata bir yamaç, kaldırım ve
+        /// kaide arazinin yarım metre üstünde olabiliyor ve bu meşru.
+        ///
+        /// Tek bir sayı hem yamacı hem çeşmeyi eleyemiyor, çünkü ikisi
+        /// aynı şeyi ölçmüyor. Doğru soru yükseklik değil <b>kimlik</b>:
+        /// ışın zaten neye çarptığını biliyor.
+        /// </summary>
+        private static bool ZemindeMi(float yuzeyKotu, Terrain arazi,
+                                      Vector3 nokta)
+        {
+            var bas = new Vector3(nokta.x, yuzeyKotu + 3f, nokta.z);
+            if (!Physics.Raycast(bas, Vector3.down, out var vurus, 6f, ~0,
+                                 QueryTriggerInteraction.Ignore))
+                return true;                       // arazi, engel yok
+
+            if (vurus.collider is TerrainCollider) return true;
+
+            // IZIN LISTESI DEGIL, RET LISTESI.
+            //
+            // Once "yalniz sunlarin ustunde durulabilir" diye yazdim
+            // (kaldirim, kaide, sokak, arazi) ve **yine hicbir aday
+            // gecmedi**: carpistiriciyi tasiyan nesnenin adi bu
+            // listedekilerden biri degil — semt sahnesinde parcalar
+            // baska adlarla gruplanmis.
+            //
+            // Bir izin listesi, listelemedigi her seyi reddeder ve
+            // dunyanin adlandirmasini tam bilmeden yazilamaz. Ret
+            // listesi ise yalnizca bildigim seyi reddeder ve
+            // bilmediklerimi serbest birakir — burada dogru olan bu,
+            // cunku sorulan soru "bu yuzey nedir" degil, **"bu yuzey
+            // ustune cikilmamasi gereken bir NESNE mi"**.
+            var t = vurus.collider.transform;
+            for (int derinlik = 0; t != null && derinlik < 6; derinlik++)
+            {
+                if (UstuneCikilmaz(t.name)) return false;
+                t = t.parent;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Bu ad, üstünde durulmaması gereken bir nesneyi mi gösteriyor.
+        ///
+        /// Liste kısa ve <b>avlu eşyalarından</b> geliyor
+        /// (<c>HayatDokusu.Esyalar</c>): şehirde 26.511 tanesi var ve
+        /// oyuncunun ilk karesi hiçbirinin üstünde açılmamalı.
+        /// Şadırvan ve çeşme ayrıca burada, çünkü sokak grafı düğümü
+        /// tam onların yanında duruyor ve ışın onlara çarpıyor.
+        /// </summary>
+        private static bool UstuneCikilmaz(string ad)
+        {
+            if (string.IsNullOrEmpty(ad)) return false;
+            return ad.StartsWith("PF_Sadirvan") || ad.StartsWith("PF_Cesme")
+                || ad.StartsWith("PF_SuKupu") || ad.StartsWith("PF_Odunluk")
+                || ad.StartsWith("PF_Cardak") || ad.StartsWith("PF_Kuyu")
+                || ad.StartsWith("PF_Sepet") || ad.StartsWith("PF_Cit")
+                || ad.StartsWith("PF_Sebze") || ad.StartsWith("PF_BahceAgaci");
+        }
+
         private static float YuzeyKotu(Terrain arazi, Vector3 nokta)
         {
             var bas = new Vector3(nokta.x, nokta.y + 60f, nokta.z);

@@ -243,10 +243,12 @@ namespace Hezarfen.Tests
 
             float toplam = 0f;
             int n = 0;
-            for (int i = 0; i < 10; i++)
+            var gorulen = new System.Collections.Generic.HashSet<GorevArketip>();
+            for (int i = 0; i < 20; i++)
             {
                 y.YeniGorev();
                 if (y.Simdiki == null) continue;
+                gorulen.Add(y.Simdiki.arketip);
                 float yol = 0f;
                 var son = oyuncuGo.transform.position;
                 foreach (int d in y.Simdiki.duraklar)
@@ -274,8 +276,62 @@ namespace Hezarfen.Tests
             // Galata'da tek han var; `Teslimat` her seferinde sehrin
             // obur ucuna gonderiyordu. Ureteci akillandirmak bunu
             // cozemezdi — hangi isin verilecegini secmek cozdu.
-            Assert.Less(ort, 900f,
-                $"Yonetici ortalama {ort:F0} m veriyor, kapi 900 m.");
+            Debug.Log($"[Hezarfen] Gorev cesitliligi: {gorulen.Count} "
+                      + $"farkli arketip ({string.Join(", ", gorulen)}).");
+
+            // NEDEN AZ CESIT: her arketip TEK BASINA ne kadar uzak.
+            //
+            // Cesitlilik seciciyle degil COGRAFYAYLA sinirli olabilir:
+            // bir arketip yakinda karsiligi olmadigi icin hic
+            // secilmiyorsa, duzeltilecek yer secici degil dunyadir.
+            // Bu blok hangisi oldugunu soyler.
+            foreach (GorevArketip a in System.Enum.GetValues(
+                         typeof(GorevArketip)))
+            {
+                var g = GorevUretici.Uret(gercek, a,
+                    oyuncuGo.transform.position, 4242, 1634, 250);
+                if (g == null || g.duraklar.Count == 0)
+                { Debug.Log($"[Hezarfen]   {a}: URETILEMEDI"); continue; }
+                float yl = 0f;
+                var s0 = oyuncuGo.transform.position;
+                foreach (int d in g.duraklar)
+                { yl += Vector3.Distance(s0, gercek.dugumler[d].konum);
+                  s0 = gercek.dugumler[d].konum; }
+                Debug.Log($"[Hezarfen]   {a}: {yl:F0} m, "
+                          + $"{g.duraklar.Count} durak");
+            }
+
+            // Grafta hangi tur kac tane — arketiplerin hammaddesi.
+            var sayim = new System.Collections.Generic.Dictionary<
+                SokakGrafi.Tur, int>();
+            foreach (var d in gercek.dugumler)
+            { sayim.TryGetValue(d.tur, out int c); sayim[d.tur] = c + 1; }
+            Debug.Log("[Hezarfen] Graf turleri: "
+                      + string.Join(", ", System.Linq.Enumerable.Select(
+                          sayim, kv => $"{kv.Key}={kv.Value}")));
+
+            // ...VE SONRA BU OLCULDU: 20 gorevin 20'si `Kayip` cikti.
+            //
+            // "En yakini ver" kurali 3.724 m'yi 882 m'ye indirdi ve
+            // CESITLILIGI SIFIRLADI. Cunku en yakin olan hep aynidir:
+            // Galata'da 130 mescit, 272 cesme, 1 han, 1 iskele var.
+            // Birincisi degismeyen bir siralama, secim degil sabittir.
+            //
+            // Ve bu testin kendisi de suclu: yalniz ORTALAMA YOLU
+            // soruyordu. 900 m kapisi, tek tip gorev veren bir oyunu
+            // yesil gecirir — cunku olcmedigi seyi koruyamaz. Kapi
+            // artik iki sayi tutuyor.
+            //
+            // Olculen: 1.030 m (7,8 dk yuruyus), rotasyon tavani
+            // 1.200 m. 6,7 dakikalik tek tip turdan 7,8 dakikalik
+            // cesitli tura — bir dakika, cesitlilik icin ucuz.
+            Assert.Less(ort, GorevYonetici.YuruyusTavani,
+                $"Yonetici ortalama {ort:F0} m veriyor, kapi "
+                + $"{GorevYonetici.YuruyusTavani:F0} m.");
+            Assert.GreaterOrEqual(gorulen.Count, 3,
+                $"20 gorevde yalniz {gorulen.Count} arketip cikti "
+                + $"({string.Join(", ", gorulen)}). Tek tip bir dongu, "
+                + "dongu degil tekrardir.");
 
             Object.DestroyImmediate(yGo);
             Object.DestroyImmediate(oyuncuGo);
