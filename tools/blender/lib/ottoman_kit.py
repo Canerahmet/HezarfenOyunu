@@ -1339,13 +1339,28 @@ def _bolme_parcalari(p, bolme, z0, z1):
     return parca
 
 
-#: Basamak yüksekliği (m). Osmanlı evinin merdiveni diktir; 0,22
-#: modern yönetmeliğin üstünde ama dönemin altında değil.
-BASAMAK_YUKSEK = 0.22
-#: Basamak genişliği (m).
-BASAMAK_DERIN = 0.26
+#: Basamak yüksekliği (m).
+#:
+#: 0,22 ile başladı — Osmanlı evinin merdiveni gerçekten diktir. Ama
+#: ölçüm gösterdi ki o diklikte merdiven **yürünebilir bir yüzey
+#: bırakmıyor**: basamak başına 1-5 hücre kalıyor ve zincir zeminden
+#: kopuyordu. Dönem doğruluğu, çıkılamayan bir merdivende bir işe
+#: yaramaz.
+#:
+#: 0,19 hâlâ dik (modern yönetmelik 0,175 ister) ama basamak yüzeyi
+#: gövdeye yer bırakıyor.
+BASAMAK_YUKSEK = 0.19
+#: Basamak genişliği (m). Ayak boyundan geniş olmalı.
+BASAMAK_DERIN = 0.30
 #: Merdiven kolunun eni (m).
-MERDIVEN_EN = 0.95
+#:
+#: 0,95 iki yandan duvara sürtüyordu; 1,10 ölçülen en iyi değer.
+#:
+#: 1,40 da denendi ve **kötüleşti** (üst kata çıkılabilen %3,9 → %0).
+#: Yani kısıt kolun eni değil; geniş kol yalnız arka odayı yiyor ve
+#: tavandaki boşluğu büyütüyor. Bir sayıyı büyütmek işe yaramıyorsa
+#: ölçülen şey o sayı değildir.
+MERDIVEN_EN = 1.10
 
 
 def merdiven_plani(p):

@@ -176,7 +176,18 @@ namespace Hezarfen.Editor.Diagnostics
             Bounds yerel = mc != null && mc.sharedMesh != null
                 ? mc.sharedMesh.bounds
                 : new Bounds(Vector3.zero, Vector3.one * 1e6f);
-            const float Pay = 0.35f;
+            // IC SINIR PAYI 0,05 m — ve sebebi olculdu.
+            //
+            // 0,35 m ile zincir tam olarak SU noktada kopuyordu:
+            // zemin kat k=2 (y=0,69), ilk merdiven hucresi k=4 (y=1,13),
+            // arada k=3 BOS. Cunku merdivenin ilk basamagi yan duvarin
+            // 0,13 m icinde ve 0,35'lik pay onu disarida birakiyordu.
+            // Yani ölçüm merdivenin ilk basamagini hic gormuyordu.
+            //
+            // Pay'in isi disarisini elemekti; onu zaten fizik yapiyor —
+            // duvarin icindeki hucrede kapsul duvara carpar. Pay yalniz
+            // ev sinirini isaretler, ic hacmi kirpmaz.
+            const float Pay = 0.05f;
 
             bool Iceride(Vector3 dunya)
             {

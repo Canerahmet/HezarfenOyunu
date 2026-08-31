@@ -13,7 +13,7 @@ D_Galata, 92 örnek ev:
 |---|---|
 | Girilebilen ev | **%97,8** |
 | Zemin katta erişilen hacim | **%100,0** |
-| **Üst kata çıkılabilen** | **1/80 — %1,3** |
+| **Üst kata çıkılabilen** | **3/77 — %3,9** |
 
 Kapı, bölme duvarları ve zemin kat tamam. Merdiven **görünüyor**,
 çarpışma kütlesinde **var**, tavanda boşluğu **açık** — ama yürüyerek
@@ -53,20 +53,56 @@ Bir hücre durulabilir sayılır — gövde boşluğu boş, hemen altı dolu —
 komşuluk bir basamak (0,22 m) yukarı/aşağı farkına izin verir. Bu, bir
 gezinme ağının en yalın hâli ve merdiveni doğal olarak tırmanır.
 
+## İkinci turda denenenler (2026-08-31)
+
+| deneme | sonuç |
+|---|---|
+| İç sınır payı 0,35 → 0,05 m | değişmedi — ilk basamak zaten pay dışında değilmiş |
+| Basamak 0,22×0,26 → **0,19×0,30**, kol 0,95 → **1,10 m** | %1,3 → **%3,9** |
+| Collider'ı kesitten **render etmek** | kesme düzlemi merdiveni kesip attı; "merdiven yok" sandım — yanlıştı, 34 kutunun 14'ü basamak |
+| Kol eni 1,10 → **1,40 m** | **kötüleşti**: %3,9 → %0. Geri alındı. |
+
+Sonuncusu önemli: bir sayıyı büyütmek işe yaramıyorsa **ölçülen şey o
+sayı değildir**. Kolun eni kısıt değil.
+
+Merdiven daha az dik ve daha geniş hâliyle **kalıyor**: dönem doğruluğu
+(0,22 diklik) çıkılamayan bir merdivende bir işe yaramaz, ve 0,19 hâlâ
+modern yönetmeliğin (0,175) üstünde.
+
+## Ölçülen kırılma noktası
+
+Kat kat tarama, zincirin **tam olarak nerede** koptuğunu söylüyor:
+
+```
+k=2  y=0,69  durulabilir=755   <- zemin kat
+k=3  y=0,91  durulabilir=0     <- KOPMA
+k=4  y=1,13  durulabilir=5     <- merdivenin ilk hücresi
+...
+k=13 y=3,11  durulabilir=4
+k=14 y=3,33  durulabilir=1143  <- üst kat (bağlı)
+```
+
+y=0,92'de destekli 677 hücrenin **hepsi** ayaktan +0,35 m'de
+engelleniyor — yani o hücreler duvar hücreleri, merdivenin ilk
+basamağının üstünde hiç destek yok. Merdiven zinciri k=4'ten yukarı
+sağlam; kopan tek yer zeminle ilk basamak arası.
+
 ## Kalan bilinmeyen
 
-Kesit, merdiven zincirinin **var olduğunu** gösteriyor: k=3'ten k=11'e
-her katta 1-3 durulabilir hücre, üstünde 414 hücrelik üst kat. Yani
-basamaklar duruyor ve üst kat yürünebilir; **zincir bir yerde
-kopuyor** ve nerede kopduğu henüz bulunamadı.
+Merdiven kolunun her basamağında **4-18 yürünebilir hücre** var ve üst
+kat (1143 hücre) yürünebilir. Zincir k=3'ten yukarı sağlam. Kopan tek
+yer **zemin katla ilk basamak arası** ve orada da 4 hücre mevcut —
+yani hücreler var, komşuluk kurulmuyor.
 
-Denenip işe yaramayanlar: yatay ızgarayı 0,35 → 0,25 → 0,15 m
-küçültmek, dikey ızgarayı basamak yüksekliğine (0,22 m) oturtmak.
+En güçlü aday artık şu: zemin katın ızgara kotu (0,69 m) ile ilk
+basamağın kotu (0,79 m) arasında **0,10 m** var, ama ızgaranın dikey
+adımı 0,22 m. Yani ikisi çoğu evde **aynı katmana** düşüyor ve
+"bir kat yukarı" komşuluğu hiç denenmiyor; ayrı katmana düştüğünde de
+aradaki fark bir tam adım değil. Izgara, basamağın kendisini değil
+basamak ile zemin arasındaki **ilk farkı** çözemiyor.
 
-En güçlü aday: basamağın üstündeki **baş boşluğu**. Orta basamaklarda
-gövdenin tepesi (ayak + 1,45 m) döşeme kotunu aşıyor ve merdiven
-boşluğunun kenarına sürtüyor olabilir — kapsül yarıçapı 0,255 m,
-boşluğun payı dar.
+Sınanacak: dikey ızgarayı zeminin kotuna göre hizalamak (kutunun
+tabanına değil, **ölçülen döşeme kotuna** göre başlatmak).
 
 ## Karar
 
