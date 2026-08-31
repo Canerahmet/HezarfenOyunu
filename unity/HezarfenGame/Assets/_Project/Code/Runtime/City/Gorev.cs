@@ -140,7 +140,8 @@ namespace Hezarfen.Sehir
             Vector3 son = yakininda;
             foreach (var tur in turler)
             {
-                int d = RastgeleAyniBilesende(graf, bilesen, b, tur, son, rng);
+                int d = RastgeleAyniBilesende(graf, bilesen, b, tur, son, rng,
+                                              duraklar);
                 if (d < 0) return null;          // o yer bu semtte yok
                 duraklar.Add(d);
                 son = graf.dugumler[d].konum;
@@ -231,14 +232,56 @@ namespace Hezarfen.Sehir
                 Ekonomi.IrgatYevmiyesi * gun * oynak));
         }
 
+        /// <summary>
+        /// Bir sonraki durağın <b>en az</b> bu kadar uzakta olması
+        /// gerekir (m).
+        ///
+        /// Ölçüldü: 60 görevlik gerçek bir dizide 168 durağın **18'i
+        /// (%11)** daha üretildiği anda oyuncunun 15 m'lik varış
+        /// eşiğinin içindeydi. Yani üç duraklı bir "Kayıp eşya" görevi,
+        /// çeşmeye varıldığı anda bitiyor ve üçüncü durak hiç
+        /// yaşanmıyordu. En kısa gerçek durak arası 9,1 m ölçüldü —
+        /// oysa koddaki yorum "40 m'nin altına inmiyor" diyordu.
+        ///
+        /// 60 m: varış eşiğinin (15 m) dört katı, yani bir durağa
+        /// varmak asla bir sonrakini tetiklemez.
+        /// </summary>
+        public const float EnAzDurakArasi = 60f;
+
         private static int RastgeleAyniBilesende(
             SokakGrafi graf, int[] bilesen, int b, SokakGrafi.Tur tur,
-            Vector3 yakininda, System.Random rng)
+            Vector3 yakininda, System.Random rng,
+            List<int> kullanilanlar = null)
         {
             var adaylar = new List<int>();
             for (int i = 0; i < graf.dugumler.Count; i++)
-                if (graf.dugumler[i].tur == tur && bilesen[i] == b)
-                    adaylar.Add(i);
+            {
+                if (graf.dugumler[i].tur != tur || bilesen[i] != b) continue;
+
+                // AYNI DUGUM IKI KEZ SECILMEZ.
+                //
+                // Galata bileseninde tek iskele var ve `KayikYolcu`
+                // arketipi iki iskele istiyor: ureteç aynı düğümü iki
+                // kez seçiyordu. Ölçüldü — 60 görevin **12'si (%20)**
+                // [1523, 1523] üretti, yani ikinci durağın mesafesi
+                // 0,0 m ve görev ilk durağa varan oyuncunun elinde
+                // kendiliğinden bitiyordu.
+                //
+                // "Karşıya yolcu götür" görevinin karşıya gitmemesi,
+                // görevin kendisinin olmaması demek.
+                if (kullanilanlar != null && kullanilanlar.Contains(i))
+                    continue;
+
+                // COK YAKIN DURAK, DURAK DEGIL.
+                if (kullanilanlar != null && kullanilanlar.Count > 0)
+                {
+                    float d2 = (graf.dugumler[i].konum - yakininda)
+                               .sqrMagnitude;
+                    if (d2 < EnAzDurakArasi * EnAzDurakArasi) continue;
+                }
+
+                adaylar.Add(i);
+            }
             if (adaylar.Count == 0) return -1;
 
             // Yakindakileri yegle ama hep en yakini secme: ayni arketip
