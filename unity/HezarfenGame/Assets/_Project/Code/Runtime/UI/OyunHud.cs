@@ -32,6 +32,7 @@ namespace Hezarfen.Arayuz
         public AranmaSistemi aranma;
         public EtkilesimAlgila etkilesim;
         public Envanter envanter;
+        public GorevYonetici gorev;
 
         [Tooltip("Duraklat tuşu.")]
         public Key duraklatTusu = Key.Escape;
@@ -58,6 +59,12 @@ namespace Hezarfen.Arayuz
             if (etkilesim == null)
                 etkilesim = FindAnyObjectByType<EtkilesimAlgila>();
             if (envanter == null) envanter = FindAnyObjectByType<Envanter>();
+            if (gorev == null) gorev = FindAnyObjectByType<GorevYonetici>();
+            if (_oyuncuT == null)
+            {
+                var go = GameObject.Find("OYUNCU");
+                if (go != null) _oyuncuT = go.transform;
+            }
         }
 
         private void Update()
@@ -122,6 +129,29 @@ namespace Hezarfen.Arayuz
             _mesajSonu = Time.unscaledTime + 3f;
         }
 
+        /// <summary>
+        /// Hedefin oyuncuya göre yönü — <b>pusula yerine geçen şey</b>.
+        ///
+        /// Oyunda harita, pusula ve işaretçi yok ve bu bir tercih
+        /// olarak savunulabilir; ama hiçbir yön bilgisi olmaması bir
+        /// tercih değil, eksiklik. Dönemin kendi dili kullanılıyor:
+        /// bir yer "kuzeyde" değil, <b>şu semte doğru</b>dur. Şimdilik
+        /// sekiz yön; kalıcı çözüm rehber rüzgâr (`WindField` zaten
+        /// sahnede) ve ayrı bir iş.
+        /// </summary>
+        private string YonAdi(Vector3? hedef)
+        {
+            if (hedef == null || _oyuncuT == null) return "—";
+            var d = hedef.Value - _oyuncuT.position;
+            float aci = Mathf.Atan2(d.x, d.z) * Mathf.Rad2Deg;
+            if (aci < 0f) aci += 360f;
+            string[] ad = { "kuzey", "kuzeydoğu", "doğu", "güneydoğu",
+                            "güney", "güneybatı", "batı", "kuzeybatı" };
+            return ad[Mathf.RoundToInt(aci / 45f) % 8];
+        }
+
+        private Transform _oyuncuT;
+
         /// <summary>Envanter kaleminin oyuncuya görünen adı.</summary>
         private static string EsyaAdi(EsyaTuru t) => t switch
         {
@@ -152,10 +182,43 @@ namespace Hezarfen.Arayuz
                           $"ezanî {ezani}  ·  {zaman.Vakit}", _yazi);
             }
 
+            // --- GOREV: baslik, hedef, mesafe, kese ---
+            //
+            // Gorunmeyen bir gorev olmayan bir gorevdir. Bu satirlar
+            // eklenene kadar `GorevUretici` uretiyordu, `Gorev` durak
+            // sayiyordu, `Kese` akce tutuyordu — ve oyuncu hicbirini
+            // bilmiyordu.
+            float ust = 78f;
+            if (gorev != null && gorev.Simdiki != null)
+            {
+                var isim = gorev.Simdiki;
+                GUI.Box(new Rect(10, ust, 330, 74), "", _kutu);
+                GUI.Label(new Rect(20, ust + 6, 320, 22), isim.baslik, _yazi);
+
+                float m = gorev.HedefMesafe;
+                string yon = YonAdi(gorev.HedefKonum);
+                GUI.Label(new Rect(20, ust + 28, 320, 22),
+                          m >= 0f ? $"{yon}  ·  {m:F0} m"
+                                  : "hedef bulunamadi", _yazi);
+                GUI.Label(new Rect(20, ust + 50, 320, 22),
+                          $"durak {isim.siradaki + 1}/{isim.duraklar.Count}"
+                          + $"  ·  {isim.akce} akçe", _yazi);
+                ust += 82f;
+            }
+
+            if (gorev != null)
+            {
+                GUI.Box(new Rect(10, ust, 330, 30), "", _kutu);
+                GUI.Label(new Rect(20, ust + 5, 320, 22),
+                          $"kese: {gorev.Kese.akce} akçe"
+                          + $"  ·  biten görev: {gorev.Bitirilen}", _yazi);
+                ust += 38f;
+            }
+
             if (aranma != null && aranma.Seviye > 0.01f)
             {
-                GUI.Box(new Rect(10, 78, 330, 30), "", _kutu);
-                GUI.Label(new Rect(20, 83, 320, 22),
+                GUI.Box(new Rect(10, ust, 330, 30), "", _kutu);
+                GUI.Label(new Rect(20, ust + 5, 320, 22),
                           $"aranma: %{aranma.Seviye * 100f:F0} "
                           + $"({aranma.SuAn})", _yazi);
             }

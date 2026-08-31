@@ -59,9 +59,23 @@ namespace Hezarfen.Player
         private Light _isik;
         private float _tohum;
 
+        /// <summary>
+        /// Aranma sistemi — fenerin <b>kanunî</b> tarafı.
+        ///
+        /// <c>AranmaSistemi.FenerVar</c> alanı vardı ve depoda ona
+        /// <b>hiç kimse yazmıyordu</b>: fener yanıyordu ama ases için
+        /// yanmıyordu. Yani bu sınıfın yirmi satırlık belgesinde
+        /// "bu bir oynanış kolaylığı değil, dönemin kuralı" yazıyordu
+        /// ve kural hiçbir yere bağlı değildi — fener yalnızca bir
+        /// ışıktı.
+        /// </summary>
+        public Sehir.AranmaSistemi aranma;
+
         private void Awake()
         {
             if (zaman == null) zaman = FindAnyObjectByType<ZamanSistemi>();
+            if (aranma == null)
+                aranma = FindAnyObjectByType<Sehir.AranmaSistemi>();
             _tohum = Random.value * 100f;
 
             var go = new GameObject("FENER");
@@ -83,6 +97,7 @@ namespace Hezarfen.Player
             if (_isik == null) return;
             bool gece = hepZaman || (zaman != null && zaman.Gece);
             Yaniyor = gece;
+            if (aranma != null) aranma.FenerVar = Yaniyor;
             _isik.enabled = gece;
             if (!gece) return;
 

@@ -21,6 +21,8 @@ namespace Hezarfen.Sehir
         public AranmaSistemi aranma;
         public NPCYonetici sehir;
         public Envanter envanter;
+        public GorevYonetici gorev;
+        public Player.Perde2Dilimi perde2;
 
         [Tooltip("Oyuncunun kesesi — akçe buradan okunur.")]
         public int akce = 0;
@@ -36,6 +38,8 @@ namespace Hezarfen.Sehir
             if (aranma == null) aranma = FindAnyObjectByType<AranmaSistemi>();
             if (sehir == null) sehir = FindAnyObjectByType<NPCYonetici>();
             if (envanter == null) envanter = FindAnyObjectByType<Envanter>();
+            if (gorev == null) gorev = FindAnyObjectByType<GorevYonetici>();
+            if (perde2 == null) perde2 = FindAnyObjectByType<Player.Perde2Dilimi>();
             if (oyuncu == null)
             {
                 var go = GameObject.Find("OYUNCU");
@@ -66,6 +70,26 @@ namespace Hezarfen.Sehir
             {
                 v.aranmaSeviyesi = aranma.Seviye;
                 v.yasakMal = aranma.YasakMalTasiyor;
+            }
+            // KAYIT ALANLARININ YARISI HIC DOLDURULMUYORDU.
+            //
+            // `perde2Asama`, `talimSayisi`, `gorevArketip`, `gorevTohum`,
+            // `gorevSiradaki` alanlari `KayitVerisi`de duruyordu ve ne
+            // yaziliyor ne okunuyordu. Ustelik `Perde2Dilimi` ve
+            // `AranmaSistemi` bunun icin birer geri-yukleme metodu
+            // yazmisti — ve o metotlari da kimse cagirmiyordu. Yani
+            // duzeltme yazilmis, baglanmamisti.
+            if (perde2 != null)
+            {
+                v.perde2Asama = (int)perde2.Simdiki;
+                v.talimSayisi = perde2.TalimSayisi;
+            }
+            if (gorev != null && gorev.Simdiki != null)
+            {
+                v.gorevArketip = (int)gorev.Simdiki.arketip;
+                v.gorevTohum = gorev.tohum;
+                v.gorevSiradaki = gorev.Simdiki.siradaki;
+                akce = gorev.Kese.akce;
             }
             v.akce = akce;
             if (envanter != null) v.envanter = envanter.Serilestir();
@@ -100,8 +124,15 @@ namespace Hezarfen.Sehir
 
                 if (acikti) cc.enabled = true;
             }
-            if (aranma != null) aranma.YasakMalTasiyor = v.yasakMal;
+            if (aranma != null)
+            {
+                aranma.YasakMalTasiyor = v.yasakMal;
+                aranma.SeviyeyiGeriYukle(v.aranmaSeviyesi);
+            }
+            if (perde2 != null)
+                perde2.DurumuGeriYukle(v.perde2Asama, v.talimSayisi);
             akce = v.akce;
+            if (gorev != null) gorev.Kese.akce = v.akce;
             if (envanter != null) envanter.Yukle(v.envanter);
 
             // SEHIR YENIDEN KURULUR: sakinler tarihten ve tohumdan doğar,

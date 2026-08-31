@@ -226,6 +226,19 @@ namespace Hezarfen.Editor.Pipeline
                 rapor.Add("Ruzgar: arazi yok, TERMIK KURULAMADI");
             }
 
+            // 5c) GOREV — sistemleri birbirine baglayan tel.
+            //
+            // `GorevUretici`, `Gorev`, `Kese`, `Ekonomi` yazilmis ve
+            // test edilmisti; hicbirini OYUNDA cagiran yoktu. Faz 6
+            // kapisi yine de yesildi cunku kapiyi gecen test gorevi
+            // KENDISI oynuyordu. Bu bilesen o teli ceker: gorev uretir,
+            // hedefi HUD'a verir, varisi olcer, akceyi oder.
+            var gorevY = Tekil<GorevYonetici>("GOREV");
+            gorevY.oyuncu = oyuncu.transform;
+            gorevY.zaman = zaman;
+            gorevY.graf = sehir.graf;
+            rapor.Add("Gorev: yonetici kuruldu");
+
             // 6a) AY — gecenin TEK kaynagi.
             //
             // Gece karesi yakalandi ve tamamen siyahti: 78 KB'lik bir

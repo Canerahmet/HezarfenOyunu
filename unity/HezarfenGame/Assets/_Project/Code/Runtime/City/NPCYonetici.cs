@@ -518,14 +518,34 @@ namespace Hezarfen.Sehir
             if (_tonBlok == null) _tonBlok = new MaterialPropertyBlock();
             foreach (var r in a.govde.GetComponentsInChildren<Renderer>(true))
             {
-                var m = r.sharedMaterial;
-                if (m == null || !m.HasProperty(TonKimlik)) continue;
-                if (!Boyanir(m.name)) continue;
+                // SLOT SLOT GEZILIR — `sharedMaterial` YALNIZ 0. SLOTU
+                // OKUR.
+                //
+                // Once `r.sharedMaterial` yaziyordu ve gövdenin 0.
+                // slotu M_Skin. `Boyanir("M_Skin")` false donuyor,
+                // dongu `continue` ediyor ve HICBIR NPC boyanmiyordu.
+                // Karede bir iyilesme gorulmustu ve gercekti — ama
+                // sebebi "ton dogru yere gidiyor" degil, "ton hic
+                // gitmiyor" idi: onceki hal her seyi turuncuya
+                // cevirdigi icin, hic boyamamak ondan iyi gorunuyordu.
+                //
+                // Ustelik `SetPropertyBlock(blok)` indekssiz cagrilinca
+                // butun slotlara birden yazar; yani dongu calissaydi
+                // bile duzeltmeye calistigi hatayi yapardi. Ikisi
+                // birlikte, "duzeltildi" denen seyin iki kez yanlis
+                // oldugu anlamina geliyordu.
+                var malzemeler = r.sharedMaterials;
+                for (int i = 0; i < malzemeler.Length; i++)
+                {
+                    var m = malzemeler[i];
+                    if (m == null || !m.HasProperty(TonKimlik)) continue;
+                    if (!Boyanir(m.name)) continue;
 
-                r.GetPropertyBlock(_tonBlok);
-                var taban = m.GetColor(TonKimlik);
-                _tonBlok.SetColor(TonKimlik, Boya(taban, dna.ton));
-                r.SetPropertyBlock(_tonBlok);
+                    r.GetPropertyBlock(_tonBlok, i);
+                    _tonBlok.SetColor(TonKimlik,
+                                      Boya(m.GetColor(TonKimlik), dna.ton));
+                    r.SetPropertyBlock(_tonBlok, i);
+                }
             }
 
             var anim = a.govde.GetComponentInChildren<Animator>();
