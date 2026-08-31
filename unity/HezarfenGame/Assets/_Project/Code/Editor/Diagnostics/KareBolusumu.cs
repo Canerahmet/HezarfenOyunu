@@ -59,6 +59,28 @@ namespace Hezarfen.Editor.Diagnostics
 
                 float taban = 0f;
 
+                // ISINMA — TABAN BUNSUZ YALAN SOYLER.
+                //
+                // Bir tur olcum sunu verdi:
+                //
+                //     hepsi acik            123,9 ms
+                //     replik kapali          15,2 ms   (+108,7)
+                //     NPC yoneticisi kapali  13,6 ms   (+110,3)
+                //
+                // Okundugu gibi alinsa "replik gostericisi 108 ms
+                // yiyor" denirdi. Yemiyordu: ilk 120 kare SEMT
+                // AKISININ icine dusuyordu — D_Galata ve D_Halic o
+                // sirada diskten yukleniyordu. Taban sisti, ondan
+                // cikarilan her fark sisti, ve ucu birden ayni sahte
+                // sayiyi tasidi.
+                //
+                // 20 karelik atlama vardi ve yetmedi: 100 ms'lik
+                // karede 20 kare 2 saniyedir. Sure tahmin etmek yerine
+                // KARARLILIGIN KENDISI olculuyor — pencere pencere
+                // bakilir, iki komsu pencere birbirine yakinsa sahne
+                // oturmustur.
+                yield return Isin();
+
                 float t = 0f;
                 yield return Olc(Kare, x => t = x);
                 taban = t;
@@ -98,6 +120,67 @@ namespace Hezarfen.Editor.Diagnostics
                 Directory.CreateDirectory(Cikti);
                 File.WriteAllText($"{Cikti}/kare_bolusumu.md", sb.ToString());
                 Debug.Log($"[Hezarfen] Kare bolusumu yazildi -> {Cikti}/kare_bolusumu.md");
+            }
+
+            /// <summary>
+            /// Sahne oturana kadar bekler: 30 karelik pencereler alir,
+            /// iki ardisik pencere %8 icinde bulusunca doner.
+            /// Ust sinir 900 kare — oturmayan sahne olculur ama
+            /// oturmadigi konsola yazilir.
+            /// </summary>
+            private static IEnumerator Isin()
+            {
+                const int Pencere = 30, EnCokKare = 900;
+                float onceki = -1f;
+                int gecen = 0;
+
+                // KARARLILIK, HAZIRLIK DEMEK DEGIL.
+                //
+                // Ilk yazimda yalniz "iki komsu pencere birbirine
+                // yakinsa oturmustur" deniyordu ve olcum yine kandi:
+                // "90 karede oturdu (191,6 ms)". Yuk sirasinda kare
+                // suresi 190 ms'de DUZ bir plato ciziyor; iki pencere
+                // pekala anlasir. Duran bir sey oturmus degildir.
+                //
+                // Semt akisi da yeterli sinyal cikmadi: akis bosta
+                // gorunurken kare hala 180 ms'ti — sisiren sey disk
+                // degil, ilk karelerde derlenen govde/golge/prob
+                // gecisleri. Yani "kim mesgul" diye sormak da yanlis
+                // soruydu.
+                //
+                // Dogru soru en basitiymis: SIMDIYE KADARKI EN IYIYE
+                // yakin miyiz. Isinma tam olarak budur — sahne, bir
+                // daha inmeyecegi bir taban bulur. Iki komsu pencere
+                // birbirine YAKIN ve ikisi de en iyinin %25 ustunde
+                // DEGILSE, oturmustur. Plato artik kandiramaz cunku
+                // 180 ms'lik plato 13 ms'lik en iyiye yakin degildir.
+                var akis = Object.FindAnyObjectByType<
+                    Streaming.DistrictStreamer>();
+                float enIyi = float.MaxValue;
+
+                while (gecen < EnCokKare)
+                {
+                    float toplam = 0f;
+                    for (int i = 0; i < Pencere; i++)
+                    { yield return null; toplam += Time.unscaledDeltaTime; }
+                    gecen += Pencere;
+                    float su = toplam / Pencere * 1000f;
+                    enIyi = Mathf.Min(enIyi, su);
+                    bool akisBosta = akis == null || akis.LoadsInFlight == 0;
+                    bool tabanaYakin = su <= enIyi * 1.25f;
+                    if (akisBosta && tabanaYakin && onceki > 0f
+                        && Mathf.Abs(su - onceki) <= onceki * 0.08f)
+                    {
+                        Debug.Log($"[Hezarfen] Isinma: {gecen} karede "
+                                  + $"oturdu ({su:0.0} ms; gorulen en iyi "
+                                  + $"{enIyi:0.0} ms).");
+                        yield break;
+                    }
+                    onceki = su;
+                }
+                Debug.LogWarning($"[Hezarfen] Isinma: {EnCokKare} karede "
+                                 + "oturmadi — asagidaki sayilar kararsiz "
+                                 + "bir sahneden geliyor.");
             }
 
             private static IEnumerator Olc(int kare, System.Action<float> sonuc)

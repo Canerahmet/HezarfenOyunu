@@ -181,6 +181,17 @@ namespace Hezarfen.Editor.Pipeline
             rapor.Add(KalabalikVar ? "Replik: gosterici kuruldu"
                                    : "Replik: KAPALI (kalabalik yok)");
 
+            // 6b) SEHRIN HAVASI — baca dumani ve marti.
+            //
+            // Kalabaliktan bagimsiz: kalabalik kapatilsa bile bacalar
+            // tuter. Bir sehri bos gostermeyen sey yalniz sokaktaki
+            // insan degil, damdaki dumandir.
+            var vfx = Tekil<SehirVFX>("SEHIR_VFX");
+            vfx.oyuncu = oyuncu.transform;
+            vfx.zaman = zaman;
+            rapor.Add($"Hava olaylari: {vfx.dumanHavuzu} baca havuzu, "
+                      + $"{vfx.martiSayisi} marti");
+
             // 7) HAVA — lodos; ucusu mumkun kilan sey bu.
             var hava = Tekil<HavaProfili>("HAVA");
             hava.ruzgar = Ruzgar.Lodos;
