@@ -79,6 +79,11 @@ namespace Hezarfen.Editor.Diagnostics
 
             int denenen = 0, cikilan = 0, ustYok = 0;
             var kalanlar = new List<string>();
+            // Basari ile evin ENI arasinda iliski var mi: dar evde kosu
+            // kirpiliyor ve basamak dikleşiyor olabilir. Tahmin degil
+            // dagilim.
+            var enBasarili = new List<float>();
+            var enBasarisiz = new List<float>();
 
             int adim = Mathf.Max(1, evler.Count / Ornek);
             for (int i = 0; i < evler.Count; i += adim)
@@ -182,7 +187,16 @@ namespace Hezarfen.Editor.Diagnostics
                     var yol = new NavMeshPath();
                     NavMesh.CalculatePath(bas.position, hedef.Value,
                                           NavMesh.AllAreas, yol);
-                    if (yol.status == NavMeshPathStatus.PathComplete) cikilan++;
+                    var yerelKutu2 = (col as MeshCollider)?.sharedMesh?.bounds
+                                     ?? new Bounds();
+                    float evEni = yerelKutu2.size.x;
+                    if (yol.status == NavMeshPathStatus.PathComplete)
+                    {
+                        cikilan++;
+                        enBasarili.Add(evEni);
+                    }
+                    else enBasarisiz.Add(evEni);
+                    if (yol.status == NavMeshPathStatus.PathComplete) { }
                     else if (kalanlar.Count < 6)
                     {
                         // Yol nerede duruyor: son kosenin kotu, evin
@@ -208,10 +222,23 @@ namespace Hezarfen.Editor.Diagnostics
             int gecerli = denenen - ustYok;
             sb.AppendLine($"  CIKILABILEN: {cikilan}/{gecerli} "
                 + $"(%{(gecerli == 0 ? 0f : 100f * cikilan / gecerli):0.0})");
+            sb.AppendLine($"  cikilan evlerin eni: {Ozet(enBasarili)}");
+            sb.AppendLine($"  cikilmayan evlerin eni: {Ozet(enBasarisiz)}");
             foreach (var k in kalanlar) sb.AppendLine("  " + k);
             Debug.Log("[Hezarfen] " + sb);
 
             EditorSceneManager.CloseScene(sahne, true);
+        }
+
+        private static string Ozet(List<float> v)
+        {
+            if (v.Count == 0) return "(yok)";
+            v.Sort();
+            float top = 0f;
+            foreach (var x in v) top += x;
+            return $"n={v.Count} ort={top / v.Count:0.00} "
+                 + $"en az={v[0]:0.00} ortanca={v[v.Count / 2]:0.00} "
+                 + $"en cok={v[v.Count - 1]:0.00}";
         }
 
         private static string Ad(Transform t)

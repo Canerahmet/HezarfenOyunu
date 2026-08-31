@@ -190,10 +190,24 @@ değil" demiştim. Yanlıştı: o sırada sahanlık ve duvar payı yoktu,
 geniş kol onları yiyordu. **Bir değişken tek başına denendiğinde
 yanıltır**; kısıt üçünün birleşimiydi.
 
-## Kalan %41,5
+## Kalan %41,5 — ölçüldü, sebep bulunamadı
+
+Genişlikle ilişki **var ama zayıf**:
+
+| | n | ortalama en | ortanca | en az | en çok |
+|---|---|---|---|---|---|
+| çıkılan | 24 | 7,47 m | 7,50 | 5,50 | 9,66 |
+| çıkılamayan | 17 | 6,62 m | 6,55 | 5,25 | 9,79 |
+
+Aralıklar iç içe: 9,79 m'lik bir ev de başarısız oluyor, 5,50 m'lik bir
+ev de başarılı. Yani darlık tek başına açıklamıyor.
+
+Bunun üzerine basamak derinliğine alt sınır kondu (0,32 m; koşu
+kırpılınca basamak sayısı azaltılıp rıht 0,28 m'ye kadar yükseltiliyor).
+Merdiven yumuşadı ama **ölçüm değişmedi**: aynı 24/41, aynı evler.
+Yani kalan kusur basamağın dikliği de değil.
 
 Başarısızların hepsi aynı deseni gösteriyor: yol kapıdan sokağa iniyor,
-yani merdiven yine bağlanmamış. En güçlü aday, dar evlerde koşunun
-(`kosu = ic_en − sahanlık − duvar payı`) kırpılıp basamağın
-dikleşmesi. Ölçülebilir: varyantın `width` değeriyle başarı
-korelasyonuna bakmak yeter.
+yani merdiven navmesh'i zemin kattan hâlâ kopuk. Bir sonraki adım
+tahmin değil ölçüm olmalı — başarısız bir evin navmesh üçgenlerini
+kotlarına göre dökmek, kopmanın hangi basamakta olduğunu söyler.

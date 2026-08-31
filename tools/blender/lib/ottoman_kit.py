@@ -1433,6 +1433,24 @@ def merdiven_plani(p):
         kosu = ic_en - SAHANLIK - DUVAR_PAYI
     if kosu < 1.2:
         return None
+
+    # BASAMAK DERINLIGINE ALT SINIR.
+    #
+    # Kosu kirpilinca basamak inceliyor ve merdiven dikleşiyor. Olculdu:
+    # ust kata cikilan evlerin ortanca eni 7,50 m, cikilamayanlarin
+    # 6,55 m — yani dar evde kirpilan kosu basamagi 0,30 m'nin altina
+    # indiriyor. Basamak sayisini azaltmak, yani riht yuksekligini
+    # artirmak, ayni kotu daha az ve daha genis basamakla cikar.
+    #
+    # Riht ust siniri 0,28 m: bunun ustu insanin adiminin degil
+    # tirmanmanin isi olurdu ve gezinme agi da (adim payi 0,30 m)
+    # sinirda kalirdi.
+    EN_AZ_BASAMAK = 0.32
+    EN_COK_RIHT = 0.28
+    while n > 2 and kosu / n < EN_AZ_BASAMAK:
+        if p.floor_height / (n - 1) > EN_COK_RIHT:
+            break
+        n -= 1
     y1 = p.depth * 0.5 - p.wall_thickness
     y0 = y1 - MERDIVEN_EN
     x0 = -ic_en * 0.5 + DUVAR_PAYI
