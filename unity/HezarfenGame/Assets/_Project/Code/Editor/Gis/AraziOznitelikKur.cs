@@ -246,6 +246,22 @@ namespace Hezarfen.Editor.Gis
         /// <summary>İki geçişli chamfer mesafe dönüşümü → 0,5 m adımlı bayt.</summary>
         private static byte[] Mesafe(bool[] tohum, int en, int boy)
         {
+            // TOHUMSUZ KATMAN AYRILMAZ.
+            //
+            // Bogaz ve Halic su semtleri: sifir bina, sifir yol. Yine de
+            // her hucreye "uzak" yazan tam boy bir dizi uretiliyordu ve
+            // ikisi birlikte **84 MB** tutuyordu — 98 MB'lik katmanin
+            // %86'si, hicbir sey soylemeyen hucrelere gidiyordu.
+            //
+            // `AraziOznitelik.Oku` katman null ise zaten `Uzak`
+            // donduruyor, yani davranis birebir ayni. Bir sey soylemeyen
+            // veriyi saklamamak, onu sifirlarla doldurmaktan daha
+            // dogru bir "hicbir sey" ifadesidir.
+            bool varMi = false;
+            for (int i = 0; i < tohum.Length; i++)
+                if (tohum[i]) { varMi = true; break; }
+            if (!varMi) return null;
+
             const float D = 1f, K = 1.41421f;   // dik ve capraz komsu
             float sonsuz = 1e9f;
             var d = new float[en * boy];
