@@ -335,6 +335,87 @@ def deri_bagla(mesh_obj, arm_obj):
     return mesh_obj
 
 
+def agirliklari_tamamla(mesh_obj, arm_obj):
+    """Ağırlıksız kalan köşeleri **en yakın kemiğe** bağlar.
+
+    ## Neden gerekli
+
+    `ARMATURE_AUTO` ısı yayılımıyla ağırlık dağıtır ve kapalı, ayrık
+    kabuklarda (gömlek, entari, kuşak) çözüm bulamaz: ölçüldü, LOD0'da
+    27.624 köşenin 2.964'ü (%10,7) hiçbir kemiğe bağlanmıyordu. Unity'de
+    o köşeler kemik 0'a, yani köke düşer ve giysi adaları gövde oynarken
+    kalçaya çakılı kalır.
+
+    ## Neden en yakın kemik, neden daha akıllısı değil
+
+    Giysi kabuğu gövdeden **kopyalanarak** üretiliyor
+    (`kiyafet_kit.kopya_kabuk`), yani her köşe zaten tenin bir köşesinin
+    birkaç santim dışında duruyor. O tenin takip ettiği kemik, giysinin
+    de takip etmesi gereken kemiktir. Daha zarif bir çözüm (tenin
+    ağırlıklarını en yakın komşudan aktarmak) daha doğru olurdu ama
+    ölçülebilir farkı belirsiz; kaba çözüm sıfır ağırlıklı köşe
+    bırakmıyor ve ölçü bunu söylüyor.
+
+    Dönüş: doldurulan köşe sayısı.
+    """
+    kemikler = [(b.name, arm_obj.matrix_world @ ((b.head_local + b.tail_local) * 0.5))
+                for b in arm_obj.data.bones]
+    if not kemikler:
+        return 0
+
+    gruplar = {ad: (mesh_obj.vertex_groups.get(ad)
+                    or mesh_obj.vertex_groups.new(name=ad))
+               for ad, _ in kemikler}
+
+    mw = mesh_obj.matrix_world
+    dolduruldu = 0
+    for v in mesh_obj.data.vertices:
+        w = 0.0
+        for g in v.groups:
+            w += g.weight
+        if w > 1e-6:
+            continue
+        p = mw @ v.co
+        en_ad, en_d = kemikler[0][0], (p - kemikler[0][1]).length
+        for ad, orta in kemikler[1:]:
+            d = (p - orta).length
+            if d < en_d:
+                en_d, en_ad = d, ad
+        gruplar[en_ad].add([v.index], 1.0, "REPLACE")
+        dolduruldu += 1
+    return dolduruldu
+
+
+def agirliksiz_kose(mesh_obj):
+    """Hiçbir kemiğe bağlanmamış köşe sayısı — **kusurun ölçüsü**.
+
+    ## Neden bu sayı önemli
+
+    Oyun içi karelerde gömlek gövdenin önünde ayrı bir levha, entari
+    eteği bacağın yanında bağımsız bir tabaka olarak duruyordu; Blender'ın
+    bind-poz kontak sayfası ise tertemizdi. Yani kusur modelde değil
+    **deri bağlamada**.
+
+    Şüpheli belli: `ARMATURE_AUTO` ısı yayılımıyla ağırlık dağıtır ve
+    birleştirilmiş ağdaki **kapalı, ayrık kabuklarda** (gömlek, entari,
+    kuşak — hepsi `kopya_kabuk` + kalınlık) çözüm bulamaz. Ağırlıksız
+    kalan köşe Unity'de kemik 0'a, yani köke düşer: gövde animasyon
+    oynarken o adalar kalçaya çakılı kalır.
+
+    Ama bu bir **hipotez**; sayı olmadan düzeltmeye kalkmak, bu projede
+    beş kez yanlış şeyi düzeltmekle sonuçlandı. Önce ölçülür.
+    """
+    toplam = len(mesh_obj.data.vertices)
+    agirliksiz = 0
+    for v in mesh_obj.data.vertices:
+        w = 0.0
+        for g in v.groups:
+            w += g.weight
+        if w <= 1e-6:
+            agirliksiz += 1
+    return agirliksiz, toplam
+
+
 def kemik_raporu(arm_obj, boy):
     """Kemiklerin **ölçülebilir** kaydı — inceleme ve test için.
 

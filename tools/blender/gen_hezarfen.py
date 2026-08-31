@@ -514,13 +514,52 @@ def main():
             raise SystemExit(f"[HZ] HATA {ad} rig: " + "; ".join(rig_hata))
 
         govde.name = f"{asset}_ten"
+
+        # BIRLESTIR, BAGLA, SONRA BOSLUGU DOLDUR.
+        #
+        # Olculdu: `ARMATURE_AUTO` birlestirilmis agda 27.624 kosenin
+        # **2.964'unu** (%10,7) hicbir kemige baglamiyor. Sebep isi
+        # yayilimi: kapali ve AYRIK kabuklarda (gomlek, entari, kusak —
+        # hepsi `kopya_kabuk` + kalinlik) isi tenden giysiye atlayamiyor.
+        # O koseler Unity'de kemik 0'a duser ve giysi adalari govde
+        # oynarken kalcaya cakili kalir — oyun ici karelerde gomlek
+        # govdenin onunde ayri bir levha olarak duruyordu.
+        #
+        # ONCE parcalari ayri baglayip sonra birlestirmeyi denedim ve
+        # OLCUM REDDETTI: 2.964 yerine 27.624, yani HEPSI agirliksiz
+        # kaldi. Birlestirme, ayri ayri kurulmus zirh iliskilerini
+        # korumuyor.
+        #
+        # Kalan yol boslugu dogrudan doldurmak: agirliksiz her koseyi
+        # EN YAKIN kemige tam agirlikla bagla. Kaba ama dogru — giysi
+        # kabugu zaten govdeden kopyalandigi icin en yakin kemik, o
+        # kosenin takip etmesi gereken kemiktir.
+        arm = rk.iskelet_kur(f"AR_{ad}", eklem, col)
         lod0 = kit.join_parts([govde] + giysi, f"{asset}_LOD0", col)
         lod1 = kar.desimasyon(lod0, 0.30, f"{asset}_LOD1")
         hz.link(lod1, col)
-
-        arm = rk.iskelet_kur(f"AR_{ad}", eklem, col)
         for m in (lod0, lod1):
             rk.deri_bagla(m, arm)
+            rk.agirliklari_tamamla(m, arm)
+
+        # AGIRLIKSIZ KOSE SAYILIR — VE SIFIR DEGILSE URETIM DURUR.
+        #
+        # Oyun ici karelerde gomlek govdenin onunde ayri bir levha,
+        # entari etegi bacagin yaninda bagimsiz bir tabaka olarak
+        # duruyordu. Blender'in bind-poz kontak sayfasi tertemiz
+        # oldugu icin kusur uzun sure "modelde bir sey var" diye
+        # arandi; oysa kusur BAGLAMADAYDI ve bind pozunda gorunmez —
+        # ancak animasyon oynayinca ortaya cikar.
+        #
+        # Bir kusurun gorulmedigi yerde olculmesi gerekir.
+        agirliksiz, toplam = rk.agirliksiz_kose(lod0)
+        hz.log(f"agirlik: {toplam - agirliksiz}/{toplam} kose bagli")
+        if agirliksiz > 0:
+            raise SystemExit(
+                f"[HZ] HATA {ad}: LOD0'da {agirliksiz}/{toplam} kose "
+                "hicbir kemige bagli degil. Unity'de bu koseler kemik "
+                "0'a (kok) duser ve o giysi adalari govde oynarken "
+                "kalcaya cakili kalir.")
 
         mn, mx = hz.bounds(lod0)
         bilgi = dict(
@@ -538,6 +577,22 @@ def main():
             dizlik=dizlik_var, giysi_parca=giysi_sayisi,
             giysi_adlari=giysi_adlari,
             tris_lod0=kar.hz_tri(lod0), tris_lod1=kar.hz_tri(lod1),
+            # AGIRLIK KAYDA GIRER — CUNKU KATALOG GORMEDIGINI KORUYAMAZ.
+            #
+            # CLAUDE.md: "git status ikili bir dosyayi degismis
+            # gosteriyorsa once catalog.json diff'ine bak — ucgen sayisi
+            # ve olculer degismediyse o dosya geri alinir."
+            #
+            # Deri baglama duzeltildiginde tam bu durum olustu:
+            # geometri bir mikron oynamadi, `catalog.json` diff'i BOSTU,
+            # ve kural gercek bir duzeltmeyi cope atmayi soyluyordu.
+            # Degisen sey kosele agirliklariydi ve katalog onu
+            # kaydetmiyordu.
+            #
+            # Kural yanlis degil; kayit eksikti. Bir kaydin isi,
+            # onemli olan her seyi gorunur kilmaktir.
+            agirliksiz_kose=agirliksiz,
+            kose_lod0=toplam,
             kemik=len(arm.data.bones),
             kemikler=rk.kemik_raporu(arm, kar.HEDEF_BOY))
 

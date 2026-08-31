@@ -90,6 +90,8 @@
    ],
    "tris_lod0": 55168,
    "tris_lod1": 16548,
+   "agirliksiz_kose": 0,
+   "kose_lod0": 27624,
    "kemik": 22,
    "kemikler": [
     {
@@ -362,6 +364,8 @@
    ],
    "tris_lod0": 55648,
    "tris_lod1": 16692,
+   "agirliksiz_kose": 0,
+   "kose_lod0": 27864,
    "kemik": 22,
    "kemikler": [
     {

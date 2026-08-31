@@ -356,9 +356,35 @@ namespace Hezarfen.Editor.Diagnostics
                 float agl = p.y - ground;
                 bool yeter = agl > 380f;
 
-                Vector3 istenen = (tirmaniyor && !yeter)
-                    ? Quaternion.Euler(0f, 55f, 0f) * oyuncu.transform.forward
-                    : hedefYon;
+                // ONCE KALDIRACI ARA, SONRA HEDEFE GIT.
+                //
+                // Pilot ilk kareden itibaren hedefe (dogu, 101 derece)
+                // yoneliyordu ve orada kaldirac YOK: yamac gunese
+                // sirtini donmus ve lodosun ruzgar altinda. Olculdu —
+                // en iyi kaldirac +1,87 m/s ve kuleden 160 m BATIDA.
+                // Yani ucus dogru kanatla, dogru termikle, yanlis yone
+                // gidiyordu: yatay mesafe 1.206 m'ye ciktiginda bile
+                // kazanc 0 m kaldi.
+                //
+                // Pilot kaldiracin yerini BILMIYOR, ARIYOR: cevresinde
+                // sekiz yone bakip havanin en cok yukseldigi yone
+                // doner. Hazir cevap vermek olcumu iyimserlestirirdi;
+                // aramak, gercek bir planorcunun yaptigi seydir.
+                Vector3 istenen;
+                if (yeter)
+                {
+                    istenen = hedefYon;                 // yeterince yuksek
+                }
+                else if (tirmaniyor)
+                {
+                    // Termigin icindeyiz: daire ciz, cikmayi surdur.
+                    istenen = Quaternion.Euler(0f, 55f, 0f)
+                              * oyuncu.transform.forward;
+                }
+                else
+                {
+                    istenen = KaldiracaDogru(p, hedefYon);
+                }
 
                 float aci = Vector3.SignedAngle(oyuncu.transform.forward,
                                                 istenen, Vector3.up);
@@ -380,6 +406,36 @@ namespace Hezarfen.Editor.Diagnostics
                 // sinirlar. Donus yaricapi 39 m; en iyi kaldirac
                 // bandi ~160 m genisliginde, rahat sigar.
                 pilot.Roll = Mathf.Clamp(aci / 120f, -0.4f, 0.4f);
+            }
+
+            /// <summary>
+            /// Çevredeki en iyi kaldıracın yönü.
+            ///
+            /// Sekiz yönde, 120 m ötede, aynı kotta havanın dikey
+            /// hızına bakılır. Hiçbiri hedeften iyi değilse hedefe
+            /// gidilir — kaldıraç aramak, hedefi unutmak değil.
+            ///
+            /// 120 m: en iyi kaldıraç kuleden 160 m ötede ve bandı
+            /// ~160 m geniş; daha kısa bir kol bandın içinde kalır ve
+            /// hiçbir fark göremez, daha uzunu suyun üstüne taşar.
+            /// </summary>
+            private static Vector3 KaldiracaDogru(Vector3 p, Vector3 hedefYon)
+            {
+                var alan = Object.FindAnyObjectByType<WindField>();
+                if (alan == null) return hedefYon;
+
+                float enIyi = alan.Sample(p + hedefYon * 120f).y;
+                var yon = hedefYon;
+                for (int i = 0; i < 8; i++)
+                {
+                    float a = i * 45f * Mathf.Deg2Rad;
+                    var d = new Vector3(Mathf.Sin(a), 0f, Mathf.Cos(a));
+                    float v = alan.Sample(p + d * 120f).y;
+                    if (v <= enIyi) continue;
+                    enIyi = v;
+                    yon = d;
+                }
+                return yon;
             }
 
             private void Yaz(List<Sonuc> l, WindField alan)
