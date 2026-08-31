@@ -308,12 +308,29 @@ namespace Hezarfen.Player
             if (suzulme != null) suzulme.enabled = true;
             if (firlatma != null) firlatma.Launch();
             _kalkisSayaci = kalkisPayi;
+            GostergeyiAyarla(true);
+        }
+
+        /// <summary>
+        /// Uçuş göstergesini açar/kapatır.
+        ///
+        /// Gösterge sahnede sürekli açıktı ve yürüyen oyuncunun
+        /// ekranında hava hızı, hücum açısı ve yatış yazıyordu —
+        /// hiçbiri o an anlamlı değil. `FlightHud.OnGUI` yalnız
+        /// `glider == null` diye bakıyor, `glider.enabled` diye
+        /// bakmıyordu.
+        /// </summary>
+        private void GostergeyiAyarla(bool acik)
+        {
+            var hud = GetComponent<Flight.FlightHud>();
+            if (hud != null) hud.enabled = acik;
         }
 
         private void YereGec()
         {
             // Ziplama geri acilir: yerde Space yine ziplamadir.
             if (yurume != null) yurume.atlayabilir = true;
+            GostergeyiAyarla(false);
             if (suzulme != null) suzulme.enabled = false;
             if (govde != null)
             {

@@ -76,5 +76,38 @@ namespace Hezarfen.Tests
                 "Gunduz ve gece toplami sabit olmali; ikisi ayni "
                 + "eksenin iki ucu.");
         }
+        /// <summary>
+        /// <b>Gerçek öznitelik katmanıyla su uzaklığı ölçülüyor mu.</b>
+        ///
+        /// Bu dosyanın öteki testleri <c>katman</c> alanını hiç
+        /// atamıyor ve o yüzden hepsi <c>y * 3</c> <b>vekil dalını</b>
+        /// ölçüyordu — testin kendi yorumu bunu itiraf ediyor.
+        ///
+        /// Sonuç: sekiz üretilmiş <c>AO_D_*.asset</c> çalışma zamanında
+        /// hiç okunmuyordu ve bunu <b>üç faz boyunca kimse fark
+        /// etmedi</b>, çünkü testler tam olarak eksik bağlantının
+        /// üstünü örtüyordu. Yeşil bir test, ölçtüğü şeyin var
+        /// olduğunu göstermez.
+        /// </summary>
+        [Test]
+        public void TheRealAttributeLayerIsReadWhenItIsThere()
+        {
+            var katman = UnityEditor.AssetDatabase
+                .LoadAssetAtPath<Hezarfen.Gis.AraziOznitelik>(
+                    "Assets/_Project/Data/AO_D_Galata.asset");
+            Assert.IsNotNull(katman, "AO_D_Galata.asset yok.");
+
+            // Galata'nin icinde bir nokta: suya uzak olmali.
+            float ic = katman.SuUzakligi(-1500f, -500f);
+            Assert.GreaterOrEqual(ic, 0f, "Su uzakligi okunamadi.");
+
+            // Vekil dal ile ayni sayiyi vermemeli: vekil yalnizca
+            // yuksekligi okur ve konuma hic bakmaz.
+            float baska = katman.SuUzakligi(-1200f, -300f);
+            Assert.IsTrue(ic != baska || ic == Hezarfen.Gis.AraziOznitelik.Uzak,
+                "Iki ayri konum ayni su uzakligini verdi — katman "
+                + "okunmuyor olabilir.");
+        }
+
     }
 }

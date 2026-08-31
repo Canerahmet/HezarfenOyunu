@@ -120,12 +120,58 @@ namespace Hezarfen.Sehir
                 int h = Hedef;
                 if (h < 0) return "";
                 if (Gece) return "Kayık gece işlemez";
-                string yer = graf.dugumler[h].semt;
-                if (string.IsNullOrEmpty(yer)) yer = "karşıya";
-                else yer = yer.Replace("D_", "").Replace("_", " ");
-                return $"{yer}'ya geç · {Ucret} akçe";
+                return $"{YerAdi(h)}'ya geç · {Ucret} akçe";
             }
         }
+
+        /// <summary>
+        /// Varış iskelesinin oyuncuya söylenecek adı.
+        ///
+        /// ## Neden düğümün kendi semti yetmiyor
+        ///
+        /// İskeleler <b>arazi sahnesinde</b> duruyor, semt sahnelerinde
+        /// değil — bu yüzden altı iskele düğümünün altısı da
+        /// <c>semt: "TERRAIN"</c> taşıyor ve ekranda
+        /// <b>"TERRAIN'ya geç"</b> yazıyordu.
+        ///
+        /// Daha kötüsü, bunu yazdığım test <b>göremedi</b>: sentetik
+        /// bir graf kurup düğüme elle <c>"D_Uskudar"</c> yazıyor ve
+        /// yeşil yanıyordu. Yani test kendi kurduğu şeyi ölçüyordu —
+        /// bu projede defalarca yakalanan kusurun benim elimden çıkmış
+        /// hâli.
+        ///
+        /// Çözüm ad uydurmak değil, <b>komşuya sormak</b>: iskelenin
+        /// çevresindeki en yakın gerçek semt düğümü nerede olduğunu
+        /// zaten biliyor.
+        /// </summary>
+        public string YerAdi(int iskele)
+        {
+            if (graf == null || iskele < 0
+                || iskele >= graf.dugumler.Count) return "karsiya";
+
+            string yer = graf.dugumler[iskele].semt;
+            if (Gecerli(yer)) return Duzelt(yer);
+
+            var p = graf.dugumler[iskele].konum;
+            float enIyi = float.MaxValue;
+            string bulunan = null;
+            for (int i = 0; i < graf.dugumler.Count; i++)
+            {
+                var d = graf.dugumler[i];
+                if (!Gecerli(d.semt)) continue;
+                float m2 = (d.konum - p).sqrMagnitude;
+                if (m2 >= enIyi) continue;
+                enIyi = m2;
+                bulunan = d.semt;
+            }
+            return bulunan != null ? Duzelt(bulunan) : "karsiya";
+        }
+
+        private static bool Gecerli(string semt) =>
+            !string.IsNullOrEmpty(semt) && semt != "TERRAIN";
+
+        private static string Duzelt(string semt) =>
+            semt.Replace("D_", "").Replace("_", " ");
 
         private bool Gece => geceKapali && zaman != null && zaman.Gece;
 

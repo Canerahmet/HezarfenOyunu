@@ -70,8 +70,19 @@ namespace Hezarfen.Sehir
         /// olur. Duvara girenler olabilir — kabul: bir kalabalığın
         /// içinden geçmek, yığının içinden geçmekten iyidir.
         /// </summary>
+        //: SAPMA SOKAKTAN GENIS OLAMAZ.
+        //
+        // ±6 m yaziyordu ve sokak 7,2 m geniş (ADR 0075) — yani sapma
+        // sokagin kendisinden genis. "Duvara girenler olabilir — kabul"
+        // diye yazilmisti ve hic olculmemisti; karelerde bir govde tas
+        // duvarin icinden cikiyor.
+        //
+        // ±2,8 m sokak eninin yarisinin biraz alti: kalabaligin
+        // dagilmasina yeter, duvara girmeye yetmez. Meydanda daha
+        // genis bir dagilim istenirse dogru yol sapmayi buyutmek
+        // degil, meydani ayri isaretlemek.
         public float Sapma => ((tohum * 2654435761u) % 1000u) / 1000f
-                              * 12f - 6f;
+                              * 5.6f - 2.8f;
 
         /// <summary>İleri-geri sapma — sıra hâlinde dizilmesinler.</summary>
         public float Boylamsal => ((tohum * 40503u) % 997u) / 997f

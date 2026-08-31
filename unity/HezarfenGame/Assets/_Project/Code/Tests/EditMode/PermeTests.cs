@@ -139,5 +139,45 @@ namespace Hezarfen.Tests
 
             Object.DestroyImmediate(zamanGo);
         }
+        /// <summary>
+        /// <b>Gerçek graftaki her iskele okunur bir yer adı söylüyor mu.</b>
+        ///
+        /// Bu dosyanın öteki testleri sentetik bir graf kurup düğüme
+        /// elle <c>"D_Uskudar"</c> yazıyor — ve o yüzden gerçek kusuru
+        /// <b>göremediler</b>: iskeleler arazi sahnesinde durduğu için
+        /// altı iskele düğümünün altısı da <c>semt: "TERRAIN"</c>
+        /// taşıyor ve oyuncu ekranda <b>"TERRAIN'ya geç"</b>
+        /// okuyordu.
+        ///
+        /// Kendi kurduğunu ölçen test, kendi kurmadığını koruyamaz.
+        /// Bu test <c>SG_Sehir.asset</c>'in kendisini yüklüyor.
+        /// </summary>
+        [Test]
+        public void EveryRealJettyNamesAPlaceAPersonWouldRecognise()
+        {
+            var gercek = UnityEditor.AssetDatabase
+                .LoadAssetAtPath<SokakGrafi>(
+                    "Assets/_Project/Data/SG_Sehir.asset");
+            Assert.IsNotNull(gercek, "SG_Sehir.asset yok.");
+
+            var go = new GameObject("PERME_GERCEK");
+            var pm = go.AddComponent<Perme>();
+            pm.graf = gercek;
+
+            int iskele = 0;
+            for (int i = 0; i < gercek.dugumler.Count; i++)
+            {
+                if (gercek.dugumler[i].tur != SokakGrafi.Tur.Iskele) continue;
+                iskele++;
+                string ad = pm.YerAdi(i);
+                Assert.IsFalse(ad.Contains("TERRAIN"),
+                    $"{i} numarali iskele '{ad}' diyor — oyuncu bir "
+                    + "sahne dosyasinin adini okuyor.");
+                Assert.IsNotEmpty(ad, $"{i} numarali iskelenin adi bos.");
+            }
+            Assert.Greater(iskele, 0, "Grafta hic iskele yok.");
+            Object.DestroyImmediate(go);
+        }
+
     }
 }

@@ -62,6 +62,79 @@ namespace Hezarfen.Arayuz
             if (envanter == null) envanter = FindAnyObjectByType<Envanter>();
             if (gorev == null) gorev = FindAnyObjectByType<GorevYonetici>();
             if (vakit == null) vakit = FindAnyObjectByType<VakitBildirimi>();
+        }
+
+        /// <summary>
+        /// Dört olaya abone olur.
+        ///
+        /// ## Neden bu gerekli
+        ///
+        /// `GorevYonetici.GorevBasladi`, `GorevBitti`,
+        /// `UcusDizisi.DurumDegisti` ve `AranmaSistemi.DurumDegisti` —
+        /// dördü de yazılmış ve çalışma zamanında <b>tek abonesi
+        /// yoktu</b>. Yani 25 dakika yürüyüp bir görev bitiren oyuncu
+        /// bunu ancak köşedeki sayaca bakarsa öğreniyordu; kanadı
+        /// kuşandığında, ases onu fark ettiğinde ekranda hiçbir şey
+        /// olmuyordu.
+        ///
+        /// Bildirme yeri zaten vardı (<see cref="Bildir"/>) ve yalnız
+        /// kaydet/yükle için kullanılıyordu. Eksik olan sekiz satırdı.
+        /// </summary>
+        private void OnEnable()
+        {
+            if (gorev != null)
+            {
+                gorev.GorevBasladi += IsBasladi;
+                gorev.GorevBitti += IsBitti;
+            }
+            var dizi = FindAnyObjectByType<Player.UcusDizisi>();
+            if (dizi != null) dizi.DurumDegisti += UcusDurumu;
+            if (aranma != null) aranma.DurumDegisti += AranmaDurumu;
+        }
+
+        private void OnDisable()
+        {
+            if (gorev != null)
+            {
+                gorev.GorevBasladi -= IsBasladi;
+                gorev.GorevBitti -= IsBitti;
+            }
+            var dizi = FindAnyObjectByType<Player.UcusDizisi>();
+            if (dizi != null) dizi.DurumDegisti -= UcusDurumu;
+            if (aranma != null) aranma.DurumDegisti -= AranmaDurumu;
+        }
+
+        private void IsBasladi(Gorev g) => Bildir($"Yeni iş: {g.baslik}");
+
+        private void IsBitti(Gorev g) =>
+            Bildir($"Teslim edildi · +{g.akce} akçe");
+
+        private void UcusDurumu(Player.UcusDizisi.Durum d)
+        {
+            switch (d)
+            {
+                case Player.UcusDizisi.Durum.Hazir:
+                    Bildir("Kanat kuşanıldı — Space ile atla"); break;
+                case Player.UcusDizisi.Durum.Ucuyor:
+                    Bildir("Uçuyorsun"); break;
+                case Player.UcusDizisi.Durum.Cakildi:
+                    Bildir("Sert indin"); break;
+            }
+        }
+
+        private void AranmaDurumu(AranmaSistemi.Durum d)
+        {
+            switch (d)
+            {
+                case AranmaSistemi.Durum.FarkEdildi:
+                    Bildir("Ases seni fark etti"); break;
+                case AranmaSistemi.Durum.Uyarildi:
+                    Bildir("«Kim var orada?»"); break;
+                case AranmaSistemi.Durum.Kovalaniyor:
+                    Bildir("Kovalanıyorsun"); break;
+                case AranmaSistemi.Durum.Yakalandi:
+                    Bildir("Yakalandın"); break;
+            }
             if (_oyuncuT == null)
             {
                 var go = GameObject.Find("OYUNCU");
@@ -97,9 +170,16 @@ namespace Hezarfen.Arayuz
             if (!Duraklatildi && etkilesim != null
                 && Basildi(etkilesimTusu, kol?.buttonWest))
             {
+                // BASARISIZLIGIN SEBEBI SOYLENIR.
+                //
+                // Once her basarisizliga "Kese dolu." deniyordu ve
+                // iskelede parasi yetmeyen oyuncu bunu okuyordu:
+                // para yetersizligi envanter dolulugu diye
+                // anlatiliyordu. Oyuncunun ne yapacagini bilmesi
+                // icin neyin olmadigini bilmesi gerekir.
                 string neydi = etkilesim.Ipucu;
-                if (etkilesim.Tetikle()) Bildir(neydi + " · alindi");
-                else if (neydi.Length > 0) Bildir("Kese dolu.");
+                if (etkilesim.Tetikle()) Bildir(neydi + " · alındı");
+                else if (neydi.Length > 0) Bildir(Sebep());
             }
         }
 
@@ -136,6 +216,22 @@ namespace Hezarfen.Arayuz
             if (kayit == null) { Bildir("Kayit sistemi yok."); return; }
             if (!Kayit.Var) { Bildir("Kayit bulunamadi."); return; }
             Bildir(kayit.Yukle() ? "Yuklendi." : "YUKLENEMEDI.");
+        }
+
+        /// <summary>
+        /// Etkileşim neden olmadı — tahmin değil, <b>hedefe sorulan</b>
+        /// cevap.
+        /// </summary>
+        private string Sebep()
+        {
+            if (etkilesim != null && etkilesim.Hedef is Perme p)
+            {
+                int kese = gorev != null ? gorev.Kese.akce : 0;
+                int eksik = p.Ucret - kese;
+                return eksik > 0 ? $"{eksik} akçe eksik."
+                                 : "Kayıkçı şimdi geçmiyor.";
+            }
+            return "Kese dolu.";
         }
 
         private void Bildir(string m)

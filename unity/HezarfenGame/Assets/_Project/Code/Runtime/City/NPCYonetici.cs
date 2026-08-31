@@ -491,8 +491,23 @@ namespace Hezarfen.Sehir
                 // en fazla `govdeButcesi` (60) isin — olculdu, kare
                 // suresine etkisi yok.
                 var yer = a.konum + yanal * a.Sapma + ileri * a.Boylamsal;
-                if (Physics.Raycast(yer + Vector3.up * 4f, Vector3.down,
-                                    out var vurus, 12f, ~0,
+
+                // ISIN SACAGIN ALTINDAN BASLAR.
+                //
+                // Once `+4 m`den atiliyordu ve saçak yerden ~3 m'de:
+                // ısın sacagin USTUNDEN basliyor, sacaga carpiyor ve
+                // gövde damin ustune oturuyordu. Karelerde bir sakin
+                // saçak kotunda dikiliyor, biri kaldirima gömülü.
+                //
+                // 1,2 m: ayagin ustunde ama her saçagin altinda.
+                // Yukaridan atmanin sebebi kaldirim ve kaidenin
+                // arazinin ustunde olmasiydi ve onlar 0,2-0,5 m — yani
+                // 1,2 m o isi de goruyor.
+                //
+                // Isin 6 m asagi bakar: yamacta dugumden asagi kalan
+                // yol bundan uzunsa zaten baska bir sey yanlistir.
+                if (Physics.Raycast(yer + Vector3.up * 1.2f, Vector3.down,
+                                    out var vurus, 6f, ~0,
                                     QueryTriggerInteraction.Ignore))
                     yer.y = vurus.point.y;
                 a.govde.position = yer;

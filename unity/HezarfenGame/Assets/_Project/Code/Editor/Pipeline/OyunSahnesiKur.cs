@@ -613,6 +613,18 @@ namespace Hezarfen.Editor.Pipeline
             // gereken cins.
             ucusHud.glider = suzulme;
 
+            // YERDE KAPALI.
+            //
+            // `FlightHud.OnGUI` yalniz `glider == null` ise geri
+            // donuyordu; `glider.enabled`'a bakmiyordu. Yani oyuncu
+            // sehirde YURURKEN ekraninda surekli HAVA HIZI, HUCUM
+            // ACISI, YATIS ve "W/S: burun" yaziyordu — ucusa hic
+            // girmemis bir oyuncuya, hicbiri anlamli olmayan dort
+            // sayi.
+            //
+            // `UcusDizisi` havaya gecerken aciyor, inerken kapatiyor.
+            ucusHud.enabled = false;
+
             // FENER: gece sokakta fenersiz dolasilmaz (RESEARCH 6).
             //
             // Ay disarida yetiyor ama dar sokakta yetmiyor: iki katli
@@ -639,6 +651,24 @@ namespace Hezarfen.Editor.Pipeline
             // Yataklar sentezle uretiliyor (tools/audio/gen_ortam.py) —
             // indirilen ses yok, izlenecek lisans yok.
             var ses = kamGo.AddComponent<Hezarfen.City.OrtamSesi>();
+            // ARAZI OZNITELIK KATMANI BAGLANIR.
+            //
+            // Sekiz `AO_D_*.asset` uretilmis ve calisma zamaninda tek
+            // okuyucusu `OrtamSesi.katman`di — ve o alan HIC
+            // atanmiyordu. Yani `SuUzakligi()` sonsuza kadar
+            // `y * 3` vekiline dusuyordu: Galata sokaginda (y~20 m)
+            // deniz sesi %97, kulenin serefesinde (98 m) %58. Yukseklik
+            // denize uzakligin yerine geciyordu ve iliski TERSTI.
+            //
+            // Ustelik `OrtamSesiTests` katmani hic atamiyor, yani tam
+            // olarak o vekil dali kilitliyordu — test, eksik baglantiyi
+            // uc faz boyunca ortmustu.
+            ses.katman = AssetDatabase.LoadAssetAtPath<Hezarfen.Gis.AraziOznitelik>(
+                "Assets/_Project/Data/AO_D_Galata.asset");
+            if (ses.katman == null)
+                Debug.LogWarning("[Hezarfen] AO_D_Galata yok — ortam sesi "
+                                 + "yukseklik vekiline duser.");
+
             ses.deniz = SesYatagi("SFX_Ortam_Deniz");
             ses.ruzgar = SesYatagi("SFX_Ortam_Ruzgar");
             ses.carsi = SesYatagi("SFX_Ortam_Carsi");
