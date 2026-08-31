@@ -181,6 +181,24 @@ namespace Hezarfen.Editor.Pipeline
             rapor.Add(KalabalikVar ? "Replik: gosterici kuruldu"
                                    : "Replik: KAPALI (kalabalik yok)");
 
+            // 6a) AY — gecenin TEK kaynagi.
+            //
+            // Gece karesi yakalandi ve tamamen siyahti: 78 KB'lik bir
+            // PNG. Sebep tekti — sahnede bir ISIK var ve `ZamanSistemi`
+            // onu gunes batinca kapatiyor. Karanlik ile siyah ayni sey
+            // degil; dolunay disarida golge dusurur.
+            var ayGo = GameObject.Find("AY");
+            if (ayGo == null) ayGo = new GameObject("AY");
+            var ayIsik = ayGo.GetComponent<Light>();
+            if (ayIsik == null) ayIsik = ayGo.AddComponent<Light>();
+            ayIsik.type = LightType.Directional;
+            var ay = ayGo.GetComponent<AyIsigi>();
+            if (ay == null) ay = ayGo.AddComponent<AyIsigi>();
+            ay.zaman = zaman;
+            ay.Uygula(zaman.yilinGunu, zaman.saat);
+            rapor.Add($"Ay: evre {AyIsigi.Evre(zaman.yilinGunu):0.00}, "
+                      + $"aydinlik {AyIsigi.Aydinlik(AyIsigi.Evre(zaman.yilinGunu)):0.00}");
+
             // 6b) SEHRIN HAVASI — baca dumani ve marti.
             //
             // Kalabaliktan bagimsiz: kalabalik kapatilsa bile bacalar
@@ -445,6 +463,13 @@ namespace Hezarfen.Editor.Pipeline
             kamGo.transform.localPosition = Vector3.zero;
             kamGo.AddComponent<Camera>();
             kamGo.AddComponent<AudioListener>();
+
+            // FENER: gece sokakta fenersiz dolasilmaz (RESEARCH 6).
+            //
+            // Ay disarida yetiyor ama dar sokakta yetmiyor: iki katli
+            // ahsap ev cephesi gogun yarisini kapatir. Fener, hem o
+            // bosluğu dolduruyor hem de donemin kendi kurali.
+            go.AddComponent<Fener>();
 
             // ETKILESIM: kese oyuncuda, nisan kamerada.
             //
