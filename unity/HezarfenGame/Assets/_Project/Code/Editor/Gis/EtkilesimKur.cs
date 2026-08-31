@@ -39,6 +39,17 @@ namespace Hezarfen.Editor.Gis
             ("PF_Sebze", EsyaTuru.Sebze, 2),
         };
 
+        /// <summary>
+        /// İskele önekleri — bunlara <see cref="Perme"/> takılır.
+        ///
+        /// Ayrı liste, çünkü iskele bir <b>eşya</b> değil bir
+        /// <b>geçiş</b>: envantere bir şey koymaz, oyuncuyu taşır.
+        /// Aynı arayüzü (<c>IEtkilesim</c>) paylaşmaları tam da o
+        /// arayüzün işi — "E'ye basınca bir şey olur" fikri ikisini de
+        /// kapsıyor.
+        /// </summary>
+        private static readonly string[] Iskeleler = { "PF_Iskele" };
+
         [MenuItem("Hezarfen/GIS/Etkilesimleri kur (D_Galata)")]
         public static void Galata() => Kur("D_Galata");
 
@@ -96,12 +107,40 @@ namespace Hezarfen.Editor.Gis
                     }
                 }
 
+            // --- ISKELELER: PERME ---
+            int perme = 0;
+            foreach (var go in sahne.GetRootGameObjects())
+                foreach (var t in go.GetComponentsInChildren<Transform>())
+                {
+                    bool iskele = false;
+                    foreach (var onek in Iskeleler)
+                        if (t.name.StartsWith(onek)) { iskele = true; break; }
+                    if (!iskele) continue;
+                    if (t.GetComponent<Perme>() != null) continue;
+
+                    var pm = t.gameObject.AddComponent<Perme>();
+                    perme++;
+
+                    // Iskeleye YAKLASILABILMELI: etkilesim fizikten
+                    // geciyor ve iskelenin carpistiricisi yoksa
+                    // `OverlapSphere` onu hic gormez.
+                    if (t.GetComponentInChildren<Collider>() == null)
+                    {
+                        var kutu = t.gameObject.AddComponent<BoxCollider>();
+                        kutu.isTrigger = true;
+                        var b = Sinir(t);
+                        kutu.center = t.InverseTransformPoint(b.center);
+                        kutu.size = t.InverseTransformVector(b.size);
+                    }
+                }
+
             EditorSceneManager.MarkSceneDirty(sahne);
             EditorSceneManager.SaveScene(sahne);
 
             var sb = new StringBuilder($"ETKILESIM {semt}\n");
             sb.AppendLine($"  {eklenen} esya isaretlendi ({vardi} zaten vardi)");
             sb.AppendLine($"  {colliderEklenen} tetikleyici collider eklendi");
+            sb.AppendLine($"  {perme} iskeleye perme takildi");
             Debug.Log("[Hezarfen] " + sb);
         }
 

@@ -239,6 +239,37 @@ namespace Hezarfen.Editor.Pipeline
             gorevY.graf = sehir.graf;
             rapor.Add("Gorev: yonetici kuruldu");
 
+            // 5d) PERME — karsiya gecis.
+            //
+            // Iskeleler ARAZI sahnesinde duruyor, semt sahnelerinde
+            // degil; `EtkilesimKur` semtleri tariyor ve onlari hic
+            // gormuyordu. Bir gecisin sahnesi, gectigi yerin sahnesi
+            // degil.
+            int permeSayisi = 0;
+            foreach (var kok in sahne.GetRootGameObjects())
+                foreach (var t in kok.GetComponentsInChildren<Transform>())
+                {
+                    if (!t.name.StartsWith("PF_Iskele")) continue;
+                    var pm = t.GetComponent<Perme>();
+                    if (pm == null) pm = t.gameObject.AddComponent<Perme>();
+                    pm.graf = sehir.graf;
+                    pm.gorev = gorevY;
+                    pm.zaman = zaman;
+                    pm.Kur();
+                    permeSayisi++;
+
+                    // Iskeleye yaklasilabilmeli: etkilesim fizikten
+                    // geciyor.
+                    if (t.GetComponentInChildren<Collider>() == null)
+                    {
+                        var kutu = t.gameObject.AddComponent<BoxCollider>();
+                        kutu.isTrigger = true;
+                        kutu.size = new Vector3(6f, 3f, 6f);
+                        kutu.center = new Vector3(0f, 1.5f, 0f);
+                    }
+                }
+            rapor.Add($"Perme: {permeSayisi} iskele baglandi");
+
             // 6a) AY — gecenin TEK kaynagi.
             //
             // Gece karesi yakalandi ve tamamen siyahti: 78 KB'lik bir
