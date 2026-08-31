@@ -152,13 +152,28 @@ namespace Hezarfen.Player
         private void Update()
         {
             var kb = Keyboard.current;
-            if (kb != null && kb[degistirTusu].wasPressedThisFrame)
+            var kol = Gamepad.current;
+
+            // Kip degistirme: V ya da sag cubuk basmasi (R3).
+            if ((kb != null && kb[degistirTusu].wasPressedThisFrame)
+                || (kol != null && kol.rightStickButton.wasPressedThisFrame))
                 Degistir();
 
             if (kip != Bakis.UcuncuSahis) return;
+
+            // Kol uzunlugu: fare tekeri ya da D-pad sag/sol.
+            //
+            // Tekerin karsiligi kolda yok; D-pad yatay ekseni bos ve
+            // kaydet/yukle dikeyde. Kola sahip bir oyuncunun kamerayi
+            // hic ayarlayamamasi, ayari olmayan bir kamera demekti.
+            float teker = 0f;
             var fare = Mouse.current;
-            if (fare == null) return;
-            float teker = fare.scroll.ReadValue().y;
+            if (fare != null) teker = fare.scroll.ReadValue().y;
+            if (kol != null)
+            {
+                if (kol.dpad.right.wasPressedThisFrame) teker = -1f;
+                else if (kol.dpad.left.wasPressedThisFrame) teker = 1f;
+            }
             if (Mathf.Abs(teker) > 0.01f)
                 mesafe = Mathf.Clamp(mesafe - Mathf.Sign(teker) * tekerAdimi,
                                      enYakin, enUzak);

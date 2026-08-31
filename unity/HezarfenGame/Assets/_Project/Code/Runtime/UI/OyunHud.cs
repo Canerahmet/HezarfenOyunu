@@ -70,17 +70,30 @@ namespace Hezarfen.Arayuz
         private void Update()
         {
             var kb = Keyboard.current;
-            if (kb == null) return;
+            var kol = Gamepad.current;
 
-            if (kb[duraklatTusu].wasPressedThisFrame) Duraklat(!Duraklatildi);
-            if (kb[kaydetTusu].wasPressedThisFrame) Kaydet();
-            if (kb[yukleTusu].wasPressedThisFrame) Yukle();
+            // KLAVYE YOKSA DA OYNANIR.
+            //
+            // Once `if (kb == null) return;` vardi ve klavyesiz bir
+            // oyuncu — Steam Deck'te oldugu gibi — oyunu
+            // DURAKLATAMIYOR, kaydedemiyor, hicbir seye dokunamiyordu.
+            // Kolla menuden girilebiliyor, sonrasi bosluktu.
+            if (kb == null && kol == null) return;
+
+            bool Basildi(Key t, UnityEngine.InputSystem.Controls.ButtonControl b)
+                => (kb != null && kb[t].wasPressedThisFrame)
+                   || (b != null && b.wasPressedThisFrame);
+
+            if (Basildi(duraklatTusu, kol?.startButton))
+                Duraklat(!Duraklatildi);
+            if (Basildi(kaydetTusu, kol?.dpad.up)) Kaydet();
+            if (Basildi(yukleTusu, kol?.dpad.down)) Yukle();
 
             // DURAKLATILMISKEN ETKILESIM YOK: menu acikken imlec serbest,
             // bakis olu ve "onunde duran sey" artik oyuncunun secimi
             // degil, duraklattigi andan kalma bir kaza.
             if (!Duraklatildi && etkilesim != null
-                && kb[etkilesimTusu].wasPressedThisFrame)
+                && Basildi(etkilesimTusu, kol?.buttonWest))
             {
                 string neydi = etkilesim.Ipucu;
                 if (etkilesim.Tetikle()) Bildir(neydi + " · alindi");

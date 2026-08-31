@@ -111,6 +111,34 @@ namespace Hezarfen.Player
 
         [Header("Bakış")]
         public float mouseSensitivity = 0.08f;
+
+        /// <summary>
+        /// Sağ çubuğun bakış hızı (derece/s).
+        ///
+        /// Fare deltası bir <b>yol</b> bildirir (bu karede kaç piksel),
+        /// çubuk ise bir <b>hız</b>. İkisini aynı birim sanmak, yüksek
+        /// kare hızında kolu uçurur — bu yüzden çubuk kare süresiyle
+        /// çarpılır, fare çarpılmaz.
+        /// </summary>
+        public float KolBakisHizi = 180f;
+
+        /// <summary>Çubuk ölü bölgesi — bırakılmış çubuk kamerayı kaydırmasın.</summary>
+        public float KolOluBolge = 0.15f;
+
+        /// <summary>
+        /// Etkin fare hassasiyeti — ayarlardan gelir.
+        ///
+        /// Alan <c>mouseSensitivity</c> Inspector'da duruyordu ve
+        /// hiçbir menüye bağlı değildi. Ayarlar bir değer kaydettiyse o
+        /// kazanır; kaydetmediyse alanın kendisi. Bir sayının iki
+        /// sahibi olmasın diye okuma tek yerden yapılıyor.
+        /// </summary>
+        private float Hassasiyet =>
+            Arayuz.Ayarlar.Hassasiyet > 0f
+                ? Arayuz.Ayarlar.Hassasiyet : mouseSensitivity;
+
+        /// <summary>Dikey bakış ters mi — ayarlardan.</summary>
+        private bool YTers => Arayuz.Ayarlar.YTers;
         public float pitchLimit = 89f;
 
         private CharacterController cc;
@@ -243,34 +271,76 @@ namespace Hezarfen.Player
 
             var kb = Keyboard.current;
             var mouse = Mouse.current;
-            if (kb == null) return;
+            var kol = Gamepad.current;
+
+            // KLAVYE YOKSA DA OYNANIR.
+            //
+            // Once `if (kb == null) return;` yaziliyordu: klavye
+            // takili degilse — Steam Deck'te oldugu gibi — bu bilesen
+            // hicbir sey yapmiyordu. Kolla menuden oyuna girilebiliyor,
+            // sonra yurunemiyordu bile.
+            if (kb == null && kol == null) return;
 
             // Esc ARTIK BURADA DEGIL: duraklatmanin tek sahibi OyunHud.
             // (Gerekcesi `Capture`in belgesinde.)
 
             // Yercekimsiz inceleme kipi bir GELISTIRME araci: yayinlanan
             // oyunda F'ye basan oyuncu sehrin uzerinde suzulmemeli.
-            if (Application.isEditor || Debug.isDebugBuild)
-                if (kb.fKey.wasPressedThisFrame) flying = !flying;
+            if ((Application.isEditor || Debug.isDebugBuild)
+                && kb != null && kb.fKey.wasPressedThisFrame)
+                flying = !flying;
 
-            // --- bakis ---
-            if (looking && mouse != null)
+            // --- bakis: fare VE sag cubuk ---
+            //
+            // Cubuk deltasi kare suresiyle carpilir, fare deltasi
+            // carpilmaz — cunku fare zaten bir YOL bildirir (bu karede
+            // kac piksel), cubuk ise bir HIZ. Ikisini ayni birim
+            // sanmak, yuksek kare hizinda kolu ucurur.
+            if (looking)
             {
-                Vector2 d = mouse.delta.ReadValue() * mouseSensitivity;
-                transform.Rotate(0f, d.x, 0f, Space.World);
-                pitch = Mathf.Clamp(pitch - d.y, -pitchLimit, pitchLimit);
-                if (cam != null && kamera == null)
-                    cam.transform.localRotation =
-                        Quaternion.Euler(pitch, 0f, 0f);
+                Vector2 d = Vector2.zero;
+                if (mouse != null)
+                    d += mouse.delta.ReadValue() * Hassasiyet;
+                if (kol != null)
+                    d += kol.rightStick.ReadValue()
+                         * (KolBakisHizi * Time.deltaTime);
+                if (YTers) d.y = -d.y;
+
+                if (d.sqrMagnitude > 0f)
+                {
+                    transform.Rotate(0f, d.x, 0f, Space.World);
+                    pitch = Mathf.Clamp(pitch - d.y, -pitchLimit, pitchLimit);
+                    if (cam != null && kamera == null)
+                        cam.transform.localRotation =
+                            Quaternion.Euler(pitch, 0f, 0f);
+                }
             }
 
-            // --- yatay girdi ---
-            float x = (kb.dKey.isPressed ? 1f : 0f) - (kb.aKey.isPressed ? 1f : 0f);
-            float z = (kb.wKey.isPressed ? 1f : 0f) - (kb.sKey.isPressed ? 1f : 0f);
+            // --- yatay girdi: WASD VE sol cubuk ---
+            float x = 0f, z = 0f;
+            if (kb != null)
+            {
+                x = (kb.dKey.isPressed ? 1f : 0f) - (kb.aKey.isPressed ? 1f : 0f);
+                z = (kb.wKey.isPressed ? 1f : 0f) - (kb.sKey.isPressed ? 1f : 0f);
+            }
+            if (kol != null)
+            {
+                var sol = kol.leftStick.ReadValue();
+                if (sol.sqrMagnitude > KolOluBolge * KolOluBolge)
+                { x += sol.x; z += sol.y; }
+            }
             var wish = transform.right * x + transform.forward * z;
             if (wish.sqrMagnitude > 1f) wish.Normalize();
 
-            float speed = kb.leftShiftKey.isPressed ? runSpeed : walkSpeed;
+            // KOSMA CUBUGUN NE KADAR ITILDIGINE DE BAKAR.
+            //
+            // Klavye ikili: yuru ya da kos, arada hicbir sey yok. Kol
+            // analog ve bu bedava bir kazanc — cubuk yarim itilirse
+            // yuruyus, sonuna kadar itilirse kosu. Shift yine calisir.
+            bool kosuTusu = kb != null && kb.leftShiftKey.isPressed;
+            float itme = new Vector2(x, z).magnitude;
+            bool kolKosu = kol != null && itme > 0.85f;
+            float speed = (kosuTusu || kolKosu) ? runSpeed : walkSpeed;
 
             if (flying)
             {
@@ -279,10 +349,10 @@ namespace Hezarfen.Player
                 // yaya seviyesinden hic gorunmuyor.
                 var f = cam != null ? cam.transform.forward : transform.forward;
                 var move = f * z + transform.right * x;
-                if (kb.spaceKey.isPressed) move += Vector3.up;
-                if (kb.leftCtrlKey.isPressed) move += Vector3.down;
+                if (kb != null && kb.spaceKey.isPressed) move += Vector3.up;
+                if (kb != null && kb.leftCtrlKey.isPressed) move += Vector3.down;
                 cc.Move(move.normalized * flySpeed
-                        * (kb.leftShiftKey.isPressed ? 3f : 1f) * Time.deltaTime);
+                        * (kosuTusu ? 3f : 1f) * Time.deltaTime);
                 vSpeed = 0f;
                 return;
             }
@@ -293,8 +363,10 @@ namespace Hezarfen.Player
                 // Kucuk bir negatif hiz: tam sifir olursa `isGrounded` yamacta
                 // titriyor ve karakter basamaklarda takiliyor.
                 vSpeed = -1.5f;
-                if (atlayabilir && kb.spaceKey.wasPressedThisFrame)
-                    vSpeed = jumpSpeed;
+                bool atlaBasildi =
+                    (kb != null && kb.spaceKey.wasPressedThisFrame)
+                    || (kol != null && kol.buttonSouth.wasPressedThisFrame);
+                if (atlayabilir && atlaBasildi) vSpeed = jumpSpeed;
             }
             else
             {

@@ -152,7 +152,19 @@ namespace Hezarfen.Player
         private static bool Basildi(Key k)
         {
             var kb = Keyboard.current;
-            return kb != null && kb[k].wasPressedThisFrame;
+            if (kb != null && kb[k].wasPressedThisFrame) return true;
+
+            // KOL DA BASABILMELI.
+            //
+            // Kanat kusanmak ve atlamak oyunun iki tek-seferlik fiili
+            // ve ikisi de yalniz klavyedeydi. Kolla oynayan biri
+            // menuden oyuna girip yuruyebiliyor ama UCAMIYORDU —
+            // yani oyunun adini tasiyan seye erisemiyordu.
+            var kol = Gamepad.current;
+            if (kol == null) return false;
+            if (k == Key.G) return kol.rightShoulder.wasPressedThisFrame;
+            if (k == Key.Space) return kol.buttonSouth.wasPressedThisFrame;
+            return false;
         }
 
         /// <summary>Kanadı kuşan — girdi bu süre boyunca kilitli.</summary>
