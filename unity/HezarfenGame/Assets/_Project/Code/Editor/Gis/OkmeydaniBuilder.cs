@@ -320,8 +320,20 @@ namespace Hezarfen.Editor.Gis
                 }
             }
 
-            EnsureFolder(System.IO.Path.GetDirectoryName(ScenePath).Replace('\\', '/'));
-            EditorSceneManager.SaveScene(scene, ScenePath);
+            // ARAZI SAHNESINE GERI KAYDEDILIR — SANDBOX'A DEGIL.
+            //
+            // Bu ureteç `Faz1_Terrain`'i aciyor, dokuz menzil tasini,
+            // Okcular Tekkesi'ni ve namazgahi oraya diziyor ve sonra
+            // sonucu **`Sandbox/Faz2_Okmeydani.unity`ye farkli
+            // kaydediyordu**. Icerik dogru yere kuruluyor, sonra oksuz
+            // bir dosyaya tasiniyordu; build listesinde `Acilis`,
+            // `Faz1_Terrain`, `FlightSlice` var ve sandbox yok.
+            //
+            // Bedelini bir oyuncu yazdi: oyunun ilk emri "Okmeydani'na
+            // git" diyor, 3,5 km yuruyorsun ve bos bir cayira
+            // variyorsun. *"Oyunun ilk perdesi sehrin tek bos odasinda
+            // geciyor."*
+            EditorSceneManager.SaveScene(scene, TerrainScene);
 
             Debug.Log($"[Hezarfen] Okmeydani: tekke {(tekke != null ? "OK" : "YOK")}, "
                       + $"namazgah {(namazgah != null ? "OK" : "YOK")}, "

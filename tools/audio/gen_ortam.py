@@ -168,6 +168,41 @@ def kalabalik(n, rng):
     return out
 
 
+def adim(n, rng):
+    """
+    Tek bir ayak sesi: taş kaldırımda deri terlik.
+
+    ## Neden gürültüden çıkar
+
+    Bir adım sesi iki olaydan ibarettir: topuğun **darbesi** (geniş
+    bantlı, çok kısa) ve tabanın **sürtünmesi** (daha yüksek frekanslı,
+    biraz daha uzun). İkisi de gürültüdür; ayıran şey zarf.
+
+    ## Neden dört varyant
+
+    Tek örneği tekrar çalmak yürüyüşü bir **metronoma** çevirir ve kulak
+    bunu bir saniyede yakalar. Gerçek adımlar birbirinin aynı değildir;
+    dört ayrı tohumla üretilen dört örnek, rastgele seçildiğinde tekrarı
+    duyulmaz kılar.
+    """
+    out = [0.0] * n
+    # Darbe: 12 ms'lik keskin bir sönüm.
+    darbe = int(FS * 0.012)
+    ham = _bant(_beyaz(n, rng), 90.0, 900.0)
+    for i in range(min(darbe, n)):
+        sonum = math.exp(-i / (darbe * 0.35))
+        out[i] += ham[i] * sonum
+
+    # Surtunme: 60 ms, daha tiz, daha yumusak baslar.
+    surt = int(FS * 0.060)
+    tiz = _bant(_beyaz(n, rng), 1400.0, 6000.0)
+    for i in range(min(surt, n)):
+        t = i / float(surt)
+        zarf = math.sin(math.pi * t) ** 1.6
+        out[i] += tiz[i] * zarf * 0.35
+    return out
+
+
 YATAKLAR = {
     # ad: (üreten fonksiyonlar ve ağırlıkları, açıklama)
     "SFX_Ortam_Deniz": ([(deniz, 1.0), (marti, 0.5)],
@@ -178,7 +213,16 @@ YATAKLAR = {
                        "gece mahallesi: circi bocegi"),
     "SFX_Ortam_Carsi": ([(kalabalik, 1.0), (ruzgar, 0.15)],
                         "uzak pazar ugultusu"),
+
+    # AYAK SESI — bir oyuncunun en cok ozledigi ses.
+    "SFX_Adim_1": ([(adim, 1.0)], "tas kaldirimda adim (1)"),
+    "SFX_Adim_2": ([(adim, 1.0)], "tas kaldirimda adim (2)"),
+    "SFX_Adim_3": ([(adim, 1.0)], "tas kaldirimda adim (3)"),
+    "SFX_Adim_4": ([(adim, 1.0)], "tas kaldirimda adim (4)"),
 }
+
+# Adim yataklari kisadir: 10 saniyelik bir dongu degil, tek bir vurus.
+KISA = {"SFX_Adim_1", "SFX_Adim_2", "SFX_Adim_3", "SFX_Adim_4"}
 
 
 def yaz(yol, sol, sag):
@@ -205,6 +249,14 @@ def main():
     n = int(FS * SURE)
 
     for ad, (parcalar, neden) in YATAKLAR.items():
+        # ADIM KISADIR VE DONGUYE KAPANMAZ.
+        #
+        # Ortam yataklari 10 saniyelik dongulerdir ve basi sonuyla
+        # capraz karisir. Bir adim ise TEK BIR VURUSTUR: 0,2 saniye
+        # ve dongu yok. Ayni islemden gecirmek onu bir ugultuya
+        # cevirirdi.
+        kisa = ad in KISA
+        n = int(FS * (0.20 if kisa else SURE))
         # STEREO AMA AYNI DEĞİL: iki kanal ayrı tohumla üretilir.
         # Aynı sinyali iki kanala koymak sesi kafanın ortasında bir
         # noktaya sıkıştırır; ortam sesi çevreyi sarmalı.
@@ -216,7 +268,8 @@ def main():
                 parca = fn(n, rng)
                 for i in range(n):
                     toplam[i] += parca[i] * agirlik
-            kanallar.append(_normalle(_dongu_kapat(toplam), 0.8))
+            kanallar.append(_normalle(
+                toplam if kisa else _dongu_kapat(toplam), 0.8))
 
         yol = os.path.join(args.out, ad + ".wav")
         yaz(yol, kanallar[0], kanallar[1])

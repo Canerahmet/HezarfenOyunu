@@ -786,6 +786,23 @@ namespace Hezarfen.Editor.Pipeline
                 rapor2 += kg.katli != null ? " + kanat" : " + KANAT YOK";
             }
 
+            // AYAK SESI — sehirde 40.000 sakin var, oyuncunun adimi yoktu.
+            var adim = go.AddComponent<AdimSesi>();
+            adim.ornekler = new[]
+            {
+                AssetDatabase.LoadAssetAtPath<AudioClip>(
+                    "Assets/_Project/Audio/Ortam/SFX_Adim_1.wav"),
+                AssetDatabase.LoadAssetAtPath<AudioClip>(
+                    "Assets/_Project/Audio/Ortam/SFX_Adim_2.wav"),
+                AssetDatabase.LoadAssetAtPath<AudioClip>(
+                    "Assets/_Project/Audio/Ortam/SFX_Adim_3.wav"),
+                AssetDatabase.LoadAssetAtPath<AudioClip>(
+                    "Assets/_Project/Audio/Ortam/SFX_Adim_4.wav"),
+            };
+            if (adim.ornekler[0] == null)
+                Debug.LogError("[Hezarfen] Adim ornekleri yok — "
+                               + "tools/audio/gen_ortam.py kosulmali.");
+
             var kipler = go.AddComponent<KameraKipi>();
             kipler.govde = govde != null ? govde.transform : null;
             // Acilista OMUZ USTU: oyuncu once karakterini gormeli.
@@ -820,6 +837,16 @@ namespace Hezarfen.Editor.Pipeline
             // Sirtta: omuz hizasi, govdenin biraz arkasi.
             ornek.transform.localPosition = new Vector3(0f, 1.35f, -0.12f);
             ornek.transform.localRotation = Quaternion.identity;
+
+            // KANAT GORULUR, CARPMAZ.
+            //
+            // Prefablar uc carpistirici tasiyor ve gorsel govdeye
+            // takilan her carpistirici `CharacterController` ile
+            // kavga eder — `OyunSahnesiTests` bunu ayni turda
+            // yakaladi. Kanat bir gorsel; fizik gövdenin kapsulunde.
+            foreach (var c in ornek.GetComponentsInChildren<Collider>(true))
+                Object.DestroyImmediate(c, true);
+
             return ornek;
         }
 

@@ -332,3 +332,65 @@ Kapı pilotu iyileştirerek açılmaz; ADR 0084'e (a)/(b)/(c) seçenekleri
 | Kare (toplu kip) | 11,0 ms | 11,0 ms (bütçe 16,7) |
 | Uçuş başına yatay | 210 m | **1.437 m** (saf süzülüş) |
 | Uçuş kapısı | 0/21 | 0/21 — sebep artık tasarım |
+
+## Son kullanıcı — 1. tur (2026-09-01)
+
+Bir oyuncu, kod okumadan, 1 saat 51 dakika oynadı. Steam incelemesi:
+**👎 Tavsiye edilmez.** İade eder ama takip listesine ekler.
+
+> *"Muhteşem bir dekor, içinde henüz oyun yok."*
+
+### En ağır iki şikâyet — ikisi de tartışılmaz
+
+**1. Denizde kapana kısıldım (5/5).** Kuleden hedefe doğru uçarsan kıyı
+**652 m**'de bitiyor; oyun ise uçuşun sayılması için **800 m** istiyor.
+Yani kuralına uyan her uçuş denize düşüyor. Suya değince bir kare
+yüzeyde, sonra yerçekimi oyuncuyu **deniz tabanına** (−12 m) indiriyor;
+kıyı basamağı 58°, tırmanma sınırı 45° — **çıkış yok**. Tek çare oyunu
+yeniden başlatmak.
+
+**Bu eşiği ben koydum, bu turda.** Perdenin iki vapur biletiyle
+atlanmasını engellemek için. 500 m'ye indi ve suya düşeni kayıkçılar
+kıyıya çıkarıyor (Haliç'te 373 kayık zaten sahnede).
+
+**2. Kanat yok (5/5).** `PF_Kanat_Katli/Acik/Kirik` modellendi, dışa
+aktarıldı, kataloglandı, depoya girdi — ve GUID taraması **sıfır
+referans** döndü. Oyuncunun cümlesi: *"Oyunun adı Hezarfen. Oyunun
+tamamı bir kanat için. Kuleden atladığımda sırtımda, elimde, hiçbir
+yerimde kanat yok."*
+
+Bu oturumda "üretildi ama bağlanmadı" deseninin **en pahalı** örneği.
+Kanat artık duruma göre sırtta katlı / açık / kırık.
+
+### Kapatılan diğerleri
+
+- **Uzun süzülünce talim sayılmıyordu**: çember **inişte** ölçülüyordu,
+  üçüncü eşik 120 m ve çember 250 m — iyi süzülen cezalandırılıyordu.
+  Artık kalkışta ölçülüyor.
+- **Okmeydanı bomboş**: üreteç arazi sahnesini açıp taşları oraya
+  diziyor, sonra `Sandbox/`e **farklı kaydediyordu**. Farklı kaydetmek
+  bir yayın kararı değil, bir kaza. Gemide artık tekke, namazgâh,
+  5 menzil, 9 taş var.
+- **Ayak sesi yok**: dört varyant üretildi (`tools/audio/gen_ortam.py`),
+  adım zamanlayıcıya değil **kat edilen yola** bağlı.
+- **Ana menüde "Devam et" yok**: kayıt on iki alan tutuyordu ve menüde
+  bir yüzü yoktu.
+
+Kanadı takınca görsel gövdeye üç çarpıştırıcı sızdı ve
+`OyunSahnesiTests` aynı turda yakaladı.
+
+### Oyuncunun beğendikleri (kayda değer)
+
+Galata sokakları, gece (ay + fener), kule şerefesinden manzara, ezanî
+saat, uçuş göstergesinin dürüstlüğü ("2903 m EKSİK" — *"en azından
+neden başaramadığımı biliyorum"*), ve **kapanış metni**: *"Oyunun en
+iyi otuz saniyesi."*
+
+### Devredilenler
+
+- Şehir sessiz: müzik yok, kalabalık uğultusu yok, ezan bir altyazı.
+- Herkes aynı adam; kadın yok; kalabalığın içinden geçiliyor.
+- Sonuç yok: 30 görev = sadece kese. Bedava su → dükkâna sat döngüsü.
+- Harita ve pusula yok.
+- Kayık görünmüyor (3 akçe, ekran değişmeden karşı kıyı).
+- Gökyüzü boş.
