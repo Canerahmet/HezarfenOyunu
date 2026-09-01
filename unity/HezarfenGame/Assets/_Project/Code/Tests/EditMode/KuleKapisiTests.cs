@@ -83,16 +83,37 @@ namespace Hezarfen.Tests
                 if (!c.isTrigger) { tas = c; break; }
             Assert.IsNotNull(tas, "Kulede kati carpistirici yok.");
 
-            // Kapinin merkezi tasin siniri DISINDA olmali.
+            // CETVEL OYUNUN KENDI SORUSUNU SORAR.
+            //
+            // Once `Collider.ClosestPoint` ile "nokta tasin icinde mi"
+            // olculuyordu ve kule carpistiricisi **disbukey olmaktan
+            // ciktigi** an o cetvel bozuldu: Unity, disbukey olmayan
+            // bir MeshCollider icin `ClosestPoint`'i desteklemez ve
+            // verilen noktayi geri dondurur. Test "kapi tasin ICINDE"
+            // dedi, oysa kapi disaridaydi.
+            //
+            // Sorulmasi gereken sey zaten belliydi ve oyunun kendisi
+            // onu soruyor: `EtkilesimAlgila` oyuncunun gozunden hedefe
+            // bir GORUS HATTI isini atar ve arada kati bir sey varsa
+            // hedefi reddeder. Test de tam onu atar — bir vekil degil,
+            // fiilin kendisi.
             var p = kapi.transform.position;
-            var enYakin = tas.ClosestPoint(p);
-            float d = Vector3.Distance(p, enYakin);
+            var eksen0 = kule.position;
+            var disari = (p - eksen0); disari.y = 0f;
+            disari = disari.sqrMagnitude > 1e-4f
+                     ? disari.normalized : -kapi.transform.forward;
 
-            Assert.Greater(d, 0.5f,
-                $"Kapi tasin {(d < 0.01f ? "ICINDE" : $"{d:F2} m disinda")}. "
-                + "Etkilesim gorus hatti istiyor; tasin icindeki bir "
-                + "tetikleyiciye oyuncu asla ulasamaz ve 'Kuleye cik' "
-                + "yazisi hic belirmez.");
+            // Oyuncunun duracagi yer: kapinin 2 m disi, goz hizasi.
+            var goz = p + disari * 2f + Vector3.up * 0.4f;
+            var fark = p - goz;
+
+            bool engel = Physics.Raycast(goz, fark.normalized,
+                                         out var v0, fark.magnitude, ~0,
+                                         QueryTriggerInteraction.Ignore);
+            Assert.IsFalse(engel,
+                $"Kapiya bakis hatti KAPALI — arada '{(engel ? v0.collider.name : "?")}' "
+                + "var. Etkilesim gorus hatti istiyor; oyuncu 'Kuleye "
+                + "cik' yazisini hic goremez.");
         }
 
         /// <summary>
@@ -133,10 +154,35 @@ namespace Hezarfen.Tests
             var nokta = eksen + Vector3.up * kapi.serefeKotu
                         + yon * kapi.serefeYaricapi;
 
+            // TANI: nokta bosta mi, yoksa TASIN ICINDE mi.
+            //
+            // Unity, carpistiricinin ICINDEN baslayan bir isina carpma
+            // bildirmez. Yani "zemin yok" iki ayri seyin ayni cevabi
+            // olabilir ve ikisi ayri kusurdur. Cetvel hangisi oldugunu
+            // soylemezse duzeltme yine tahmine kalir.
+            Collider tas2 = null;
+            foreach (var c in (kapi.transform.parent != null
+                     ? kapi.transform.parent.GetComponentsInChildren<Collider>(true)
+                     : new Collider[0]))
+                if (!c.isTrigger) { tas2 = c; break; }
+            string tani = "carpistirici yok";
+            if (tas2 != null)
+            {
+                var en = tas2.ClosestPoint(nokta);
+                float d2 = Vector3.Distance(en, nokta);
+                tani = d2 < 0.01f
+                    ? $"nokta TASIN ICINDE ({tas2.GetType().Name}, "
+                      + $"sinir {tas2.bounds.min.y:F1}–{tas2.bounds.max.y:F1} m)"
+                    : $"nokta tasin {d2:F2} m disinda "
+                      + $"({tas2.GetType().Name}, "
+                      + $"sinir {tas2.bounds.min.y:F1}–{tas2.bounds.max.y:F1} m)";
+            }
+
             bool zemin = Physics.Raycast(nokta + Vector3.up * 4f,
                                          Vector3.down, out var v, 9f, ~0,
                                          QueryTriggerInteraction.Ignore);
             Assert.IsTrue(zemin,
+                $"TANI: {tani}. " +
                 $"Kapinin biraktigi nokta ({nokta.x:F1}, {nokta.y:F1}, "
                 + $"{nokta.z:F1}) BOSLUKTA — altinda hicbir sey yok. "
                 + "Oyuncu manzarayi bir saniye gorup duser.");

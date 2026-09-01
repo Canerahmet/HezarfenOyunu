@@ -337,8 +337,31 @@ def build_galata(p, col, asset_name, textured=False):
     # Cizici SILINDIRIK olmali: kutu collider, kulenin dibinde 3,4 m'lik
     # gorunmez bir kose birakirdi (16,45 m capli bir daire ile onu saran
     # karenin farki). Oyuncu kuleye carpar ama havada durur.
-    ucx = hz.make_tube(f"UCX_{asset_name}", r, r, mx[2] - mn[2], base_z=mn[2],
-                       segments=12, cap_top=True, cap_bottom=True, col=col)
+    # CIZICI KULENIN BICIMINI IZLER — TEK DOLU SILINDIR DEGIL.
+    #
+    # Once butun yuksekligi kaplayan tek bir kapali tup uretiliyordu ve
+    # `UCX_` oneki onu **disbukey** yapiyordu. Sonucu bir oyuncu buldu:
+    # kapidan gecince kagir govdenin ustundeki mazgalli sahanliga
+    # cikmasi gerekirken **tasin icinde** kaliyordu — olculdu,
+    # `ClosestPoint` noktayi carpistiricinin icinde buldu
+    # (MeshCollider, sinir 52,2–98,2 m).
+    #
+    # Kulenin gercek bicimi kademeli: kagir govde `shaft_h` (34,50) +
+    # korkuluk (1,70) yuksekliginde biter ve USTU DUZDUR — Hezarfen'in
+    # kalktigi yer orasi. Uzerinde daha dar bir kasnak ve ahsap kulah
+    # durur.
+    #
+    # Iki tup birlestirilir ve `UCXB_` adini alir: depo bu sozlesmeyi
+    # evlerde zaten kurdu (`ImportLanding`: UCX_ dolu -> convex,
+    # UCXB_ ici bos -> convex DEGIL). Disbukey yapmak kademeyi geri
+    # yutar ve sahanlik yine kaybolurdu.
+    _ust = p.shaft_h + p.parapet_h
+    _govde = hz.make_tube("UCXB_govde", r, r, _ust, base_z=mn[2],
+                          segments=12, cap_top=True, cap_bottom=True, col=col)
+    _tepe = hz.make_tube("UCXB_tepe", r - 0.35, r - 0.35,
+                         (mx[2] - mn[2]) - _ust, base_z=mn[2] + _ust,
+                         segments=12, cap_top=True, cap_bottom=False, col=col)
+    ucx = hz.join([_govde, _tepe], f"UCXB_{asset_name}", col=col)
     hz.assign(ucx, mats["stone"])
 
     for obj in (lod0, lod1):
