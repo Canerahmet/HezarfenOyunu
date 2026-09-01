@@ -237,6 +237,16 @@ namespace Hezarfen.Editor.Gis
             // `radius_m` cevrel dairenin yaricapidir, poligonun kendisi degil.
             Vector2 edge = OutsideEdge(field, 128f, marginM: 26f);
 
+            // BASKA YERE KONMUS KOPYALAR TEMIZLENIR.
+            //
+            // `LandmarkPlacer` da ayni iki yapiyi katalog noktasina
+            // koyuyordu ve sahnede iki takim duruyordu. Tabloyu
+            // duzeltmek yenilerini engeller, var olanlari silmez —
+            // ureteç kendi sahasini kendisi toplamali, yoksa duzeltme
+            // yalniz temiz bir depoda calisir.
+            int temizlenen = Temizle(scene, "PF_Tekke_Okcular")
+                             + Temizle(scene, "PF_Namazgah_Okmeydani");
+
             var tekke = Place(root.transform, "PF_Tekke_Okcular", terrain, edge,
                               yaw: 128f + 180f,
                               note: "Okcular (Kemankes) Tekkesi. RESEARCH.md: "
@@ -372,7 +382,7 @@ namespace Hezarfen.Editor.Gis
             EditorSceneManager.SaveScene(scene, TerrainScene);
 
             Debug.Log($"[Hezarfen] Okmeydani: tekke {(tekke != null ? "OK" : "YOK")}, "
-                      + $"{hucre} hucre, "
+                      + $"{hucre} hucre, {temizlenen} kopya silindi, "
                       + $"namazgah {(namazgah != null ? "OK" : "YOK")}, "
                       + $"{Menzils.Length} menzil, {feet.Count} ayak tasi, "
                       + $"{stones} bas tasi.\n" + string.Join("\n", lines));
@@ -512,6 +522,27 @@ namespace Hezarfen.Editor.Gis
                 if (r.gameObject.name.EndsWith("LOD0"))
                     return Mathf.Max(r.bounds.size.x, r.bounds.size.z);
             return 4f;
+        }
+
+        /// <summary>
+        /// Sahnedeki bu adı taşıyan eski örnekleri siler.
+        ///
+        /// Bir üreteç ikinci kez koştuğunda aynı sonucu vermeli; "zaten
+        /// var" diye atlamak ya da üstüne bir yenisini eklemek, bu
+        /// depoda üç ayrı yerde kusur üretti (kule kapısının dört
+        /// kopyası, dükkânların hiç güncellenmemesi, ve burası).
+        /// </summary>
+        private static int Temizle(Scene scene, string ad)
+        {
+            var silinecek = new List<GameObject>();
+            foreach (var kok in scene.GetRootGameObjects())
+                foreach (var t in kok.GetComponentsInChildren<Transform>(true))
+                    if (t.name.StartsWith(ad))
+                        silinecek.Add(t.gameObject);
+
+            foreach (var go in silinecek)
+                if (go != null) UnityEngine.Object.DestroyImmediate(go);
+            return silinecek.Count;
         }
 
         private static void EnsureFolder(string assetFolder)

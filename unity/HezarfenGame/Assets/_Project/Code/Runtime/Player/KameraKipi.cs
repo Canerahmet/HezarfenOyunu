@@ -117,7 +117,24 @@ namespace Hezarfen.Player
                 _eskiGolge = new UnityEngine.Rendering.ShadowCastingMode[0];
                 return;
             }
-            _ciziciler = govde.GetComponentsInChildren<Renderer>(true);
+            // KANAT BIRINCI SAHISTA DA GORUNUR.
+            //
+            // Gizlenecek ciziciler gövdenin TAMAMINDAN toplaniyordu ve
+            // kanat gövdenin cocugu; sonucu bir oyuncu yazdi:
+            // *"Birinci sahsa gecince kanat tamamen kayboluyor —
+            // kuleden atlarken V'ye basarsam kanatsiz uçuyorum."*
+            //
+            // Oysa suzülen bir pilotun gormesi gereken tek sey
+            // kanattir: nerede oldugunu, ne kadar yattigini ve
+            // titredigini oradan okur. Kendi govdesini gormemesi
+            // dogru, kanadini gormemesi degil.
+            var hepsi = govde.GetComponentsInChildren<Renderer>(true);
+            var liste = new System.Collections.Generic.List<Renderer>();
+            foreach (var r in hepsi)
+                if (r.GetComponentInParent<KanatGorseli>() == null)
+                    liste.Add(r);
+
+            _ciziciler = liste.ToArray();
             _eskiGolge = new UnityEngine.Rendering
                 .ShadowCastingMode[_ciziciler.Length];
             for (int i = 0; i < _ciziciler.Length; i++)

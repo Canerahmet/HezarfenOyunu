@@ -30,6 +30,9 @@ namespace Hezarfen.Tests
         private const string CatalogPath = "art/blend/landmark/catalog.json";
         private const string PrefabDir = "Assets/_Project/Art/Prefabs";
 
+        private const string ArazaSahnesi =
+            "Assets/_Project/Scenes/Faz1_Terrain.unity";
+
         /// <summary>Bugünkü kule (m) — model bunun ALTINDA kalmak zorunda.</summary>
         private const float TodayTotalH = 62.59f;
 
@@ -1192,10 +1195,39 @@ namespace Hezarfen.Tests
         [Test]
         public void OkmeydaniBuildingsArePlaceable()
         {
-            foreach (var id in new[] { "LM_OkcularTekkesi",
-                                       "LM_OkmeydaniNamazgah" })
-                Assert.IsTrue(LandmarkPlacer.Built.ContainsKey(id),
-                    $"{id} yerlestirme listesinde yok.");
+            // SORU DEGISTI: "TABLODA MI" DEGIL, "DUNYADA MI".
+            //
+            // Bu test tekkenin `LandmarkPlacer` tablosunda olmasini
+            // sart kosuyordu ve tam da bu yuzden bir kusuru koruyordu:
+            // ayni iki yapi hem burada hem `OkmeydaniBuilder`'da
+            // yerlestiriliyor, sahnede iki takim duruyordu. Bir oyuncu
+            // buldu — *"Istanbul'da iki Okcular Tekkesi var."*
+            //
+            // Sahip artik tek: yapilar meydanin KENARINDA durmak
+            // zorunda (II. Bayezid vakfiyesi) ve o kisit menzil
+            // geometrisiyle birlikte `OkmeydaniBuilder`'da yasiyor.
+            // Test de yerlestiricinin listesini degil, sahneyi sorar —
+            // oyuncunun gordugu sey odur.
+            var sahne = UnityEditor.SceneManagement.EditorSceneManager
+                .GetSceneByPath(ArazaSahnesi);
+            if (!sahne.isLoaded)
+                sahne = UnityEditor.SceneManagement.EditorSceneManager
+                    .OpenScene(ArazaSahnesi,
+                        UnityEditor.SceneManagement.OpenSceneMode.Additive);
+
+            foreach (var ad in new[] { "PF_Tekke_Okcular",
+                                       "PF_Namazgah_Okmeydani" })
+            {
+                int n = 0;
+                foreach (var kok in sahne.GetRootGameObjects())
+                    foreach (var t in kok.GetComponentsInChildren<Transform>(true))
+                        if (t.name.StartsWith(ad)) n++;
+
+                Assert.AreEqual(1, n,
+                    $"Sahnede {n} adet {ad} var. Sifir ise oyunun ilk "
+                    + "perdesinin gectigi yer bos; birden fazlaysa iki "
+                    + "yerlestirici ayni yapiyi koyuyor demektir.");
+            }
 
             foreach (var pf in new[] { "PF_Tekke_Okcular",
                                        "PF_Namazgah_Okmeydani" })

@@ -70,8 +70,21 @@ namespace Hezarfen.Editor.Gis
                 { "LM_IncliKosk", "PF_IncliKosk_Ahsap" },
                 { "LM_TopkapiAdaletKulesi", "PF_TopkapiAdaletKulesi" },
                 { "LM_TopkapiBabusselam", "PF_TopkapiBabusselam" },
-                { "LM_OkcularTekkesi", "PF_Tekke_Okcular" },
-                { "LM_OkmeydaniNamazgah", "PF_Namazgah_Okmeydani" },
+                // OKMEYDANI YAPILARININ SAHIBI `OkmeydaniBuilder`.
+                //
+                // Ikisi de burada ve orada yerlestiriliyordu; sonucu
+                // bir oyuncu buldu: *"tekke ve namazgahin ikinci bir
+                // kopyasi 1 km otede duruyor — Istanbul'da iki Okcular
+                // Tekkesi var."*
+                //
+                // Hangi konum dogru sorusunun cevabi belli: meydanin
+                // yapisi menzil geometrisinden turer ve yapilar
+                // meydanin KENARINDA durmak zorunda (II. Bayezid
+                // vakfiyesi meydana yapi yapilmasini yasaklar). Bu
+                // kisit `OkmeydaniBuilder`'da yazili; katalog noktasi
+                // ise kaba bir isaret.
+                //
+                // Bir nesnenin iki sahibi olmaz.
                 { "LM_YeniCamiHarabe", "PF_YeniCamiHarabe" },
                 { "LM_Suleymaniye", "PF_Suleymaniye" },
                 // Ayasofya bir KILISEDIR ve kibleye donuk degildir; yonu
