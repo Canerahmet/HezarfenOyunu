@@ -251,3 +251,84 @@ sayaçları Editor'den okunmalı — bu bilinen ve yazılı bir sınır.
 - **SSR kapalı, su var**: Galata Kulesi Haliç'te görünmüyor.
 - **DLSS/dinamik çözünürlük kapalı** — 4070'te masada bırakılmış süre.
 - ADR 0084 hâlâ Caner'in kararını bekliyor.
+
+## 10. tur — 2026-09-01 (son yorumcu turu)
+
+Üç yorumcu, on yedi bulgu. Bu tur ayrıca "ilk iki saat", "ilk uçuş" ve
+"ilk bakış" anlatılarını istedi; onlar son kullanıcı aşamasına
+devredilen asıl belge.
+
+### İki yayımlanmış iddiam çürütüldü
+
+**1. "Menzil %15 arttı" (9. tur) — gerçek kazanç 12 metre.**
+İki tork terimi aynı anda çalışıyor: `pitchAuthority` (2,2) hedefe
+çevirir, `pitchStability` (0,8) açıyı sıfıra geri çeker. Denge
+`α = hedef × 2,2/3,0`, yani kanat komut edilenin **%73'ünü** uçuyor.
+`BestGlideRatio` 6,23° diyor, kanat 4,57° uçuyordu ve en iyi süzülüşe
+hiç ulaşmamıştı. Kazancı komut edilen açıların L/D'sinden hesaplamıştım;
+kanat o açıların hiçbirini uçmuyordu. 568 → 580 m.
+
+**2. "SSGI profilden silindi" (9. tur) — diskte duruyordu.**
+Silme kodu çalışıyor, sonra aynı dosyanın elli satır aşağısındaki
+`Ensure<GlobalIllumination>` onu geri ekliyordu. Yazdım, ölçmedim.
+Şimdi silme profil kurulumunun sonunda, alt-varlık da kaldırılıyor ve
+**dosyanın kendisini okuyan** bir kapı testi var.
+
+Bir de 9. turdaki "kalabalık tek fazda yürüyor" bulgum yanlış cetvele
+bakmış: faz kayması `anim.Play(0, 0, dna.faz)` ile çalışıyor.
+
+### Bu turda benim yazdığım koddaki üç kusur
+
+- `UcusSesi` inişten sonra hiç susmuyordu (kapalı `GlideController`
+  `AirspeedMps`'i dondurur) — oyuncu çarşıda bitmeyen rüzgârla.
+- 9. turda eklediğim süzülme konisi oyun sahnesinde **hiç
+  çizilmiyordu**: hedefi yalnız `FlightSlice`'ta var olan bir nesneyle
+  arıyordu.
+- Alan raporu süslü parantez eksikliğinden doğru sayıları toplayıp
+  **yanlış sonucu** yazdı.
+
+### Oyuncunun oyunu kapatacağı üç an — üçü de kapatıldı
+
+1. **Talim duvarı.** Eşik 3×60 m; düz zeminden bir süzülüş 22 m ve 60 m
+   için 5,2 m düşüş gerek. Sayaç `0/3` diyor, sebebini söylemiyordu.
+   → Artan merdiven (30/60/120) + her denemede sebep.
+2. **Çıkılamayan kule.** Konveks kabuk, kapı yok, külah 45,9° / eğim
+   sınırı 45°. Perde ise yalnız yatay yakınlık soruyordu: kule dibinde
+   G+Space "kalkış" sayılıyor, 3.336 m'lik final **iki vapur biletiyle**
+   geçilebiliyordu. → `KuleKapisi` + kalkış 40 m irtifa + iniş 800 m
+   uçulan yol istiyor.
+3. **Sessiz son.** `TepkiKodeksi`'nin 400 karakteri, sıfır okuyucu.
+   → Tam ekran kapanış paneli.
+
+Ayrıca: denizin çarpıştırıcısı yok, oyuncu −12 m'de yürüyordu; kamera
+55° yatışta ufku düz tutuyordu; bir test ölü SSGI override'ını
+koruyordu.
+
+### ADR 0084: süzülüş yarısı kapandı, kalanı bir tasarım kararı
+
+| ölçü | önce | sonra |
+|---|---:|---:|
+| Uçuş başına ortalama yatay | 210 m | **1.437 m** |
+| Kaldıraç (ölçüldü, ilk kez) | — | 1,99 m/s @ 480 m batı |
+| Dönme eşiği (türetildi) | 2,12 elle | **1,23** |
+| Dönüşün net kazancı | — | **+0,76 m/s** |
+
+Ölçüm aracının kendisinde dört kusur bulundu: pilot havaya göre
+tırmanmayı arıyordu (süzülen kanat havaya göre hep batar), dönüş eşiği
+elle yazılmıştı, arama yarıçapı 120 m iken kaldıraç 480 m ötedeydi, ve
+deneme yalnız Editor'dan koşuyordu — kapıyı tutan sayı, kapıyı
+değiştiren commit'ten üç commit eskiydi.
+
+Ve dürüst sonuç: **doğru uçan pilot, yanlış uçandan daha kısa gidiyor**
+(1.437 → 764 m), çünkü ulaşılabilir kaldıraç bedelini geri ödemiyor.
+Kapı pilotu iyileştirerek açılmaz; ADR 0084'e (a)/(b)/(c) seçenekleri
+ölçülmüş sayılarla yazıldı, önerim (b) — hedefi Sarayburnu'na almak.
+
+### Ölçülen durum
+
+| ölçü | 9. tur | 10. tur |
+|---|---|---|
+| EditMode testi | 434 | **435 yeşil**, 0 derleme hatası |
+| Kare (toplu kip) | 11,0 ms | 11,0 ms (bütçe 16,7) |
+| Uçuş başına yatay | 210 m | **1.437 m** (saf süzülüş) |
+| Uçuş kapısı | 0/21 | 0/21 — sebep artık tasarım |

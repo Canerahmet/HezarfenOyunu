@@ -373,7 +373,21 @@ namespace Hezarfen.Editor.Diagnostics
                 float havaDikey = 0f;
                 var alan = Object.FindAnyObjectByType<WindField>();
                 if (alan != null) havaDikey = alan.Sample(p).y;
-                bool tirmaniyor = govde.linearVelocity.y - havaDikey > 0.15f;
+                // ...VE SONRA BU FAZLA ILERI GITTI.
+                //
+                // Yukaridaki duzeltme (yer ekseni yerine hava ekseni)
+                // dogruydu ve amaci fugoid salinimini termik
+                // sanmamakti. Ama sorulan soru yanlis oldu: **suzulen
+                // bir kanat havaya gore HER ZAMAN batar** (en az batis
+                // 0,94 m/s). `linearVelocity.y - havaDikey > 0,15`
+                // kosulu bu yuzden neredeyse hicbir zaman dogru olmaz
+                // ve pilot termigin icindeyken bile "termikte degilim"
+                // der. 21 ucusun 21'inde kazanc 0 m cikmasinin sebebi
+                // budur.
+                //
+                // Bir variometrenin sordugu sey bu degil: **hava
+                // yukseliyor mu.** Pilotun karari da ona bagli.
+                bool tirmaniyor = havaDikey > 0.3f;
 
                 // Yeterince yuksekse termikte oyalanma, yola cik.
                 float ground = 0f;
@@ -429,12 +443,25 @@ namespace Hezarfen.Editor.Diagnostics
                     // — dusunce oradan gelir, buraya elle yazilmaz.
                     istenen = hedefYon;
                     var enIyi = KaldiracaDogru(p, hedefYon, out float kaldirac);
-                    if (kaldirac > DonusBatisi) istenen = enIyi;
+                    if (kaldirac > DonusBatisi()) istenen = enIyi;
                 }
 
                 float aci = Vector3.SignedAngle(oyuncu.transform.forward,
                                                 istenen, Vector3.up);
-                pilot.Pitch = tirmaniyor && !yeter ? 0.10f : 0f;
+                // YAVASLAMAK, YALNIZ DEGMEYE DEGER KALDIRACTA.
+                //
+                // `tirmaniyor` duzeltildikten sonra (hava yukseliyor
+                // mu) bu satir en ufak yukselmede burnu kaldiriyor ve
+                // aygiti yavaslatiyordu: olculdu, ortalama mesafe
+                // 1.437'den 717 m'ye dustu. Zayif kaldiracta yavaslamak
+                // yalnizca yol kaybettirir — gercek bir planorcu de
+                // zayif termige durup girmez.
+                //
+                // Esik donusunkiyle ayni olmali: ikisi de ayni soruyu
+                // soruyor — "bu kaldirac, onun icin odeyecegim
+                // batisi karsiliyor mu".
+                bool degerli = tirmaniyor && havaDikey > DonusBatisi();
+                pilot.Pitch = degerli && !yeter ? 0.10f : 0f;
 
                 // YATIS KIRPILIR — SARMAL DALIS BURADAN BASLIYORDU.
                 //
@@ -472,30 +499,85 @@ namespace Hezarfen.Editor.Diagnostics
                 var alan = Object.FindAnyObjectByType<WindField>();
                 if (alan == null) return hedefYon;
 
-                kaldirac = alan.Sample(p + hedefYon * 120f).y;
+                // ARAMA YARICAPI 120 m IDI VE KALDIRAC 480 m OTEDEYDI.
+                //
+                // Alan olculdu: en guclu dikey ruzgar **1,99 m/s** ve
+                // kulenin **480 m batisinda**. Pilot 120 m'lik bir
+                // cemberde ariyordu, yani var olan tek kaldiraci
+                // yapisal olarak goremiyordu — 21 ucusun 21'inde
+                // "kazanc 0 m" cikmasinin son sebebi bu.
+                //
+                // Uc yaricap: yakin (120 m) donulecek termik, orta
+                // (300 m) suzulerek gidilecek, uzak (550 m) yolu
+                // degistirmeye deger olan. Uzagi secmek bir maliyet —
+                // 550 m gitmek 48 m irtifa yer — ama tavan 620 m ve
+                // hedef 3.336 m: yukselmeden gidilemiyor.
                 var yon = hedefYon;
-                for (int i = 0; i < 8; i++)
+                kaldirac = alan.Sample(p + hedefYon * 120f).y;
+                // ...VE GENISLETMEK OLCUMU KOTULESTIRDI: 720 -> 662 m.
+                //
+                // Sebep ucuncu bir sayida ve onu ancak alan olcumu
+                // gosterdi: kaldiracin en guclu noktasi **80 m
+                // irtifada**, yani yamaci siyiran bir kotta. Kuleden
+                // (100 m) oraya suzulmek 42 m yiyor ve varista irtifa
+                // 58 m kaliyor; oradan +0,77 m/s ile 430 m'ye cikmak
+                // **8 dakika** suruyor. Denemenin sure tavani 300 s.
+                //
+                // Yani kapiyi tutan sey artik pilot degil: bu rotanin
+                // termikle gecilmesi SEKIZ DAKIKALIK bir suzulus
+                // demek ve bu bir TASARIM karari (ADR 0084) — kaldiraci
+                // guclendirmek, hedefi yaklastirmak, ya da uzun
+                // suzulusu kabul etmek.
+                //
+                // Genis arama kayda geciyor ama kapali: bugunku sure
+                // butcesinde yalnizca yol kaybettiriyor.
+                float[] yaricaplar = { 120f };
+                for (int i = 0; i < 16; i++)
                 {
-                    float a = i * 45f * Mathf.Deg2Rad;
+                    float a = i * 22.5f * Mathf.Deg2Rad;
                     var d = new Vector3(Mathf.Sin(a), 0f, Mathf.Cos(a));
-                    float v = alan.Sample(p + d * 120f).y;
-                    if (v <= kaldirac) continue;
-                    kaldirac = v;
-                    yon = d;
+                    foreach (float r in yaricaplar)
+                    {
+                        float v = alan.Sample(p + d * r).y;
+                        // Uzagi secmenin bedeli var: oraya suzulmek
+                        // irtifa yer. Kaldiraci mesafeyle indirimle ki
+                        // pilot yakindaki iyiyi uzaktaki cok iyiye
+                        // tercih edebilsin.
+                        float indirimli = v - r / 550f * 0.35f;
+                        if (indirimli <= kaldirac) continue;
+                        kaldirac = indirimli;
+                        yon = d;
+                    }
                 }
                 return yon;
             }
 
             /// <summary>
-            /// 33° yatışta ölçülen batış (m/s) — dönmeye değer kaldıracın
-            /// alt sınırı.
+            /// 33° yatışta batış (m/s) — dönmeye değer kaldıracın alt sınırı.
             ///
-            /// Sayı `SustainedBank_DoesNotSpiralDive` testinden geliyor
-            /// ve elle yazılmıyor olması önemli: dönüş verimi iyileşince
-            /// bu eşik de düşmeli, yoksa pilot iyileşmeyi kullanmaz.
-            /// Bugün 2,12; ADR 0083'ün hedefi 1,40 civarı.
+            /// <b>Kendi yorumunu ihlal ediyordu.</b> Belge "elle
+            /// yazılmıyor olması önemli: dönüş verimi iyileşince bu
+            /// eşik de düşmeli, yoksa pilot iyileşmeyi kullanmaz"
+            /// diyordu — ve altında <c>const 2.12f</c> yazıyordu.
+            /// Bu turda dönüş batışı gerçekten düzeldi ve eşik yerinde
+            /// kaldığı için pilot düzelmeyi <b>kullanamadı</b>: en iyi
+            /// kaldıraç +1,87 m/s, eski eşik 2,12 — yani hiçbir termiğe
+            /// hiç girmedi.
+            ///
+            /// Artık modelden türüyor: en az batış açısındaki batış,
+            /// yatışın yük katsayısıyla ölçeklenmiş
+            /// (<c>(1/cos φ)^1.5</c> — taşıma katsayısı 1/cos ile,
+            /// indüklenmiş sürükleme onun karesiyle artar).
             /// </summary>
-            private const float DonusBatisi = 2.12f;
+            private static float DonusBatisi()
+            {
+                var t = Object.FindAnyObjectByType<GlideController>()?.tuning;
+                if (t == null) return 2.12f;
+                float duz = Aerodynamics.MinSinkRate(t).sink;
+                const float Yatis = 33f;
+                float yuk = 1f / Mathf.Cos(Yatis * Mathf.Deg2Rad);
+                return duz * Mathf.Pow(yuk, 1.5f);
+            }
 
             private void Yaz(List<Sonuc> l, WindField alan)
             {
@@ -555,6 +637,71 @@ namespace Hezarfen.Editor.Diagnostics
                               + $"ortalama süre {toplamSure / n:F0} s");
                 sb.AppendLine();
                 sb.AppendLine("Kapı: varan ≥ %70.");
+
+                // DENEME, DAYANDIGI KALDIRACIN VAR OLUP OLMADIGINI
+                // SOYLEMELI.
+                //
+                // Yirmi bir ucusun yirmi birinde "kazanc 0 m" cikti ve
+                // ben once pilotu sucladim: tirmanis testini duzelttim,
+                // donus esigini modelden turettim — ve ortalama mesafe
+                // 1.437'den 720 m'ye DUSTU, kazanc yine 0. Yani pilot
+                // artik kaldirac ariyor ve bulamiyor.
+                //
+                // Bir olcum, girdisinin var olup olmadigini
+                // raporlamiyorsa, cikti hakkinda soyledigi her sey
+                // eksiktir. Alan burada dogrudan orneklenir.
+                if (alan != null)
+                {
+                    float enCok = float.MinValue, toplam = 0f;
+                    int n2 = 0; Vector3 enIyiNokta = Vector3.zero;
+                    for (int gx = -8; gx <= 8; gx++)
+                    for (int gz = -8; gz <= 8; gz++)
+                    for (int gy = 1; gy <= 4; gy++)
+                    {
+                        var q = new Vector3(gx * 60f, 40f + gy * 40f, gz * 60f);
+                        float w = alan.Sample(q).y;
+                        toplam += w; n2++;
+                        if (w > enCok) { enCok = w; enIyiNokta = q; }
+                    }
+                    sb.AppendLine();
+                    sb.AppendLine("## Kaldıraç alanı — kule çevresi 960×960 m");
+                    sb.AppendLine();
+                    sb.AppendLine($"En güçlü dikey rüzgâr **{enCok:F2} m/s** "
+                                  + $"@ ({enIyiNokta.x:F0}, {enIyiNokta.y:F0}, "
+                                  + $"{enIyiNokta.z:F0}); ortalama "
+                                  + $"{toplam / Mathf.Max(1, n2):F2} m/s, "
+                                  + $"{n2} örnek.");
+                    sb.AppendLine();
+                    sb.AppendLine($"Dönmeye değer eşik: **{DonusBatisi():F2} m/s** "
+                                  + "(en az batış × yük katsayısı).");
+                    // SUSLU PARANTEZ UNUTULDU VE RAPOR YALAN SOYLEDI.
+                    //
+                    // Ilk kosumda bu blok parantezsizdi: `if` yalnizca
+                    // bos `AppendLine()`i tutuyor, uyari satiri
+                    // KOSULSUZ basiliyordu. Rapor "bu arazide termikle
+                    // yukselmek mumkun degil" yazdi — oysa ayni raporun
+                    // iki satir ustunde kaldirac 1,99 ve esik 1,23
+                    // yaziyordu, yani donmek net +0,76 m/s.
+                    //
+                    // Bir olcum aracinin yanlis cumle kurmasi, olcumun
+                    // kendisinden daha pahalidir: dogru sayilari
+                    // toplayip yanlis sonucu yazdi.
+                    if (enCok < DonusBatisi())
+                    {
+                        sb.AppendLine();
+                        sb.AppendLine("> Alanın en güçlü noktası bile dönüş "
+                                      + "batışının altında: bu arazide termikle "
+                                      + "yükselmek **mümkün değil**.");
+                    }
+                    else
+                    {
+                        sb.AppendLine();
+                        sb.AppendLine($"> Dönmek net **+{enCok - DonusBatisi():F2} "
+                                      + "m/s** kazandırıyor — yükselmek mümkün. "
+                                      + "Kaldıraç hedefin TERSİ yönde (batıda), "
+                                      + "yani uçuş önce geriye gitmeli.");
+                    }
+                }
 
                 Directory.CreateDirectory(Cikti);
                 File.WriteAllText($"{Cikti}/ucus_denemesi.md", sb.ToString());
