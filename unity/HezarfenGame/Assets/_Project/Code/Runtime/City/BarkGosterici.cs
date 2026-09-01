@@ -47,8 +47,36 @@ namespace Hezarfen.Sehir
         // duyulmaz. Iki replik bir sokak sesidir, alti bir gurultudur.
         [Range(1, 12)] public int ayniAndaEnCok = 2;
 
-        [Tooltip("Yazının başın üstündeki yüksekliği (m).")]
-        public float yukseklik = 1.95f;
+        [Tooltip("Yazının başın üstündeki payı (m). Gövdenin boyuna eklenir.")]
+        public float yukseklik = 0.25f;
+
+        /// <summary>
+        /// Repliğin duracağı kot — <b>o kişinin başının üstü</b>.
+        ///
+        /// Burada sabit 1,95 m yazılıydı ve tek gövde varken doğruydu:
+        /// 1,70 m'lik adamın 25 cm üstü. Yedi arketip gelince yalan
+        /// oldu — 1,24 m'lik oğlanın repliği <b>başının 71 cm
+        /// üstünde</b>, boşlukta duruyor; 1,55 m'lik kadınınki 40 cm.
+        /// Kalabalığın konuştuğu değil, kalabalığın üstünde yazılar
+        /// uçuştuğu görünürdü.
+        ///
+        /// Gövdenin kendi boyu zaten biliniyor
+        /// (<see cref="SakinGovde.tabanBoy"/>) ve ölçeği de gövdenin
+        /// üstünde duruyor; ikisini çarpmak doğru kotu verir. Gövde
+        /// henüz atanmamışsa (uzaktaki sakin) yetişkin boyu varsayılır —
+        /// zaten replik yalnız görünür sakinlere çizilir.
+        /// </summary>
+        private float BasUstu(NPCAjan a)
+        {
+            float boy = InsanDNA.TabanBoy;
+            if (a.govde != null)
+            {
+                var sg = a.govde.GetComponent<SakinGovde>();
+                if (sg != null && sg.tabanBoy > 0.1f)
+                    boy = sg.tabanBoy * a.govde.localScale.y;
+            }
+            return boy + yukseklik;
+        }
 
         public int GorunurReplik { get; private set; }
 
@@ -159,7 +187,8 @@ namespace Hezarfen.Sehir
                     if (gecen >= ayniAndaEnCok)
                     { _adaylar.RemoveRange(i, _adaylar.Count - i); break; }
 
-                    var agiz = _adaylar[i].ajan.konum + Vector3.up * yukseklik;
+                    var agiz = _adaylar[i].ajan.konum
+                               + Vector3.up * BasUstu(_adaylar[i].ajan);
                     var fark = agiz - goz;
                     if (Physics.Raycast(goz, fark.normalized,
                                         fark.magnitude - 0.4f, ~0,
@@ -186,7 +215,8 @@ namespace Hezarfen.Sehir
                 for (int i = _adaylar.Count - 1; i >= 0; i--)
                 {
                     var d = _kamera.WorldToScreenPoint(
-                        _adaylar[i].ajan.konum + Vector3.up * yukseklik);
+                        _adaylar[i].ajan.konum
+                        + Vector3.up * BasUstu(_adaylar[i].ajan));
                     if (d.z <= 0f) { _adaylar.RemoveAt(i); continue; }
 
                     // AYRISMA YAZININ GENISLIGINE BAKAR, CAPAYA DEGIL.
@@ -239,7 +269,7 @@ namespace Hezarfen.Sehir
                 var g = t.transform.childCount > 0
                     ? t.transform.GetChild(0).GetComponent<TextMesh>() : null;
                 if (g != null) g.text = t.text;
-                t.transform.position = a.konum + Vector3.up * yukseklik;
+                t.transform.position = a.konum + Vector3.up * BasUstu(a);
                 if (_kamera != null)
                 {
                     var bakis = t.transform.position - _kamera.transform.position;

@@ -208,6 +208,16 @@ namespace Hezarfen.Editor.Pipeline
             bark.yonetici = sehir;
             bark.oyuncu = oyuncu.transform;
             bark.enabled = KalabalikVar;      // konusacak kimse yoksa susar
+            // PAY BURADA YAZILIR — ALAN VARSAYILANI SAHNEYI DEGISTIRMEZ.
+            //
+            // `yukseklik` artik "basin ustundeki PAY" (0,25 m); once
+            // "yerden mutlak kot" (1,95 m) idi. Sahnedeki bilesen eski
+            // seri degeri tasiyor ve kodda varsayilani degistirmek onu
+            // duzeltmez — bu depoda tam olarak bu bir kez oldu (nufus
+            // 9.000'e cikarildi, sahne 1.200'de kaldi). Anlami degisen
+            // bir alan, sahnede yeniden yazilmadikca eski anlamiyla
+            // calisir: replikler basin 1,95 m USTUNDE ucusurdu.
+            bark.yukseklik = 0.25f;
             rapor.Add(KalabalikVar ? "Replik: gosterici kuruldu"
                                    : "Replik: KAPALI (kalabalik yok)");
 

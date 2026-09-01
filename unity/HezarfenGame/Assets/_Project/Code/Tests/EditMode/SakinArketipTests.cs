@@ -177,6 +177,62 @@ namespace Hezarfen.Tests.EditMode
             }
         }
 
+        /// <summary>
+        /// <b>Her arketipin kişiden kişiye değişen bir kumaşı var mı.</b>
+        ///
+        /// Gövde çeşitliliği siluet verir, ton çeşitliliği aynı siluetin
+        /// tekrarını kırar. İkisinden biri eksikse kalabalık yine
+        /// kopyalanmış görünür — ve bu tam olarak oldu: yedi gövde
+        /// üretildi, ama <c>NPCYonetici.Boyanir</c> üç kumaş adı
+        /// tanıyordu ve kadının feracesi ile çocuğun takkesi listede
+        /// yoktu. Şehirdeki bütün kadınlar aynı mor.
+        /// </summary>
+        /// <summary>
+        /// Bilerek beyaz bırakılan kumaşlar — dönemde ağartılmış keten.
+        ///
+        /// Liste bir muafiyet değil bir <b>karar kaydı</b>: bu adların
+        /// boyanmaması bir unutma değil, kaynağın söylediği şey.
+        /// </summary>
+        private static readonly string[] BeyazKalan =
+            { "M_Cloth_Sarik", "M_Cloth_Yasmak", "M_Cloth_Gomlek",
+              "M_Cloth_Kavuk" };
+
+        [Test]
+        public void EveryArchetypeHasAGarmentThatVariesPerPerson()
+        {
+            // ILK YAZIMI KUSURU YAKALAMIYORDU.
+            //
+            // "En az bir kumasi boyaniyor mu" diye soruyordu ve kadinda
+            // salvar boyandigi icin YESIL doniyordu — oysa salvar
+            // feracenin ALTINDA, hic gorunmuyor. Bir testin gecmesi,
+            // ustundeki mor feracenin herkeste ayni oldugunu
+            // degistirmiyordu.
+            //
+            // Dogru soru "her kumas hakkinda bir KARAR verilmis mi":
+            // ya tona gore boyanir, ya bilerek beyaz birakilir. Yeni
+            // bir kumas eklendiginde bu test onu ikisinden birine
+            // yazmaya zorlar.
+            foreach (var p in Arketipler())
+            {
+                foreach (var r in p.GetComponentsInChildren<Renderer>(true))
+                {
+                    foreach (var m in r.sharedMaterials)
+                    {
+                        if (m == null) continue;
+                        string ad = m.name;
+                        if (!ad.StartsWith("M_Cloth_")) continue;
+                        if (NPCYonetici.MalzemeBoyanir(ad)) continue;
+                        Assert.Contains(ad, BeyazKalan,
+                            $"{p.name}: '{ad}' ne tona gore boyaniyor ne de "
+                            + "bilerek beyaz birakilanlar arasinda — bu "
+                            + "kumasi giyen herkes ayni renkte olur. Ya "
+                            + "NPCYonetici.Boyanir'a ekle, ya buradaki "
+                            + "BeyazKalan listesine gerekcesiyle yaz.");
+                    }
+                }
+            }
+        }
+
         [Test]
         public void ScaleIsRelativeToEachBodysOwnHeight()
         {

@@ -243,10 +243,22 @@ namespace Hezarfen.Sehir
                     evDugum = s.evDugum,
                     tohum = s.tohum,
                     konum = graf.dugumler[s.evDugum].konum,
-                    // Herkes ayni hizda yurumez; %15'lik bir yayilim
-                    // kalabaligi "tek vucut" olmaktan cikarir.
-                    yurumeHizi = 1.4f * (0.85f + 0.30f
-                        * Mathf.Abs(Mathf.Sin(s.tohum * 0.618f))),
+                    // HIZIN TEK SAHIBI VAR: InsanDNA.
+                    //
+                    // Burada ayri bir formul duruyordu
+                    // (`1,4 x (0,85 + 0,30 |sin(tohum x 0,618)|)`) ve
+                    // `DNAUygula` govde el degistirdiginde ayni alani
+                    // `dna.hiz` ile UZERINE yaziyordu. Yani ayni kisi,
+                    // oyuncu ona bakiyorsa bir hizda, bakmiyorsa baska
+                    // bir hizda yuruyordu — ve gorunmeyen 8.940 kisinin
+                    // ise varis saati oyuncunun nereye baktigina
+                    // bagliydi. Iki formul de "makul" sayilar
+                    // uretiyordu, o yuzden hicbir sey bozuk gorunmedi.
+                    //
+                    // DNA'ninki daha da dogru: hiz orada yasla duser ve
+                    // boyla artar, yani yasli adam sokakta yavas yurur.
+                    // Buradaki formul yalnizca tohumun sinusuydu.
+                    yurumeHizi = InsanDNA.Uret(s.tohum).hiz,
                 };
                 _sakinler.Add(a);
             }
@@ -853,13 +865,37 @@ namespace Hezarfen.Sehir
         /// ten ten, mest deri kalır — hepsi dönemin kendi kuralı,
         /// hepsi ayrıca siluetin okunmasını sağlayan şey.
         /// </summary>
+        /// <summary>
+        /// Bu malzeme kişiden kişiye <b>boyanır mı</b>.
+        ///
+        /// Liste üç kumaşla yazılıydı (entari, şalvar, kuşak) ve tek
+        /// gövde varken hepsini kapsıyordu. Yedi arketip gelince
+        /// eksildi: kadın <c>M_Cloth_Ferace</c>, çocuk
+        /// <c>M_Cloth_Takke</c> giyiyor ve ikisi de listede yoktu —
+        /// yani şehirdeki bütün kadınlar <b>aynı mor</b> feraceyle,
+        /// bütün çocuklar aynı kırmızı takkeyle geziyordu. Çeşitlilik
+        /// için yedi gövde üretip sonra beşini tek renge boyamak,
+        /// düzeltilen kusurun yeni bir yerde tekrarıydı.
+        ///
+        /// <b>Yaşmak ve sarık bilerek dışarıda:</b> ikisi de ağartılmış
+        /// ketendir ve dönemin sokağında beyazdır. Onları da tona
+        /// kaydırmak çeşitlilik değil, kaynağa aykırılık olurdu —
+        /// bu liste "boyanabilen her şey" değil, <b>boyanan şeyler</b>
+        /// listesi.
+        /// </summary>
         private static bool Boyanir(string malzemeAdi)
         {
             if (string.IsNullOrEmpty(malzemeAdi)) return false;
             return malzemeAdi.StartsWith("M_Cloth_Entari")
                 || malzemeAdi.StartsWith("M_Cloth_Salvar")
-                || malzemeAdi.StartsWith("M_Cloth_Kusak");
+                || malzemeAdi.StartsWith("M_Cloth_Kusak")
+                || malzemeAdi.StartsWith("M_Cloth_Ferace")
+                || malzemeAdi.StartsWith("M_Cloth_Takke");
         }
+
+        /// <summary>Testler için: bu ad tona göre boyanıyor mu.</summary>
+        public static bool MalzemeBoyanir(string malzemeAdi) =>
+            Boyanir(malzemeAdi);
 
         /// <summary>
         /// Tabanı DNA tonuna kaydırır — <b>parlaklığını bozmadan</b>.

@@ -36,6 +36,45 @@ namespace Hezarfen.Tests
                 + "yeniden kuruldugunda kimse baskasina donusmesin.");
         }
 
+        /// <summary>
+        /// <b>Yürüme hızının tek sahibi var.</b>
+        ///
+        /// <c>NPCYonetici</c> sakin kurulurken hızı kendi formülüyle
+        /// yazıyordu ve <c>DNAUygula</c>, gövde el değiştirdiğinde aynı
+        /// alanı <c>dna.hiz</c> ile üzerine yazıyordu. İkisi de makul
+        /// sayılar ürettiği için hiçbir şey bozuk görünmüyordu — ama
+        /// aynı kişi <b>oyuncu ona bakarken</b> bir hızda, bakmazken
+        /// başka bir hızda yürüyordu ve görünmeyen sekiz binin işe varış
+        /// saati oyuncunun bakışına bağlıydı.
+        ///
+        /// Bu test formülü değil, <b>sahipliği</b> koruyor: hız yalnız
+        /// burada hesaplanmalı.
+        /// </summary>
+        [Test]
+        public void PaceComesFromAgeAndHeightNotFromASeedSine()
+        {
+            foreach (var d in Ornek(400))
+            {
+                // Yasli yavas, genc hizli: hiz yasla DUSMELI.
+                Assert.That(d.hiz, Is.InRange(0.85f, 1.75f),
+                    $"tempo {d.hiz:0.00} m/s — insan yuruyusu degil.");
+            }
+
+            // Yasin gercekten etkisi var mi: en yasli ucte bir, en genc
+            // ucte birden ORTALAMA olarak yavas olmali. Tek tek
+            // kiyaslamak boy yayilimina takilirdi.
+            var hepsi = Ornek(900);
+            hepsi.Sort((a, b) => a.yas.CompareTo(b.yas));
+            int c = hepsi.Count / 3;
+            float genc = 0f, yasli = 0f;
+            for (int i = 0; i < c; i++) genc += hepsi[i].hiz;
+            for (int i = hepsi.Count - c; i < hepsi.Count; i++)
+                yasli += hepsi[i].hiz;
+            Assert.Greater(genc / c, yasli / c + 0.10f,
+                $"genc {genc / c:0.00} m/s, yasli {yasli / c:0.00} m/s — "
+                + "yas tempoyu degistirmiyorsa kalabalik tek ritimde.");
+        }
+
         [Test]
         public void HeightSpreadsLikeAPopulationNotAConstant()
         {
