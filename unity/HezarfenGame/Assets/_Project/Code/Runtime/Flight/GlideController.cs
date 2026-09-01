@@ -36,6 +36,38 @@ namespace Hezarfen.Flight
         public bool IsStalled { get; private set; }
         public float CurrentLift { get; private set; }
         public float CurrentDrag { get; private set; }
+
+        /// <summary>
+        /// Takılan kanat parçası sayısı (0–3) — sürüklemeyi düşürür.
+        ///
+        /// ## Neden bir ilerleme var
+        ///
+        /// Bir oyuncu iki saat oynadı ve şunu yazdı: *"Yaptığım hiçbir
+        /// şeyin sonucu yok. Otuz görev yaptım, değişen tek şey
+        /// kesedeki sayı."* Kese doluyordu ve harcanacak bir şey yoktu;
+        /// en pahalı mal 3 akçeydi.
+        ///
+        /// Kanat parçası o boşluğun iki ucunu birden kapatıyor: akçenin
+        /// gideceği yer <b>ve</b> uçuşun iyileşeceği yol. Zincir
+        /// <b>çalış → parça → daha uzağa uç</b>.
+        ///
+        /// ## Neden sürükleme, neden taşıma değil
+        ///
+        /// Taşımayı artırmak kanadı büyütmek olurdu ve `wingArea`
+        /// tarihsel bir iddia taşıyor (RESEARCH: kartal kanadı taklidi).
+        /// Sürüklemeyi düşürmek ise <b>işçiliktir</b>: daha sıkı
+        /// gerilmiş bez, daha temiz yontulmuş kaburga. Aynı kanat, daha
+        /// iyi yapılmış.
+        ///
+        /// Parça başına %6: üç parça sürüklemeyi %17 düşürür, süzülme
+        /// oranını 11,56'dan ~13,9'a çıkarır — 51,6 m'den menzil
+        /// 597'den ~717 m'ye. Oyunu bitirmeye yetmez (ADR 0084 hâlâ
+        /// açık) ama farkı <b>uçarken hissedilir</b>.
+        /// </summary>
+        [Range(0, 3)] public int kanatParcasi;
+
+        /// <summary>Parça başına sürükleme indirimi.</summary>
+        public const float ParcaBasinaIndirim = 0.06f;
         public Vector3 WindAtCraft { get; private set; }
 
         /// <summary>Girdi kaynağını değiştirir (testlerde sanal pilot için).</summary>
@@ -106,7 +138,14 @@ namespace Hezarfen.Flight
             float q = Aerodynamics.DynamicPressure(AirspeedMps, tuning);
 
             CurrentLift = q * tuning.wingArea * cl;
-            CurrentDrag = q * tuning.wingArea * cd;
+            // ISCILIK SURUKLEMEYI DUSURUR.
+            //
+            // Takilan her kanat parcasi %6: daha siki gerilmis bez,
+            // daha temiz yontulmus kaburga. Ayni kanat, daha iyi
+            // yapilmis.
+            float iscilik = 1f - ParcaBasinaIndirim
+                            * Mathf.Clamp(kanatParcasi, 0, 3);
+            CurrentDrag = q * tuning.wingArea * cd * iscilik;
 
             // Taşıma akışa DİK, gövde yukarısı tarafında. Çift çapraz çarpım,
             // gövde-yukarı vektörünün akışa dik bileşenini verir.

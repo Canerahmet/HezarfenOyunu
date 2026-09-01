@@ -96,7 +96,24 @@ namespace Hezarfen.Sehir
             EsyaTuru.Su => 2,
             EsyaTuru.Odun => 3,
             EsyaTuru.Sebze => 2,
-            // Kanat parcasi satilik degil — Hezarfen'in kendi isi.
+            // KANAT PARCASI: OYUNUN ADINI TASIYAN SEY, VE SATILIK.
+            //
+            // Once burada `0` vardi ve gerekcesi "Hezarfen'in kendi
+            // isi" idi. Sonucu olculdu: parca ne alinabiliyor, ne
+            // satilabiliyor, dunyada sifir tane var ve hicbir gorev
+            // tasitmiyordu — yani oyunun adini tasiyan aygitin
+            // parcasi **yalniz bir enum adiydi**.
+            //
+            // Ve kesenin gidecek bir yeri yoktu: bir oyuncu iki saatte
+            // ~130 akce biriktirip harcayacak bir sey bulamadi. En
+            // pahali mal 3 akce.
+            //
+            // 25 akce = 2,5 irgat yevmiyesi (`Ekonomi.IrgatYevmiyesi`
+            // 10). Uc parca 75 akce ≈ yedi gorev ≈ bir oturum. Boylece
+            // zincir kapanir: **calis → parca → daha uzaga uc.**
+            // Kendi isi olmasi, malzemesini kendisinin yontugu
+            // anlamina gelmiyor; ahsabi ve bezi carsidan alinir.
+            EsyaTuru.KanatParcasi => 25,
             _ => 0,
         };
 
@@ -107,7 +124,13 @@ namespace Hezarfen.Sehir
         /// oyuncuya sonsuz akçe basan bir döngü verirdi: al, sat, al.
         /// </summary>
         public static int SatisFiyati(EsyaTuru t) =>
-            Mathf.Max(0, Fiyat(t) - 1);
+            // KANAT PARCASI GERI SATILMAZ.
+            //
+            // Yontulmus bir kanat kaburgasinin esnaf icin degeri yok;
+            // ve geri satilabilseydi 25 akcelik bir mal 24'e donerek
+            // ilerlemeyi geri alinabilir yapardi. Bir yatirim, geri
+            // alinabiliyorsa yatirim degildir.
+            t == EsyaTuru.KanatParcasi ? 0 : Mathf.Max(0, Fiyat(t) - 1);
 
         public string Ipucu
         {
@@ -116,6 +139,9 @@ namespace Hezarfen.Sehir
                 if (!Acik) return "Kepenk kapalı";
                 if (_kip == 0)
                     return $"{Ad(satilan)} al · {Fiyat(satilan)} akçe";
+
+                if (_alimGunu == Gun && _alinan >= GunlukAlim)
+                    return "Esnafın bugünlük alacağı kalmadı";
 
                 var elde = SatilabilirOlan();
                 return elde == null
@@ -151,12 +177,46 @@ namespace Hezarfen.Sehir
             return true;
         }
 
+        /// <summary>
+        /// Bir esnafın <b>bir günde</b> alacağı en çok kalem.
+        ///
+        /// ## Neden bir sınır var
+        ///
+        /// Bir oyuncu on dakikada şunu buldu: avludaki su küpünden
+        /// bedava su al, dükkâna sat, tekrar al. Şehirde 15.815
+        /// toplanabilir eşya var ve hepsi ~90 saniyede yenileniyor —
+        /// yani akçe sonsuz.
+        ///
+        /// Çözüm mekaniği kaldırmak değil: toplanan şeyin bir karşılığı
+        /// <b>olmalı</b>, o yüzden yazıldı. Çözüm, esnafın da bir insan
+        /// olması. Bir fırıncı günde beş kap su alır, beşincisinden
+        /// sonra <i>"elimde var"</i> der. Sınır dükkân başına ve gün
+        /// başına: şehri dolaşan oyuncu yine kazanır, tek bir dükkânın
+        /// önünde duran kazanmaz.
+        ///
+        /// Beş: ırgat yevmiyesinin (10 akçe) yarısı kadar bir gelir —
+        /// bir günlük ek iş, bir meslek değil.
+        /// </summary>
+        public const int GunlukAlim = 5;
+
+        private int _alinan;
+        private int _alimGunu = -1;
+
+        /// <summary>Bugün bu dükkândan kaç kalem alındı — test okur.</summary>
+        public int BugunAlinan => _alimGunu == Gun ? _alinan : 0;
+
+        private int Gun => zaman != null ? zaman.yilinGunu : 0;
+
         private bool Sat(Envanter env, Kese kese)
         {
+            if (_alimGunu != Gun) { _alimGunu = Gun; _alinan = 0; }
+            if (_alinan >= GunlukAlim) return false;
+
             var t = SatilabilirOlan();
             if (t == null) return false;
             if (!env.Cikar(t.Value)) return false;
             kese.Kazan(SatisFiyati(t.Value));
+            _alinan++;
             return true;
         }
 

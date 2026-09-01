@@ -193,6 +193,16 @@ namespace Hezarfen.Player
         public void Kusan()
         {
             if (Simdiki != Durum.Yerde) return;
+
+            // PARCALAR KUSANIRKEN TAKILIR.
+            //
+            // Kanadi sirtina alirken elindeki parcalari da takarsin;
+            // ucus sirasinda degil. Bu, ilerlemenin oyuncuya gorunur
+            // oldugu andir ve dogru an odur.
+            var env = GetComponentInParent<Sehir.Envanter>();
+            if (env != null && suzulme != null)
+                suzulme.kanatParcasi = Mathf.Clamp(
+                    env.Adet(Sehir.EsyaTuru.KanatParcasi), 0, 3);
             animasyon?.Kusan();
             _sayac = kusanmaSuresi;
             Gec(Durum.Kusaniyor);

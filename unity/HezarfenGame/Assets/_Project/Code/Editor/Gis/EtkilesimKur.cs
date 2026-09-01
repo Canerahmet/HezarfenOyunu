@@ -70,6 +70,37 @@ namespace Hezarfen.Editor.Gis
             ("PF_Dukkan", EsyaTuru.Sebze),
         };
 
+        /// <summary>
+        /// Bu dükkân <b>kanat parçası</b> mı satıyor.
+        ///
+        /// ## Neden bir kısmı
+        ///
+        /// Kesenin gidecek bir yeri yoktu: bir oyuncu iki saatte
+        /// ~130 akçe biriktirdi ve en pahalı mal 3 akçeydi. Kanat
+        /// parçası — oyunun adını taşıyan aygıtın parçası — ne
+        /// alınabiliyor ne satılabiliyordu; dünyada sıfır tane vardı.
+        ///
+        /// Her dükkânda bulunursa aramanın anlamı kalmaz; hiçbirinde
+        /// bulunmazsa zincir kapanmaz. Kırkta bir: şehirde ~14 dükkân,
+        /// Galata'da üç dört tane — yürüyerek bulunur, ama aranır.
+        ///
+        /// ## Neden konumdan
+        ///
+        /// Seçim <b>deterministik</b> olmalı: aynı şehir her açılışta
+        /// aynı dükkânları taşımalı, yoksa oyuncu dün bulduğu yeri
+        /// bugün bulamaz. Konum zaten benzersiz ve kalıcı; ayrı bir
+        /// tohum alanı tutmak ikinci bir sahip yaratırdı.
+        /// </summary>
+        private static bool KanatciMi(Transform t)
+        {
+            if (!t.name.StartsWith("PF_Dukkan")) return false;
+            var p = t.position;
+            uint h = (uint)(Mathf.RoundToInt(p.x) * 73856093
+                            ^ Mathf.RoundToInt(p.z) * 19349663);
+            h ^= h >> 13; h *= 2246822519u; h ^= h >> 16;
+            return h % 40u == 0u;
+        }
+
         [MenuItem("Hezarfen/GIS/Etkilesimleri kur (D_Galata)")]
         public static void Galata() => Kur("D_Galata");
 
@@ -128,16 +159,32 @@ namespace Hezarfen.Editor.Gis
                 }
 
             // --- DUKKANLAR ---
-            int dukkan = 0;
+            int dukkan = 0, kanatciSayisi = 0;
             foreach (var go in sahne.GetRootGameObjects())
                 foreach (var t in go.GetComponentsInChildren<Transform>())
                 {
                     foreach (var (onek, satar) in Dukkanlar)
                     {
                         if (!t.name.StartsWith(onek)) continue;
-                        if (t.GetComponent<Dukkan>() != null) break;
-                        var d = t.gameObject.AddComponent<Dukkan>();
-                        d.satilan = satar;
+                        // VAR OLAN DUKKANIN MALI DA GUNCELLENIR.
+                        //
+                        // Once `if (GetComponent<Dukkan>() != null) break;`
+                        // yaziliyordu, yani bilesen bir kez eklendikten
+                        // sonra bu gecis o dukkana bir daha DOKUNMUYORDU.
+                        // Kanat parcasi satan dukkanlar eklendiginde
+                        // gecis "0 dukkan acildi" dedi ve hicbir dukkan
+                        // kanatciya donmedi — sessizce.
+                        //
+                        // Bir boru hatti adimi, ikinci kez kosuldugunda
+                        // AYNI SONUCU vermeli; "zaten var" diye atlamak
+                        // onu tek atimlik yapar ve bu depoda tek atimlik
+                        // duzeltmeler defalarca varlik uretiminin
+                        // arkasinda kaldi.
+                        var d = t.GetComponent<Dukkan>();
+                        if (d == null) d = t.gameObject.AddComponent<Dukkan>();
+                        bool kanatci = KanatciMi(t);
+                        d.satilan = kanatci ? EsyaTuru.KanatParcasi : satar;
+                        if (kanatci) kanatciSayisi++;
                         dukkan++;
                         if (t.GetComponentInChildren<Collider>() == null)
                         {
@@ -185,6 +232,7 @@ namespace Hezarfen.Editor.Gis
             sb.AppendLine($"  {eklenen} esya isaretlendi ({vardi} zaten vardi)");
             sb.AppendLine($"  {colliderEklenen} tetikleyici collider eklendi");
             sb.AppendLine($"  {perme} iskeleye perme takildi");
+            sb.AppendLine($"  {kanatciSayisi} dukkan kanat parcasi satiyor");
             sb.AppendLine($"  {dukkan} dukkan acildi");
             Debug.Log("[Hezarfen] " + sb);
         }

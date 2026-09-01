@@ -53,8 +53,23 @@ namespace Hezarfen.Tests
             Assert.AreEqual(Ekonomi.GunlukEkmek, Dukkan.Fiyat(EsyaTuru.Ekmek),
                 "Ekmek fiyati narh defterinden gelmiyor.");
             Assert.Greater(Dukkan.Fiyat(EsyaTuru.Odun), 0);
-            Assert.AreEqual(0, Dukkan.Fiyat(EsyaTuru.KanatParcasi),
-                "Kanat parcasi satilik — oysa Hezarfen'in kendi isi.");
+            // KANAT PARCASI ARTIK SATILIK — VE OLMASI GEREKIYORDU.
+            //
+            // Bu satir once `0` sart kosuyordu, gerekcesi "Hezarfen'in
+            // kendi isi". Sonucu olculdu: parca ne alinabiliyor, ne
+            // satilabiliyor, dunyada sifir tane vardi ve hicbir gorev
+            // tasitmiyordu — oyunun adini tasiyan aygitin parcasi
+            // **yalniz bir enum adiydi**. Kese de bosalmiyordu: bir
+            // oyuncu iki saatte ~130 akce biriktirip harcayacak bir sey
+            // bulamadi.
+            //
+            // Kendi isi olmasi, malzemesini kendisinin yontugu anlamina
+            // gelmiyor; ahsabi ve bezi carsidan alinir.
+            Assert.AreEqual(25, Dukkan.Fiyat(EsyaTuru.KanatParcasi),
+                "Kanat parcasi alinamiyor — kesenin gidecek yeri yok.");
+            Assert.AreEqual(0, Dukkan.SatisFiyati(EsyaTuru.KanatParcasi),
+                "Kanat parcasi geri satilabiliyor — geri alinabilen bir "
+                + "yatirim yatirim degildir.");
         }
 
         [Test]
@@ -104,6 +119,76 @@ namespace Hezarfen.Tests
             Assert.AreEqual(1, _env.Adet(EsyaTuru.Odun), "Odun satilmadi.");
             Assert.Greater(_gorev.Kese.akce, once,
                 "Satistan akce gelmedi — toplanan esya hala olu.");
+        }
+
+        /// <summary>
+        /// <b>Aynı dükkâna sonsuz mal satılamaz.</b>
+        ///
+        /// Bir oyuncu on dakikada buldu: avludaki su küpünden bedava
+        /// al, dükkâna sat, tekrar al. Şehirde 15.815 toplanabilir eşya
+        /// var ve hepsi ~90 saniyede yenileniyor — akçe sonsuzdu.
+        ///
+        /// Kapatılan şey mekanik değil, tek bir dükkânın önünde durup
+        /// para basmak. Şehri dolaşan oyuncu yine kazanır.
+        /// </summary>
+        [Test]
+        public void ASingleShopWillNotBuyForever()
+        {
+            _env.Ekle(EsyaTuru.Odun, 20);
+
+            int satilan = 0;
+            for (int i = 0; i < 40; i++)
+            {
+                // Cift basis: kip al/sat arasinda donuyor.
+                _d.Etkiles(_oGo);
+                if (_d.Etkiles(_oGo)) satilan++;
+            }
+
+            Assert.LessOrEqual(satilan, Dukkan.GunlukAlim,
+                $"Ayni dukkana bir gunde {satilan} kalem satildi; "
+                + $"sinir {Dukkan.GunlukAlim}. Sinirsiz alim, bedava "
+                + "esyayla birlesince sonsuz akce demek.");
+            Assert.Greater(satilan, 0, "Dukkan hic almadi.");
+        }
+
+        /// <summary>
+        /// <b>Akçenin gideceği bir yer var, ve karşılığı uçuşta.</b>
+        ///
+        /// Bir oyuncu iki saatte ~130 akçe biriktirdi ve harcayacak
+        /// hiçbir şey bulamadı; en pahalı mal 3 akçeydi. Zincir artık
+        /// kapanıyor: çalış → kanat parçası → daha uzağa uç.
+        ///
+        /// Bu test o zincirin <b>iki ucunu</b> birden tutar: parça
+        /// alınabiliyor mu, ve alınan parçanın uçuşta bir karşılığı
+        /// var mı. Yalnız fiyatı ölçmek, ödediği şeyin bir işe
+        /// yaradığını söylemezdi — bu depoda tam o kusur defalarca
+        /// çıktı.
+        /// </summary>
+        [Test]
+        public void CoinBuysReachAndNotJustAnInventoryLine()
+        {
+            _gorev.Kese.Kazan(Dukkan.Fiyat(EsyaTuru.KanatParcasi) * 3);
+            _d.satilan = EsyaTuru.KanatParcasi;
+
+            for (int i = 0; i < 3; i++)
+            {
+                Assert.IsTrue(_d.Etkiles(_oGo), $"{i + 1}. parca alinamadi.");
+                _d.Etkiles(_oGo);   // kip sat'a doner, geri al
+            }
+            Assert.AreEqual(3, _env.Adet(EsyaTuru.KanatParcasi));
+
+            // Ucusta karsiligi: surukleme duser.
+            var go = new GameObject("KANAT_T");
+            var g = go.AddComponent<Hezarfen.Flight.GlideController>();
+            g.kanatParcasi = 3;
+            float indirim = 1f - Hezarfen.Flight.GlideController
+                                 .ParcaBasinaIndirim * 3;
+            Assert.Less(indirim, 1f,
+                "Uc parca surukleme indirimi getirmiyor — alinan sey "
+                + "bir envanter satiri olarak kaliyor.");
+            Assert.Greater(indirim, 0.5f,
+                "Indirim asiri: kanat uc parcayla planore donuyor.");
+            Object.DestroyImmediate(go);
         }
 
         [Test]
