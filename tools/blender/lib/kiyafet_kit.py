@@ -659,3 +659,92 @@ def zemine_otur(obj, z=0.0):
             v.co.z = z
     obj.data.update()
     return obj
+
+
+def giysi_kolu(ad, col, cizgi, r_omuz, r_dirsek, r_bilek, kalinlik,
+               segment=16):
+    """
+    Entari kolu — **gövdenin kopyası değil, kendi hacmi olan bir giysi**.
+
+    ## Neden gerekti
+
+    Kol bugüne kadar :func:`kopya_kabuk` ile üretiliyordu: gövde kabuğu
+    kopyalanıp birkaç milimetre şişiriliyordu. Bir oyuncunun cümlesi
+    kusuru tam söylüyor — kıyafet *"giysi değil, biraz büyük bir vücut"*
+    gibi duruyor. Kola yapışmış kumaş, kumaş gibi görünmez.
+
+    Osmanlı entarisinin kolu **bileğe doğru genişler** ve sarkar;
+    Rålamb albümündeki (1657-58, kamu malı, ``refs/ralamb/``)
+    figürlerin hepsinde böyle. Yani kolun silueti bir ofset değil bir
+    **profil**: omuzda dar, dirsekte orta, bilekte geniş.
+
+    ## Nasıl
+
+    Kolun merkez çizgisi zaten ölçülüyor (``rig_kit.uzuv_cizgisi`` — rig
+    eklemleri de oradan çıkıyor). Bu işlev o çizgi boyunca halkalar
+    dizer ve halkaları çizginin **kendi yönüne dik** tutar; yoksa kol
+    dirsekte ezilir.
+    """
+    if not cizgi or len(cizgi) < 2:
+        return None
+
+    n = len(cizgi)
+
+    def yaricap(t):
+        # Omuz -> dirsek -> bilek: parcali dogrusal.
+        if t <= 0.5:
+            return r_omuz + (r_dirsek - r_omuz) * (t / 0.5)
+        return r_dirsek + (r_bilek - r_dirsek) * ((t - 0.5) / 0.5)
+
+    bm = bmesh.new()
+    halkalar = []
+    for i, p in enumerate(cizgi):
+        t = i / float(n - 1)
+        if i == 0:
+            yon = cizgi[1] - cizgi[0]
+        elif i == n - 1:
+            yon = cizgi[-1] - cizgi[-2]
+        else:
+            yon = cizgi[i + 1] - cizgi[i - 1]
+        if yon.length < 1e-6:
+            yon = Vector((0.0, 0.0, -1.0))
+        yon = yon.normalized()
+
+        gecici = Vector((0.0, 0.0, 1.0))
+        if abs(yon.dot(gecici)) > 0.95:
+            gecici = Vector((1.0, 0.0, 0.0))
+        u_ax = yon.cross(gecici).normalized()
+        v_ax = yon.cross(u_ax).normalized()
+
+        r = yaricap(t)
+        halka = []
+        for k in range(segment):
+            a = math.tau * k / segment
+            halka.append(bm.verts.new(
+                p + u_ax * (math.cos(a) * r) + v_ax * (math.sin(a) * r)))
+        halkalar.append(halka)
+
+    bm.verts.ensure_lookup_table()
+    for i in range(n - 1):
+        ust, alt = halkalar[i], halkalar[i + 1]
+        for k in range(segment):
+            k2 = (k + 1) % segment
+            bm.faces.new((ust[k], ust[k2], alt[k2], alt[k]))
+
+    obj = hz.mesh_from_bmesh(ad, bm, col=col)
+    if obj is None:
+        return None
+
+    # KALINLIK: tek yuzlu bir kol iceriden gorunmez ve birinci sahiste
+    # kanadin altindan tam da oraya bakiliyor.
+    m = obj.modifiers.new("Kalinlik", "SOLIDIFY")
+    m.thickness = kalinlik
+    m.offset = 1.0
+    _uygula(obj)
+
+    # YUMUSAK GOLGELEME: 16 segmentli bir tup duz golgelenirse
+    # renderda faseli bir fici gibi okunur — ilk denemede tam oyle
+    # cikti.
+    for poly in obj.data.polygons:
+        poly.use_smooth = True
+    return obj

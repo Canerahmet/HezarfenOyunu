@@ -467,3 +467,106 @@ def uzuv_denetimi(eklem, boy):
             if d > 0.01:
                 hata.append(f"{a}/{b} kot farki %{d*100:.1f} — govde simetrik")
     return hata
+
+def etek_kemikleri(arm_obj, mesh_obj, z_bel, z_etek, zincir=4, eklem=2,
+                   yaricap=None):
+    """
+    Eteğe **salınım kemikleri** ekler ve etek köşelerini onlara bağlar.
+
+    ## Neden gerekti
+
+    Caner *"yürürken dalgalansın"* dedi ve doğru görünen cevap Unity'nin
+    kumaş çözücüsüydü. Ölçü onu eliyor: şehirde aynı anda 60 görünür
+    gövde var, her biri 16 bin üçgen. Altmış kumaş çözücüsü 16,7 ms'lik
+    kare bütçesinin tamamını yerdi.
+
+    Kemik ise ucuz: dört zincir × iki eklem = gövde başına 8 transform,
+    altmış gövdede 480. Ölçüm gürültüsü kadar.
+
+    ## Neden Humanoid rig'i bozmuyor
+
+    Kemikler ``Hips``'e bağlanır ve adları ``Etek_`` ile başlar. Unity
+    Humanoid eşlemesi yalnızca tanıdığı kemikleri kullanır; geri kalanı
+    hiyerarşide **durur** ve Mixamo klipleri onlara dokunmaz. Yani klip
+    yürüyüşü oynatır, kemikleri betik sürer, ikisi çakışmaz.
+
+    Ağırlık **kota göre** karışır: belde tamamen gövdeye bağlı, etek
+    ucunda tamamen salınım kemiğine. Aksi hâlde etek belden kopar.
+    """
+    import math
+    from mathutils import Vector
+
+    if arm_obj is None or mesh_obj is None:
+        return 0
+
+    mn, mx = hz.bounds(mesh_obj)
+    if yaricap is None:
+        yaricap = max(mx[0] - mn[0], mx[1] - mn[1]) * 0.32
+
+    onceki = bpy.context.view_layer.objects.active
+    bpy.context.view_layer.objects.active = arm_obj
+    bpy.ops.object.mode_set(mode="EDIT")
+
+    arm = arm_obj.data
+    if "Hips" not in arm.edit_bones:
+        bpy.ops.object.mode_set(mode="OBJECT")
+        bpy.context.view_layer.objects.active = onceki
+        return 0
+
+    kalca = arm.edit_bones["Hips"]
+    adlar = []
+    for i in range(zincir):
+        a = math.tau * i / zincir
+        yon = Vector((math.cos(a), math.sin(a), 0.0))
+        ebeveyn = kalca
+        for j in range(eklem):
+            t0 = j / float(eklem)
+            t1 = (j + 1) / float(eklem)
+            z0 = z_bel + (z_etek - z_bel) * t0
+            z1 = z_bel + (z_etek - z_bel) * t1
+            ad = f"Etek_{i}_{j}"
+            eb = arm.edit_bones.new(ad)
+            eb.head = Vector((yon.x * yaricap, yon.y * yaricap, z0))
+            eb.tail = Vector((yon.x * yaricap, yon.y * yaricap, z1))
+            eb.parent = ebeveyn
+            eb.use_connect = False
+            ebeveyn = eb
+            adlar.append((ad, yon, z0, z1))
+
+    bpy.ops.object.mode_set(mode="OBJECT")
+    bpy.context.view_layer.objects.active = onceki
+
+    # --- AGIRLIKLAR: kota gore karisim ------------------------------
+    for ad, _, _, _ in adlar:
+        if ad not in mesh_obj.vertex_groups:
+            mesh_obj.vertex_groups.new(name=ad)
+
+    mw = mesh_obj.matrix_world
+    bagli = 0
+    for v in mesh_obj.data.vertices:
+        p = mw @ v.co
+        if p.z > z_bel or p.z < z_etek - 0.02:
+            continue
+
+        # Belde 0, etek ucunda 1: salinimin payi asagi indikce artar.
+        t = (z_bel - p.z) / max(1e-6, z_bel - z_etek)
+        pay = min(1.0, max(0.0, t)) ** 1.6
+        if pay < 0.02:
+            continue
+
+        # En yakin zincir: aci farkina gore.
+        aci = math.atan2(p.y, p.x)
+        en_iyi, en_fark = None, 1e9
+        for ad, yon, z0, z1 in adlar:
+            d = abs((math.atan2(yon.y, yon.x) - aci + math.pi)
+                    % math.tau - math.pi)
+            if d < en_fark:
+                en_fark, en_iyi = d, (ad, z0, z1)
+        if en_iyi is None:
+            continue
+
+        ad, z0, z1 = en_iyi
+        mesh_obj.vertex_groups[ad].add([v.index], pay, "REPLACE")
+        bagli += 1
+
+    return bagli

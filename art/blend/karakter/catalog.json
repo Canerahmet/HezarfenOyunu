@@ -61,11 +61,13 @@
    "derinlik": 0.5829,
    "etek_kotu": 0.093,
    "dizlik": false,
-   "giysi_parca": 24,
+   "giysi_parca": 26,
    "giysi_adlari": [
     "Biyik_-1",
     "Biyik_1",
     "Entari_Etek",
+    "Entari_Kol_Sag",
+    "Entari_Kol_Sol",
     "Entari_Ust",
     "Gomlek",
     "Kavuk",
@@ -88,11 +90,11 @@
     "Salvar",
     "Sarik"
    ],
-   "tris_lod0": 55168,
-   "tris_lod1": 16548,
+   "tris_lod0": 53920,
+   "tris_lod1": 16174,
    "agirliksiz_kose": 0,
-   "kose_lod0": 27624,
-   "kemik": 22,
+   "kose_lod0": 27000,
+   "kemik": 38,
    "kemikler": [
     {
      "ad": "Hips",
@@ -313,6 +315,166 @@
      ],
      "uzunluk": 0.06,
      "kot_orani": 0.012
+    },
+    {
+     "ad": "Etek_0_0",
+     "bas": [
+      0.3506,
+      0.0,
+      1.02
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.6
+    },
+    {
+     "ad": "Etek_0_1",
+     "bas": [
+      0.3506,
+      0.0,
+      0.5567
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.3275
+    },
+    {
+     "ad": "Etek_1_0",
+     "bas": [
+      0.0,
+      0.3506,
+      1.02
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.6
+    },
+    {
+     "ad": "Etek_1_1",
+     "bas": [
+      0.0,
+      0.3506,
+      0.5567
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.3275
+    },
+    {
+     "ad": "Etek_2_0",
+     "bas": [
+      -0.3506,
+      0.0,
+      1.02
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.6
+    },
+    {
+     "ad": "Etek_2_1",
+     "bas": [
+      -0.3506,
+      0.0,
+      0.5567
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.3275
+    },
+    {
+     "ad": "Etek_3_0",
+     "bas": [
+      -0.0,
+      -0.3506,
+      1.02
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.6
+    },
+    {
+     "ad": "Etek_3_1",
+     "bas": [
+      -0.0,
+      -0.3506,
+      0.5567
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.3275
+    },
+    {
+     "ad": "Etek_0_0.001",
+     "bas": [
+      0.3508,
+      0.0,
+      1.02
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.6
+    },
+    {
+     "ad": "Etek_0_1.001",
+     "bas": [
+      0.3508,
+      0.0,
+      0.5567
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.3275
+    },
+    {
+     "ad": "Etek_1_0.001",
+     "bas": [
+      0.0,
+      0.3508,
+      1.02
+     ],
+     "uzunluk": 0.4633,
+     "kot_orani": 0.6
+    },
+    {
+     "ad": "Etek_1_1.001",
+     "bas": [
+      0.0,
+      0.3508,
+      0.5567
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.3275
+    },
+    {
+     "ad": "Etek_2_0.001",
+     "bas": [
+      -0.3508,
+      0.0,
+      1.02
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.6
+    },
+    {
+     "ad": "Etek_2_1.001",
+     "bas": [
+      -0.3508,
+      0.0,
+      0.5567
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.3275
+    },
+    {
+     "ad": "Etek_3_0.001",
+     "bas": [
+      -0.0,
+      -0.3508,
+      1.02
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.6
+    },
+    {
+     "ad": "Etek_3_1.001",
+     "bas": [
+      -0.0,
+      -0.3508,
+      0.5567
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.3275
     }
    ]
   },
@@ -333,13 +495,15 @@
    "derinlik": 0.5941,
    "etek_kotu": 0.535,
    "dizlik": true,
-   "giysi_parca": 26,
+   "giysi_parca": 28,
    "giysi_adlari": [
     "Biyik_-1",
     "Biyik_1",
     "Dizlik_-1",
     "Dizlik_1",
     "Entari_Etek",
+    "Entari_Kol_Sag",
+    "Entari_Kol_Sol",
     "Entari_Ust",
     "Gomlek",
     "Kavuk",
@@ -362,11 +526,11 @@
     "Salvar",
     "Sarik"
    ],
-   "tris_lod0": 55648,
-   "tris_lod1": 16692,
+   "tris_lod0": 54400,
+   "tris_lod1": 16318,
    "agirliksiz_kose": 0,
-   "kose_lod0": 27864,
-   "kemik": 22,
+   "kose_lod0": 27240,
+   "kemik": 38,
    "kemikler": [
     {
      "ad": "Hips",
@@ -587,6 +751,166 @@
      ],
      "uzunluk": 0.06,
      "kot_orani": 0.012
+    },
+    {
+     "ad": "Etek_0_0",
+     "bas": [
+      0.3506,
+      0.0,
+      1.02
+     ],
+     "uzunluk": 0.2422,
+     "kot_orani": 0.6
+    },
+    {
+     "ad": "Etek_0_1",
+     "bas": [
+      0.3506,
+      0.0,
+      0.7778
+     ],
+     "uzunluk": 0.2423,
+     "kot_orani": 0.4575
+    },
+    {
+     "ad": "Etek_1_0",
+     "bas": [
+      0.0,
+      0.3506,
+      1.02
+     ],
+     "uzunluk": 0.2422,
+     "kot_orani": 0.6
+    },
+    {
+     "ad": "Etek_1_1",
+     "bas": [
+      0.0,
+      0.3506,
+      0.7778
+     ],
+     "uzunluk": 0.2423,
+     "kot_orani": 0.4575
+    },
+    {
+     "ad": "Etek_2_0",
+     "bas": [
+      -0.3506,
+      0.0,
+      1.02
+     ],
+     "uzunluk": 0.2422,
+     "kot_orani": 0.6
+    },
+    {
+     "ad": "Etek_2_1",
+     "bas": [
+      -0.3506,
+      0.0,
+      0.7778
+     ],
+     "uzunluk": 0.2423,
+     "kot_orani": 0.4575
+    },
+    {
+     "ad": "Etek_3_0",
+     "bas": [
+      -0.0,
+      -0.3506,
+      1.02
+     ],
+     "uzunluk": 0.2422,
+     "kot_orani": 0.6
+    },
+    {
+     "ad": "Etek_3_1",
+     "bas": [
+      -0.0,
+      -0.3506,
+      0.7778
+     ],
+     "uzunluk": 0.2423,
+     "kot_orani": 0.4575
+    },
+    {
+     "ad": "Etek_0_0.001",
+     "bas": [
+      0.3508,
+      0.0,
+      1.02
+     ],
+     "uzunluk": 0.2422,
+     "kot_orani": 0.6
+    },
+    {
+     "ad": "Etek_0_1.001",
+     "bas": [
+      0.3508,
+      0.0,
+      0.7778
+     ],
+     "uzunluk": 0.2423,
+     "kot_orani": 0.4575
+    },
+    {
+     "ad": "Etek_1_0.001",
+     "bas": [
+      0.0,
+      0.3508,
+      1.02
+     ],
+     "uzunluk": 0.2422,
+     "kot_orani": 0.6
+    },
+    {
+     "ad": "Etek_1_1.001",
+     "bas": [
+      0.0,
+      0.3508,
+      0.7778
+     ],
+     "uzunluk": 0.2423,
+     "kot_orani": 0.4575
+    },
+    {
+     "ad": "Etek_2_0.001",
+     "bas": [
+      -0.3508,
+      0.0,
+      1.02
+     ],
+     "uzunluk": 0.2422,
+     "kot_orani": 0.6
+    },
+    {
+     "ad": "Etek_2_1.001",
+     "bas": [
+      -0.3508,
+      0.0,
+      0.7778
+     ],
+     "uzunluk": 0.2423,
+     "kot_orani": 0.4575
+    },
+    {
+     "ad": "Etek_3_0.001",
+     "bas": [
+      -0.0,
+      -0.3508,
+      1.02
+     ],
+     "uzunluk": 0.2422,
+     "kot_orani": 0.6
+    },
+    {
+     "ad": "Etek_3_1.001",
+     "bas": [
+      -0.0,
+      -0.3508,
+      0.7778
+     ],
+     "uzunluk": 0.2423,
+     "kot_orani": 0.4575
     }
    ]
   }

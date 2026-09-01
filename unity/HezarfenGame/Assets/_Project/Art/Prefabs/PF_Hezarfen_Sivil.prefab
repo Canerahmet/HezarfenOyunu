@@ -113,12 +113,20 @@ PrefabInstance:
       value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 4742473837712756890, guid: 64b47f7848bb753468c5185f63f0dd7d, type: 3}
+      propertyPath: m_Size
+      value: 2.01284
+      objectReference: {fileID: 0}
+    - target: {fileID: 4742473837712756890, guid: 64b47f7848bb753468c5185f63f0dd7d, type: 3}
       propertyPath: m_FadeMode
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4742473837712756890, guid: 64b47f7848bb753468c5185f63f0dd7d, type: 3}
+      propertyPath: m_LocalReferencePoint.x
+      value: -0.0003298223
+      objectReference: {fileID: 0}
+    - target: {fileID: 4742473837712756890, guid: 64b47f7848bb753468c5185f63f0dd7d, type: 3}
       propertyPath: m_LocalReferencePoint.z
-      value: 0.061231256
+      value: 0.06423652
       objectReference: {fileID: 0}
     - target: {fileID: 4742473837712756890, guid: 64b47f7848bb753468c5185f63f0dd7d, type: 3}
       propertyPath: m_LODs.Array.data[0].fadeTransitionWidth

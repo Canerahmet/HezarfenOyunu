@@ -191,13 +191,79 @@ def giydir(govde, col, mats, etek_orani, dizlik_var):
     # kalcaya kadar iniyordu ve o parca eteğin ICINDE kaliyordu — hic
     # gorunmeyen ~7 bin ucgen. Bir katman gorunmuyorsa katman degildir.
     z_ust_alt = z_bel - boy * 0.035
+    # KOL ARTIK KABUK DEGIL, KENDI HACMI OLAN BIR GIYSI.
+    #
+    # Once kol da bu kabugun icindeydi (`kol(c) and c.z >= z_bilek`):
+    # govde kabugu kopyalanip 3,4 cm sisiriliyordu, yani kumas kola
+    # YAPISIYORDU. Bir oyuncu kusuru tek cumleyle soyledi — kiyafet
+    # "giysi degil, biraz buyuk bir vucut" gibi duruyor.
+    #
+    # Osmanli entarisinin kolu bilege dogru GENISLER ve sarkar (Ralamb
+    # 1657-58). Silueti bir ofset degil bir profil; o yuzden kol artik
+    # kendi cizgisi boyunca lofting ile uretiliyor ve kabuk yalniz
+    # govdeyi tasiyor.
     entari_ust = kiy.kopya_kabuk(
         govde, "Entari_Ust", col,
-        tut=lambda c: (z_ust_alt <= c.z <= z_boyun and not kol(c))
-        or (kol(c) and c.z >= z_bilek),
+        tut=lambda c: z_ust_alt <= c.z <= z_boyun and not kol(c),
         sisme=ENTARI_SIS, kalinlik=kiy.ENTARI_KAL)
     if entari_ust:
         parts.append(hz.assign(kiy.yumusat(entari_ust, 5), mats["entari"]))
+
+    # --- ENTARI KOLLARI -----------------------------------------------------
+    kol_sayisi = 0
+    for isaret in (+1.0, -1.0):
+        def _kol_filtre(c, s=isaret):
+            return kol(c) and (c.x * s) > 0.0
+
+        cizgi = rk.uzuv_cizgisi(govde, z_boyun, z_parmak, _kol_filtre,
+                                 adim=24)
+        if not cizgi or len(cizgi) < 3:
+            continue
+
+        # Bilekten sonrasi ele girer: cizgiyi bilekte kes.
+        cizgi = [p for p in cizgi if p.z >= z_bilek] or cizgi
+
+        # CIZGI OMUZA KADAR UZATILIR.
+        #
+        # Ilk denemede kol, izleme filtresinin kolu ayirt edebildigi
+        # yerden basliyordu — yani omuzdan bir karis asagidan. Renderda
+        # omuzla kol arasinda **cıplak ten** goruldu: kabuk kolu
+        # birakmis, kol da omza yetismemisti. Iki katmanin arasindaki
+        # bosluk, katmanlarin kendisinden daha cok goze carpar.
+        #
+        # Cizgi kendi ekseninde govdeye dogru uzatilir; boylece kol
+        # entarinin govde kabuguna GIRER ve dikis gorunmez.
+        # UZATMA YATAY OLMALI, KOL EKSENINDE DEGIL.
+        #
+        # Ilk denemede uzatma kolun kendi yonundeydi ve omuz hizasinin
+        # USTUNE tasti: renderda omuzlarda apolet gibi iki tup cikti.
+        # Kolun omuza yaklasan ucu yukari-ice bakar; o yonde uzatmak
+        # kumasi omzun ustune kaldirir.
+        #
+        # Istenen sey kumasi govdenin ICINE sokmak, yukari degil:
+        # dikey bilesen sifirlanir.
+        if len(cizgi) >= 2:
+            ic = (cizgi[0] - cizgi[1])
+            ic.z = 0.0
+            if ic.length > 1e-6:
+                cizgi = [cizgi[0] + ic.normalized() * (boy * 0.045)] + cizgi
+
+        # Profil BOY'a gore: omuzda kolu sarar, bilekte iki katina cikar.
+        kolu = kiy.giysi_kolu(
+            f"Entari_Kol_{'Sag' if isaret > 0 else 'Sol'}", col, cizgi,
+            # OLCU RENDERDAN DUZELTILDI.
+            #
+            # Ilk deger bilekte boy*0,098 = 17,6 cm yariçap, yani 35 cm
+            # capinda bir agiz: kol balon gibi cikti. Ralamb
+            # plakalarinda entari kolu genistir ama koldan iki kat
+            # kalin degildir — bilekte kabaca elin genisligi kadar
+            # sarkar.
+            r_omuz=boy * 0.052, r_dirsek=boy * 0.054,
+            r_bilek=boy * 0.072, kalinlik=kiy.ENTARI_KAL)
+        if kolu is not None:
+            parts.append(hz.assign(kolu, mats["entari"]))
+            kol_sayisi += 1
+    hz.log(f"entari kolu: {kol_sayisi} parca (lofted, kabuk degil)")
 
     # --- ENTARI ETEGI -------------------------------------------------------
     #
@@ -500,6 +566,19 @@ def main():
         asset = f"SK_{ad}"
         govde, _, _ = taban_kur(args, mats)
         giysi, kol_esik, z_kol_alt = giydir(govde, col, mats, etek_orani, dizlik_var)
+
+        # ETEK KOTLARI BIRLESTIRMEDEN ONCE OLCULUR.
+        #
+        # `join_parts` gövdeyi TUKETIR; sonra `hz.bounds(govde)` demek
+        # "StructRNA of type Object has been removed" verir. Olcum,
+        # olctugu sey hala varken alinir.
+        #
+        # Oranlar `giydir` ile ayni kaynaktan: bir sayinin iki sahibi
+        # olmamali (bu depoda uc kez bedeli odendi).
+        _mn, _mx = hz.bounds(govde)
+        _boy = _mx[2] - _mn[2]
+        z_bel_k = _boy * kiy.BEL_ORAN
+        z_etek_k = _boy * etek_orani
         # Adlar BIRLESTIRMEDEN once alinir: birlestirme parca nesnelerini
         # siler ve sonradan okumak "StructRNA has been removed" verir.
         giysi_adlari = sorted({o.name.split(".")[0] for o in giysi})
@@ -541,6 +620,18 @@ def main():
         for m in (lod0, lod1):
             rk.deri_bagla(m, arm)
             rk.agirliklari_tamamla(m, arm)
+
+        # ETEK SALINIM KEMIKLERI.
+        #
+        # Once baglanan agirliklarin USTUNE yazilir: etek koseleri
+        # belde govdeye, ucta salinim kemigine bagli olacak sekilde
+        # karisir. Sirasi onemli — `agirliklari_tamamla` her koseyi
+        # en yakin kemige tam agirlikla baglar ve once kosarsa etek
+        # kemikleri hicbir sey almaz.
+        salinim = 0
+        for m in (lod0, lod1):
+            salinim += rk.etek_kemikleri(arm, m, z_bel_k, z_etek_k)
+        hz.log(f"etek salinimi: {salinim} kose 4 zincire baglandi")
 
         # AGIRLIKSIZ KOSE SAYILIR — VE SIFIR DEGILSE URETIM DURUR.
         #

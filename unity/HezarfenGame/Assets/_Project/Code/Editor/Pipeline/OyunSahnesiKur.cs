@@ -843,6 +843,24 @@ namespace Hezarfen.Editor.Pipeline
                 rapor2 += kg.katli != null ? " + kanat" : " + KANAT YOK";
             }
 
+            // KIYAFET SALINIMI — etek yururken dalgalanir.
+            //
+            // Kumas cozucusu degil KEMIK: sehirde ayni anda 60 gorunur
+            // govde var ve altmis `Cloth` bileseni 16,7 ms'lik butcenin
+            // tamamini yerdi. Dort zincir × iki eklem = govde basina 8
+            // transform.
+            if (govde != null)
+            {
+                var sal = govde.AddComponent<KiyafetSalinimi>();
+                var liste = new System.Collections.Generic.List<Transform>();
+                foreach (var t in govde.GetComponentsInChildren<Transform>(true))
+                    if (t.name.StartsWith("Etek")) liste.Add(t);
+                sal.kemikler = liste.ToArray();
+                rapor2 += liste.Count > 0
+                    ? $" + etek salinimi ({liste.Count} kemik)"
+                    : " + ETEK KEMIGI YOK";
+            }
+
             // AYAK SESI — sehirde 40.000 sakin var, oyuncunun adimi yoktu.
             var adim = go.AddComponent<AdimSesi>();
             adim.ornekler = new[]
