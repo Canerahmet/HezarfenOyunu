@@ -244,8 +244,20 @@ namespace Hezarfen.Editor.Gis
             // duzeltmek yenilerini engeller, var olanlari silmez —
             // ureteç kendi sahasini kendisi toplamali, yoksa duzeltme
             // yalniz temiz bir depoda calisir.
+            // TASLAR DA TEMIZLENIR.
+            //
+            // Ilk halde yalniz tekke ve namazgah temizleniyordu ve bir
+            // oyuncu sonucu saydi: **dokuz menzil tasi, yirmi yedi
+            // ornek** — her biri birebir ayni koordinatta uc kez.
+            // Ureteç uc kez kosmus, her seferinde bir takim daha
+            // eklemis. Ayni kusurun bu depodaki dorduncu tekrari
+            // (kapinin dort kopyasi, dukkanlarin atlanmasi, tekkenin
+            // iki kopyasi, taslarin ucu).
             int temizlenen = Temizle(scene, "PF_Tekke_Okcular")
-                             + Temizle(scene, "PF_Namazgah_Okmeydani");
+                             + Temizle(scene, "PF_Namazgah_Okmeydani")
+                             + Temizle(scene, "BasTasi_")
+                             + Temizle(scene, "AyakTasi_")
+                             + Temizle(scene, "PF_MenzilTasi");
 
             var tekke = Place(root.transform, "PF_Tekke_Okcular", terrain, edge,
                               yaw: 128f + 180f,

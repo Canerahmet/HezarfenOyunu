@@ -60,11 +60,58 @@ namespace Hezarfen.Sehir
         /// </summary>
         public float serefeYaricapi = 5.5f;
 
-        public string Ipucu => "Kuleye çık";
+        [System.NonSerialized] public Hezarfen.Player.UcusDizisi dizi;
+
+        private Hezarfen.Player.UcusDizisi Dizi =>
+            dizi != null ? dizi
+            : (dizi = FindAnyObjectByType<Hezarfen.Player.UcusDizisi>());
+
+        /// <summary>Kanat kuşanılmış mı — kanatsız çıkılmaz.</summary>
+        private bool KanatVar =>
+            Dizi != null && Dizi.Simdiki == Hezarfen.Player.UcusDizisi.Durum.Hazir;
+
+        public string Ipucu =>
+            KanatVar ? "Kuleye çık ve atla" : "Kuleye çık · önce kanadı kuşan";
+
         public bool Hazir => true;
+
+        /// <summary>
+        /// Kulenin gerçek yarıçapı (m) — <b>yerel</b> sınırdan.
+        ///
+        /// Önce <c>Collider.bounds</c> (dünya hizalı kutu) okunuyordu
+        /// ve kule 205° dönük: 8,225 m yarıçaplı bir silindirin dünya
+        /// kutusu 8,225 × (|cos|+|sin|) = <b>10,92 m</b> ölçülüyordu.
+        /// Yani kod 16,45 m çapındaki kuleyi 21,8 m sanıyor, kapıyı
+        /// duvarın 3,9 m açığına, çayırın ortasına koyuyordu.
+        /// </summary>
+        private float Yaricap()
+        {
+            var t = transform.parent;
+            if (t == null) return 8.2f;
+            foreach (var c in t.GetComponentsInChildren<Collider>(true))
+            {
+                if (c.isTrigger) continue;
+                if (c is MeshCollider mc && mc.sharedMesh != null)
+                {
+                    var b = mc.sharedMesh.bounds;
+                    var o = t.lossyScale;
+                    return Mathf.Max(b.extents.x * Mathf.Abs(o.x),
+                                     b.extents.z * Mathf.Abs(o.z));
+                }
+            }
+            return 8.2f;
+        }
 
         public bool Etkiles(GameObject aktor)
         {
+            // KANATSIZ CIKILMAZ.
+            //
+            // Once cikilabiliyordu ve sonucu 46 m'lik **hasarsiz** bir
+            // dususten baska bir sey degildi: oyuncu yere carpiyor,
+            // kalkiyor, yuruyordu. Bir kule, oradan atlayacak seyi
+            // olmayan birine acilmamali.
+            if (!KanatVar) return false;
+
             var cc = aktor.GetComponentInParent<CharacterController>();
             var kok = cc != null ? cc.transform : aktor.transform;
 
@@ -85,23 +132,33 @@ namespace Hezarfen.Sehir
             var nokta = eksen + Vector3.up * serefeKotu
                         + yon * serefeYaricapi;
 
-            // VE ZEMIN SORULUR — VARSAYILMAZ.
+            // KAPI BIR SEREFEYE DEGIL, KALKISA ACILIR (ADR 0086).
             //
-            // Bir oyuncu su cumleyi yazdi: *"Kapiyi yaptiniz, kolu
-            // cevirdim, kapi acildi — arkasinda oda yok, bosluk var."*
-            // Yukaridan asagi bir isin, altta gercekten bir sey olup
-            // olmadigini soyler; bulamazsa oyuncu ISINLANMAZ, cunku
-            // havaya birakmak yerinde birakmaktan kotudur.
-            if (!Physics.Raycast(nokta + Vector3.up * 4f, Vector3.down,
-                                 out var v, 9f, ~0,
-                                 QueryTriggerInteraction.Ignore))
-                return false;
-            nokta = v.point + Vector3.up * 0.15f;
+            // Uc tur boyunca burada bir "durulacak yer" varsayildi ve
+            // uc kez tuzak cikti: once tasin icinde, sonra kulahin
+            // ustunde, sonunda kapali bir ficinin icinde. Dorduncu
+            // turda oyuncu serefede bes saniye durabildi ve
+            // **inemedi**.
+            //
+            // Cunku bu kulede gezilecek bir serefe YOK: korkuluk
+            // (8,225 m) ile ahsap kasnak (7,875 m) arasi 0,35 m,
+            // oyuncunun kapsulu 0,70 m; ve kulahin sacagi (9,175 m)
+            // korkulugun ustunu ortuyor. 1632'de balkon yok — dogru
+            // olan kayit buydu, yanlis olan onu var saymamdi.
+            //
+            // Kuleye cikmak, govdenin icinden yukari cikip tepedeki
+            // acikliktan ADIM ATMAKTIR. Oyuncu korkulugun DISINA, acik
+            // havaya birakilir ve ayni karede ucusa gecer: ne dusus,
+            // ne fici, ne de bir zemin varsayimi.
+            var cikis = eksen + Vector3.up * serefeKotu
+                        + yon * (Yaricap() + 1.4f);
 
             bool acikti = cc != null && cc.enabled;
             if (acikti) cc.enabled = false;
-            kok.position = nokta;
+            kok.position = cikis;
             if (acikti) cc.enabled = true;
+
+            Dizi.Atla();
             return true;
         }
     }

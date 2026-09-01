@@ -182,10 +182,44 @@ namespace Hezarfen.Sehir
 
         private Hezarfen.Player.Perde2Dilimi _perde;
 
-        private void IsBitince(Gorev g) => Kaydet();
+        private void IsBitince(Gorev g) => KaydetGuvenliyse();
 
         private void AsamaDegisince(Hezarfen.Player.Perde2Dilimi.Asama a)
-            => Kaydet();
+            => KaydetGuvenliyse();
+
+        /// <summary>
+        /// Yalnızca oyuncunun <b>kurtulabileceği</b> bir andaysa kaydeder.
+        ///
+        /// ## Neden bir koşul gerekti
+        ///
+        /// Otomatik kayıt bir oyuncunun kırk sekiz dakikasını
+        /// kurtarmak için eklendi ve bir sonraki turda onun oyununu
+        /// kurtarılamaz hâle getirdi: kulenin tepesinde kapalı bir
+        /// yerde Space'e bastığında perde Kule→Uçuş→İniş→Kule diye
+        /// art arda değişiyor, her değişimde kaydediliyor ve tek slot
+        /// olduğu için geri dönüş kalmıyordu. *"Geçen turdaki 48
+        /// dakikamı kaybettim diye eklediğiniz özellik, bu turda
+        /// oyunumu kurtarılamaz hâle getirdi."*
+        ///
+        /// İki kural: iki kayıt arasında en az beş saniye olmalı
+        /// (art arda üç yazmayı keser), ve oyuncu <b>uçuyorsa</b>
+        /// kaydedilmez — havadaki bir konum, yüklendiğinde düşmenin
+        /// ortasıdır.
+        /// </summary>
+        private void KaydetGuvenliyse()
+        {
+            if (Time.unscaledTime - _sonKayit < 5f) return;
+
+            var dizi = FindAnyObjectByType<Hezarfen.Player.UcusDizisi>();
+            if (dizi != null
+                && dizi.Simdiki != Hezarfen.Player.UcusDizisi.Durum.Yerde)
+                return;
+
+            _sonKayit = Time.unscaledTime;
+            Kaydet();
+        }
+
+        private float _sonKayit = -999f;
 
         /// <summary>Yükle. Kayıt yoksa ya da bozuksa <c>false</c>.</summary>
         public bool Yukle()

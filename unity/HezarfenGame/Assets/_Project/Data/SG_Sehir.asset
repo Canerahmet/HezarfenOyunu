@@ -4654,6 +4654,24 @@ MonoBehaviour:
   - konum: {x: -707.8936, y: 41.35284, z: 2469.4744}
     tur: 2
     semt: TERRAIN
+  - konum: {x: -714.493, y: 42.72821, z: 2455.7056}
+    tur: 2
+    semt: TERRAIN
+  - konum: {x: -717.8526, y: 43.36223, z: 2459.5154}
+    tur: 2
+    semt: TERRAIN
+  - konum: {x: -712.9369, y: 42.336994, z: 2460.7954}
+    tur: 2
+    semt: TERRAIN
+  - konum: {x: -714.1147, y: 42.48127, z: 2465.7366}
+    tur: 2
+    semt: TERRAIN
+  - konum: {x: -709.17346, y: 41.58531, z: 2464.5588}
+    tur: 2
+    semt: TERRAIN
+  - konum: {x: -707.8936, y: 41.35284, z: 2469.4744}
+    tur: 2
+    semt: TERRAIN
   - konum: {x: -703.50806, y: 42.480244, z: 2455.13}
     tur: 10
     semt: TERRAIN
@@ -25332,7 +25350,11 @@ MonoBehaviour:
     uzunluk: 66.332306
     kayik: 0
   - a: 1541
-    b: 1549
+    b: 1547
+    uzunluk: 0
+    kayik: 0
+  - a: 1541
+    b: 1555
     uzunluk: 0
     kayik: 0
   - a: 1541
@@ -25340,35 +25362,35 @@ MonoBehaviour:
     uzunluk: 5.1189556
     kayik: 0
   - a: 1541
-    b: 1550
+    b: 1548
     uzunluk: 5.1189556
     kayik: 0
   - a: 1541
-    b: 1543
-    uzunluk: 5.336757
-    kayik: 0
-  - a: 1541
-    b: 1551
-    uzunluk: 5.336757
+    b: 1556
+    uzunluk: 5.1189556
     kayik: 0
   - a: 1542
-    b: 1550
+    b: 1548
     uzunluk: 0
     kayik: 0
   - a: 1542
-    b: 1549
+    b: 1556
+    uzunluk: 0
+    kayik: 0
+  - a: 1542
+    b: 1547
     uzunluk: 5.1189556
     kayik: 0
   - a: 1542
-    b: 1543
-    uzunluk: 5.182064
-    kayik: 0
-  - a: 1542
-    b: 1551
-    uzunluk: 5.182064
+    b: 1555
+    uzunluk: 5.1189556
     kayik: 0
   - a: 1543
-    b: 1551
+    b: 1557
+    uzunluk: 0
+    kayik: 0
+  - a: 1543
+    b: 1549
     uzunluk: 0
     kayik: 0
   - a: 1543
@@ -25376,136 +25398,176 @@ MonoBehaviour:
     uzunluk: 5.0816436
     kayik: 0
   - a: 1543
-    b: 1552
+    b: 1558
     uzunluk: 5.0816436
     kayik: 0
   - a: 1543
     b: 1550
-    uzunluk: 5.182064
-    kayik: 0
-  - a: 1544
-    b: 1552
-    uzunluk: 0
-    kayik: 0
-  - a: 1544
-    b: 1551
     uzunluk: 5.0816436
     kayik: 0
   - a: 1544
-    b: 1545
-    uzunluk: 5.1580505
+    b: 1558
+    uzunluk: 0
     kayik: 0
   - a: 1544
-    b: 1553
-    uzunluk: 5.1580505
+    b: 1550
+    uzunluk: 0
+    kayik: 0
+  - a: 1544
+    b: 1557
+    uzunluk: 5.0816436
+    kayik: 0
+  - a: 1544
+    b: 1549
+    uzunluk: 5.0816436
     kayik: 0
   - a: 1545
-    b: 1553
+    b: 1551
     uzunluk: 0
+    kayik: 0
+  - a: 1545
+    b: 1559
+    uzunluk: 0
+    kayik: 0
+  - a: 1545
+    b: 1552
+    uzunluk: 5.084728
     kayik: 0
   - a: 1545
     b: 1546
     uzunluk: 5.084728
     kayik: 0
   - a: 1545
-    b: 1554
+    b: 1560
     uzunluk: 5.084728
     kayik: 0
-  - a: 1545
-    b: 1552
-    uzunluk: 5.1580505
-    kayik: 0
   - a: 1546
-    b: 1554
+    b: 1560
     uzunluk: 0
     kayik: 0
   - a: 1546
-    b: 1553
-    uzunluk: 5.084728
-    kayik: 0
-  - a: 1544
-    b: 1546
-    uzunluk: 7.3448043
+    b: 1552
+    uzunluk: 0
     kayik: 0
   - a: 1546
-    b: 1552
-    uzunluk: 7.3448043
+    b: 1559
+    uzunluk: 5.084728
     kayik: 0
-  - a: 1543
-    b: 1547
-    uzunluk: 11.000982
-    kayik: 0
-  - a: 1547
+  - a: 1546
     b: 1551
-    uzunluk: 11.000982
-    kayik: 0
-  - a: 1541
-    b: 1547
-    uzunluk: 11.002793
+    uzunluk: 5.084728
     kayik: 0
   - a: 1547
-    b: 1549
-    uzunluk: 11.002793
-    kayik: 0
-  - a: 1545
-    b: 1547
-    uzunluk: 11.036436
-    kayik: 0
-  - a: 1541
-    b: 1548
-    uzunluk: 29.434982
-    kayik: 0
-  - a: 1548
-    b: 1549
-    uzunluk: 29.434982
-    kayik: 0
-  - a: 1542
-    b: 1548
-    uzunluk: 32.076015
-    kayik: 0
-  - a: 1548
-    b: 1550
-    uzunluk: 32.076015
+    b: 1555
+    uzunluk: 0
     kayik: 0
   - a: 1547
     b: 1548
-    uzunluk: 34.30227
-    kayik: 0
-  - a: 1549
-    b: 1550
     uzunluk: 5.1189556
     kayik: 0
-  - a: 1543
-    b: 1549
-    uzunluk: 5.336757
+  - a: 1547
+    b: 1556
+    uzunluk: 5.1189556
+    kayik: 0
+  - a: 1548
+    b: 1556
+    uzunluk: 0
+    kayik: 0
+  - a: 1548
+    b: 1555
+    uzunluk: 5.1189556
     kayik: 0
   - a: 1549
-    b: 1551
-    uzunluk: 5.336757
+    b: 1557
+    uzunluk: 0
+    kayik: 0
+  - a: 1549
+    b: 1558
+    uzunluk: 5.0816436
+    kayik: 0
+  - a: 1549
+    b: 1550
+    uzunluk: 5.0816436
     kayik: 0
   - a: 1550
-    b: 1551
-    uzunluk: 5.182064
+    b: 1558
+    uzunluk: 0
+    kayik: 0
+  - a: 1550
+    b: 1557
+    uzunluk: 5.0816436
+    kayik: 0
+  - a: 1551
+    b: 1559
+    uzunluk: 0
+    kayik: 0
+  - a: 1551
+    b: 1560
+    uzunluk: 5.084728
     kayik: 0
   - a: 1551
     b: 1552
-    uzunluk: 5.0816436
-    kayik: 0
-  - a: 1552
-    b: 1553
-    uzunluk: 5.1580505
-    kayik: 0
-  - a: 1553
-    b: 1554
     uzunluk: 5.084728
     kayik: 0
-  - a: 1544
-    b: 1554
-    uzunluk: 7.3448043
+  - a: 1552
+    b: 1560
+    uzunluk: 0
     kayik: 0
   - a: 1552
+    b: 1559
+    uzunluk: 5.084728
+    kayik: 0
+  - a: 1543
+    b: 1553
+    uzunluk: 11.000982
+    kayik: 0
+  - a: 1553
+    b: 1557
+    uzunluk: 11.000982
+    kayik: 0
+  - a: 1549
+    b: 1553
+    uzunluk: 11.000982
+    kayik: 0
+  - a: 1541
+    b: 1553
+    uzunluk: 11.002793
+    kayik: 0
+  - a: 1553
+    b: 1555
+    uzunluk: 11.002793
+    kayik: 0
+  - a: 1541
     b: 1554
-    uzunluk: 7.3448043
+    uzunluk: 29.434982
+    kayik: 0
+  - a: 1547
+    b: 1554
+    uzunluk: 29.434982
+    kayik: 0
+  - a: 1554
+    b: 1555
+    uzunluk: 29.434982
+    kayik: 0
+  - a: 1542
+    b: 1554
+    uzunluk: 32.076015
+    kayik: 0
+  - a: 1554
+    b: 1556
+    uzunluk: 32.076015
+    kayik: 0
+  - a: 1555
+    b: 1556
+    uzunluk: 5.1189556
+    kayik: 0
+  - a: 1557
+    b: 1558
+    uzunluk: 5.0816436
+    kayik: 0
+  - a: 1559
+    b: 1560
+    uzunluk: 5.084728
     kayik: 0
   - a: 840
     b: 843
@@ -26128,8 +26190,12 @@ MonoBehaviour:
     uzunluk: 854.57214
     kayik: 0
   - a: 446
-    b: 1548
+    b: 1554
     uzunluk: 996.5237
+    kayik: 0
+  - a: 446
+    b: 1551
+    uzunluk: 1034.5165
     kayik: 0
   - a: 1522
     b: 1523

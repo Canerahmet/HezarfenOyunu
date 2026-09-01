@@ -323,12 +323,29 @@ namespace Hezarfen.Editor.Pipeline
                     // Sayiyi elle duzeltmek yeni bir sihirli sabit
                     // olurdu. Yariçap carpistiricinin KENDISINDEN
                     // okunur; kule modeli degisirse kapi da degisir.
-                    float yaricap = 6.5f;
-                    var kuleCarp = t.GetComponentInChildren<Collider>();
-                    if (kuleCarp != null)
+                    // YARICAP YEREL SINIRDAN OKUNUR.
+                    //
+                    // `Collider.bounds` DUNYA HIZALI kutudur ve kule
+                    // 205 derece donuk: 8,225 m yariçapli bir silindir
+                    // icin 8,225 × (|cos|+|sin|) = **10,92 m**
+                    // olculuyordu. Yani kod 16,45 m capindaki kuleyi
+                    // 21,8 m saniyor, kapiyi duvarin 3,9 m aciginda —
+                    // cayirin ortasinda — birakiyordu. Bir oyuncu
+                    // kemerli kapiya basip hicbir sey olmadigini, sonra
+                    // arka tarafta cimenin ustunde yazi belirdigini
+                    // yazdi.
+                    float yaricap = 8.2f;
+                    foreach (var c in t.GetComponentsInChildren<Collider>(true))
                     {
-                        var b = kuleCarp.bounds;
-                        yaricap = Mathf.Max(b.extents.x, b.extents.z);
+                        if (c.isTrigger) continue;
+                        if (c is MeshCollider mc && mc.sharedMesh != null)
+                        {
+                            var b = mc.sharedMesh.bounds;
+                            var o = t.lossyScale;
+                            yaricap = Mathf.Max(b.extents.x * Mathf.Abs(o.x),
+                                                b.extents.z * Mathf.Abs(o.z));
+                            break;
+                        }
                     }
                     // 1,2 m pay: oyuncunun kapsulu (0,35 m) rahat sigar
                     // ve etkilesim menzili (2,5 m) hala yetisir.
@@ -336,7 +353,13 @@ namespace Hezarfen.Editor.Pipeline
 
                     var kapi = new GameObject("PF_KuleKapisi");
                     kapi.transform.SetParent(t, false);
-                    kapi.transform.localPosition = new Vector3(0f, 1.2f, -uzaklik);
+                    // KAPI KEMERIN OLDUGU TARAFTA.
+                    //
+                    // −Z'ye konuyordu; modeldeki kemerli kapi ise
+                    // +Z'de. Yani gorunen kapi bir tarafta, basilan
+                    // kapi obur taraftaydi ve oyuncu uc turdur kuleyi
+                    // dolaniyordu.
+                    kapi.transform.localPosition = new Vector3(0f, 1.2f, uzaklik);
                     var kk = kapi.AddComponent<KuleKapisi>();
                     var kutu = kapi.AddComponent<BoxCollider>();
                     kutu.isTrigger = true;

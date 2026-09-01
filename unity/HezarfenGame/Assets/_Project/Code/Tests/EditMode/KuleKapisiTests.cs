@@ -117,92 +117,96 @@ namespace Hezarfen.Tests
         }
 
         /// <summary>
-        /// <b>Çıkılan yerde zemin var mı.</b>
+        /// <b>Kapı seni kuleden ÇIKARIYOR mu.</b>
         ///
-        /// ## Neden bu test var
+        /// ## Neden bu test öncekilerin yerine geçti
         ///
-        /// Önceki üç test kapıyı ölçüyordu — tek mi, taşın dışında mı,
-        /// kotu eşiğin üstünde mi — ve üçü de geçiyordu. Bir oyuncu
-        /// yine de kuleye çıkamadı, çünkü hiçbiri <b>varılan yeri</b>
-        /// sormuyordu: kapı doğru yerdeydi, kapının bıraktığı nokta
-        /// külahın 1,2 m üstünde ve 3,4 m yanındaydı. Oyuncu bir
-        /// saniye manzarayı görüyor, sonra düşüyordu.
+        /// Önceki dört test kapıyı ölçüyordu — tek mi, taşın dışında
+        /// mı, kotu eşiğin üstünde mi, altında zemin var mı — ve
+        /// <b>dördü de yeşilken</b> bir oyuncu kulenin tepesinde,
+        /// kapısı olmayan bir odanın içinde kilitli kaldı. Onun cümlesi:
+        /// *"Ben 'beş saniye durun' dedim, siz beş saniye durmayı
+        /// ölçtünüz. Altıncı saniyeyi kimse sormadı."*
         ///
-        /// Onun cümlesi: *"Kapıyı çalan bir test var, içeri giren
-        /// yok."* Ve istediği ölçü tam olarak buydu — iniş noktasının
-        /// altına bir ışın.
-        ///
-        /// Bu, bu oturumun en sık tekrarlanan kusurunun test
-        /// hâlidir: <b>bir şeyin var olduğunu ölçmek, işe yaradığını
-        /// ölçmek değildir.</b>
+        /// Kapı artık bir şerefeye değil <b>kalkışa</b> açılıyor
+        /// (ADR 0086), çünkü bu kulede gezilecek şerefe yok: korkuluk
+        /// ile kasnak arası 0,35 m ve oyuncunun kapsülü 0,70 m. Test de
+        /// buna göre soruyor — çıkış noktası kulenin <b>dışında</b> mı.
         /// </summary>
         [Test]
-        public void WhereTheDoorPutsYouHasFloorUnderIt()
+        public void TheDoorTakesYouOutOfTheTowerNotIntoIt()
         {
             var k = Kapilar();
             Assert.AreEqual(1, k.Length, "Once kapi sayisi duzelmeli.");
             var kapi = k[0];
+            var kule = kapi.transform.parent;
+            Assert.IsNotNull(kule, "Kapinin ebeveyni yok.");
 
-            var eksen = kapi.transform.parent != null
-                        ? kapi.transform.parent.position
-                        : kapi.transform.position;
+            // Kodun kullandigi yariçapin AYNISI: yerel sinirdan.
+            float yaricap = 8.2f;
+            foreach (var c in kule.GetComponentsInChildren<Collider>(true))
+            {
+                if (c.isTrigger) continue;
+                if (c is MeshCollider mc && mc.sharedMesh != null)
+                {
+                    var b = mc.sharedMesh.bounds;
+                    var o = kule.lossyScale;
+                    yaricap = Mathf.Max(b.extents.x * Mathf.Abs(o.x),
+                                        b.extents.z * Mathf.Abs(o.z));
+                    break;
+                }
+            }
+
+            var eksen = kule.position;
             var yon = kapi.transform.position - eksen;
             yon.y = 0f;
             yon = yon.sqrMagnitude > 1e-4f
                   ? yon.normalized : -kapi.transform.forward;
 
-            var nokta = eksen + Vector3.up * kapi.serefeKotu
-                        + yon * kapi.serefeYaricapi;
+            var cikis = eksen + Vector3.up * kapi.serefeKotu
+                        + yon * (yaricap + 1.4f);
 
-            // TANI: nokta bosta mi, yoksa TASIN ICINDE mi.
-            //
-            // Unity, carpistiricinin ICINDEN baslayan bir isina carpma
-            // bildirmez. Yani "zemin yok" iki ayri seyin ayni cevabi
-            // olabilir ve ikisi ayri kusurdur. Cetvel hangisi oldugunu
-            // soylemezse duzeltme yine tahmine kalir.
-            Collider tas2 = null;
-            foreach (var c in (kapi.transform.parent != null
-                     ? kapi.transform.parent.GetComponentsInChildren<Collider>(true)
-                     : new Collider[0]))
-                if (!c.isTrigger) { tas2 = c; break; }
-            string tani = "carpistirici yok";
-            if (tas2 != null)
-            {
-                var en = tas2.ClosestPoint(nokta);
-                float d2 = Vector3.Distance(en, nokta);
-                tani = d2 < 0.01f
-                    ? $"nokta TASIN ICINDE ({tas2.GetType().Name}, "
-                      + $"sinir {tas2.bounds.min.y:F1}–{tas2.bounds.max.y:F1} m)"
-                    : $"nokta tasin {d2:F2} m disinda "
-                      + $"({tas2.GetType().Name}, "
-                      + $"sinir {tas2.bounds.min.y:F1}–{tas2.bounds.max.y:F1} m)";
-            }
+            // (a) Cikis noktasindan EKSENE dogru bakinca kule olmali:
+            //     yoksa yariçap yanlis okunmus demektir.
+            bool kuleVar = Physics.Raycast(cikis, -yon, out var v1, 4f, ~0,
+                                           QueryTriggerInteraction.Ignore);
+            Assert.IsTrue(kuleVar,
+                $"Cikis noktasindan ({cikis.x:F1}, {cikis.y:F1}, {cikis.z:F1}) "
+                + "eksene bakinca kule yok — yariçap yanlis okunuyor ve "
+                + "oyuncu bosluga birakiliyor.");
 
-            bool zemin = Physics.Raycast(nokta + Vector3.up * 4f,
-                                         Vector3.down, out var v, 9f, ~0,
+            // (b) VE cikis noktasinin KENDISI bos olmali: asagi bakan
+            //     bir isin kuleye degil, cok asagida araziye carpmali.
+            bool altta = Physics.Raycast(cikis, Vector3.down, out var v2,
+                                         6f, ~0,
                                          QueryTriggerInteraction.Ignore);
-            Assert.IsTrue(zemin,
-                $"TANI: {tani}. " +
-                $"Kapinin biraktigi nokta ({nokta.x:F1}, {nokta.y:F1}, "
-                + $"{nokta.z:F1}) BOSLUKTA — altinda hicbir sey yok. "
-                + "Oyuncu manzarayi bir saniye gorup duser.");
-
-            float fark = Mathf.Abs(nokta.y - v.point.y);
-            Assert.Less(fark, 2.5f,
-                $"Zemin {fark:F1} m asagida. Oyuncu birakildigi yerden "
-                + "duserek varir; bu bir cikis degil bir dususun basi.");
+            Assert.IsFalse(altta,
+                $"Cikis noktasinin 6 m altinda '{(altta ? v2.collider.name : "?")}' "
+                + "var — oyuncu kulenin ustune degil, icine birakiliyor. "
+                + "Bu, dort turdur tekrarlanan tuzagin ta kendisi.");
         }
 
-        /// <summary>Şerefe kotu gerçekten kalkış eşiğinin üstünde mi.</summary>
+        /// <summary>
+        /// <b>Kanatsız çıkılmıyor mu.</b>
+        ///
+        /// Kapı açıkken kanatsız çıkmanın karşılığı 46 m'lik
+        /// <b>hasarsız</b> bir düşüştü: oyuncu yere çarpıyor, kalkıyor,
+        /// yürüyordu. Bir kule, oradan atlayacak şeyi olmayan birine
+        /// açılmamalı.
+        /// </summary>
         [Test]
-        public void TheGalleryIsHighEnoughToCountAsALaunch()
+        public void TheDoorRefusesSomeoneWithoutAWing()
         {
             var k = Kapilar();
             Assert.AreEqual(1, k.Length, "Once kapi sayisi duzelmeli.");
-            Assert.Greater(k[0].serefeKotu,
-                Hezarfen.Player.Perde2Dilimi.KalkisKotu,
-                "Serefe, perdenin kalkis esiginin altinda — kuleye "
-                + "cikan oyuncu yine 'kalkis sayilmadi' gorur.");
+
+            // Sahnede ucus dizisi yok (Editor kipi) → kanat yok sayilir.
+            var sahte = new GameObject("AKTOR_T");
+            bool oldu = k[0].Etkiles(sahte);
+            Assert.IsFalse(oldu,
+                "Kanatsiz kuleye cikildi — 46 m'lik hasarsiz bir dusus "
+                + "bir mekanik degil, bir bosluktur.");
+            Object.DestroyImmediate(sahte);
         }
     }
 }

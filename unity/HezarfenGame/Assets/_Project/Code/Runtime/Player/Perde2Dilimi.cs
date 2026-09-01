@@ -60,8 +60,28 @@ namespace Hezarfen.Player
         public Transform oyuncu;
 
         [Header("Yerler (katalogdan — ADR 0007 dünya orijini)")]
+        /// <summary>
+        /// Okmeydanı'nda oyuncunun gönderildiği nokta.
+        ///
+        /// <b>Önce (−1143, 3331) idi ve orası bomboştu.</b> Bir oyuncu
+        /// on dakika koşup vardı ve yazdı: *"Etrafıma bakıyorum:
+        /// çimen. Sadece çimen. 250 metre yarıçapında tek bir nesne
+        /// yok."* Ölçüldü — o noktaya en yakın graf düğümü 965 m
+        /// ötede.
+        ///
+        /// Sebep yapısal ve <b>düzeltilecek yer nokta</b>: talim alanı
+        /// (`G_Okmeydani_Yasak`, belgeli, yarıçap 1.630 m) boş olmak
+        /// zorunda — II. Bayezid vakfiyesi meydanda yapı, mezar, bağ ve
+        /// bahçe yasaklar. Tekke, namazgâh ve menzil taşları bu yüzden
+        /// alanın <b>kenarında</b> duruyor ve öyle durmalı.
+        ///
+        /// Yani oyuncu alanın ortasına gönderiliyordu ve orada
+        /// gerçekten hiçbir şey yok — olmaması da doğru. Yeni nokta
+        /// tekkenin 120 m içerisi: okçunun durduğu yer, tekke ve
+        /// namazgâh görüş alanında, alanın kendisi önünde.
+        /// </summary>
         [Tooltip("Okmeydanı — Hezarfen'in talim alanı.")]
-        public Vector3 okmeydani = new Vector3(-1143f, 94.6f, 3331f);
+        public Vector3 okmeydani = new Vector3(-803f, 94.6f, 2542f);
 
         [Tooltip("Galata Kulesi — dünya orijini, kalkış.")]
         public Vector3 kule = new Vector3(0f, 52f, 0f);
