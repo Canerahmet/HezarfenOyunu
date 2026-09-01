@@ -88,6 +88,24 @@ namespace Hezarfen.Player
         [Tooltip("Doğancılar'a inmiş sayılma yarıçapı (m).")]
         public float inisYaricapi = 220f;
 
+        /// <summary>
+        /// Kalkışın sayılması için kule tabanının kaç metre üstü (m).
+        ///
+        /// Şerefe 98,2 m, kule tabanı 52 m. 40 m, şerefeyi ister ve
+        /// yakındaki bir damdan atlamayı istemez.
+        /// </summary>
+        public const float KalkisKotu = 40f;
+
+        /// <summary>
+        /// Bir uçuşun uçuş sayılması için en az yatay yol (m).
+        ///
+        /// Ölçülen en iyi süzülüş 630 m, ortalama 210 m — yani bu eşik
+        /// bugün <b>geçilemiyor</b> ve bu doğru: perde, olmayan bir
+        /// başarıyı olmuş saymamalı. ADR 0084 kapatılınca gerçek
+        /// hedefe (3.336 m) yaklaşır.
+        /// </summary>
+        public const float EnAzUcus = 800f;
+
         [Tooltip("Tepki sahnesinin geçtiği yarıçap (m).")]
         public float tepkiYaricapi = 120f;
 
@@ -104,6 +122,27 @@ namespace Hezarfen.Player
         public bool Cakildi { get; private set; }
 
         public event Action<Asama> AsamaDegisti;
+
+        /// <summary>Talim denemesinin sonucu — HUD okur.</summary>
+        public event Action<string> TalimBildirimi;
+
+        /// <summary>
+        /// Kaçıncı talimin kaç metre istediği.
+        /// 
+        /// Üç denemenin üçü de 60 m istiyordu ve ilk deneme düz
+        /// zeminden <b>hiç</b> geçemiyordu. Artan bir merdiven
+        /// oyuncuya ilk denemede bir <b>evet</b> verir; bugünkü hâlde
+        /// ilk üç cevabın üçü de hayır.
+        ///
+        /// 30 m: kalkış hızıyla hafif bir eğimden erişilir.
+        /// 60 m: ~5 m'lik bir düşüş ister. 120 m: gerçek bir yamaç.
+        /// </summary>
+        public float TalimEsigi(int kacinci) => kacinci switch
+        {
+            0 => talimMesafesi * 0.5f,
+            1 => talimMesafesi,
+            _ => talimMesafesi * 2f,
+        };
 
         /// <summary>
         /// <b>Kayıttan gelen ilerlemeyi geri koyar.</b>
@@ -162,9 +201,21 @@ namespace Hezarfen.Player
                     break;
 
                 case Asama.Kule:
-                    // Kuleye YATAY olarak yaklasmak yeter: tepesine cikmak
-                    // dikey bir hareket ve onu `dizi` olcuyor.
+                    // IRTIFA SORULUR — YOKSA PERDE KENDINI ATLAR.
+                    //
+                    // Once yalniz YATAY yakinlik ve "ucuyor mu"
+                    // soruluyordu; gerekcesi "tepeye cikmak dikey bir
+                    // hareket ve onu `dizi` olcuyor" idi. Olcmuyordu:
+                    // kule DIBINDE (kot 52 m) G + Space'e basmak iki
+                    // sarti da karsiliyor, bir saniye sonra yere
+                    // deginca `Ucus -> Inis` oluyordu. Yani oyuncu
+                    // 3.336 m'lik suzulusu **iki vapur biletiyle**
+                    // geciyor ve durum makinesi bunu ucus sayiyordu.
+                    //
+                    // Serefe kotu 98,2 m, kule tabani 52 m: 40 m'lik
+                    // sart serefeyi ister, damdan atlamayi istemez.
                     if (Yatay(p, kule) <= kuleYaricapi
+                        && p.y >= kule.y + KalkisKotu
                         && dizi != null
                         && dizi.Simdiki == UcusDizisi.Durum.Ucuyor)
                     {
@@ -190,6 +241,14 @@ namespace Hezarfen.Player
                     // yakalanma sonuclari" ilkesiyle ayni: her iki sonuc
                     // da oynanabilir olmali.
                     if (Cakildi) { Basa(); break; }
+
+                    // UCULMEDIYSE INILMIS SAYILMAZ.
+                    //
+                    // `Inis` yalnizca "Dogancilar'a 220 m" soruyordu,
+                    // yani oyuncu kayikla karsiya gecip yuruyerek de
+                    // perdeyi bitirebiliyordu. Oyunun doruk noktasi,
+                    // orada OLMAKLA gecilemez.
+                    if (UcusMesafesi < EnAzUcus) { Basa(); break; }
                     if (Yatay(p, dogancilar) <= inisYaricapi)
                         Gec(Asama.Tepki);
                     break;
@@ -214,11 +273,34 @@ namespace Hezarfen.Player
             else if (!ucuyor && _ucusta)
             {
                 _ucusta = false;
-                // Talim YALNIZ Okmeydani'nda sayilir: baska yerde yapilan
-                // deneme talim degil, uçustur.
-                if (Yatay(p, okmeydani) <= talimYaricapi
-                    && Yatay(p, _kalkis) >= talimMesafesi)
+                float d = Yatay(p, _kalkis);
+
+                // SAYILMAYAN DENEME SESSIZ GECMEZ.
+                //
+                // Once bu blok yalnizca sayiyordu ve sayamadiginda
+                // hicbir sey soylemiyordu. Aritmetik acikti: kalkis
+                // yatay 12,5 m/s, dikey bilesen yok, kanat 11,56:1 —
+                // yani **duz zeminden bir suzulus ~22 m**. Esik 60 m.
+                // Duz zeminde atilan her sicrama sayilmiyordu ve sayac
+                // 0/3'te kaliyordu.
+                //
+                // Oyuncu bos bir cayirda dort-bes kez atliyor, her
+                // seferinde ayni "0/3"u okuyor ve kanadin bozuk
+                // oldugunu dusunup **oyunu burada kapatiyor**. Bir
+                // ogretmenin en kotu hali, yanlisi soylemeden
+                // tekrarlatandir.
+                if (Yatay(p, okmeydani) > talimYaricapi)
+                    TalimBildirimi?.Invoke("Talim Okmeydanı'nda sayılır.");
+                else if (d < TalimEsigi(TalimSayisi))
+                    TalimBildirimi?.Invoke(
+                        $"{d:F0} m — {TalimEsigi(TalimSayisi):F0} m gerek. "
+                        + "Yüksek bir yerden atla.");
+                else
+                {
                     TalimSayisi++;
+                    TalimBildirimi?.Invoke(
+                        $"{d:F0} m süzüldün · talim {TalimSayisi}/{talimHedefi}");
+                }
             }
         }
 

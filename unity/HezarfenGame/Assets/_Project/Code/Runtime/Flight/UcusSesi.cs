@@ -33,10 +33,20 @@ namespace Hezarfen.Flight
         public AudioClip yatak;
 
         [Tooltip("Kanadın duyulmaya başladığı hava hızı (m/s).")]
-        public float sessizHiz = 8f;
+        public float sessizHiz = 7.4f;
 
-        [Tooltip("Sesin doyduğu hava hızı (m/s).")]
-        public float doygunHiz = 30f;
+        /// <summary>
+        /// Sesin doyduğu hava hızı (m/s) — <b>kanattan türer</b>.
+        ///
+        /// 30 yazıyordu ve bu kanadın <b>fiziksel olarak ulaşamadığı</b>
+        /// bir hız: en dik dengeli uçuşta 21,2 m/s. Yani bandın yalnız
+        /// 0,20–0,60 arası kullanılıyor ve perde 0,93'ten 1,09'a
+        /// çıkıyordu — 1,4 yarım ses, ayırt etme eşiğinin dibinde.
+        /// Aynı turda <see cref="Hezarfen.Player.KameraKipi.DoygunHiz"/>
+        /// doğru sayıyı (21) yazdı: iki bileşen, aynı büyüklük, iki
+        /// farklı sabit.
+        /// </summary>
+        public float doygunHiz = 21f;
 
         [Range(0f, 1f)] public float enCokSes = 0.55f;
 
@@ -71,8 +81,21 @@ namespace Hezarfen.Flight
         {
             if (_kanat == null) return;
 
-            float t = Mathf.InverseLerp(sessizHiz, doygunHiz,
-                                        _kanat.AirspeedMps);
+            // KANAT KAPALIYSA HIZ SIFIRDIR — DONMUS BIR ALAN HIZ DEGILDIR.
+            //
+            // `UcusDizisi.YereGec()` `suzulme.enabled = false` yapinca
+            // `GlideController.Step()` hic cagrilmiyor ve
+            // `AirspeedMps` **son ucus degerinde doniyor**. Bu sinifi
+            // bu turda ben yazdim ve tam bu kusuru koydum: oyuncu
+            // kanadi cikariyor, carsiya iniyor, kalabaligin icinde
+            // yuruyor ve kulaginda hic dinmeyen bir ruzgar oluyor.
+            // Stall'da inmisse kumas cirpinmasi da sonsuza kadar
+            // caliyor.
+            bool ucuyor = _kanat.isActiveAndEnabled;
+            float hiz = ucuyor ? _kanat.AirspeedMps : 0f;
+            bool stall = ucuyor && _kanat.IsStalled;
+
+            float t = Mathf.InverseLerp(sessizHiz, doygunHiz, hiz);
 
             // SES ANI DEGISMEZ.
             //
@@ -92,7 +115,7 @@ namespace Hezarfen.Flight
             // Stall bir ses degil bir UYARI: ekrandaki kirmizi yazidan
             // once kulakta olmali, cunku oyuncu o an ekranin ortasina
             // degil ufka bakiyor.
-            float c = _kanat.IsStalled ? enCokSes * 0.7f : 0f;
+            float c = stall ? enCokSes * 0.7f : 0f;
             _c = Mathf.MoveTowards(_c, c, 6f * Time.deltaTime);
             _cirpinma.volume = _c;
         }

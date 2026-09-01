@@ -95,6 +95,7 @@ namespace Hezarfen.Arayuz
             if (perde != null)
             {
                 perde.AsamaDegisti += AsamaDegisti;
+                perde.TalimBildirimi += Bildir;
                 // Ilk kareden itibaren gorunmeli: oyuncu ne yapacagini
                 // ancak bir asama DEGISTIGINDE ogrenirse, hic
                 // ogrenmez.
@@ -112,7 +113,11 @@ namespace Hezarfen.Arayuz
             var dizi = FindAnyObjectByType<Player.UcusDizisi>();
             if (dizi != null) dizi.DurumDegisti -= UcusDurumu;
             if (aranma != null) aranma.DurumDegisti -= AranmaDurumu;
-            if (perde != null) perde.AsamaDegisti -= AsamaDegisti;
+            if (perde != null)
+            {
+                perde.AsamaDegisti -= AsamaDegisti;
+                perde.TalimBildirimi -= Bildir;
+            }
         }
 
         private void IsBasladi(Gorev g) => Bildir($"Yeni iş: {g.baslik}");
@@ -145,8 +150,12 @@ namespace Hezarfen.Arayuz
                     "Doğancılar Meydanı'na in.",
                 Player.Perde2Dilimi.Asama.Tepki =>
                     "İncili Köşk'e git — padişah seni görmek istiyor.",
+                Player.Perde2Dilimi.Asama.Bitti => "Hikâye bitti.",
                 _ => "",
             };
+
+        /// <summary>Kapanış paneli bir kez gösterildi mi.</summary>
+        private bool _kodeksGosterildi;
 
         private void IsBitti(Gorev g) =>
             Bildir($"Teslim edildi · +{g.akce} akçe");
@@ -487,10 +496,47 @@ namespace Hezarfen.Arayuz
             // `talimMesafesi = 60 m` esikleri vardi ve ikisi de
             // oyuncuya hic gorunmuyordu: kimse "3 suzulusten 1'i
             // tamam" demeden ucmayi ogrenemez.
+            // --- KAPANIS: OYUN SESSIZCE BITMEZ ---
+            //
+            // `TepkiKodeksi` — kese altini, surgun, ve anlatinin tek
+            // kaynaga dayandiginin itirafi — depoda **sifir okuyucusu
+            // olan bir sabit**ti. Incili Kosk'e varan oyuncunun
+            // ekraninda olan tek sey uc saniyelik bos bir bildirim
+            // kutusuydu; padisah yok, metin yok, jenerik yok. Oyuncu
+            // yanlis yere geldigini saniyordu.
+            //
+            // Bu, 9. turda kapatilan "ana hikaye ekranda hic yoktu"
+            // bulgusunun ters ucu: hikaye artik BASLIYOR ama
+            // BITMIYORDU.
+            if (perde != null
+                && perde.Simdiki == Player.Perde2Dilimi.Asama.Bitti
+                && !_kodeksGosterildi)
+            {
+                float kg = 720f, ky = 420f;
+                var kr = new Rect((_en - kg) * 0.5f, (_boy - ky) * 0.5f, kg, ky);
+                GUI.Box(kr, "", _kutu);
+                GUI.Label(new Rect(kr.x + 30, kr.y + 24, kg - 60, 30),
+                          "HEZARFEN AHMED ÇELEBİ", _yazi);
+                GUI.Label(new Rect(kr.x + 30, kr.y + 64, kg - 60, ky - 150),
+                          Player.Perde2Dilimi.TepkiKodeksi, _yazi);
+                GUI.Label(new Rect(kr.x + 30, kr.y + ky - 78, kg - 60, 24),
+                          $"biten görev: {(gorev != null ? gorev.Bitirilen : 0)}"
+                          + $"  ·  kese: {(gorev != null ? gorev.Kese.akce : 0)} akçe",
+                          _yazi);
+                if (GUI.Button(new Rect(kr.x + 30, kr.y + ky - 46, kg - 60, 32),
+                               "Şehirde kalmaya devam et"))
+                    _kodeksGosterildi = true;
+
+                GUI.matrix = eskiMatris;
+                return;
+            }
+
             if (perde != null && perde.Simdiki != Player.Perde2Dilimi.Asama.Bitti)
             {
                 string ek = perde.Simdiki == Player.Perde2Dilimi.Asama.Talim
-                    ? $"  ({perde.TalimSayisi}/{perde.talimHedefi})" : "";
+                    ? $"  ({perde.TalimSayisi}/{perde.talimHedefi} · "
+                      + $"{perde.TalimEsigi(perde.TalimSayisi):F0} m gerek)"
+                    : "";
                 var pk = PerdeHedefi();
                 string yon = pk != null ? YonAdi(pk) : "";
                 float pm = pk != null && OyuncuT != null

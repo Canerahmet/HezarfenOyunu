@@ -35,6 +35,42 @@ namespace Hezarfen.Flight
                 var t = GameObject.Find("GB_Target_Dogancilar");
                 if (t != null) target = t.transform;
             }
+
+            // HEDEF BIR NESNE DEGIL BIR YERDIR.
+            //
+            // Yukaridaki arama `GB_Target_Dogancilar` diye bir nesne
+            // ariyor ve o nesne **yalniz `FlightSlice.unity`'de** var.
+            // Oyun sahnesinde `Find` null doner, `if (target != null)`
+            // blogu hic girmez ve ekranda sabit **"HEDEFE 0 m"** yazar:
+            // gecen tur ekledigim yon pusulasi ve suzulme konisi —
+            // "oyunun tek gercek sorusu" diye yazdigim sey — oynanan
+            // sahnede HIC CIZILMIYORDU.
+            //
+            // Ana zincirin hedefi zaten bir `Vector3` ve
+            // `Perde2Dilimi` onu biliyor. Bir yeri gostermek icin o
+            // yerde bir nesne olmasi gerekmez.
+            _perde = FindAnyObjectByType<Hezarfen.Player.Perde2Dilimi>();
+        }
+
+        private Hezarfen.Player.Perde2Dilimi _perde;
+
+        /// <summary>Hedefin dünya konumu; yoksa null.</summary>
+        private Vector3? HedefKonum
+        {
+            get
+            {
+                if (target != null) return target.position;
+                if (_perde == null) return null;
+                return _perde.Simdiki switch
+                {
+                    Hezarfen.Player.Perde2Dilimi.Asama.Ucus => _perde.dogancilar,
+                    Hezarfen.Player.Perde2Dilimi.Asama.Inis => _perde.dogancilar,
+                    Hezarfen.Player.Perde2Dilimi.Asama.Talim => _perde.okmeydani,
+                    Hezarfen.Player.Perde2Dilimi.Asama.Kule => _perde.kule,
+                    Hezarfen.Player.Perde2Dilimi.Asama.Tepki => _perde.incilikosk,
+                    _ => null,
+                };
+            }
         }
 
         private void OnGUI()
@@ -86,9 +122,10 @@ namespace Hezarfen.Flight
 
             float distance = 0f;
             string hedefYon = "", yetisme = "";
-            if (target != null)
+            var hk = HedefKonum;
+            if (hk != null)
             {
-                Vector3 d = target.position - glider.transform.position;
+                Vector3 d = hk.Value - glider.transform.position;
                 distance = new Vector2(d.x, d.z).magnitude;
                 hedefYon = YonAdi(d);
 
@@ -104,7 +141,7 @@ namespace Hezarfen.Flight
                 // UCUS BOYUNCA gorunmeli, ucus bitince degil.
                 float ld = glider.CurrentDrag > 1e-3f
                            ? glider.CurrentLift / glider.CurrentDrag : 0f;
-                float ulasilir = Mathf.Max(0f, altitude - target.position.y) * ld;
+                float ulasilir = Mathf.Max(0f, altitude - hk.Value.y) * ld;
                 yetisme = ulasilir >= distance
                     ? "YETİŞİYOR"
                     : $"{distance - ulasilir:F0} m EKSİK";

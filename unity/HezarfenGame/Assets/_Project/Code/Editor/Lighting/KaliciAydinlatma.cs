@@ -104,6 +104,29 @@ namespace Hezarfen.Editor.Lighting
         /// </summary>
         public const float GolgeMesafesi = 320f;
 
+        /// <summary>
+        /// Ölü <c>GlobalIllumination</c> bileşenini profilden çıkarır.
+        ///
+        /// Etkin ardışık düzen (<c>HDRP Balanced</c>) <c>supportSSGI: 0</c>
+        /// ile onu hiç derlemiyor; profilde durması "GI açık" diye
+        /// okunan bir yalandır. Dolaylı aydınlatma APV'den geliyor ve
+        /// APV gerçekten pişirilmiş.
+        ///
+        /// <b>Alt-varlık da silinir.</b> Yalnız listeden çıkarmak
+        /// dosyada yetim bir nesne bırakır ve <c>components</c> sayısı
+        /// ile diskteki alt-varlık sayısı ayrışır — bu depoda o
+        /// ayrışmayı yakalayan bir test zaten var.
+        /// </summary>
+        private static void SsgiyiKaldir(VolumeProfile profil)
+        {
+            var gi = profil.components.Find(c => c is GlobalIllumination);
+            if (gi == null) return;
+            profil.components.Remove(gi);
+            AssetDatabase.RemoveObjectFromAsset(gi);
+            Object.DestroyImmediate(gi, true);
+            EditorUtility.SetDirty(profil);
+        }
+
         /// <summary>Alacakaranlık pozu — artık yalnız belge değeri.</summary>
         public const float AlacakaranlikEV = 6.0f;
 
@@ -426,13 +449,6 @@ namespace Hezarfen.Editor.Lighting
             // geliyor ve APV GERCEKTEN pisirilmis (98 MB CellData
             // diskte). Bir profil, tasidigi seyi yapmiyorsa yalan
             // soyluyor demektir.
-            var gi = profil.components.Find(
-                c => c is UnityEngine.Rendering.HighDefinition.GlobalIllumination);
-            if (gi != null)
-            {
-                profil.Remove<UnityEngine.Rendering.HighDefinition.GlobalIllumination>();
-                Object.DestroyImmediate(gi, true);
-            }
 
             // --- SIS: Halic sabahi -------------------------------------
             var sis = Ensure<Fog>(profil);
@@ -478,11 +494,6 @@ namespace Hezarfen.Editor.Lighting
             sis.enableVolumetricFog.overrideState = true;
             sis.enableVolumetricFog.value = true;
 
-            // --- SSGI: sicramanin ustune, kademeli ---------------------
-            var ssgi = Ensure<GlobalIllumination>(profil);
-            ssgi.enable.overrideState = true;
-            ssgi.enable.value = true;
-
             // --- POST: gravür esintisi, ÇOK hafif ---------------------
             //
             // PLAN Bölüm 12: *"hafif film grain + ton eğrisi (dönem gravür
@@ -511,6 +522,19 @@ namespace Hezarfen.Editor.Lighting
             ton.mode.value = TonemappingMode.Neutral;
 
             EditorUtility.SetDirty(profil);
+                        // SILME EN SONDA — CUNKU BIR SEYI SILIP SONRA GERI EKLEDIM.
+            //
+            // Ilk denemede bu blok burada duruyordu ve elli satir
+            // asagida `Ensure<GlobalIllumination>` onu **geri
+            // ekliyordu**. Tur raporuna "profilden silindi" diye
+            // yazdim; diskte iki `GlobalIllumination` satiri duruyordu
+            // ve bir yorumcu bunu bularak beni duzeltti.
+            //
+            // Bu, bu oturumun tekrar eden kusurunun en sade hali:
+            // yaptigimi ölçmedim. Silme artik profilin kurulmasi
+            // BITTIKTEN sonra kosuyor ve alt-varlik da diskten
+            // kaldiriliyor — bellekten kaldirmak yetmez, dosyada kalir.
+            SsgiyiKaldir(profil);
             AssetDatabase.SaveAssets();
             AssetDatabase.ImportAsset(ProfilePath);
 

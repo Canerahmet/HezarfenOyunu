@@ -228,8 +228,19 @@ namespace Hezarfen.Player
         /// <summary>Eğrinin doyduğu hava hızı (m/s) — modelin üst ucu.</summary>
         public const float DoygunHiz = 21f;
 
+        /// <summary>
+        /// Kameranın gövdenin yatışından ne kadarını taşıdığı.
+        ///
+        /// 1,0 kanada kilitlenmek olurdu (Superflight'ın seçimi) ve
+        /// ufku sürekli döndürür; 0 ise bugünkü hâl, yani dönüşün
+        /// görünmemesi. 0,55 dönüşü kadrajda okutur ve mide
+        /// bulandırmaz — TotK'nın kanadı bu bandın içindedir.
+        /// </summary>
+        public const float KameraRolluPayi = 0.55f;
+
         private Hezarfen.Flight.GlideController _suzulme;
         private float _fov = YerFov;
+        private float _ucusEgimi;
 
         /// <summary>
         /// <b>Hızın görülmesi.</b>
@@ -291,7 +302,33 @@ namespace Hezarfen.Player
             var eksen = transform.position
                         + Vector3.up * omuzYuksekligi
                         + transform.right * omuzKaymasi;
+            // UCUSTA KADRAJ YATISA ESLIK EDER.
+            //
+            // Z bileseni literal `0f` idi: `maxBankAngleDeg = 55`,
+            // govde 55 derece yatiyor, kamera **0 derece**. Oyuncu
+            // dondugunu yalnizca HUD'daki "YATIS 55" sayisindan
+            // anliyordu. Bir suzulus oyununda donusu GORMEK, onu
+            // okumaktan once gelir.
+            //
+            // Ve `transform.eulerAngles.y` dik dalista ayrisamaz —
+            // stall kurtarisinda yaw sicriyordu. Yaw artik govdenin
+            // ILERISINDEN turetiliyor; tekillik yok.
             var yon = Quaternion.Euler(pitch, transform.eulerAngles.y, 0f);
+            if (_suzulme != null && _suzulme.isActiveAndEnabled)
+            {
+                var ileri = Vector3.ProjectOnPlane(transform.forward,
+                                                   Vector3.up);
+                if (ileri.sqrMagnitude < 1e-4f) ileri = -transform.up;
+                float yaw = Quaternion.LookRotation(ileri.normalized)
+                                      .eulerAngles.y;
+                float egim = -Mathf.Asin(
+                    Mathf.Clamp(transform.forward.y, -1f, 1f))
+                    * Mathf.Rad2Deg;
+                float roll = _suzulme.BankAngleDeg * KameraRolluPayi;
+                _ucusEgimi = Mathf.LerpAngle(_ucusEgimi, egim,
+                                             1f - Mathf.Exp(-4f * Time.deltaTime));
+                yon = Quaternion.Euler(_ucusEgimi + pitch, yaw, roll);
+            }
             var geri = yon * Vector3.back;
 
             // ENGEL TARAMASI KENDI GOVDESINI ATLAR.

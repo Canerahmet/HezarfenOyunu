@@ -86,6 +86,33 @@ namespace Hezarfen.Editor.Diagnostics
             return KuleTabani;
         }
 
+        /// <summary>
+        /// Toplu kipten koşulabilen giriş — <b>ADR 0084'ün kapısı bu</b>.
+        ///
+        /// <c>KareBolusumu</c> bu dersi öğrendi ve yazdı: <i>elle
+        /// yapılan adım, yapılmayan adımdır.</i> Bedeli ölçüldü —
+        /// <c>ucus_denemesi.md</c>'nin son yazılma zamanı, uçuş
+        /// modelini değiştiren commit'ten <b>üç commit eskiydi</b>.
+        /// Yani kapıyı tutan sayı, kapıyı değiştiren işi hiç görmemişti.
+        /// </summary>
+        public static void TopluKos()
+        {
+            UnityEditor.SceneManagement.EditorSceneManager
+                .OpenScene("Assets/_Project/Scenes/Faz1_Terrain.unity");
+            EditorApplication.playModeStateChanged += DurumDegisti;
+            EditorApplication.EnterPlaymode();
+        }
+
+        private static void DurumDegisti(PlayModeStateChange d)
+        {
+            if (d != PlayModeStateChange.EnteredPlayMode) return;
+            EditorApplication.playModeStateChanged -= DurumDegisti;
+            Baslat();
+        }
+
+        private static bool Toplu =>
+            System.Environment.CommandLine.Contains("TopluKos");
+
         [MenuItem("Hezarfen/Olcum/Ucus denemesi (20 ucus)")]
         public static void Baslat()
         {
@@ -533,6 +560,7 @@ namespace Hezarfen.Editor.Diagnostics
                 File.WriteAllText($"{Cikti}/ucus_denemesi.md", sb.ToString());
                 Debug.Log($"[Hezarfen] Ucus denemesi: {varan}/{l.Count} vardi "
                           + $"-> {Cikti}/ucus_denemesi.md");
+                if (Toplu) EditorApplication.Exit(0);
             }
         }
     }

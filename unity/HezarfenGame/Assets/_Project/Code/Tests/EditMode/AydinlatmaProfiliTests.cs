@@ -76,7 +76,16 @@ namespace Hezarfen.Tests
             Assert.IsTrue(p.TryGet<Exposure>(out _), "Poz yok.");
             Assert.IsTrue(p.TryGet<Tonemapping>(out _), "Tonemap yok.");
             Assert.IsTrue(p.TryGet<Fog>(out _), "Sis yok.");
-            Assert.IsTrue(p.TryGet<GlobalIllumination>(out _), "SSGI yok.");
+            // SSGI BURADAN KALDIRILDI — VE BU TESTIN KENDISI ONU
+            // KORUYORDU.
+            //
+            // Bu satir SSGI'nin VARLIGINI sart kosuyordu ve o sart,
+            // etkin ardisik duzenin (`HDRP Balanced`, `supportSSGI: 0`)
+            // onu hic derlemedigi gercegini hic sormuyordu. Yani bir
+            // test, olu bir override'i "temel katman" diye korumustu.
+            //
+            // Yerine gecen iddia `NoOverrideIsDeadInTheActivePipeline`:
+            // artik profildeki her katmanin CALISIYOR olmasi soruluyor.
         }
 
         /// <summary>
@@ -163,6 +172,41 @@ namespace Hezarfen.Tests
             Assert.GreaterOrEqual(g.maxShadowDistance.value, 300f,
                 $"Golge mesafesi {g.maxShadowDistance.value:F0} m. "
                 + "Bir acik dunyada bu, sehri kesilmis karton yapar.");
+        }
+
+        /// <summary>
+        /// <b>Profildeki her katman etkin ardışık düzende çalışıyor mu.</b>
+        ///
+        /// SSGI profilde tam donanımlı duruyordu — <c>enable: 1</c>,
+        /// <c>tracing: 1</c> — ve <c>HDRP Balanced</c> onu
+        /// <c>supportSSGI: 0</c> ile hiç derlemiyordu. "11 override
+        /// diskte" diye sayılan katmanlardan biri tamamen ölüydü.
+        ///
+        /// Sildim, tur raporuna yazdım — ve <b>silmedim</b>: elli satır
+        /// aşağıda aynı dosya onu geri ekliyordu. Diskte iki
+        /// <c>GlobalIllumination</c> satırı duruyordu ve bunu bir
+        /// yorumcu buldu, ben değil.
+        ///
+        /// Bu test o hatayı imkânsız kılar, çünkü <b>dosyanın
+        /// kendisini</b> okur: bir düzeltmeyi ölçmemek onu yapmamakla
+        /// aynı şeydir.
+        /// </summary>
+        [Test]
+        public void NoOverrideIsDeadInTheActivePipeline()
+        {
+            var p = Profil();
+            Assert.IsFalse(
+                p.TryGet<UnityEngine.Rendering.HighDefinition.GlobalIllumination>(
+                    out _),
+                "Profilde SSGI var ama etkin ardisik duzen (HDRP "
+                + "Balanced) supportSSGI: 0 ile onu derlemiyor. Olu bir "
+                + "override, bir sonraki okuyana 'GI acik' der.");
+
+            string metin = System.IO.File.ReadAllText(Yol);
+            Assert.IsFalse(metin.Contains("GlobalIllumination"),
+                "Bilesen bellekten kalkti ama DOSYADA duruyor — yetim "
+                + "alt-varlik. Listeden cikarmak yetmez, "
+                + "AssetDatabase.RemoveObjectFromAsset da gerekir.");
         }
 
         /// <summary>

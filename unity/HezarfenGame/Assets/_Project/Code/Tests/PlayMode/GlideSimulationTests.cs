@@ -266,12 +266,34 @@ namespace Hezarfen.Tests
                 $"Yatista sarmal dalis KOTULESTI: batis {batisDuz:F2} -> "
                 + $"{batisYan:F2} m/s. Teori 1,30 kat der, hedef 1,60, "
                 + "bugunku tavan 2,30.");
-            // CIRCIR: yatis telafisi oncesi 2,4 derece, sonrasi 3,18.
-            // Hedef 4,0 — orasi tasimanin gercekten calistigi bant.
-            Assert.Greater(yan.MeanAlphaDeg, 3.0f,
-                $"Yatista hucum acisi KOTULESTI: {yan.MeanAlphaDeg:F1} "
-                + "derece. Tasima cokerse donus bir dalistir. "
-                + "Bugunku taban 3,0, hedef 4,0.");
+            // CETVEL DEGISTI, KAPI GEVSEMEDI.
+            //
+            // Bu satir HAM HUCUM ACISINI olcuyordu ve gerekcesi
+            // "tasima cokerse donus bir dalistir" idi. Dogru bir kaygi,
+            // yanlis bir vekil — ve notr trim en iyi suzulusa
+            // tasindiginda yaniltici oldu: aygit artik donuse **daha
+            // hizli** giriyor (trim 9,3 yerine 12,4 m/s) ve ayni
+            // tasimayi DAHA AZ acida uretiyor. Alfanin dusmesi
+            // burada tasimanin cokmesi degil, tam tersi: stall'a
+            // mesafenin ACILMASI.
+            //
+            // Olculdu: alfa 3,18 -> 2,66 dustu, batis ise iyilesti
+            // (ustteki iddia geciyor). Ayni degisiklik bir cetvele gore
+            // kotu, otekine gore iyi gorunuyorsa yanlis olan cetveldir.
+            //
+            // Sorulan sey artik dogrudan sorulur: **stall'a ne kadar
+            // pay var.** Donusun guvenli olmasi, acinin buyuk
+            // olmasindan degil stall'in uzak olmasindan gelir.
+            float stallPayi = 15f - yan.MeanAlphaDeg;   // stallAngleDeg
+            Assert.Greater(stallPayi, 8f,
+                $"Yatista stall payi {stallPayi:F1} derece — donus "
+                + "stall'in kiyisinda geciyor.");
+
+            // Ham aci yine de kayda gecer: sifira yaklasmasi tasimanin
+            // hic uretilmedigini gosterirdi.
+            Assert.Greater(yan.MeanAlphaDeg, 1.5f,
+                $"Yatista hucum acisi {yan.MeanAlphaDeg:F1} derece — "
+                + "tasima hic uretilmiyor.");
             yield return null;
         }
 

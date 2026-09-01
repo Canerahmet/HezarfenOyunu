@@ -286,6 +286,33 @@ namespace Hezarfen.Editor.Pipeline
                 }
             rapor.Add($"Perme: {permeSayisi} iskele baglandi");
 
+            // 5e) KULE KAPISI — oyunun adini tasiyan fiile giris.
+            //
+            // Kuleye cikilamiyordu: ic mekan yok, tirmanma mekanigi
+            // yok, ve uçusu olcen tek arac oyuncuyu ISINLIYORDU. Yani
+            // 3.336 m'lik final hicbir zaman bir oyuncunun
+            // erisebilecegi bir sey olmadi.
+            int kapiSayisi = 0;
+            foreach (var kok in sahne.GetRootGameObjects())
+                foreach (var t in kok.GetComponentsInChildren<Transform>())
+                {
+                    if (!t.name.StartsWith("SM_GalataTower")
+                        && !t.name.StartsWith("PF_GalataKulesi")) continue;
+                    if (t.GetComponent<KuleKapisi>() != null) continue;
+
+                    var kapi = new GameObject("PF_KuleKapisi");
+                    kapi.transform.SetParent(t, false);
+                    kapi.transform.localPosition = new Vector3(0f, 1.2f, -6.5f);
+                    var kk = kapi.AddComponent<KuleKapisi>();
+                    var kutu = kapi.AddComponent<BoxCollider>();
+                    kutu.isTrigger = true;
+                    kutu.size = new Vector3(3f, 2.6f, 1.5f);
+                    kutu.center = new Vector3(0f, 1.3f, 0f);
+                    kapiSayisi++;
+                    break;
+                }
+            rapor.Add($"Kule kapisi: {kapiSayisi}");
+
             // 6a) AY — gecenin TEK kaynagi.
             //
             // Gece karesi yakalandi ve tamamen siyahti: 78 KB'lik bir

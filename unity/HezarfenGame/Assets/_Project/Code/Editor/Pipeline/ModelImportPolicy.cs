@@ -24,13 +24,28 @@ namespace Hezarfen.Editor.Pipeline
         /// Bu sayının artırılmadığı bir politika değişikliği, diskteki eski
         /// ayarlarla çalışmaya devam eder — sessiz ve bulunması zor bir tuzak.
         /// </summary>
-        public override uint GetVersion() => 4;
+        public override uint GetVersion() => 6;
 
         public static bool IsGoverned(string assetPath)
         {
             string p = assetPath.Replace('\\', '/').ToLowerInvariant();
             return p.StartsWith(ImportLanding) || p.StartsWith(ArtModels);
         }
+
+        // KLIP KOKUNU AYAGA TASIMAK DENENDI VE GERI ALINDI.
+        //
+        // `AyakIKTests` "karakter zeminden +0,426 m uzakta basliyor"
+        // diyor ve haklı: `MX_Hezarfen@Durus` klibi kökü kalçadan
+        // ölçüyor (`keepOriginalPositionY: 1`). Doğru görünen düzeltme
+        // `heightFromFeet` idi — Unity'nin "Based Upon: Feet" ayarı.
+        //
+        // ÖLÇÜM AKSİNİ SÖYLEDİ: 0,426 hiç değişmedi **ve** yürüyen
+        // kliplerin yer hızı ölçümü bozuldu (PlayMode 47 → 43). Yani
+        // kökün dikey çapası bu kusurun kaynağı değil; kaynağı başka
+        // bir yerde ve henüz bilmiyorum.
+        //
+        // Bir düzeltmenin doğru GÖRÜNMESİ, doğru olduğunun kanıtı
+        // değil. Geri alındı ve kusur açık kaydedildi.
 
         private void OnPreprocessModel()
         {

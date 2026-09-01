@@ -248,6 +248,15 @@ namespace Hezarfen.Player
 
         private float _kalkisSayaci;
 
+        /// <summary>
+        /// Deniz seviyesi (m) — ADR 0007'nin dünya sözleşmesi.
+        ///
+        /// Dünya orijini Galata Kulesi tabanı ve <b>y = 0 deniz
+        /// seviyesi</b>. Su yüzeyinin çarpıştırıcısı olmadığı için
+        /// temas denetiminin sorabileceği tek doğru soru budur.
+        /// </summary>
+        public const float DenizSeviyesi = 0f;
+
         private void TemasDenetle()
         {
             // TEMAS, IKI KARE ARASINDAKI YOLUN TAMAMINDA ARANIR.
@@ -298,7 +307,31 @@ namespace Hezarfen.Player
                          && Physics.Linecast(once, su, ~0,
                                              QueryTriggerInteraction.Ignore);
 
-            if (!yakin && !tunel) return;
+            // (c) SU: DENIZIN CARPISTIRICISI YOK.
+            //
+            // HDRP `WaterSurface` bir carpistirici tasimiyor ve bunu
+            // olcen kimse olmadi: (a) ve (b) su yuzeyini GORMEZ, deniz
+            // TABANINI gorur (`seabed_depth_m: 12`). Yani Bogaz'a
+            // dusen oyuncu su yuzeyinden geciyor, −12 m'ye iniyor,
+            // "Indin" yaziyor ve **denizin dibinde yurumeye
+            // basliyordu**. Yuzme yok, bogulma yok, geri koyma yok.
+            //
+            // Deniz seviyesi bu projede bir sozlesme: y = 0 (ADR 0007).
+            // Bir carpistirici eklemek yerine sozlesmeyi sormak hem
+            // ucuz hem dogru — su, dunyanin her yerinde ayni kotta.
+            bool suya = transform.position.y <= DenizSeviyesi;
+            if (suya)
+            {
+                // Suya inmek bir inistir, bir cakilma degil: oyuncu
+                // yuzeyde birakilir ve kiyiya yuruyebilir. Bogulma ayri
+                // bir tur (ADR gerektirir: oyun olumu var mi).
+                var yer = transform.position;
+                yer.y = DenizSeviyesi + 0.1f;
+                if (govde != null) govde.position = yer;
+                else transform.position = yer;
+            }
+
+            if (!yakin && !tunel && !suya) return;
 
             float dikey = govde != null ? govde.linearVelocity.y : 0f;
             bool sert = dikey < cakilmaHizi;

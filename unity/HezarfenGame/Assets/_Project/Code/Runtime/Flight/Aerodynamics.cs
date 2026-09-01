@@ -75,6 +75,34 @@ namespace Hezarfen.Flight
         }
 
         /// <summary>
+        /// <b>En az batış</b> açısı ve o açıdaki batış hızı.
+        ///
+        /// En iyi süzülüş (<see cref="BestGlideRatio"/>) en uzağa
+        /// götüren açıdır; en az batış <b>en uzun havada kalanı</b>.
+        /// İkisi aynı şey değil ve süzülüşün asıl becerisi arada
+        /// geçiş yapmaktır: mesafe için burnu indir, termikte ve
+        /// <b>dönüşte</b> yavaşla.
+        ///
+        /// Dönüşte gerekli oluyor, çünkü yatmış kanat aynı taşımayı
+        /// üretmek için daha çok <c>CL</c> ister; en iyi süzülüşün
+        /// düşük <c>CL</c>'i orada yetmez ve uçak süzülmez, <b>düşer</b>.
+        /// Ölçüldü: nötr açıyı 12,5°'den 6,2°'ye taşımak düz uçuşu
+        /// iyileştirdi ve 33° yatışta batışı 1,27'den 4,36 m/s'ye
+        /// çıkardı.
+        /// </summary>
+        public static (float sink, float alphaDeg) MinSinkRate(WindTuning t)
+        {
+            float best = float.MaxValue;
+            float bestAlpha = t.stallAngleDeg;
+            for (float a = t.minCommandAlphaDeg; a <= t.stallAngleDeg; a += 0.1f)
+            {
+                float s = SinkRate(a, t);
+                if (s < best) { best = s; bestAlpha = a; }
+            }
+            return (best, bestAlpha);
+        }
+
+        /// <summary>
         /// Verilen hücum açısında dengeli (taşıma = ağırlık) uçuş hızı, m/s.
         /// L = 0.5*rho*v^2*S*CL = m*g  =>  v = sqrt(2*m*g / (rho*S*CL))
         /// </summary>

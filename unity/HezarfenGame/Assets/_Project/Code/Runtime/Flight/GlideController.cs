@@ -217,6 +217,42 @@ namespace Hezarfen.Flight
             // Yatışsız uçuşta cos 0 = 1, yani bu terim <b>etkisizdir</b>:
             // mevcut süzülme testleri aynen geçer.
             float cosBank = Mathf.Cos(BankAngleDeg * Mathf.Deg2Rad);
+
+            // DONUSTE TABAN ACI EN AZ BATISA KAYAR.
+            //
+            // Notr aciyi en iyi suzulusa (6,2°) tasimak duz ucusu
+            // %17 uzattı ve **donusu bozdu**: 33° yatista batis
+            // 1,27'den 4,36 m/s'ye cikti. Sebep aerodinamik ve
+            // dogru — yatmis kanat daha cok CL ister, en iyi
+            // suzulusun dusuk CL'i orada yetmez.
+            //
+            // Cozum carpani buyutmek degil, TABANI degistirmek:
+            // gercek bir pilot donuste yavaslar. Yatis arttikca
+            // hedef aci en iyi suzulusten en az batisa (12,5°)
+            // kayar. Duz ucusta terim etkisiz (cos 0 = 1), yani
+            // menzil kazanci aynen durur.
+            if (pitchIn >= -0.01f && pitchIn <= 0.01f)
+            {
+                float minBatisAlfa = Aerodynamics.MinSinkRate(tuning).alphaDeg;
+                // KAYMA 25 DERECEDE TAMAMLANIR, 55'TE DEGIL.
+                //
+                // Once 55°'ye (izin verilen en cok yatis) gore
+                // olceklendi ve olcum yetmedigini soyledi: 33°
+                // yatista batis 4,36'dan 3,13 m/s'ye indi ama kapi
+                // 2,92. Sebep aritmetikte — 33°'de kayma yalnizca
+                // 0,375 oluyor, yani taban aci 8,6°'de kaliyor.
+                //
+                // Dogru esik dönüşün ne zaman DAYANIKLILIK istedigi:
+                // 25 derecelik bir yatis zaten bir manevradir, tam
+                // yatisi beklemenin sebebi yok. Boylece 33°'de kayma
+                // tamamlanir ve olculen eski davranisa (2,30 m/s)
+                // donulur — menzil kazanci ise duz ucusta oldugu
+                // icin aynen kalir.
+                const float TamKaymaYatisi = 25f;
+                float esik = 1f - Mathf.Cos(TamKaymaYatisi * Mathf.Deg2Rad);
+                float kayma = Mathf.Clamp01((1f - cosBank) / esik);
+                targetAlpha = Mathf.Lerp(targetAlpha, minBatisAlfa, kayma);
+            }
             float yukKatsayisi = Mathf.Min(2.5f, 1f / Mathf.Max(0.25f,
                                                                  cosBank));
             // ...AMA TELAFI STALL'A SOKMAMALI.
@@ -253,6 +289,29 @@ namespace Hezarfen.Flight
                 Mathf.Min(tuning.maxCommandAlphaDeg,
                           tuning.stallAngleDeg - 1.5f));
             targetAlpha = Mathf.Min(targetAlpha * yukKatsayisi, alfaTavani);
+
+            // KANAT KOMUT EDILEN ACIYI UCMUYORDU — %73'UNU UCUYORDU.
+            //
+            // Iki terim ayni anda uygulaniyor: `pitchAuthority` hedefe
+            // dogru cevirir (2,2), `pitchStability` aciyi sifira geri
+            // ceker (0,8). Denge noktasi
+            //     authority·(hedef − α) = stability·α
+            //   → α = hedef × 2,2/3,0 = hedef × **0,733**
+            //
+            // Yani `Aerodynamics.BestGlideRatio` 6,23° diyor, kanat
+            // 4,57° uçuyor ve en iyi suzulusa **hicbir zaman
+            // ulasmiyor**. Gecen tur notr trimi 12,5°'den 6,23°'ye
+            // tasidim ve "menzil %15 artti" diye yazdim; gercek kazanc
+            // 568 → 580 m, yani **12 metre**. Iddiayi komut edilen
+            // acilarin L/D'sinden hesaplamistim; kanat o acilarin
+            // hicbirini ucmuyordu.
+            //
+            // On-telafi bunu kapatir: komutu 1/0,733 = 1,364 ile
+            // carp, kanat hedeflenen aciyi GERCEKTEN ucsun.
+            float telafi = (tuning.pitchAuthority + tuning.pitchStability)
+                           / Mathf.Max(0.01f, tuning.pitchAuthority);
+            targetAlpha = Mathf.Min(targetAlpha * telafi,
+                                    tuning.maxCommandAlphaDeg);
 
             float alphaErrorRad = (targetAlpha - AngleOfAttackDeg) * Mathf.Deg2Rad;
             float sideslipRad = SideslipDeg * Mathf.Deg2Rad;
