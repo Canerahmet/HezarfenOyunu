@@ -765,6 +765,27 @@ namespace Hezarfen.Editor.Pipeline
             var govde = GovdeTak(go, out string govdeNot);
             rapor2 = govdeNot;
 
+            // KANAT — MODELLENDI, HIC EKRANA GIRMEDI.
+            //
+            // Uc kanat prefabi (`PF_Kanat_Katli/Acik/Kirik`) diskte
+            // duruyor ve GUID taramasi **sifir referans** dondu: hicbir
+            // sahnede, hicbir prefabta, hicbir kod satirinda. Yani
+            // oyuncu kuleden atliyor ve ekranda kollarini iki yana
+            // acmis entarili bir adam dusuyor — oyunun ADINI tasiyan
+            // nesne hic gorunmuyordu.
+            if (govde != null)
+            {
+                var kanatGo = new GameObject("KANAT");
+                kanatGo.transform.SetParent(govde.transform, false);
+                var kg = kanatGo.AddComponent<KanatGorseli>();
+                kg.dizi = go.GetComponent<UcusDizisi>();
+                kg.katli = KanatTak(kanatGo.transform, "PF_Kanat_Katli");
+                kg.acik = KanatTak(kanatGo.transform, "PF_Kanat_Acik");
+                kg.kirik = KanatTak(kanatGo.transform, "PF_Kanat_Kirik");
+                kg.Uygula(UcusDizisi.Durum.Yerde);
+                rapor2 += kg.katli != null ? " + kanat" : " + KANAT YOK";
+            }
+
             var kipler = go.AddComponent<KameraKipi>();
             kipler.govde = govde != null ? govde.transform : null;
             // Acilista OMUZ USTU: oyuncu once karakterini gormeli.
@@ -784,6 +805,24 @@ namespace Hezarfen.Editor.Pipeline
         /// gövdesiz kalırsa oyuncu boşluğun arkasından bakar ve bunun
         /// nedeni sahnede hiçbir yerde yazmaz.
         /// </summary>
+        /// <summary>Kanat modelini gövdeye takar; yoksa null.</summary>
+        private static GameObject KanatTak(Transform ebeveyn, string ad)
+        {
+            var pf = AssetDatabase.LoadAssetAtPath<GameObject>(
+                $"Assets/_Project/Art/Prefabs/{ad}.prefab");
+            if (pf == null)
+            {
+                Debug.LogError($"[Hezarfen] {ad} bulunamadi.");
+                return null;
+            }
+            var ornek = (GameObject)PrefabUtility.InstantiatePrefab(pf, ebeveyn);
+            ornek.name = ad;
+            // Sirtta: omuz hizasi, govdenin biraz arkasi.
+            ornek.transform.localPosition = new Vector3(0f, 1.35f, -0.12f);
+            ornek.transform.localRotation = Quaternion.identity;
+            return ornek;
+        }
+
         private static GameObject GovdeTak(GameObject oyuncu, out string not)
         {
             const string yol =

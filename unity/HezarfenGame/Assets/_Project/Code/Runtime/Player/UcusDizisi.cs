@@ -257,6 +257,66 @@ namespace Hezarfen.Player
         /// </summary>
         public const float DenizSeviyesi = 0f;
 
+        /// <summary>
+        /// Suya inen oyuncuyu <b>en yakın kıyıya</b> bırakır.
+        ///
+        /// ## Neden yüzeyde bırakmak yetmedi
+        ///
+        /// İlk düzeltme oyuncuyu su yüzeyine koyuyordu ve bir oyuncu
+        /// raporu ne olduğunu anlattı: bir kare yüzeyde duruyor, sonra
+        /// <see cref="WalkController"/> devralıp yerçekimiyle
+        /// <b>deniz tabanına indiriyor</b> (−12 m) ve orada yürümeye
+        /// başlıyor. Kıyı basamağı 58° eğimli, karakterin tırmanma
+        /// sınırı 45°: <b>çıkış yok.</b> Tek çare oyunu yeniden
+        /// başlatmak.
+        ///
+        /// Daha kötüsü, bu kapanı oyunun kendi kuralı zorunlu
+        /// kılıyordu: uçuşun sayılması için 800 m isteniyor ve hedefe
+        /// doğru kıyı <b>652 m</b>'de bitiyor. Yani oyuncunun doğru
+        /// oynaması, kesin olarak denize düşmesi demekti.
+        ///
+        /// ## Neden yüzme değil
+        ///
+        /// Yüzme ayrı bir mekanik ve ayrı bir tur. Dönemin cevabı da
+        /// zaten hazır: Haliç ve Boğaz kayık kaynıyor (373 kayık
+        /// sahnede). Suya düşen adamı kayıkçılar çıkarır — bu bir
+        /// kolaylık değil, 1632'de suya düşmenin gerçek sonucu.
+        /// </summary>
+        private void KiyiyaBirak()
+        {
+            var p = transform.position;
+
+            // Kiyi HESAPLANMAZ, ARANIR: arazi kotunu sekiz yonde
+            // artan yariclarla ornekle, deniz seviyesinin uzerine
+            // cikan ilk noktayi al.
+            var arazi = Terrain.activeTerrain;
+            Vector3 hedef = p;
+            bool bulundu = false;
+            if (arazi != null)
+            {
+                for (float r = 40f; r <= 900f && !bulundu; r += 40f)
+                    for (int i = 0; i < 12 && !bulundu; i++)
+                    {
+                        float a = i * 30f * Mathf.Deg2Rad;
+                        var q = p + new Vector3(Mathf.Sin(a), 0f,
+                                                Mathf.Cos(a)) * r;
+                        float kot = arazi.SampleHeight(q)
+                                    + arazi.transform.position.y;
+                        if (kot <= DenizSeviyesi + 0.5f) continue;
+                        hedef = new Vector3(q.x, kot + 0.2f, q.z);
+                        bulundu = true;
+                    }
+            }
+            if (!bulundu) { hedef = p; hedef.y = DenizSeviyesi + 0.2f; }
+
+            if (govde != null) govde.position = hedef;
+            transform.position = hedef;
+            SuyaDustu?.Invoke();
+        }
+
+        /// <summary>Suya düşüp kıyıya bırakılınca — HUD okur.</summary>
+        public event System.Action SuyaDustu;
+
         private void TemasDenetle()
         {
             // TEMAS, IKI KARE ARASINDAKI YOLUN TAMAMINDA ARANIR.
@@ -320,16 +380,7 @@ namespace Hezarfen.Player
             // Bir carpistirici eklemek yerine sozlesmeyi sormak hem
             // ucuz hem dogru — su, dunyanin her yerinde ayni kotta.
             bool suya = transform.position.y <= DenizSeviyesi;
-            if (suya)
-            {
-                // Suya inmek bir inistir, bir cakilma degil: oyuncu
-                // yuzeyde birakilir ve kiyiya yuruyebilir. Bogulma ayri
-                // bir tur (ADR gerektirir: oyun olumu var mi).
-                var yer = transform.position;
-                yer.y = DenizSeviyesi + 0.1f;
-                if (govde != null) govde.position = yer;
-                else transform.position = yer;
-            }
+            if (suya) KiyiyaBirak();
 
             if (!yakin && !tunel && !suya) return;
 

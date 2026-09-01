@@ -37,6 +37,23 @@ namespace Hezarfen.Tests
             public float MeanBankDeg;
             public float MeanSpeed;
             public float EndX;
+
+            /// <summary>
+            /// Uçuş boyunca değişen yön (derece; sağa dönüş pozitif).
+            ///
+            /// <b>Yer değiştirme yanıltıcı bir vekildi.</b> "Sağa yatınca
+            /// sağa döner mi" sorusu <c>EndX &gt; 20 m</c> ile
+            /// ölçülüyordu ve dönüşte tabanın en az batış açısına
+            /// kayması aygıtı <b>bilerek yavaşlattığı</b> için aynı
+            /// sürede daha az yol alınıyor: 15,6 m. Yatış oluşuyor
+            /// (testin kendi ilk iddiası geçiyor), dönüş oluyor, yalnız
+            /// mesafe kısalıyor.
+            ///
+            /// Testin kendi yorumu bunu zaten kabul ediyordu — "tam
+            /// yatışta yer değiştirme ölçmek yanıltıcı olurdu". Yarım
+            /// yatışta da öyle oldu. Sorulan şey artık doğrudan sorulur.
+            /// </summary>
+            public float HeadingDeg;
             public float GlideRatio => Horizontal / Mathf.Max(Dropped, 0.001f);
         }
 
@@ -83,6 +100,21 @@ namespace Hezarfen.Tests
             rb.angularVelocity = Vector3.zero;
 
             Vector3 start = craft.transform.position;
+
+            // YON BIRIKIMLI OLCULUR — UC NOKTA FARKI SARMALANIR.
+            //
+            // Once `DeltaAngle(baslangic, son)` kullandim ve olcum
+            // soyledi: sola yatista **+64,6 derece** okundu. Aygit 15
+            // saniyede yarim turdan fazla donup acinin obur tarafina
+            // gecmisti; fark [-180, 180] araligina kirpildigi icin
+            // isaret bile ters cikti. Testin kendi yorumu bunu zaten
+            // biliyordu: "tam yatista aygit neredeyse daireyi kapatip
+            // baslangica doner".
+            //
+            // Kare kare toplamak sarmalanmaz ve gercekten donulen aciyi
+            // verir.
+            float oncekiYon = craft.transform.eulerAngles.y;
+            float birikimliYon = 0f;
             int steps = Mathf.RoundToInt(seconds / Dt);
             int half = steps / 2;
 
@@ -91,6 +123,10 @@ namespace Hezarfen.Tests
 
             for (int i = 0; i < steps; i++)
             {
+                float suYon = craft.transform.eulerAngles.y;
+                birikimliYon += Mathf.DeltaAngle(oncekiYon, suYon);
+                oncekiYon = suYon;
+
                 glide.Step();
                 Physics.Simulate(Dt);
 
@@ -113,7 +149,8 @@ namespace Hezarfen.Tests
                 MeanAlphaDeg = sumAlpha / samples,
                 MeanBankDeg = sumBank / samples,
                 MeanSpeed = sumSpeed / samples,
-                EndX = end.x
+                EndX = end.x,
+                HeadingDeg = birikimliYon,
             };
         }
 
@@ -196,7 +233,9 @@ namespace Hezarfen.Tests
             var f = Fly(0f, 0.4f, 15f);
 
             Assert.Greater(f.MeanBankDeg, 10f, $"Saga yatis olusmadi: bank {f.MeanBankDeg:F1} derece");
-            Assert.Greater(f.EndX, 20f, $"Saga yatista saga donmedi: x={f.EndX:F1}");
+            Assert.Greater(f.HeadingDeg, 25f,
+                $"Saga yatista saga donmedi: yon {f.HeadingDeg:F1} derece degisti.");
+            Assert.Greater(f.EndX, 0f, "Saga yatista sola gitti.");
             yield return null;
         }
 
@@ -207,11 +246,14 @@ namespace Hezarfen.Tests
             var left = Fly(0f, -0.4f, 15f);
 
             Assert.Less(left.MeanBankDeg, -10f, $"Sola yatis olusmadi: bank {left.MeanBankDeg:F1}");
-            Assert.Less(left.EndX, -20f, $"Sola yatista sola donmedi: x={left.EndX:F1}");
+            Assert.Less(left.HeadingDeg, -25f,
+                $"Sola yatista sola donmedi: yon {left.HeadingDeg:F1} derece degisti.");
+            Assert.Less(left.EndX, 0f, "Sola yatista saga gitti.");
 
             // Simetri: sag ve sol ayna olmali. Degilse bir eksende gizli bir yanlilik var.
             Assert.AreEqual(right.MeanBankDeg, -left.MeanBankDeg, 2f, "Yatis simetrik degil.");
-            Assert.AreEqual(right.EndX, -left.EndX, 5f, "Donus simetrik degil.");
+            Assert.AreEqual(right.HeadingDeg, -left.HeadingDeg, 6f,
+                "Donus simetrik degil.");
             yield return null;
         }
         /// <summary>

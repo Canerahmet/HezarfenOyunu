@@ -107,18 +107,35 @@ namespace Hezarfen.Editor.Pipeline
             UnityEventTools.AddPersistentListener(basla.onClick,
                                                acilis.Basla);
 
+            // DEVAM ET — VE NEDEN YOKTU.
+            //
+            // Menude dort dugme vardi ve hicbiri kaydi acmiyordu.
+            // Dunku oturumunu surdurmek isteyen oyuncu **Basla**'ya
+            // basmak, sehri bastan yuklemek, varsayilan noktada dogmak
+            // ve sonra ekranin kosesindeki tus satirindan F9'u ogrenip
+            // ona basmak zorundaydi. Kayit sistemi on iki alan tutuyor,
+            // Perde 2 ilerlemesi dahil — ve menude bir yuzu yoktu.
+            //
+            // Dugme her zaman KURULUR ama kayit yoksa GORUNMEZ:
+            // olmayan bir kaydi sunmak, olmayan bir secenek sunmaktir.
+            var devam = Dugme(menu.transform, "DevamDugme", "Devam et",
+                              new Vector2(0f, -95f));
+            UnityEventTools.AddPersistentListener(devam.onClick,
+                                               acilis.DevamEt);
+            acilis.devamDugmesi = devam.gameObject;
+
             var ayarDugme = Dugme(menu.transform, "AyarDugme", "Ayarlar",
-                                  new Vector2(0f, -95f));
+                                  new Vector2(0f, -170f));
             UnityEventTools.AddPersistentListener(ayarDugme.onClick,
                                                acilis.AyarlariAc);
 
             var krediDugme = Dugme(menu.transform, "KrediDugme", "Krediler",
-                                   new Vector2(0f, -170f));
+                                   new Vector2(0f, -245f));
             UnityEventTools.AddPersistentListener(krediDugme.onClick,
                                                acilis.KredileriAc);
 
             var cik = Dugme(menu.transform, "CikDugme", "Çık",
-                            new Vector2(0f, -245f));
+                            new Vector2(0f, -320f));
             UnityEventTools.AddPersistentListener(cik.onClick,
                                                acilis.Cik);
 

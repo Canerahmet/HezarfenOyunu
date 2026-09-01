@@ -99,12 +99,17 @@ namespace Hezarfen.Player
         /// <summary>
         /// Bir uçuşun uçuş sayılması için en az yatay yol (m).
         ///
-        /// Ölçülen en iyi süzülüş 630 m, ortalama 210 m — yani bu eşik
-        /// bugün <b>geçilemiyor</b> ve bu doğru: perde, olmayan bir
-        /// başarıyı olmuş saymamalı. ADR 0084 kapatılınca gerçek
-        /// hedefe (3.336 m) yaklaşır.
+        /// <b>800 idi ve bir kapan kuruyordu.</b> Hedefe doğru kıyı
+        /// <b>652 m</b>'de bitiyor (DEM ölçümü): 800 m şartı, kuralına
+        /// uyan her oyuncuyu kesin olarak denize düşürüyordu. Bir
+        /// oyuncu raporu bunu buldu ve eşiği ben koymuştum.
+        ///
+        /// 500 m: kıyının belirgin biçimde altında, ama kule dibinden
+        /// atlayıp bir saniyede inmenin de üstünde — perdenin
+        /// atlanmasını engelleyen sayı buydu, oyuncuyu denize atan
+        /// değil.
         /// </summary>
-        public const float EnAzUcus = 800f;
+        public const float EnAzUcus = 500f;
 
         [Tooltip("Tepki sahnesinin geçtiği yarıçap (m).")]
         public float tepkiYaricapi = 120f;
@@ -289,7 +294,17 @@ namespace Hezarfen.Player
                 // oldugunu dusunup **oyunu burada kapatiyor**. Bir
                 // ogretmenin en kotu hali, yanlisi soylemeden
                 // tekrarlatandir.
-                if (Yatay(p, okmeydani) > talimYaricapi)
+                // CEMBER KALKISTA OLCULUR, INISTE DEGIL.
+                //
+                // Once inis noktasi soruluyordu ve bu bir tuzak
+                // kuruyordu: ucuncu esik 120 m, cember 250 m — yani
+                // COK IYI suzulen oyuncu cemberin disina dusuyor ve
+                // "Talim Okmeydani'nda sayilir" cevabini aliyordu.
+                // Bir oyuncu bunu yasadi ve hakli olarak kizdi:
+                // "uzun atarsan cezalandiriliyorsun".
+                //
+                // Talim NEREDEN atladiginla ilgilidir.
+                if (Yatay(_kalkis, okmeydani) > talimYaricapi)
                     TalimBildirimi?.Invoke("Talim Okmeydanı'nda sayılır.");
                 else if (d < TalimEsigi(TalimSayisi))
                     TalimBildirimi?.Invoke(

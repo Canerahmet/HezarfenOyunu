@@ -57,6 +57,10 @@ namespace Hezarfen.Arayuz
 
         private void Start()
         {
+            // Kayit yoksa "Devam et" gorunmez.
+            if (devamDugmesi != null)
+                devamDugmesi.SetActive(Sehir.Kayit.Var);
+
             // AYARLAR ACILISTA UYGULANIR.
             //
             // Kaydedilmis ama uygulanmamis bir ayar, olmayan bir ayardir:
@@ -150,13 +154,40 @@ namespace Hezarfen.Arayuz
                     Mathf.Clamp(k, 0, Ayarlar.KademeAciklamasi.Length - 1)];
         }
 
-        /// <summary>"Başla" düğmesi.</summary>
+        /// <summary>"Başla" düğmesi — yeni oyun.</summary>
         public void Basla()
         {
             if (Yukleniyor) return;
+            _devamEt = false;
             Goster(menu: false);
             StartCoroutine(Yukle());
         }
+
+        /// <summary>
+        /// <b>"Devam et" — ve neden yoktu.</b>
+        ///
+        /// Menüde dört düğme vardı: Başla · Ayarlar · Krediler · Çık.
+        /// Dünkü oturumunu sürdürmek isteyen oyuncu <b>Başla</b>'ya
+        /// basmak, şehri baştan yüklemek, varsayılan noktada doğmak ve
+        /// sonra ekranın köşesindeki tuş satırından F9'u öğrenip ona
+        /// basmak zorundaydı. Kayıt sistemi on iki alan tutuyor, Perde 2
+        /// ilerlemesi dahil — ve menüde bir yüzü yoktu.
+        ///
+        /// Düğme yalnız <see cref="Sehir.Kayit.Var"/> iken görünür:
+        /// olmayan bir kaydı sunmak, olmayan bir seçenek sunmaktır.
+        /// </summary>
+        public void DevamEt()
+        {
+            if (Yukleniyor || !Sehir.Kayit.Var) return;
+            _devamEt = true;
+            Goster(menu: false);
+            StartCoroutine(Yukle());
+        }
+
+        private bool _devamEt;
+
+        [Tooltip("\"Devam et\" düğmesi — kayıt yoksa gizlenir.")]
+        public GameObject devamDugmesi;
 
         /// <summary>"Çık" düğmesi.</summary>
         public void Cik()
@@ -195,6 +226,20 @@ namespace Hezarfen.Arayuz
                 if (ilerlemeYazi != null)
                     ilerlemeYazi.text = $"Şehir yükleniyor… %{SonIlerleme * 100f:F0}";
                 yield return null;
+            }
+
+            // KAYIT SAHNE KURULDUKTAN SONRA YUKLENIR.
+            //
+            // Sahne yuklenirken oyuncu, gorev yoneticisi ve perde
+            // dilimi henuz yok; kaydi once yuklemek hicbir seye
+            // yazmazdi. Bir kare beklenir, sonra baglayici cagrilir.
+            if (_devamEt)
+            {
+                yield return null;
+                var baglayici = FindAnyObjectByType<Sehir.KayitBaglayici>();
+                if (baglayici != null) baglayici.Yukle();
+                else Debug.LogWarning("[Hezarfen] Kayit baglayici yok — "
+                                      + "devam edilemedi.");
             }
         }
     }

@@ -285,33 +285,36 @@ namespace Hezarfen.Flight
             // Tavan yalnizca telafinin FAZLASINI tutar: kendi
             // komutun her zaman gecer, yatis yuzunden eklenen pay
             // seni stall'a itemez.
+            // TAVAN, UCULACAK ACIYA UYGULANIR — KOMUT EDILENE DEGIL.
+            //
+            // Bu satirlar once burada duruyor, on-telafi ise yirmi
+            // satir asagida uygulaniyordu ve sira yanlisti: donuste
+            // taban aci 12,04'e kayiyor, tavan 13,5'te tutuyor, sonra
+            // telafi 1,364 ile carpip **16,4** yapiyordu. Stall acisi
+            // 15. Yani kanat her donuste stall'a giriyor, kontrol
+            // otoritesini kaybediyor ve 20 derece komut edilen yatista
+            // ancak 15,6 derece yatabiliyordu — iki donus testi bunu
+            // yakaladi.
+            //
+            // Tavan `uculacak` acinin tavanidir; telafi ondan SONRA
+            // gelir ve kendi siniri `maxCommandAlphaDeg`dir.
             float alfaTavani = Mathf.Max(targetAlpha,
                 Mathf.Min(tuning.maxCommandAlphaDeg,
                           tuning.stallAngleDeg - 1.5f));
             targetAlpha = Mathf.Min(targetAlpha * yukKatsayisi, alfaTavani);
 
-            // KANAT KOMUT EDILEN ACIYI UCMUYORDU — %73'UNU UCUYORDU.
+            // ON-TELAFI: KOMUT EDILEN ACI GERCEKTEN UCULSUN.
             //
-            // Iki terim ayni anda uygulaniyor: `pitchAuthority` hedefe
-            // dogru cevirir (2,2), `pitchStability` aciyi sifira geri
-            // ceker (0,8). Denge noktasi
-            //     authority·(hedef − α) = stability·α
-            //   → α = hedef × 2,2/3,0 = hedef × **0,733**
-            //
-            // Yani `Aerodynamics.BestGlideRatio` 6,23° diyor, kanat
-            // 4,57° uçuyor ve en iyi suzulusa **hicbir zaman
-            // ulasmiyor**. Gecen tur notr trimi 12,5°'den 6,23°'ye
-            // tasidim ve "menzil %15 artti" diye yazdim; gercek kazanc
-            // 568 → 580 m, yani **12 metre**. Iddiayi komut edilen
-            // acilarin L/D'sinden hesaplamistim; kanat o acilarin
-            // hicbirini ucmuyordu.
-            //
-            // On-telafi bunu kapatir: komutu 1/0,733 = 1,364 ile
-            // carp, kanat hedeflenen aciyi GERCEKTEN ucsun.
+            // Iki tork terimi ayni anda calisiyor: `pitchAuthority`
+            // (2,2) hedefe cevirir, `pitchStability` (0,8) aciyi sifira
+            // geri ceker. Denge `α = hedef × 2,2/3,0`, yani kanat
+            // komut edilenin **%73'unu** uçuyordu ve
+            // `BestGlideRatio`'nun 6,23 derecesine hic ulasmamisti.
             float telafi = (tuning.pitchAuthority + tuning.pitchStability)
                            / Mathf.Max(0.01f, tuning.pitchAuthority);
             targetAlpha = Mathf.Min(targetAlpha * telafi,
                                     tuning.maxCommandAlphaDeg);
+
 
             float alphaErrorRad = (targetAlpha - AngleOfAttackDeg) * Mathf.Deg2Rad;
             float sideslipRad = SideslipDeg * Mathf.Deg2Rad;

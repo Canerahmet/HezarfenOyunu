@@ -88,7 +88,11 @@ namespace Hezarfen.Arayuz
                 gorev.GorevBitti += IsBitti;
             }
             var dizi = FindAnyObjectByType<Player.UcusDizisi>();
-            if (dizi != null) dizi.DurumDegisti += UcusDurumu;
+            if (dizi != null)
+            {
+                dizi.DurumDegisti += UcusDurumu;
+                dizi.SuyaDustu += SuyaDustu;
+            }
             if (aranma != null) aranma.DurumDegisti += AranmaDurumu;
 
             if (perde == null) perde = FindAnyObjectByType<Player.Perde2Dilimi>();
@@ -111,7 +115,11 @@ namespace Hezarfen.Arayuz
                 gorev.GorevBitti -= IsBitti;
             }
             var dizi = FindAnyObjectByType<Player.UcusDizisi>();
-            if (dizi != null) dizi.DurumDegisti -= UcusDurumu;
+            if (dizi != null)
+            {
+                dizi.DurumDegisti -= UcusDurumu;
+                dizi.SuyaDustu -= SuyaDustu;
+            }
             if (aranma != null) aranma.DurumDegisti -= AranmaDurumu;
             if (perde != null)
             {
@@ -121,6 +129,15 @@ namespace Hezarfen.Arayuz
         }
 
         private void IsBasladi(Gorev g) => Bildir($"Yeni iş: {g.baslik}");
+
+        /// <summary>
+        /// Suya düşünce — <b>bir şey olduğu söylenmeli</b>.
+        ///
+        /// Oyuncu suya düşüyor, kıyıya bırakılıyor ve ekranda hiçbir
+        /// şey olmuyorsa ışınlandığını sanır. Kayıkçılar Haliç'te 373
+        /// tekneyle duruyor; onu çıkaran onlar.
+        /// </summary>
+        private void SuyaDustu() => Bildir("Kayıkçılar seni kıyıya çıkardı.");
 
         /// <summary>
         /// Oyunun <b>kendi</b> hikâyesi — ekrana ilk kez ulaşıyor.

@@ -908,363 +908,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5868267331516990518, guid: d38a05b7423c20a4dbbcbf00ca97d210, type: 3}
   m_PrefabInstance: {fileID: 36882429}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &37620377
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 37620394}
-  - component: {fileID: 37620393}
-  - component: {fileID: 37620392}
-  - component: {fileID: 37620391}
-  - component: {fileID: 37620390}
-  - component: {fileID: 37620389}
-  - component: {fileID: 37620388}
-  - component: {fileID: 37620387}
-  - component: {fileID: 37620386}
-  - component: {fileID: 37620385}
-  - component: {fileID: 37620384}
-  - component: {fileID: 37620383}
-  - component: {fileID: 37620382}
-  - component: {fileID: 37620381}
-  - component: {fileID: 37620380}
-  - component: {fileID: 37620379}
-  - component: {fileID: 37620378}
-  m_Layer: 0
-  m_Name: OYUNCU
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &37620378
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 37620377}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 128291f566b5bab41a9ba8da84975ab0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Player.Perde2Dilimi
-  dizi: {fileID: 37620385}
-  oyuncu: {fileID: 37620394}
-  okmeydani: {x: -1143, y: 94.6, z: 3331}
-  kule: {x: 0, y: 52, z: 0}
-  dogancilar: {x: 3267.6, y: 46.6, z: -672.9}
-  incilikosk: {x: 1210, y: 0.1, z: -1225}
-  talimYaricapi: 250
-  talimMesafesi: 60
-  talimHedefi: 3
-  kuleYaricapi: 40
-  inisYaricapi: 220
-  tepkiYaricapi: 120
---- !u!114 &37620379
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 37620377}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 022db8b1dddb92440b8c3c1e54ac637a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Player.KameraKipi
-  kip: 1
-  degistirTusu: 36
-  omuzYuksekligi: 1.45
-  omuzKaymasi: 0.45
-  mesafe: 3.2
-  enYakin: 1.4
-  enUzak: 6
-  tekerAdimi: 0.35
-  carpismaYaricapi: 0.25
-  yumusatma: 14
-  govde: {fileID: 517553850}
---- !u!114 &37620380
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 37620377}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8236ed9a88ca38e4fbfedc6f44b77fc0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Player.HezarfenAnimator
-  animator: {fileID: 517553852}
-  karakterKontrol: {fileID: 37620393}
-  suzulme: {fileID: 37620389}
-  pitchDoyum: 14
-  rollDoyum: 45
-  yumusatma: 0.12
---- !u!114 &37620381
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 37620377}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63069368d6dbf74418d9effb4a5353b9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Player.EtkilesimAlgila
-  menzil: 2.4
-  aci: 35
-  bakis: {fileID: 1875201657}
-  katman:
-    serializedVersion: 2
-    m_Bits: 4294967295
---- !u!114 &37620382
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 37620377}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2a84a4100541ea34d8cb5e65decac7d9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Envanter
---- !u!114 &37620383
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 37620377}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b367301a8d01f734c8b929b3aa748234, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Player.Fener
-  zaman: {fileID: 0}
-  lumen: 18
-  menzil: 7.5
-  hepZaman: 0
-  aranma: {fileID: 0}
---- !u!114 &37620384
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 37620377}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 020d8b9522c5a0548b0b6c26d2974c08, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Flight.FlightHud
-  glider: {fileID: 37620389}
-  target: {fileID: 0}
-  varioScale: 4
---- !u!114 &37620385
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 37620377}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fee2ded785c70bc44b3e7346ccea3cd8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Player.UcusDizisi
-  animasyon: {fileID: 0}
-  yurume: {fileID: 37620390}
-  kapsul: {fileID: 37620393}
-  govde: {fileID: 37620392}
-  suzulme: {fileID: 37620389}
-  firlatma: {fileID: 37620386}
-  kusanmaSuresi: 2.5
-  inisSuresi: 1.5
-  cakilmaHizi: -9
-  temasMesafesi: 0.35
-  kusanTusu: 21
-  atlaTusu: 1
-  ucusKapsulu: {fileID: 37620391}
-  kalkisPayi: 0.4
---- !u!114 &37620386
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 37620377}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 74c8e0afb56bc534b9ed0716b48c38cf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Flight.FlightLaunch
-  useTrimSpeed: 1
-  manualLaunchSpeed: 12.5
-  launchOnStart: 0
---- !u!114 &37620387
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 37620377}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f3e5b4e381272d347ba0ddebdcb13601, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Flight.PlayerFlightInput
---- !u!114 &37620388
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 37620377}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 03a5fac3dbab7544aa9ead20b4f7cb15, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Flight.UcusSesi
-  yatak: {fileID: 8300000, guid: 099d30ae5c3a7214c855d1e525edf01e, type: 3}
-  sessizHiz: 7.4
-  doygunHiz: 21
-  enCokSes: 0.55
---- !u!114 &37620389
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 37620377}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f3c4894906a1f4488dc842c94fbeb87, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Flight.GlideController
-  tuning: {fileID: 11400000, guid: 01a154cceaf22394dbf7c6dda24e4c61, type: 2}
-  windField: {fileID: 0}
-  minAerodynamicSpeed: 0.5
---- !u!114 &37620390
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 37620377}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d19701d4f6e49c74bbb7367514f64a9b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Player.WalkController
-  eyeHeight: 1.59
-  walkSpeed: 2.2
-  runSpeed: 6
-  flySpeed: 12
-  jumpSpeed: 3.6
-  gravity: -9.81
-  mouseSensitivity: 0.08
-  KolBakisHizi: 180
-  KolOluBolge: 0.15
-  pitchLimit: 89
---- !u!136 &37620391
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 37620377}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 2
-  m_Radius: 0.3
-  m_Height: 1.7
-  m_Direction: 1
-  m_Center: {x: 0, y: 0.85, z: 0}
---- !u!54 &37620392
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 37620377}
-  serializedVersion: 5
-  m_Mass: 78
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 1
-  m_Constraints: 0
-  m_CollisionDetection: 2
---- !u!143 &37620393
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 37620377}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Height: 1.7
-  m_Radius: 0.3
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0.85, z: 0}
---- !u!4 &37620394
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 37620377}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9.95876, y: 77.23017, z: 238.69838}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1875201657}
-  - {fileID: 517553850}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &39760146
 GameObject:
   m_ObjectHideFlags: 0
@@ -2004,39 +1647,6 @@ MonoBehaviour:
   points:
   - {x: -36.85, y: 0, z: -293.74}
   markerHeight: 120
---- !u!1 &70267016
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 70267017}
-  m_Layer: 0
-  m_Name: AYDINLATMA_Kalici
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &70267017
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 70267016}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 559106164}
-  - {fileID: 1397484098}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &73128909
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2484,6 +2094,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4408068855616533919, guid: d65d673279cf1a54db850dd880047207, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1679848624}
+    - targetCorrespondingSourceObject: {fileID: 4408068855616533919, guid: d65d673279cf1a54db850dd880047207, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1016433505}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d65d673279cf1a54db850dd880047207, type: 3}
 --- !u!4 &99228146 stripped
@@ -3075,7 +2688,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 9c2b688290b5c8d43ae105b05474d9b3, type: 2}
   zaman: {fileID: 701257620}
   govdePrefab: {fileID: 2547391781085434518, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
-  oyuncu: {fileID: 37620394}
+  oyuncu: {fileID: 849621104}
   aranma: {fileID: 567701420}
   sakinSayisi: 40000
   gorunurMesafe: 120
@@ -5818,6 +5431,104 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7919366751736543682, guid: 3ddd7cd8f1336694caa2313d7d84b54d, type: 3}
   m_PrefabInstance: {fileID: 399347042}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &401621195
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 849621104}
+    m_Modifications:
+    - target: {fileID: 2547391781085434518, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
+      propertyPath: m_Name
+      value: Govde
+      objectReference: {fileID: 0}
+    - target: {fileID: 2887361483294410796, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2887361483294410796, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2887361483294410796, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2887361483294410796, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2887361483294410796, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2887361483294410796, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2887361483294410796, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2887361483294410796, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2887361483294410796, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2887361483294410796, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 2887361483294410796, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 536525242}
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2547391781085434518, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 401621199}
+  m_SourcePrefab: {fileID: 100100000, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
+--- !u!4 &401621196 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2887361483294410796, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
+  m_PrefabInstance: {fileID: 401621195}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &401621197 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2547391781085434518, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
+  m_PrefabInstance: {fileID: 401621195}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &401621198 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 9147333300603671126, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
+  m_PrefabInstance: {fileID: 401621195}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &401621199
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 401621197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1d162bccc7c10e4499f286e5cbf9411, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Player.AyakIK
+  aramaYukari: 0.45
+  aramaAsagi: 1.2
+  zeminMaskesi:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  yumusatma: 0.12
+  govdeEnCokInis: 0.4
+  enCokEgim: 55
 --- !u!1001 &405842876
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6772,101 +6483,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3704252391955842268, guid: 7273f099b4e530b4dbba380c3ab2df1b, type: 3}
   m_PrefabInstance: {fileID: 516597582}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &517553849
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 37620394}
-    m_Modifications:
-    - target: {fileID: 2547391781085434518, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
-      propertyPath: m_Name
-      value: Govde
-      objectReference: {fileID: 0}
-    - target: {fileID: 2887361483294410796, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2887361483294410796, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2887361483294410796, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2887361483294410796, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2887361483294410796, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2887361483294410796, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2887361483294410796, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2887361483294410796, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2887361483294410796, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2887361483294410796, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2547391781085434518, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 517553853}
-  m_SourcePrefab: {fileID: 100100000, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
---- !u!4 &517553850 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2887361483294410796, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
-  m_PrefabInstance: {fileID: 517553849}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &517553851 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2547391781085434518, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
-  m_PrefabInstance: {fileID: 517553849}
-  m_PrefabAsset: {fileID: 0}
---- !u!95 &517553852 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 9147333300603671126, guid: 77b92d85c2a90f14ba49170ac520191f, type: 3}
-  m_PrefabInstance: {fileID: 517553849}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &517553853
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 517553851}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c1d162bccc7c10e4499f286e5cbf9411, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Player.AyakIK
-  aramaYukari: 0.45
-  aramaAsagi: 1.2
-  zeminMaskesi:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  yumusatma: 0.12
-  govdeEnCokInis: 0.4
-  enCokEgim: 55
 --- !u!1001 &529126971
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6991,6 +6607,57 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5868267331516990518, guid: d38a05b7423c20a4dbbcbf00ca97d210, type: 3}
   m_PrefabInstance: {fileID: 535124508}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &536525241
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 536525242}
+  - component: {fileID: 536525243}
+  m_Layer: 0
+  m_Name: KANAT
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &536525242
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 536525241}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1153280031}
+  - {fileID: 630266975}
+  - {fileID: 1403964394}
+  m_Father: {fileID: 401621196}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &536525243
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 536525241}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8ecbc621fe96c34d869d1b3e2ef0786, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Player.KanatGorseli
+  katli: {fileID: 1153280032}
+  acik: {fileID: 630266976}
+  kirik: {fileID: 1403964395}
+  dizi: {fileID: 849621095}
 --- !u!1001 &548330257
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7083,7 +6750,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.KayitBaglayici
   zaman: {fileID: 701257620}
-  oyuncu: {fileID: 37620394}
+  oyuncu: {fileID: 849621104}
   aranma: {fileID: 567701420}
   sehir: {fileID: 159983479}
   envanter: {fileID: 0}
@@ -7105,55 +6772,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &559106163
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 559106164}
-  - component: {fileID: 559106165}
-  m_Layer: 0
-  m_Name: VOL_Kalici
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &559106164
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 559106163}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 70267017}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &559106165
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 559106163}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.Volume
-  m_IsGlobal: 1
-  priority: 10
-  blendDistance: 0
-  weight: 1
-  sharedProfile: {fileID: 11400000, guid: 32695412b68da8f4c8cc4f19b3c7a82f, type: 2}
 --- !u!1001 &563242077
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7247,7 +6865,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.AranmaSistemi
   zaman: {fileID: 701257620}
   sehir: {fileID: 159983479}
-  oyuncu: {fileID: 37620394}
+  oyuncu: {fileID: 849621104}
   gorusMesafesi: 26
   geceGorusCarpani: 0.55
   uyariEsigi: 0.3
@@ -7511,6 +7129,39 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5868267331516990518, guid: d38a05b7423c20a4dbbcbf00ca97d210, type: 3}
   m_PrefabInstance: {fileID: 587728725}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &600696582
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 600696583}
+  m_Layer: 0
+  m_Name: AYDINLATMA_Kalici
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &600696583
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 600696582}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2047171888}
+  - {fileID: 813178345}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &606466347
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7952,6 +7603,77 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 7919366751736543682, guid: 3ddd7cd8f1336694caa2313d7d84b54d, type: 3}
   m_PrefabInstance: {fileID: 627062097}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &630266974
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 536525242}
+    m_Modifications:
+    - target: {fileID: 549562453530080039, guid: 986eb879dd27b7546a6a94941e1af499, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 549562453530080039, guid: 986eb879dd27b7546a6a94941e1af499, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 549562453530080039, guid: 986eb879dd27b7546a6a94941e1af499, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.12
+      objectReference: {fileID: 0}
+    - target: {fileID: 549562453530080039, guid: 986eb879dd27b7546a6a94941e1af499, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 549562453530080039, guid: 986eb879dd27b7546a6a94941e1af499, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 549562453530080039, guid: 986eb879dd27b7546a6a94941e1af499, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 549562453530080039, guid: 986eb879dd27b7546a6a94941e1af499, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 549562453530080039, guid: 986eb879dd27b7546a6a94941e1af499, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 549562453530080039, guid: 986eb879dd27b7546a6a94941e1af499, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 549562453530080039, guid: 986eb879dd27b7546a6a94941e1af499, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6692685533986568248, guid: 986eb879dd27b7546a6a94941e1af499, type: 3}
+      propertyPath: m_Name
+      value: PF_Kanat_Acik
+      objectReference: {fileID: 0}
+    - target: {fileID: 6692685533986568248, guid: 986eb879dd27b7546a6a94941e1af499, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 986eb879dd27b7546a6a94941e1af499, type: 3}
+--- !u!4 &630266975 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 549562453530080039, guid: 986eb879dd27b7546a6a94941e1af499, type: 3}
+  m_PrefabInstance: {fileID: 630266974}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &630266976 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6692685533986568248, guid: 986eb879dd27b7546a6a94941e1af499, type: 3}
+  m_PrefabInstance: {fileID: 630266974}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &632043130
 PrefabInstance:
@@ -10130,6 +9852,82 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &813178344
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 813178345}
+  - component: {fileID: 813178346}
+  m_Layer: 0
+  m_Name: APV_Sehir
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &813178345
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 813178344}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -361.63525, y: 60.219616, z: 1446.5627}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 600696583}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &813178346
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 813178344}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cded085d155cde949b60f67a11dbc3bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.ProbeVolume
+  version: 2
+  globalVolume: 0
+  mode: 2
+  size: {x: 600, y: 120, z: 600}
+  overrideRendererFilters: 0
+  minRendererVolumeSize: 0.1
+  objectLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  lowestSubdivLevelOverride: 0
+  highestSubdivLevelOverride: 3
+  overridesSubdivLevels: 0
+  mightNeedRebaking: 0
+  cachedTransform:
+    e00: 0
+    e01: 0
+    e02: 0
+    e03: 0
+    e10: 0
+    e11: 0
+    e12: 0
+    e13: 0
+    e20: 0
+    e21: 0
+    e22: 0
+    e23: 0
+    e30: 0
+    e31: 0
+    e32: 0
+    e33: 0
+  cachedHashCode: 0
+  fillEmptySpaces: 0
 --- !u!1 &818253611
 GameObject:
   m_ObjectHideFlags: 0
@@ -10614,6 +10412,363 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1418294738756777822, guid: 5849ac51ece58274d9c88d6ed0633b9f, type: 3}
   m_PrefabInstance: {fileID: 846189823}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &849621087
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 849621104}
+  - component: {fileID: 849621103}
+  - component: {fileID: 849621102}
+  - component: {fileID: 849621101}
+  - component: {fileID: 849621100}
+  - component: {fileID: 849621099}
+  - component: {fileID: 849621098}
+  - component: {fileID: 849621097}
+  - component: {fileID: 849621096}
+  - component: {fileID: 849621095}
+  - component: {fileID: 849621094}
+  - component: {fileID: 849621093}
+  - component: {fileID: 849621092}
+  - component: {fileID: 849621091}
+  - component: {fileID: 849621090}
+  - component: {fileID: 849621089}
+  - component: {fileID: 849621088}
+  m_Layer: 0
+  m_Name: OYUNCU
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &849621088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849621087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 128291f566b5bab41a9ba8da84975ab0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Player.Perde2Dilimi
+  dizi: {fileID: 849621095}
+  oyuncu: {fileID: 849621104}
+  okmeydani: {x: -1143, y: 94.6, z: 3331}
+  kule: {x: 0, y: 52, z: 0}
+  dogancilar: {x: 3267.6, y: 46.6, z: -672.9}
+  incilikosk: {x: 1210, y: 0.1, z: -1225}
+  talimYaricapi: 250
+  talimMesafesi: 60
+  talimHedefi: 3
+  kuleYaricapi: 40
+  inisYaricapi: 220
+  tepkiYaricapi: 120
+--- !u!114 &849621089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849621087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 022db8b1dddb92440b8c3c1e54ac637a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Player.KameraKipi
+  kip: 1
+  degistirTusu: 36
+  omuzYuksekligi: 1.45
+  omuzKaymasi: 0.45
+  mesafe: 3.2
+  enYakin: 1.4
+  enUzak: 6
+  tekerAdimi: 0.35
+  carpismaYaricapi: 0.25
+  yumusatma: 14
+  govde: {fileID: 401621196}
+--- !u!114 &849621090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849621087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8236ed9a88ca38e4fbfedc6f44b77fc0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Player.HezarfenAnimator
+  animator: {fileID: 401621198}
+  karakterKontrol: {fileID: 849621103}
+  suzulme: {fileID: 849621099}
+  pitchDoyum: 14
+  rollDoyum: 45
+  yumusatma: 0.12
+--- !u!114 &849621091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849621087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63069368d6dbf74418d9effb4a5353b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Player.EtkilesimAlgila
+  menzil: 2.4
+  aci: 35
+  bakis: {fileID: 917376769}
+  katman:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!114 &849621092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849621087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a84a4100541ea34d8cb5e65decac7d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.Envanter
+--- !u!114 &849621093
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849621087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b367301a8d01f734c8b929b3aa748234, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Player.Fener
+  zaman: {fileID: 0}
+  lumen: 18
+  menzil: 7.5
+  hepZaman: 0
+  aranma: {fileID: 0}
+--- !u!114 &849621094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849621087}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 020d8b9522c5a0548b0b6c26d2974c08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Flight.FlightHud
+  glider: {fileID: 849621099}
+  target: {fileID: 0}
+  varioScale: 4
+--- !u!114 &849621095
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849621087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fee2ded785c70bc44b3e7346ccea3cd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Player.UcusDizisi
+  animasyon: {fileID: 0}
+  yurume: {fileID: 849621100}
+  kapsul: {fileID: 849621103}
+  govde: {fileID: 849621102}
+  suzulme: {fileID: 849621099}
+  firlatma: {fileID: 849621096}
+  kusanmaSuresi: 2.5
+  inisSuresi: 1.5
+  cakilmaHizi: -9
+  temasMesafesi: 0.35
+  kusanTusu: 21
+  atlaTusu: 1
+  ucusKapsulu: {fileID: 849621101}
+  kalkisPayi: 0.4
+--- !u!114 &849621096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849621087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74c8e0afb56bc534b9ed0716b48c38cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Flight.FlightLaunch
+  useTrimSpeed: 1
+  manualLaunchSpeed: 12.5
+  launchOnStart: 0
+--- !u!114 &849621097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849621087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3e5b4e381272d347ba0ddebdcb13601, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Flight.PlayerFlightInput
+--- !u!114 &849621098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849621087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03a5fac3dbab7544aa9ead20b4f7cb15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Flight.UcusSesi
+  yatak: {fileID: 8300000, guid: 099d30ae5c3a7214c855d1e525edf01e, type: 3}
+  sessizHiz: 7.4
+  doygunHiz: 21
+  enCokSes: 0.55
+--- !u!114 &849621099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849621087}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f3c4894906a1f4488dc842c94fbeb87, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Flight.GlideController
+  tuning: {fileID: 11400000, guid: 01a154cceaf22394dbf7c6dda24e4c61, type: 2}
+  windField: {fileID: 0}
+  minAerodynamicSpeed: 0.5
+--- !u!114 &849621100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849621087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d19701d4f6e49c74bbb7367514f64a9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Player.WalkController
+  eyeHeight: 1.59
+  walkSpeed: 2.2
+  runSpeed: 6
+  flySpeed: 12
+  jumpSpeed: 3.6
+  gravity: -9.81
+  mouseSensitivity: 0.08
+  KolBakisHizi: 180
+  KolOluBolge: 0.15
+  pitchLimit: 89
+--- !u!136 &849621101
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849621087}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 2
+  m_Radius: 0.3
+  m_Height: 1.7
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.85, z: 0}
+--- !u!54 &849621102
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849621087}
+  serializedVersion: 5
+  m_Mass: 78
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 1
+  m_Constraints: 0
+  m_CollisionDetection: 2
+--- !u!143 &849621103
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849621087}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 1.7
+  m_Radius: 0.3
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0.85, z: 0}
+--- !u!4 &849621104
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849621087}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 9.95876, y: 77.23017, z: 238.69838}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 917376769}
+  - {fileID: 401621196}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &852627128
 GameObject:
   m_ObjectHideFlags: 0
@@ -11368,6 +11523,261 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5868267331516990518, guid: d38a05b7423c20a4dbbcbf00ca97d210, type: 3}
   m_PrefabInstance: {fileID: 914985741}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &917376768
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 917376769}
+  - component: {fileID: 917376773}
+  - component: {fileID: 917376772}
+  - component: {fileID: 917376771}
+  - component: {fileID: 917376770}
+  m_Layer: 0
+  m_Name: Main Camera
+  m_TagString: MainCamera
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &917376769
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 917376768}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 849621104}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &917376770
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 917376768}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23c1ce4fb46143f46bc5cb5224c934f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.HighDefinition.Runtime::UnityEngine.Rendering.HighDefinition.HDAdditionalCameraData
+  m_Version: 9
+  m_ObsoleteRenderingPath: 0
+  m_ObsoleteFrameSettings:
+    overrides: 0
+    enableShadow: 0
+    enableContactShadows: 0
+    enableShadowMask: 0
+    enableSSR: 0
+    enableSSAO: 0
+    enableSubsurfaceScattering: 0
+    enableTransmission: 0
+    enableAtmosphericScattering: 0
+    enableVolumetrics: 0
+    enableReprojectionForVolumetrics: 0
+    enableLightLayers: 0
+    enableExposureControl: 1
+    diffuseGlobalDimmer: 0
+    specularGlobalDimmer: 0
+    shaderLitMode: 0
+    enableDepthPrepassWithDeferredRendering: 0
+    enableTransparentPrepass: 0
+    enableMotionVectors: 0
+    enableObjectMotionVectors: 0
+    enableDecals: 0
+    enableRoughRefraction: 0
+    enableTransparentPostpass: 0
+    enableDistortion: 0
+    enablePostprocess: 0
+    enableOpaqueObjects: 0
+    enableTransparentObjects: 0
+    enableRealtimePlanarReflection: 0
+    enableMSAA: 0
+    enableAsyncCompute: 0
+    runLightListAsync: 0
+    runSSRAsync: 0
+    runSSAOAsync: 0
+    runContactShadowsAsync: 0
+    runVolumeVoxelizationAsync: 0
+    lightLoopSettings:
+      overrides: 0
+      enableDeferredTileAndCluster: 0
+      enableComputeLightEvaluation: 0
+      enableComputeLightVariants: 0
+      enableComputeMaterialVariants: 0
+      enableFptlForForwardOpaque: 0
+      enableBigTilePrepass: 0
+      isFptlEnabled: 0
+  clearColorMode: 0
+  backgroundColorHDR: {r: 0.025, g: 0.07, b: 0.19, a: 0}
+  clearDepth: 1
+  volumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  volumeAnchorOverride: {fileID: 0}
+  antialiasing: 2
+  SMAAQuality: 2
+  dithering: 1
+  stopNaNs: 0
+  taaSharpenStrength: 0.5
+  TAAQuality: 2
+  taaSharpenMode: 0
+  taaRingingReduction: 0
+  taaHistorySharpening: 0.35
+  taaAntiFlicker: 0.5
+  taaMotionVectorRejection: 0
+  taaAntiHistoryRinging: 0
+  taaBaseBlendFactor: 0.875
+  taaJitterScale: 1
+  physicalParameters:
+    m_Iso: 200
+    m_ShutterSpeed: 0.005
+    m_Aperture: 16
+    m_FocusDistance: 10
+    m_BladeCount: 5
+    m_Curvature: {x: 2, y: 11}
+    m_BarrelClipping: 0.25
+    m_Anamorphism: 0
+  flipYMode: 0
+  xrRendering: 1
+  fullscreenPassthrough: 0
+  allowDynamicResolution: 0
+  customRenderingSettings: 0
+  invertFaceCulling: 0
+  probeLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  hasPersistentHistory: 0
+  screenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  screenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  allowDeepLearningSuperSampling: 1
+  deepLearningSuperSamplingUseCustomQualitySettings: 0
+  deepLearningSuperSamplingQuality: 0
+  deepLearningSuperSamplingUseCustomAttributes: 0
+  deepLearningSuperSamplingUseOptimalSettings: 1
+  deepLearningSuperSamplingSharpening: 0
+  allowFidelityFX2SuperResolution: 1
+  fidelityFX2SuperResolutionUseCustomQualitySettings: 0
+  fidelityFX2SuperResolutionQuality: 0
+  fidelityFX2SuperResolutionUseCustomAttributes: 0
+  fidelityFX2SuperResolutionUseOptimalSettings: 1
+  fidelityFX2SuperResolutionEnableSharpening: 0
+  fidelityFX2SuperResolutionSharpening: 0
+  fsrOverrideSharpness: 0
+  fsrSharpness: 0.92
+  exposureTarget: {fileID: 0}
+  materialMipBias: 0
+  m_RenderingPathCustomFrameSettings:
+    bitDatas:
+      data1: 5770166122053581
+      data2: 12934340311651418136
+    lodBias: 1
+    lodBiasMode: 0
+    lodBiasQualityLevel: 0
+    maximumLODLevel: 0
+    maximumLODLevelMode: 0
+    maximumLODLevelQualityLevel: 0
+    sssQualityMode: 0
+    sssQualityLevel: 0
+    sssCustomSampleBudget: 20
+    sssCustomDownsampleSteps: 0
+    msaaMode: 1
+    materialQuality: 0
+  renderingPathCustomFrameSettingsOverrideMask:
+    mask:
+      data1: 0
+      data2: 0
+  defaultFrameSettings: 0
+--- !u!114 &917376771
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 917376768}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc51b7ab3022653439d6e592df3995af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.City.OrtamSesi
+  deniz: {fileID: 8300000, guid: 24adfa97f984fcb46bc8a5c9eaab5eea, type: 3}
+  ruzgar: {fileID: 8300000, guid: 099d30ae5c3a7214c855d1e525edf01e, type: 3}
+  carsi: {fileID: 8300000, guid: 24f9e812a50b3d145aec08f15d5af515, type: 3}
+  gece: {fileID: 8300000, guid: 79c96d66049e5324e87f522a5e7d8973, type: 3}
+  kiyiYakin: 40
+  kiyiUzak: 420
+  ruzgarYuksek: 120
+  anaSes: 0.55
+  yumusatma: 0.8
+  katman: {fileID: 11400000, guid: 9d5ee664d6b608c478d1d0997ed6c824, type: 2}
+--- !u!81 &917376772
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 917376768}
+  m_Enabled: 1
+--- !u!20 &917376773
+Camera:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 917376768}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_ClearFlags: 1
+  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_projectionMatrixMode: 1
+  m_GateFitMode: 2
+  m_FOVAxisMode: 0
+  m_Iso: 200
+  m_ShutterSpeed: 0.005
+  m_Aperture: 16
+  m_FocusDistance: 10
+  m_FocalLength: 50
+  m_BladeCount: 5
+  m_Curvature: {x: 2, y: 11}
+  m_BarrelClipping: 0.25
+  m_Anamorphism: 0
+  m_SensorSize: {x: 36, y: 24}
+  m_LensShift: {x: 0, y: 0}
+  m_NormalizedViewPortRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  near clip plane: 0.3
+  far clip plane: 6000
+  field of view: 60
+  orthographic: 0
+  orthographic size: 5
+  m_Depth: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingPath: -1
+  m_TargetTexture: {fileID: 0}
+  m_TargetDisplay: 0
+  m_TargetEye: 3
+  m_HDR: 0
+  m_AllowMSAA: 0
+  m_AllowDynamicResolution: 0
+  m_ForceIntoRT: 0
+  m_OcclusionCulling: 1
+  m_StereoConvergence: 10
+  m_StereoSeparation: 0.022
 --- !u!1001 &921308737
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13004,6 +13414,74 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5868267331516990518, guid: d38a05b7423c20a4dbbcbf00ca97d210, type: 3}
   m_PrefabInstance: {fileID: 1009284063}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1016433504
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1016433505}
+  - component: {fileID: 1016433507}
+  - component: {fileID: 1016433506}
+  m_Layer: 0
+  m_Name: PF_KuleKapisi
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1016433505
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1016433504}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.2, z: -6.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 99228146}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &1016433506
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1016433504}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 3, y: 2.6, z: 1.5}
+  m_Center: {x: 0, y: 1.3, z: 0}
+--- !u!114 &1016433507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1016433504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 986023c12a33e594a809e3f3720bb592, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.KuleKapisi
+  serefeKotu: 46
+  serefeYaricapi: 3.2
 --- !u!1001 &1018749853
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14477,6 +14955,73 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2970356851574301746, guid: 3bdafc4cbcb090c4eba23c2ab702e009, type: 3}
   m_PrefabInstance: {fileID: 1146351347}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1153280030
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 536525242}
+    m_Modifications:
+    - target: {fileID: 544208424411380566, guid: 83be98ba779a7bc4b84c209375871860, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 544208424411380566, guid: 83be98ba779a7bc4b84c209375871860, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 544208424411380566, guid: 83be98ba779a7bc4b84c209375871860, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.12
+      objectReference: {fileID: 0}
+    - target: {fileID: 544208424411380566, guid: 83be98ba779a7bc4b84c209375871860, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 544208424411380566, guid: 83be98ba779a7bc4b84c209375871860, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 544208424411380566, guid: 83be98ba779a7bc4b84c209375871860, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 544208424411380566, guid: 83be98ba779a7bc4b84c209375871860, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 544208424411380566, guid: 83be98ba779a7bc4b84c209375871860, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 544208424411380566, guid: 83be98ba779a7bc4b84c209375871860, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 544208424411380566, guid: 83be98ba779a7bc4b84c209375871860, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1289434942295912120, guid: 83be98ba779a7bc4b84c209375871860, type: 3}
+      propertyPath: m_Name
+      value: PF_Kanat_Katli
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 83be98ba779a7bc4b84c209375871860, type: 3}
+--- !u!4 &1153280031 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 544208424411380566, guid: 83be98ba779a7bc4b84c209375871860, type: 3}
+  m_PrefabInstance: {fileID: 1153280030}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1153280032 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1289434942295912120, guid: 83be98ba779a7bc4b84c209375871860, type: 3}
+  m_PrefabInstance: {fileID: 1153280030}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1155998351
 GameObject:
   m_ObjectHideFlags: 0
@@ -14913,7 +15458,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09e1bee5d8fdb4a46b201d38630f95ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.SehirVFX
-  oyuncu: {fileID: 37620394}
+  oyuncu: {fileID: 849621104}
   zaman: {fileID: 701257620}
   dumanHavuzu: 10
   dumanMenzili: 70
@@ -16337,7 +16882,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.VakitBildirimi
   zaman: {fileID: 701257620}
   graf: {fileID: 11400000, guid: 57346d4bb12826744bffdcd96a092654, type: 2}
-  oyuncu: {fileID: 37620394}
+  oyuncu: {fileID: 849621104}
   ezanKlibi: {fileID: 0}
   bildirimSuresi: 3.5
 --- !u!4 &1337770033
@@ -17151,82 +17696,77 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7919366751736543682, guid: 3ddd7cd8f1336694caa2313d7d84b54d, type: 3}
   m_PrefabInstance: {fileID: 1386283685}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1397484097
-GameObject:
+--- !u!1001 &1403964393
+PrefabInstance:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1397484098}
-  - component: {fileID: 1397484099}
-  m_Layer: 0
-  m_Name: APV_Sehir
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1397484098
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1397484097}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -361.6355, y: 60.219616, z: 1446.5623}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 70267017}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1397484099
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 536525242}
+    m_Modifications:
+    - target: {fileID: 3803779619066293854, guid: ae6b0520d54c22d46bd8eebbca03d3d9, type: 3}
+      propertyPath: m_Name
+      value: PF_Kanat_Kirik
+      objectReference: {fileID: 0}
+    - target: {fileID: 3803779619066293854, guid: ae6b0520d54c22d46bd8eebbca03d3d9, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9048880198305965576, guid: ae6b0520d54c22d46bd8eebbca03d3d9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9048880198305965576, guid: ae6b0520d54c22d46bd8eebbca03d3d9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 9048880198305965576, guid: ae6b0520d54c22d46bd8eebbca03d3d9, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.12
+      objectReference: {fileID: 0}
+    - target: {fileID: 9048880198305965576, guid: ae6b0520d54c22d46bd8eebbca03d3d9, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9048880198305965576, guid: ae6b0520d54c22d46bd8eebbca03d3d9, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9048880198305965576, guid: ae6b0520d54c22d46bd8eebbca03d3d9, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9048880198305965576, guid: ae6b0520d54c22d46bd8eebbca03d3d9, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9048880198305965576, guid: ae6b0520d54c22d46bd8eebbca03d3d9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9048880198305965576, guid: ae6b0520d54c22d46bd8eebbca03d3d9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9048880198305965576, guid: ae6b0520d54c22d46bd8eebbca03d3d9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ae6b0520d54c22d46bd8eebbca03d3d9, type: 3}
+--- !u!4 &1403964394 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9048880198305965576, guid: ae6b0520d54c22d46bd8eebbca03d3d9, type: 3}
+  m_PrefabInstance: {fileID: 1403964393}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1397484097}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cded085d155cde949b60f67a11dbc3bd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.ProbeVolume
-  version: 2
-  globalVolume: 0
-  mode: 2
-  size: {x: 600, y: 120, z: 600}
-  overrideRendererFilters: 0
-  minRendererVolumeSize: 0.1
-  objectLayerMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  lowestSubdivLevelOverride: 0
-  highestSubdivLevelOverride: 3
-  overridesSubdivLevels: 0
-  mightNeedRebaking: 0
-  cachedTransform:
-    e00: 0
-    e01: 0
-    e02: 0
-    e03: 0
-    e10: 0
-    e11: 0
-    e12: 0
-    e13: 0
-    e20: 0
-    e21: 0
-    e22: 0
-    e23: 0
-    e30: 0
-    e31: 0
-    e32: 0
-    e33: 0
-  cachedHashCode: 0
-  fillEmptySpaces: 0
+--- !u!1 &1403964395 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3803779619066293854, guid: ae6b0520d54c22d46bd8eebbca03d3d9, type: 3}
+  m_PrefabInstance: {fileID: 1403964393}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1404661722
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17556,7 +18096,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.BarkGosterici
   yonetici: {fileID: 159983479}
-  oyuncu: {fileID: 37620394}
+  oyuncu: {fileID: 849621104}
   duyulmaMesafesi: 12
   ayniAndaEnCok: 4
   yukseklik: 1.95
@@ -21538,7 +22078,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27cbe277260c0e94f8ca07dd4f388cc7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Streaming.DistrictStreamer
-  viewer: {fileID: 37620394}
+  viewer: {fileID: 849621104}
   registry: {fileID: 11400000, guid: 2b58ece5ccf8b564b8f8d4c56a80f3d3, type: 2}
   evaluateInterval: 0.25
   streamingEnabled: 1
@@ -23606,261 +24146,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5868267331516990518, guid: d38a05b7423c20a4dbbcbf00ca97d210, type: 3}
   m_PrefabInstance: {fileID: 1871209821}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1875201656
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1875201657}
-  - component: {fileID: 1875201661}
-  - component: {fileID: 1875201660}
-  - component: {fileID: 1875201659}
-  - component: {fileID: 1875201658}
-  m_Layer: 0
-  m_Name: Main Camera
-  m_TagString: MainCamera
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1875201657
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1875201656}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 37620394}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1875201658
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1875201656}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23c1ce4fb46143f46bc5cb5224c934f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.RenderPipelines.HighDefinition.Runtime::UnityEngine.Rendering.HighDefinition.HDAdditionalCameraData
-  m_Version: 9
-  m_ObsoleteRenderingPath: 0
-  m_ObsoleteFrameSettings:
-    overrides: 0
-    enableShadow: 0
-    enableContactShadows: 0
-    enableShadowMask: 0
-    enableSSR: 0
-    enableSSAO: 0
-    enableSubsurfaceScattering: 0
-    enableTransmission: 0
-    enableAtmosphericScattering: 0
-    enableVolumetrics: 0
-    enableReprojectionForVolumetrics: 0
-    enableLightLayers: 0
-    enableExposureControl: 1
-    diffuseGlobalDimmer: 0
-    specularGlobalDimmer: 0
-    shaderLitMode: 0
-    enableDepthPrepassWithDeferredRendering: 0
-    enableTransparentPrepass: 0
-    enableMotionVectors: 0
-    enableObjectMotionVectors: 0
-    enableDecals: 0
-    enableRoughRefraction: 0
-    enableTransparentPostpass: 0
-    enableDistortion: 0
-    enablePostprocess: 0
-    enableOpaqueObjects: 0
-    enableTransparentObjects: 0
-    enableRealtimePlanarReflection: 0
-    enableMSAA: 0
-    enableAsyncCompute: 0
-    runLightListAsync: 0
-    runSSRAsync: 0
-    runSSAOAsync: 0
-    runContactShadowsAsync: 0
-    runVolumeVoxelizationAsync: 0
-    lightLoopSettings:
-      overrides: 0
-      enableDeferredTileAndCluster: 0
-      enableComputeLightEvaluation: 0
-      enableComputeLightVariants: 0
-      enableComputeMaterialVariants: 0
-      enableFptlForForwardOpaque: 0
-      enableBigTilePrepass: 0
-      isFptlEnabled: 0
-  clearColorMode: 0
-  backgroundColorHDR: {r: 0.025, g: 0.07, b: 0.19, a: 0}
-  clearDepth: 1
-  volumeLayerMask:
-    serializedVersion: 2
-    m_Bits: 1
-  volumeAnchorOverride: {fileID: 0}
-  antialiasing: 2
-  SMAAQuality: 2
-  dithering: 1
-  stopNaNs: 0
-  taaSharpenStrength: 0.5
-  TAAQuality: 2
-  taaSharpenMode: 0
-  taaRingingReduction: 0
-  taaHistorySharpening: 0.35
-  taaAntiFlicker: 0.5
-  taaMotionVectorRejection: 0
-  taaAntiHistoryRinging: 0
-  taaBaseBlendFactor: 0.875
-  taaJitterScale: 1
-  physicalParameters:
-    m_Iso: 200
-    m_ShutterSpeed: 0.005
-    m_Aperture: 16
-    m_FocusDistance: 10
-    m_BladeCount: 5
-    m_Curvature: {x: 2, y: 11}
-    m_BarrelClipping: 0.25
-    m_Anamorphism: 0
-  flipYMode: 0
-  xrRendering: 1
-  fullscreenPassthrough: 0
-  allowDynamicResolution: 0
-  customRenderingSettings: 0
-  invertFaceCulling: 0
-  probeLayerMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  hasPersistentHistory: 0
-  screenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
-  screenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
-  allowDeepLearningSuperSampling: 1
-  deepLearningSuperSamplingUseCustomQualitySettings: 0
-  deepLearningSuperSamplingQuality: 0
-  deepLearningSuperSamplingUseCustomAttributes: 0
-  deepLearningSuperSamplingUseOptimalSettings: 1
-  deepLearningSuperSamplingSharpening: 0
-  allowFidelityFX2SuperResolution: 1
-  fidelityFX2SuperResolutionUseCustomQualitySettings: 0
-  fidelityFX2SuperResolutionQuality: 0
-  fidelityFX2SuperResolutionUseCustomAttributes: 0
-  fidelityFX2SuperResolutionUseOptimalSettings: 1
-  fidelityFX2SuperResolutionEnableSharpening: 0
-  fidelityFX2SuperResolutionSharpening: 0
-  fsrOverrideSharpness: 0
-  fsrSharpness: 0.92
-  exposureTarget: {fileID: 0}
-  materialMipBias: 0
-  m_RenderingPathCustomFrameSettings:
-    bitDatas:
-      data1: 5770166122053581
-      data2: 12934340311651418136
-    lodBias: 1
-    lodBiasMode: 0
-    lodBiasQualityLevel: 0
-    maximumLODLevel: 0
-    maximumLODLevelMode: 0
-    maximumLODLevelQualityLevel: 0
-    sssQualityMode: 0
-    sssQualityLevel: 0
-    sssCustomSampleBudget: 20
-    sssCustomDownsampleSteps: 0
-    msaaMode: 1
-    materialQuality: 0
-  renderingPathCustomFrameSettingsOverrideMask:
-    mask:
-      data1: 0
-      data2: 0
-  defaultFrameSettings: 0
---- !u!114 &1875201659
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1875201656}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc51b7ab3022653439d6e592df3995af, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.City.OrtamSesi
-  deniz: {fileID: 8300000, guid: 24adfa97f984fcb46bc8a5c9eaab5eea, type: 3}
-  ruzgar: {fileID: 8300000, guid: 099d30ae5c3a7214c855d1e525edf01e, type: 3}
-  carsi: {fileID: 8300000, guid: 24f9e812a50b3d145aec08f15d5af515, type: 3}
-  gece: {fileID: 8300000, guid: 79c96d66049e5324e87f522a5e7d8973, type: 3}
-  kiyiYakin: 40
-  kiyiUzak: 420
-  ruzgarYuksek: 120
-  anaSes: 0.55
-  yumusatma: 0.8
-  katman: {fileID: 11400000, guid: 9d5ee664d6b608c478d1d0997ed6c824, type: 2}
---- !u!81 &1875201660
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1875201656}
-  m_Enabled: 1
---- !u!20 &1875201661
-Camera:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1875201656}
-  m_Enabled: 1
-  serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
-  m_projectionMatrixMode: 1
-  m_GateFitMode: 2
-  m_FOVAxisMode: 0
-  m_Iso: 200
-  m_ShutterSpeed: 0.005
-  m_Aperture: 16
-  m_FocusDistance: 10
-  m_FocalLength: 50
-  m_BladeCount: 5
-  m_Curvature: {x: 2, y: 11}
-  m_BarrelClipping: 0.25
-  m_Anamorphism: 0
-  m_SensorSize: {x: 36, y: 24}
-  m_LensShift: {x: 0, y: 0}
-  m_NormalizedViewPortRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
-  near clip plane: 0.3
-  far clip plane: 6000
-  field of view: 60
-  orthographic: 0
-  orthographic size: 5
-  m_Depth: 0
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingPath: -1
-  m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 0
-  m_TargetEye: 3
-  m_HDR: 0
-  m_AllowMSAA: 0
-  m_AllowDynamicResolution: 0
-  m_ForceIntoRT: 0
-  m_OcclusionCulling: 1
-  m_StereoConvergence: 10
-  m_StereoSeparation: 0.022
 --- !u!1 &1879410638
 GameObject:
   m_ObjectHideFlags: 0
@@ -25898,6 +26183,55 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 242886909866390092, guid: b86d740978c1737409b05da0dc088203, type: 3}
   m_PrefabInstance: {fileID: 2044757888}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2047171887
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2047171888}
+  - component: {fileID: 2047171889}
+  m_Layer: 0
+  m_Name: VOL_Kalici
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2047171888
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2047171887}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 600696583}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2047171889
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2047171887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.Volume
+  m_IsGlobal: 1
+  priority: 10
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: 32695412b68da8f4c8cc4f19b3c7a82f, type: 2}
 --- !u!1001 &2050658679
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -26699,7 +27033,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.GorevYonetici
   graf: {fileID: 11400000, guid: 57346d4bb12826744bffdcd96a092654, type: 2}
-  oyuncu: {fileID: 37620394}
+  oyuncu: {fileID: 849621104}
   zaman: {fileID: 701257620}
   envanter: {fileID: 0}
   varisMesafesi: 15
@@ -27844,5 +28178,5 @@ SceneRoots:
   - {fileID: 2138976160}
   - {fileID: 2089030706}
   - {fileID: 1337770033}
-  - {fileID: 70267017}
-  - {fileID: 37620394}
+  - {fileID: 600696583}
+  - {fileID: 849621104}

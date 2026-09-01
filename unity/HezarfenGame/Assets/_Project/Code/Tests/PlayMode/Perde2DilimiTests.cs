@@ -130,17 +130,48 @@ namespace Hezarfen.Tests
             Assert.AreEqual(Perde2Dilimi.Asama.Talim, d.Simdiki);
 
             // --- TALIM: Okmeydani'nda uc suzulus --------------------
+            //
+            // MESAFE ARTIK SABIT DEGIL, ARTAN BIR MERDIVEN.
+            //
+            // Once ucunde de 90 m suzuluyordu cunku esik 3×60 m'ydi.
+            // O esik olculdu ve duz zeminden **erisilemiyordu**:
+            // kalkis 12,41 m/s, kanat 11,25:1, yani duz zeminden bir
+            // suzulus ~22 m. Yani oyuncu ilk uc denemesinde de "hayir"
+            // aliyor ve sebebini hic ogrenmiyordu.
+            //
+            // Esik artik 30/60/120 ve test onu KODDAN okuyor: sabiti
+            // burada tekrar yazmak, bir sayinin iki sahibi olmasi
+            // demekti ve bu depoda o kusur uc kez cikti.
             for (int i = 0; i < d.talimHedefi; i++)
+            {
+                float gerek = d.TalimEsigi(i) + 30f;   // esigin uzerinde
                 yield return Suzul(dizi, d.okmeydani,
-                                   d.okmeydani + new Vector3(90f, 0f, 0f));
+                                   d.okmeydani + new Vector3(gerek, 0f, 0f));
+            }
 
             Assert.AreEqual(d.talimHedefi, d.TalimSayisi,
                 $"{d.TalimSayisi} talim sayildi, {d.talimHedefi} bekleniyordu.");
+
+            // Sayac dolar, asama BIR SONRAKI karede gecer: `TalimiIzle`
+            // inisi gordugu karede sayar, gecis kontrolu ondan sonra
+            // kosar. Oyunda farkedilmez, olcumde beklenmeli — bu
+            // dosyanin inis dalinda ayni not zaten yazili.
+            for (int k = 0; k < 3; k++) yield return null;
             Assert.AreEqual(Perde2Dilimi.Asama.Kule, d.Simdiki,
                 "Talim bitti ama dilim kuleye gecmedi.");
 
             // --- KULE: kalkis ---------------------------------------
-            Koy(d.kule, KalkisYuksekligi);
+            //
+            // SEREFE KOTUNDAN KALKILIR, KULE DIBINDEN DEGIL.
+            //
+            // Once 25 m'den kalkiliyordu ve gecerdi, cunku asama
+            // yalniz YATAY yakinlik soruyordu. Bedeli olculdu: oyuncu
+            // kule DIBINDE G ve Space'e basinca "kalkis" sayiliyor,
+            // bir saniye sonra yere deginca `Ucus -> Inis` oluyor ve
+            // 3.336 m'lik final iki vapur biletiyle geciliyordu.
+            //
+            // Sart artik irtifa; test de onu kullanir.
+            Koy(d.kule, Perde2Dilimi.KalkisKotu + 5f);
             yield return null;
             dizi.Kusan();
             float t = 0f;
@@ -221,14 +252,22 @@ namespace Hezarfen.Tests
         public IEnumerator ACrashSendsYouBackToTheTowerNotToAWall()
         {
             var (d, dizi) = Kur();
+
+            // Esikler artik artan bir merdiven (30/60/120) ve sabit 90 m
+            // ikinci basamagi geciyor, ucuncuyu gecmiyordu. Esik
+            // koddan okunur; burada tekrar yazmak bir sayinin iki
+            // sahibi olmasi demek.
             for (int i = 0; i < d.talimHedefi; i++)
                 yield return Suzul(dizi, d.okmeydani,
-                                   d.okmeydani + new Vector3(90f, 0f, 0f));
+                                   d.okmeydani
+                                   + new Vector3(d.TalimEsigi(i) + 30f, 0f, 0f));
+            for (int k = 0; k < 3; k++) yield return null;
             Assert.AreEqual(Perde2Dilimi.Asama.Kule, d.Simdiki);
 
+            // Kalkis artik IRTIFA istiyor: serefe kotundan atlanir.
             // Bundan sonraki her temas SERT sayilsin.
             dizi.cakilmaHizi = -0.01f;
-            yield return Suzul(dizi, d.kule,
+            yield return Suzul(dizi, d.kule + Vector3.up * Perde2Dilimi.KalkisKotu,
                                d.kule + new Vector3(800f, 0f, 0f));
             yield return null;
 
