@@ -394,3 +394,56 @@ iyi otuz saniyesi."*
 - Harita ve pusula yok.
 - Kayık görünmüyor (3 akçe, ekran değişmeden karşı kıyı).
 - Gökyüzü boş.
+
+## Son kullanıcı — 2. tur (2026-09-01)
+
+Aynı oyuncu yamayı denedi. Sekiz maddenin **beşi tam, ikisi yarım,
+biri hâlâ bozuk**. Steam: hâlâ 👎, ama sebebi değişti.
+
+> *"Geçen sefer eksik olan şey işti, bu sefer eksik olan şey bir
+> kontrol."*
+
+### ❌ Kule kapısı — iki turdur kapatıldığı söylenen kusur
+
+Kapıyı ben koydum ve **taşın içine gömdüm.** Kule çarpıştırıcısı
+8,225 m yarıçapında dolu bir silindir; kapıyı eksenden 6,5 m'ye
+koydum, yani duvarın **1,7 m içine**. `EtkilesimAlgila` birinci turda
+tam bu iş için görüş hattı ışını eklemişti ve kapıyı doğru biçimde
+reddediyordu: "Kuleye çık" yazısı **hiç belirmedi**. Oyuncu otuz
+dakika kuleyi dolandı.
+
+Ve aynı sahnede kapının **dört üst üste binmiş kopyası** vardı: üreteç
+her koşuşta bir yenisini ekliyor, eskisini silmiyordu. Yani üreteç
+dört kez koşmuş ve kimse bakmamış.
+
+**Düzeltme:** kapının yeri artık çarpıştırıcının kendi sınırlarından
+hesaplanıyor (sihirli sabit yok), eskiler siliniyor, ve
+`KuleKapisiTests` üç şeyi ölçüyor — kapı tam bir tane mi, taşın
+dışında mı (`ClosestPoint`), şerefe kalkış eşiğinin üstünde mi.
+
+Oyuncunun son cümlesi: *"Bu yamayı çıkarmadan önce birinin oturup
+kuleye çıkmayı denemesi yeterdi."* Artık deneyen bir test var.
+
+### Doğrulanan düzeltmeler (✅)
+
+500 m eşiği (kıyı 650 m'de — su değmeden sayılıyor), Okmeydanı'nın
+taşları, talim merdiveni ve sebebi söylemesi, ayak sesi.
+
+### Yarım kalanlar — bu turda kapatıldı
+
+- **Deniz kurtarması yalnız uçarken çalışıyordu**; kıyıdan kayan
+  oyuncu yine −12 m'de yürüyordu. `WalkController`'a da kondu.
+- **Katlı kanat göğüsten geçen 2,84 m'lik yatay levhaydı** (üç hâle de
+  aynı sıfır dönüş verilmişti). Sırtta dik ve %55 ölçekli.
+- **Otomatik kayıt yoktu**, dolayısıyla "Devam et" düğmesi ona en çok
+  ihtiyacı olan oyuncuya görünmüyordu. İş bitince ve perde ilerleyince
+  kaydediyor.
+
+### Devredilenler
+
+- **Okmeydanı'nda sıfır insan**: 1.000 m yarıçapında 0 graf düğümü.
+  Oyunun ilk perdesi şehrin insan ayağı basmayan tek köşesinde.
+- **Final uçarak bitirilemiyor** (ADR 0084 Caner'in kararını bekliyor).
+- Tekke ve namazgâhın 1 km ötede ikinci kopyası.
+- Birinci şahısta kanat kayboluyor.
+- Şehir dilsiz (8 ses dosyası), kadın yok.

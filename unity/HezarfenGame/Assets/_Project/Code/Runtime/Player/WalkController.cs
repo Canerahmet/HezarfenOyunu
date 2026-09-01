@@ -274,6 +274,38 @@ namespace Hezarfen.Player
         private float _coyote, _tampon;
         private Vector3 _yatay;
 
+        /// <summary>
+        /// Deniz seviyesinin altına düşen oyuncuyu kıyıya çıkarır.
+        ///
+        /// Yüzme ayrı bir mekanik; 1632'de suya düşen adamı kayıkçılar
+        /// çıkarır ve Haliç'te 373 kayık var. Aynı kurtarma
+        /// <see cref="UcusDizisi"/>'nde uçuş için yazılıydı ve burada
+        /// yoktu — bir kural iki yerden ihlal edilebiliyorsa iki yerde
+        /// de tutulmalı.
+        /// </summary>
+        private void KiyiyaCik()
+        {
+            var p = transform.position;
+            var arazi = Terrain.activeTerrain;
+            if (arazi == null) return;
+
+            for (float r = 40f; r <= 900f; r += 40f)
+                for (int i = 0; i < 12; i++)
+                {
+                    float a = i * 30f * Mathf.Deg2Rad;
+                    var q = p + new Vector3(Mathf.Sin(a), 0f, Mathf.Cos(a)) * r;
+                    float kot = arazi.SampleHeight(q) + arazi.transform.position.y;
+                    if (kot <= UcusDizisi.DenizSeviyesi + 0.5f) continue;
+
+                    bool acikti = cc.enabled;
+                    if (acikti) cc.enabled = false;
+                    transform.position = new Vector3(q.x, kot + 0.3f, q.z);
+                    if (acikti) cc.enabled = true;
+                    vSpeed = 0f;
+                    return;
+                }
+        }
+
         private void Update()
         {
             // Duraklatilmisken girdi OKUNMAZ. Bakis blogu deltaTime
@@ -432,6 +464,19 @@ namespace Hezarfen.Player
             var step = _yatay;
             step.y = vSpeed;
             cc.Move(step * Time.deltaTime);
+
+            // DENIZ, YURUYENI DE YUTUYORDU.
+            //
+            // `UcusDizisi` suya inen oyuncuyu kiyiya birakiyor — ama
+            // yalnizca UCARKEN. Bir oyuncu kiyidan asagi kaydi
+            // (yamac 58 derece, tirmanma siniri 45) ve yine deniz
+            // tabaninda, −12 m'de yurumeye basladi: *"Ayni kapan,
+            // farkli kapi."*
+            //
+            // Deniz seviyesi bu projede bir sozlesme (ADR 0007, y = 0)
+            // ve `WalkController`'da onu bilen tek satir yoktu.
+            if (transform.position.y < UcusDizisi.DenizSeviyesi - 0.5f)
+                KiyiyaCik();
 
             DunyayaGeriKoy();
         }

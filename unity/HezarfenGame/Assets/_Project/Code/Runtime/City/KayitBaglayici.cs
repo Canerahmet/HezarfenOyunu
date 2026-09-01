@@ -145,6 +145,48 @@ namespace Hezarfen.Sehir
         /// <summary>Kaydet.</summary>
         public bool Kaydet() => Kayit.Yaz(Topla());
 
+        /// <summary>
+        /// <b>Kendiliğinden kaydeder.</b>
+        ///
+        /// ## Neden gerekti
+        ///
+        /// Bir oyuncu kırk sekiz dakika oynadı ve F5'e basmadığı için
+        /// hepsini kaybetti. Aynı oyuncu ana menüdeki yeni "Devam et"
+        /// düğmesini de hiç görmedi — düğme kayıt varsa görünüyor,
+        /// kayıt ise yalnız F5 ile oluşuyordu. Yani düğme, ona en çok
+        /// ihtiyacı olan kişiye görünmez kalıyordu: *"kapıyı takıp
+        /// menteşeyi unutmak."*
+        ///
+        /// ## Neden bu iki an
+        ///
+        /// Kaydetme anı keyfi olmamalı. Bir işin bitmesi ve perdenin
+        /// ilerlemesi, oyuncunun *"bir şey başardım"* dediği iki andır;
+        /// oyunun onu koruduğu an da orası olmalı. Zamanlayıcıyla
+        /// kaydetmek daha sık yazar ama hiçbir şey ifade etmez ve
+        /// oyuncuyu kötü bir anda dondurabilir.
+        /// </summary>
+        private void OnEnable()
+        {
+            if (gorev == null) gorev = FindAnyObjectByType<GorevYonetici>();
+            if (gorev != null) gorev.GorevBitti += IsBitince;
+
+            _perde = FindAnyObjectByType<Hezarfen.Player.Perde2Dilimi>();
+            if (_perde != null) _perde.AsamaDegisti += AsamaDegisince;
+        }
+
+        private void OnDisable()
+        {
+            if (gorev != null) gorev.GorevBitti -= IsBitince;
+            if (_perde != null) _perde.AsamaDegisti -= AsamaDegisince;
+        }
+
+        private Hezarfen.Player.Perde2Dilimi _perde;
+
+        private void IsBitince(Gorev g) => Kaydet();
+
+        private void AsamaDegisince(Hezarfen.Player.Perde2Dilimi.Asama a)
+            => Kaydet();
+
         /// <summary>Yükle. Kayıt yoksa ya da bozuksa <c>false</c>.</summary>
         public bool Yukle()
         {

@@ -298,11 +298,45 @@ namespace Hezarfen.Editor.Pipeline
                 {
                     if (!t.name.StartsWith("SM_GalataTower")
                         && !t.name.StartsWith("PF_GalataKulesi")) continue;
-                    if (t.GetComponent<KuleKapisi>() != null) continue;
+                    // ONCEKI KAPILAR TEMIZLENIR.
+                    //
+                    // Once `if (GetComponent<KuleKapisi>() != null) continue;`
+                    // yaziliyordu; kapi ise bir ALT nesneye takiliyor,
+                    // yani bu denetim onu hic gormuyordu ve her kosumda
+                    // bir yenisi ekleniyordu. Bir oyuncu sahnede **dort
+                    // ust uste binmis kopya** buldu: ureteç dort kez
+                    // kosmus ve kimse bakmamis.
+                    foreach (var eski in t.GetComponentsInChildren<KuleKapisi>(true))
+                        Object.DestroyImmediate(eski.gameObject);
+
+                    // KAPI TASIN ICINE GOMULMEZ — YERI OLCULUR.
+                    //
+                    // Ilk halde `localPosition.z = -6,5` yaziliyordu.
+                    // Kule carpistiricisi 8,225 m yariçapinda **dolu**
+                    // bir silindir, yani kapi duvarin 1,7 m ICINDEydi.
+                    // `EtkilesimAlgila` birinci turda tam bu is icin
+                    // gorus hatti isini eklemisti: hedefin onunde kati
+                    // bir sey varsa hedef reddedilir. Kule, kapisinin
+                    // onunde duruyordu ve "Kuleye cik" yazisi HIC
+                    // belirmedi. Bir oyuncu otuz dakika kuleyi dolandi.
+                    //
+                    // Sayiyi elle duzeltmek yeni bir sihirli sabit
+                    // olurdu. Yariçap carpistiricinin KENDISINDEN
+                    // okunur; kule modeli degisirse kapi da degisir.
+                    float yaricap = 6.5f;
+                    var kuleCarp = t.GetComponentInChildren<Collider>();
+                    if (kuleCarp != null)
+                    {
+                        var b = kuleCarp.bounds;
+                        yaricap = Mathf.Max(b.extents.x, b.extents.z);
+                    }
+                    // 1,2 m pay: oyuncunun kapsulu (0,35 m) rahat sigar
+                    // ve etkilesim menzili (2,5 m) hala yetisir.
+                    float uzaklik = yaricap + 1.2f;
 
                     var kapi = new GameObject("PF_KuleKapisi");
                     kapi.transform.SetParent(t, false);
-                    kapi.transform.localPosition = new Vector3(0f, 1.2f, -6.5f);
+                    kapi.transform.localPosition = new Vector3(0f, 1.2f, -uzaklik);
                     var kk = kapi.AddComponent<KuleKapisi>();
                     var kutu = kapi.AddComponent<BoxCollider>();
                     kutu.isTrigger = true;
@@ -835,8 +869,24 @@ namespace Hezarfen.Editor.Pipeline
             var ornek = (GameObject)PrefabUtility.InstantiatePrefab(pf, ebeveyn);
             ornek.name = ad;
             // Sirtta: omuz hizasi, govdenin biraz arkasi.
-            ornek.transform.localPosition = new Vector3(0f, 1.35f, -0.12f);
-            ornek.transform.localRotation = Quaternion.identity;
+            // KATLI KANAT SIRTTA DIK DURUR, YATAY DEGIL.
+            //
+            // Uc hale de ayni sifir donus veriliyordu. Kanat modeli
+            // duz yatay bir yuzey: ucarken dogru, sirtta degil. Bir
+            // oyuncu ne oldugunu yazdi — 2,84 × 2,70 m'lik levha
+            // gogsunden geciyor, dar sokakta (4,6 m) duvarin icine
+            // giriyor: *"onumde 1,3 m cikinti yapan bir tezgah
+            // tasiyorum."*
+            //
+            // Katli hal sirta dayanmis bir denk gibidir: dik ve dar.
+            bool acikKanat = ad.EndsWith("_Acik");
+            ornek.transform.localPosition = acikKanat
+                ? new Vector3(0f, 1.35f, -0.12f)
+                : new Vector3(0f, 1.05f, -0.28f);
+            ornek.transform.localRotation = acikKanat
+                ? Quaternion.identity
+                : Quaternion.Euler(78f, 0f, 0f);
+            if (!acikKanat) ornek.transform.localScale = Vector3.one * 0.55f;
 
             // KANAT GORULUR, CARPMAZ.
             //
