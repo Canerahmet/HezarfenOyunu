@@ -78,10 +78,24 @@ namespace Hezarfen.Sehir
         {
             // Narh defterinden: gunluk ekmek 1 akce.
             EsyaTuru.Ekmek => Ekonomi.GunlukEkmek,
-            // Saka suyu ucuz ama bedava degil; en kucuk birim 1 akce.
-            EsyaTuru.Su => 1,
-            EsyaTuru.Odun => 2,
-            EsyaTuru.Sebze => 1,
+            // TAM SAYI AKCE, MARJA YER BIRAKMALI.
+            //
+            // Once ucu de 1-2 akceydi ve `SatisFiyati = Fiyat - 1`
+            // oldugu icin **1 akcelik her malin satis fiyati 0**
+            // cikiyordu; `SatilabilirOlan` da `> 0` sordugu icin su,
+            // sebze ve ekmek hic satilamiyordu. Sehirdeki 15.815
+            // toplanabilir esyanin karsiligi TEK mala (odun) inmisti —
+            // ve bunun tersini iddia eden bir commit gövdesi yazdim.
+            //
+            // Ekmek narh defterinden gelir ve 1 akcedir (T1); onun
+            // satilamamasi DOGRU — firinci ekmegini geri almaz ve narh
+            // zaten kari sifirlar. Otekiler benim T2 tahminimdi ve bir
+            // akce yukari cekmek onlari ayni banttan cikarmiyor: saka
+            // suyu bir kupten, odun bir yukten, sebze bir sepetten
+            // olculur ve ucu de gunluk ekmegin uzerindedir.
+            EsyaTuru.Su => 2,
+            EsyaTuru.Odun => 3,
+            EsyaTuru.Sebze => 2,
             // Kanat parcasi satilik degil — Hezarfen'in kendi isi.
             _ => 0,
         };

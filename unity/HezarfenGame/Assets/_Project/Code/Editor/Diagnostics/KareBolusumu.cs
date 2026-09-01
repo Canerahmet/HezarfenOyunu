@@ -24,6 +24,49 @@ namespace Hezarfen.Editor.Diagnostics
     {
         private const string Cikti = "../../renders/denetim";
 
+        /// <summary>
+        /// Toplu kipten koşulabilen giriş — <b>projenin kapısı bu ölçüm</b>.
+        ///
+        /// <c>Baslat</c> oynatma kipi ister ve oynatma kipine yalnız
+        /// Editor penceresinden girilebiliyordu; yani sözleşmenin
+        /// *"bir faz kendi kare ölçümü olmadan bitmiş sayılmaz"*
+        /// kuralı, elle yapılan bir adıma bağlıydı. Elle yapılan adım,
+        /// yapılmayan adımdır.
+        ///
+        /// <c>-nographics</c> <b>verilmemeli</b>: grafik aygıtı
+        /// olmadan ölçülen kare süresi bir sayı üretir ama hiçbir şey
+        /// ölçmez.
+        /// </summary>
+        public static void TopluKos()
+        {
+            // SAHNE ACILMADAN OYNATILMAZ.
+            //
+            // Ilk denemede toplu kosum acik olan sahneyi oynatti ve
+            // rapor "0,1 ms, sakin=0, cizim cagrisi=0" yazdi. Yani
+            // cetvel bir sayi uretti ve hicbir sey olcmedi — bu
+            // oturumda dort kez yakalanan kusurun cetvelin kendi
+            // elinden cikmis hali.
+            UnityEditor.SceneManagement.EditorSceneManager
+                .OpenScene(OyunSahnesi);
+            EditorApplication.playModeStateChanged += DurumDegisti;
+            EditorApplication.EnterPlaymode();
+        }
+
+        /// <summary>Ölçümün yapılacağı sahne.</summary>
+        private const string OyunSahnesi =
+            "Assets/_Project/Scenes/Faz1_Terrain.unity";
+
+        private static void DurumDegisti(PlayModeStateChange d)
+        {
+            if (d != PlayModeStateChange.EnteredPlayMode) return;
+            EditorApplication.playModeStateChanged -= DurumDegisti;
+            Baslat();
+        }
+
+        /// <summary>Toplu koşumdan gelindiyse ölçüm bitince çıkılır.</summary>
+        private static bool Toplu =>
+            System.Environment.CommandLine.Contains("TopluKos");
+
         [MenuItem("Hezarfen/Olcum/Kare suresini bolustur")]
         public static void Baslat()
         {
@@ -117,9 +160,28 @@ namespace Hezarfen.Editor.Diagnostics
                               + $"agac cizilen={(agac != null ? agac.CizilenAgac : 0)} "
                               + $"cizim cagrisi={(agac != null ? agac.CizimCagrisi : 0)}");
 
+                // BOS SAHNE OLCULMEZ.
+                //
+                // Sifir cizim cagrisi bir performans sonucu degil, bir
+                // olcum basarisizligidir; onu 0,1 ms diye yazmak
+                // yalandir. Bir cetvel, olcemedigini soyleyebilmeli.
+                int cizim = agac != null ? agac.CizimCagrisi : 0;
+                if (cizim == 0 || (npc != null && npc.GorunurSayisi == 0))
+                {
+                    Debug.LogError(
+                        "[Hezarfen] Kare olculemedi: cizim cagrisi "
+                        + $"{cizim}, gorunur govde "
+                        + $"{(npc != null ? npc.GorunurSayisi : -1)}. "
+                        + "Sahne bos ya da akis yuklenmedi — rapor "
+                        + "YAZILMADI.");
+                    if (Toplu) EditorApplication.Exit(1);
+                    yield break;
+                }
+
                 Directory.CreateDirectory(Cikti);
                 File.WriteAllText($"{Cikti}/kare_bolusumu.md", sb.ToString());
                 Debug.Log($"[Hezarfen] Kare bolusumu yazildi -> {Cikti}/kare_bolusumu.md");
+                if (Toplu) EditorApplication.Exit(0);
             }
 
             /// <summary>

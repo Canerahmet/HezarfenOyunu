@@ -62,7 +62,19 @@ namespace Hezarfen.Sehir
         /// yüksekliğiyle ölçeklenmesi HUD'un ölçek işiyle birlikte
         /// gelecek.
         /// </summary>
+        /// <summary>
+        /// İki etiketin dikeyde ayrık sayıldığı en az piksel — 1080p'de.
+        ///
+        /// Sayı 1080p'de ölçüldü ve <b>oraya çakılıydı</b>; 1440p ve
+        /// 4K'da aynı sahne daha çok piksel ürettiği için üst üste
+        /// binme geri dönüyordu. Eşik çözünürlükle ölçeklenir
+        /// (<see cref="AyrikY"/>), çünkü ölçülen şey piksel değil
+        /// <b>okunabilirlik</b>.
+        /// </summary>
         private const float EkranAyrikY = 46f;
+
+        /// <summary>Geçerli çözünürlükte dikey ayrışma eşiği (px).</summary>
+        private static float AyrikY => EkranAyrikY * (Screen.height / 1080f);
         private const float EkranAyrikX = 300f;
 
         private readonly List<Vector3> _ekran = new List<Vector3>();
@@ -81,7 +93,8 @@ namespace Hezarfen.Sehir
             // Etiket dunya uzayinda `uzak/12` olcekli ve ekrandaki boyu
             // bu yuzden mesafeden bagimsiz; 1080p'de harf basina ~11 px
             // olcuduk.
-            return Mathf.Clamp(harf * 11f, 40f, Screen.width * 0.8f);
+            return Mathf.Clamp(harf * 11f * (Screen.height / 1080f),
+                               40f, Screen.width * 0.8f);
         }
 
         private readonly List<(NPCAjan ajan, float d2)> _adaylar = new();
@@ -95,7 +108,20 @@ namespace Hezarfen.Sehir
             float menzil2 = duyulmaMesafesi * duyulmaMesafesi;
             _adaylar.Clear();
 
-            foreach (var a in yonetici.Sakinler)
+            // KIRK BIN DEGIL, ALTMIS.
+            //
+            // Burada `yonetici.Sakinler` taraniyordu — sehrin TAMAMI,
+            // kirk bin kisi, her karede, mesafe hesabiyla. Oysa hemen
+            // altindaki satir govdesi olmayani zaten eliyor ve govdesi
+            // olan altmis kisi var. Tarama yuzde 99,85'i bulup atmak
+            // icin kosuyordu.
+            //
+            // Olculen bedel 1,0 ms, butcenin %6'si, ekranda EN COK IKI
+            // yazi icin. Once gorus hatti isinini sucladim ve onu
+            // tembel yaptim — dogru bir duzeltmeydi ama sayi
+            // oynamadi. Tahmin edilen darbogaz ile olculen darbogaz
+            // ayni sey degil; ikincisi buydu.
+            foreach (var a in yonetici.GorunurSakinler)
             {
                 // Govdesi olmayan konusmaz: gorunmeyen bir agizdan cikan
                 // yazi havada asili kalirdi.
@@ -103,29 +129,45 @@ namespace Hezarfen.Sehir
                 float d2 = (a.konum - oyuncu.position).sqrMagnitude;
                 if (d2 > menzil2) continue;
 
-                // GORUS HATTI SART.
-                //
-                // Yazi dunyada duruyor ama duvarin ARKASINDAN da
-                // okunuyordu: cami avlusunda cekilen karede dort replik
-                // ust uste binmis, direklerin ve evlerin onunde asili
-                // duruyordu. Duyulmasi degil GORULMESI sorun — konusan
-                // kisi gorunmuyorsa sozu de gorunmemeli.
-                if (_kamera != null)
-                {
-                    var agiz = a.konum + Vector3.up * yukseklik;
-                    var goz = _kamera.transform.position;
-                    var fark = agiz - goz;
-                    if (Physics.Raycast(goz, fark.normalized,
-                                        fark.magnitude - 0.4f, ~0,
-                                        QueryTriggerInteraction.Ignore))
-                        continue;
-                }
-
                 _adaylar.Add((a, d2));
             }
 
             // En yakinlar konusur — kalabalikta duyulan da odur.
             _adaylar.Sort((x, y) => x.d2.CompareTo(y.d2));
+
+            // GORUS HATTI SART — AMA SIRALAMADAN SONRA.
+            //
+            // Yazi dunyada duruyor ve duvarin ARKASINDAN da okunuyordu:
+            // cami avlusunda cekilen karede dort replik direklerin
+            // onunde asili duruyordu. Duyulmasi degil GORULMESI sorun.
+            //
+            // Kusur ISININ KENDISINDE degil, ne zaman atildigindaydi:
+            // suzgec siralamadan **once** kosuyor ve menzildeki her
+            // adaya (60'a kadar) 36.302 carpistiricili bir sahnede ayri
+            // bir isin atiyordu — sonra 58'i zaten eleniyordu. Olculen
+            // bedel +1,0 ms, yani 16,7 ms'lik butcenin %6'si, ekranda
+            // IKI etiket icin.
+            //
+            // Dogru sira: once en yakini sec, sonra yalnizca
+            // gosterecegin kadarina sor. Ayni cevap, otuz kat az isin.
+            if (_kamera != null)
+            {
+                var goz = _kamera.transform.position;
+                int gecen = 0;
+                for (int i = 0; i < _adaylar.Count; i++)
+                {
+                    if (gecen >= ayniAndaEnCok)
+                    { _adaylar.RemoveRange(i, _adaylar.Count - i); break; }
+
+                    var agiz = _adaylar[i].ajan.konum + Vector3.up * yukseklik;
+                    var fark = agiz - goz;
+                    if (Physics.Raycast(goz, fark.normalized,
+                                        fark.magnitude - 0.4f, ~0,
+                                        QueryTriggerInteraction.Ignore))
+                    { _adaylar.RemoveAt(i); i--; continue; }
+                    gecen++;
+                }
+            }
 
             // EKRANDA AYRI DURSUNLAR — VE OLCU EKRANDA ALINIR.
             //
@@ -163,7 +205,7 @@ namespace Hezarfen.Sehir
                     foreach (var e in _ekran)
                     {
                         float pay = (benimEn + e.z) * 0.5f + 16f;
-                        if (Mathf.Abs(e.y - d.y) < EkranAyrikY
+                        if (Mathf.Abs(e.y - d.y) < AyrikY
                             && Mathf.Abs(e.x - d.x) < pay)
                         { cakisti = true; break; }
                     }
@@ -258,7 +300,21 @@ namespace Hezarfen.Sehir
                 // TMP'ye gecmek ayri bir is (HUD'un tamami IMGUI).
                 var golgeGo = new GameObject("golge");
                 golgeGo.transform.SetParent(go.transform, false);
-                golgeGo.transform.localPosition = new Vector3(0f, 0f, 0.03f);
+                // OTELEME EKRAN DUZLEMINDE OLMALI, BAKIS EKSENINDE DEGIL.
+                //
+                // Once `(0, 0, 0.03)` yaziliyordu ve gerekcesi "koyu
+                // kopya geride kalsin" idi. Ama etiket her karede
+                // `LookRotation(konum - kamera)` ile donduruluyor, yani
+                // **yerel +Z tam olarak bakis eksenidir**. Perspektif
+                // izdusumunde bakis ekseni boyunca oteleme ekranda
+                // hicbir yere kaymaz; yalnizca %0,25 kucultur. 30
+                // piksellik bir harfte aciga cikan kontur 0,075
+                // piksel — yani hic.
+                //
+                // Yerel X ve Y ekran duzlemine paraleldir; oteleme
+                // oraya konur. Olcek mesafeyle orantili oldugu icin
+                // (`uzak/12`) ekrandaki kayma her mesafede sabit kalir.
+                golgeGo.transform.localPosition = new Vector3(0.035f, -0.035f, 0.02f);
                 var golge = golgeGo.AddComponent<TextMesh>();
                 golge.characterSize = tm.characterSize;
                 golge.fontSize = tm.fontSize;

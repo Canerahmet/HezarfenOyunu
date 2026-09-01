@@ -72,12 +72,37 @@ namespace Hezarfen.Editor.Lighting
         /// Işık eklendi, kare 367 KB'a çıktı ve <b>hâlâ</b> karanlıktı:
         /// eksik olan ikinci parça buydu.
         ///
-        /// −1,0, gerçekçi gecenin (−3 EV) biraz üstünde duruyor ve bu
-        /// bilerek: göz karanlığa yirmi dakikada uyum sağlar, oyuncu
-        /// yirmi dakika bekleyemez. Oyun burada tarihe değil <b>göze</b>
-        /// uyuyor ve fark bir seçim olarak yazılı duruyor.
+        /// −1,0 seçildi ve <b>ölçülmedi</b> — bedeli buydu: sınır hiç
+        /// ısırmadı ve gece gündüzle aynı parlaklıkta pozlandı.
+        /// Aritmetik açık yazılırsa görülür. Dolunay 0,55 lüks
+        /// (<see cref="AyIsigi.dolunayLuks"/>); albedosu 0,30 olan bir
+        /// sıva duvarın parlaklığı L = ρ·E/π ≈ 0,053 cd/m², yani
+        /// EV100 = log₂(L·8) ≈ <b>−1,25</b>. Sınır −1,0'da dururken
+        /// kelepçe topu topu <b>çeyrek durak</b> ısırıyordu; histogram
+        /// geceyi de orta griye çekiyor ve ay ile fener için harcanan
+        /// bütün tur ekranda görünmez oluyordu.
+        ///
+        /// 2,0: gecenin kendi pozundan <b>3,25 durak koyu</b>. Gerçekçi
+        /// gece bundan da koyudur (−3 EV çıplak gözle uyum ister) ama
+        /// oyuncu yirmi dakika karanlığa alışamaz; 3,25 durak, biçimin
+        /// okunduğu ama gecenin gece kaldığı yer. Sinemanın gece-gündüz
+        /// farkı da bu mertebededir.
+        ///
+        /// Bu sayı artık <c>AydinlatmaProfiliTests</c>'te bir kapı:
+        /// bir daha sessizce gevşeyemez.
         /// </summary>
-        public const float GeceEV = -1.0f;
+        public const float GeceEV = 2.0f;
+
+        /// <summary>
+        /// Gölgenin görüldüğü en uzak mesafe (m).
+        ///
+        /// HDRP varsayılanı 150 m'ydi ve profilde bu ayar <b>hiç
+        /// yoktu</b> — 11 override'ın hiçbiri ona dokunmuyordu. 320 m,
+        /// dört kaskadla bölündüğünde yakın kaskadın dokunum
+        /// yoğunluğunu düşürür ama atlas maliyeti sabit kalır; beklenen
+        /// bedel yarım milisaniye mertebesinde ve <b>ölçülecek</b>.
+        /// </summary>
+        public const float GolgeMesafesi = 320f;
 
         /// <summary>Alacakaranlık pozu — artık yalnız belge değeri.</summary>
         public const float AlacakaranlikEV = 6.0f;
@@ -334,6 +359,43 @@ namespace Hezarfen.Editor.Lighting
             poz.adaptationSpeedDarkToLight.value = 1.2f;
             poz.adaptationSpeedLightToDark.overrideState = true;
             poz.adaptationSpeedLightToDark.value = 0.6f;
+
+            // OLCUM EKRANIN MERKEZINDEN ALINMAZ — BU BIR UCUS OYUNU.
+            //
+            // Merkez agirlikli olcum yerde makul, havada felaket:
+            // burnu kaldirinca ekranin merkezi GOKYUZU olur, poz
+            // gokyuzune gore ayarlanir ve sehir kararir; dalisa gecince
+            // merkez zemin olur ve ekran patlar. Oyuncu 86 saniyelik bir
+            // suzulus boyunca bu pompalamayi izliyordu.
+            //
+            // Yordamsal maske dokusuz calisir: agirlik merkezi ekranin
+            // biraz ALTINA (0,42) alinir, cunku ucusta bakilan sey
+            // asagidaki sehirdir, ustteki bosluk degil.
+            poz.meteringMode.overrideState = true;
+            poz.meteringMode.value = MeteringMode.ProceduralMask;
+            poz.proceduralCenter.overrideState = true;
+            poz.proceduralCenter.value = new Vector2(0.5f, 0.42f);
+            poz.proceduralRadii.overrideState = true;
+            poz.proceduralRadii.value = new Vector2(0.4f, 0.4f);
+            poz.proceduralSoftness.overrideState = true;
+            poz.proceduralSoftness.value = 0.5f;
+
+            // --- GOLGE MESAFESI ----------------------------------------
+            //
+            // Profilde `HDShadowSettings` HIC YOKTU, yani HDRP
+            // varsayilani (150 m) gecerliydi. Kule serefesinden Halic'e
+            // bakan oyuncu icin bu sunu demek: Suleymaniye, Ayasofya,
+            // sur hatti ve butun Surici **hicbir golge dusurmuyor**.
+            // Sehir kesilmis karton gibi okunuyordu.
+            //
+            // Ortam ortme (1,2 m) ve temas golgesi (0,15 m) bu olcekte
+            // yardim edemez — ikisi de yakin olcek araci. 320 m: yaya
+            // gozunden bir mahalle derinligi, ucustan bir siluet.
+            var golge = Ensure<HDShadowSettings>(profil);
+            golge.maxShadowDistance.overrideState = true;
+            golge.maxShadowDistance.value = GolgeMesafesi;
+            golge.cascadeShadowSplitCount.overrideState = true;
+            golge.cascadeShadowSplitCount.value = 4;
 
             // --- SIS: Halic sabahi -------------------------------------
             var sis = Ensure<Fog>(profil);

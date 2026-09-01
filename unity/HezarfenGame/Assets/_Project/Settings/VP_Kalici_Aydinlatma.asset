@@ -411,6 +411,7 @@ MonoBehaviour:
   - {fileID: 639782154949122753}
   - {fileID: 4944221408858487287}
   - {fileID: -6922887927925597323}
+  - {fileID: 6956798519225789026}
 --- !u!114 &639782154949122753
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -451,7 +452,7 @@ MonoBehaviour:
     m_Value: 4
   meteringMode:
     m_OverrideState: 1
-    m_Value: 2
+    m_Value: 4
   luminanceSource:
     m_OverrideState: 1
     m_Value: 1
@@ -463,7 +464,7 @@ MonoBehaviour:
     m_Value: 0
   limitMin:
     m_OverrideState: 1
-    m_Value: -1
+    m_Value: 2
   limitMax:
     m_OverrideState: 1
     m_Value: 16.5
@@ -571,10 +572,10 @@ MonoBehaviour:
     m_Value: 0
   proceduralCenter:
     m_OverrideState: 1
-    m_Value: {x: 0.5, y: 0.5}
+    m_Value: {x: 0.5, y: 0.42}
   proceduralRadii:
     m_OverrideState: 1
-    m_Value: {x: 0.3, y: 0.3}
+    m_Value: {x: 0.4, y: 0.4}
   maskMinIntensity:
     m_OverrideState: 1
     m_Value: -30
@@ -735,5 +736,49 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value: 0
   saturation:
+    m_OverrideState: 1
+    m_Value: 0
+--- !u!114 &6956798519225789026
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ddcec8a8eb2d684d833ac8f5d26aebd, type: 3}
+  m_Name: HDShadowSettings
+  m_EditorClassIdentifier: Unity.RenderPipelines.HighDefinition.Runtime::UnityEngine.Rendering.HighDefinition.HDShadowSettings
+  active: 1
+  interCascadeBorders: 1
+  maxShadowDistance:
+    m_OverrideState: 1
+    m_Value: 320
+  directionalTransmissionMultiplier:
+    m_OverrideState: 1
+    m_Value: 1
+  cascadeShadowSplitCount:
+    m_OverrideState: 1
+    m_Value: 4
+  cascadeShadowSplit0:
+    m_OverrideState: 1
+    m_Value: 0.05
+  cascadeShadowSplit1:
+    m_OverrideState: 1
+    m_Value: 0.15
+  cascadeShadowSplit2:
+    m_OverrideState: 1
+    m_Value: 0.3
+  cascadeShadowBorder0:
+    m_OverrideState: 1
+    m_Value: 0
+  cascadeShadowBorder1:
+    m_OverrideState: 1
+    m_Value: 0
+  cascadeShadowBorder2:
+    m_OverrideState: 1
+    m_Value: 0
+  cascadeShadowBorder3:
     m_OverrideState: 1
     m_Value: 0

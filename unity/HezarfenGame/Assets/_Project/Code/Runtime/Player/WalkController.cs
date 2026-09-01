@@ -262,6 +262,18 @@ namespace Hezarfen.Player
             Cursor.visible = !on;
         }
 
+        /// <summary>Yerden ayrıldıktan sonra zıplamanın hâlâ kabul edildiği süre (s).</summary>
+        public const float CoyoteSuresi = 0.12f;
+
+        /// <summary>Yere değmeden önce basılan zıplamanın hatırlandığı süre (s).</summary>
+        public const float TamponSuresi = 0.15f;
+
+        /// <summary>Yatay ivmelenme ve frenleme (m/s²).</summary>
+        public const float YatayIvme = 14f;
+
+        private float _coyote, _tampon;
+        private Vector3 _yatay;
+
         private void Update()
         {
             // Duraklatilmisken girdi OKUNMAZ. Bakis blogu deltaTime
@@ -369,22 +381,55 @@ namespace Hezarfen.Player
             }
 
             // --- yerde: yercekimi + zipla ---
+            //
+            // COYOTE VE TAMPON: ZIPLAMA TEK KAREYE SORULMAZ.
+            //
+            // Once `wasPressedThisFrame` yalniz `isGrounded` iken
+            // okunuyordu, yani ziplama iki kareyi AYNI ANDA tutturmayi
+            // sart kosuyordu. Kare butcesi 16,2 ms olan bir oyunda bir
+            // kare kacirmak 16 ms'lik girdiyi yutmak demek: basamagin
+            // kenarindan bir kare gec basan oyuncu, tusa hic
+            // dokunmamis gibi dusuyordu.
+            //
+            // Iki sayac, iki ayri kusuru kapatir: `_coyote` "az once
+            // yerdeydim"i, `_tampon` "az once bastim"i hatirlar.
+            if (cc.isGrounded) _coyote = CoyoteSuresi;
+            else _coyote -= Time.deltaTime;
+
+            bool atlaBasildi =
+                (kb != null && kb.spaceKey.wasPressedThisFrame)
+                || (kol != null && kol.buttonSouth.wasPressedThisFrame);
+            if (atlaBasildi) _tampon = TamponSuresi;
+            else _tampon -= Time.deltaTime;
+
             if (cc.isGrounded)
             {
                 // Kucuk bir negatif hiz: tam sifir olursa `isGrounded` yamacta
                 // titriyor ve karakter basamaklarda takiliyor.
                 vSpeed = -1.5f;
-                bool atlaBasildi =
-                    (kb != null && kb.spaceKey.wasPressedThisFrame)
-                    || (kol != null && kol.buttonSouth.wasPressedThisFrame);
-                if (atlayabilir && atlaBasildi) vSpeed = jumpSpeed;
             }
             else
             {
                 vSpeed += gravity * Time.deltaTime;
             }
 
-            var step = wish * speed;
+            if (atlayabilir && _tampon > 0f && _coyote > 0f)
+            {
+                vSpeed = jumpSpeed;
+                _tampon = 0f; _coyote = 0f;
+            }
+
+            // IVMELENME: 0'DAN 6 m/s'YE TEK KAREDE DEGIL.
+            //
+            // `step = wish * speed` yaziyordu; ne ivme, ne frenleme, ne
+            // donus sonumlemesi. Yuruyus 2008 hissi veriyordu.
+            // 14 m/s^2: bir insanin duragandan kosuya gecmesi ~0,45 s,
+            // yani bir adim — kontrol kaybettirmeden agirlik verir.
+            var hedefYatay = wish * speed;
+            _yatay = Vector3.MoveTowards(_yatay, hedefYatay,
+                                         YatayIvme * Time.deltaTime);
+
+            var step = _yatay;
             step.y = vSpeed;
             cc.Move(step * Time.deltaTime);
 

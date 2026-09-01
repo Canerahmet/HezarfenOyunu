@@ -80,11 +80,28 @@ namespace Hezarfen.Editor.Diagnostics
                     var p = a.govde.position;
 
                     // --- ayak-zemin farki ---
+                    //
+                    // CETVEL, DUZELTMENIN KOPYASI OLMAMALI.
+                    //
+                    // Once burada `p + up*1,2` noktasindan asagi bir
+                    // isin atiliyordu — yani `NPCYonetici`'nin gövdeyi
+                    // OTURTURKEN kullandigi isinin birebir aynisi. Ayni
+                    // soruyu ayni cetvelle sormak, cevabin sifir
+                    // cikmasini garanti eder: olcum yerlestiricinin
+                    // varsayimini dogrular, oyuncunun gordugu seyi
+                    // degil. Bu depoda ucuncu kez ayni tuzak
+                    // (`PermeTests` sentetik graf, `OrtamSesiTests`
+                    // atanmamis katman) ve bu kez ben kurmusum.
+                    //
+                    // Dogru cetvel: **ayak kemigi**. İskeletin ayağı
+                    // nerede duruyorsa gozun gordugu yer orasidir; kok
+                    // transformu degil.
+                    var ayak = AyakNoktasi(a.govde);
                     float fark = 0f;
-                    if (Physics.Raycast(p + Vector3.up * 1.2f, Vector3.down,
-                                        out var v, 8f, ~0,
+                    if (Physics.Raycast(ayak + Vector3.up * 1.2f,
+                                        Vector3.down, out var v, 8f, ~0,
                                         QueryTriggerInteraction.Ignore))
-                        fark = p.y - v.point.y;
+                        fark = ayak.y - v.point.y;
 
                     if (fark > ZeminPayi)
                     {
@@ -127,6 +144,30 @@ namespace Hezarfen.Editor.Diagnostics
 
                 Yaz(sayilan, havada, gomulu, icinde,
                     enKotuHava, enKotuGomme, enKotular.ToString());
+            }
+
+            /// <summary>
+            /// Gövdenin <b>ayağının</b> dünya konumu.
+            ///
+            /// Animatörü olan bir iskelette ayak kemiği sorulur; yoksa
+            /// kök transform'a düşülür. Fark bir ayrıntı değil ölçümün
+            /// kendisi: yürüme çevriminde ayak kökten 15-20 cm sapar ve
+            /// karelerde "kaldırıma gömülü" görünen tam olarak odur.
+            /// </summary>
+            private static Vector3 AyakNoktasi(Transform govde)
+            {
+                var an = govde.GetComponentInChildren<Animator>();
+                if (an != null && an.isHuman)
+                {
+                    var sol = an.GetBoneTransform(HumanBodyBones.LeftFoot);
+                    var sag = an.GetBoneTransform(HumanBodyBones.RightFoot);
+                    if (sol != null && sag != null)
+                        return sol.position.y < sag.position.y
+                               ? sol.position : sag.position;
+                    if (sol != null) return sol.position;
+                    if (sag != null) return sag.position;
+                }
+                return govde.position;
             }
 
             private void Yaz(int n, int havada, int gomulu, int icinde,

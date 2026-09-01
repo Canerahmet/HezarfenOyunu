@@ -142,6 +142,20 @@ namespace Hezarfen.Player
                     // ustune biniyordu.
                     if (yurume != null) yurume.atlayabilir = false;
                     if (Basildi(atlaTusu)) Atla();
+
+                    // KANAT CIKARILABILIR: KAPI IKI YONLU.
+                    //
+                    // `Hazir` tek yonlu bir kapandi — girilince
+                    // ziplama kapaniyor ve `Yerde`'ye donmenin TEK yolu
+                    // ucup inmekti. Carsida merakla G'ye basan oyuncu
+                    // artik bir bordure, bir merdivene, `EvMerdiveni`nin
+                    // ciktigi hicbir yere cikamiyor; Space'e her basisi
+                    // bir firlatma denemesi oluyordu. Kanadi kapatmak
+                    // icin kendini bir yerden atmasi gerekiyordu.
+                    //
+                    // Bir moda giren her oyun o modun kapisini iki
+                    // yonlu yapar.
+                    else if (Basildi(kusanTusu)) { YereGec(); Gec(Durum.Yerde); }
                     break;
 
                 case Durum.Ucuyor:

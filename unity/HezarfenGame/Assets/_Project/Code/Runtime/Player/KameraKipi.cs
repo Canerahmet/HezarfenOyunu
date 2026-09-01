@@ -151,6 +151,13 @@ namespace Hezarfen.Player
 
         private void Update()
         {
+            // DURAKLATILMISKEN KAMERA KIPI DEGISMEZ.
+            //
+            // Ayni ders `WalkController` ve `UcusDizisi` icin yazildi,
+            // buraya konmamisti: menu acikken V (ya da R3) hala kamerayi
+            // birinci sahistan ucuncu sahisa ceviriyordu.
+            if (Time.timeScale == 0f) return;
+
             var kb = Keyboard.current;
             var kol = Gamepad.current;
 

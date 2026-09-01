@@ -199,6 +199,28 @@ namespace Hezarfen.Arayuz
             }
         }
 
+        /// <summary>
+        /// Elindeki aygıta göre tuş adı.
+        ///
+        /// Ekrandaki her tuş adı klavyeye sabit yazılmıştı — "E al",
+        /// "G kanat", "Shift koş" — oysa kod kolu <b>destekliyor</b>:
+        /// kanat <c>rightShoulder</c>, etkileşim <c>buttonWest</c>,
+        /// duraklat <c>start</c>. Yani kolla oynayan biri kule tepesine
+        /// çıkıyor, ekranda "G kanat" okuyor ve elinde G tuşu yok.
+        /// "Kolla oynayan biri uçamıyordu" kusuru kodda kapatılmış,
+        /// arayüzde açık bırakılmıştı.
+        /// </summary>
+        public static string Glif(string klavye, string kol) =>
+            Gamepad.current != null ? kol : klavye;
+
+        /// <summary>Alt köşedeki kumanda satırı.</summary>
+        private static string Tuslar() =>
+            Gamepad.current != null
+                ? "Start duraklat · X al · RB kanat · R3 bakış\n"
+                  + "D-pad yukarı kaydet · D-pad aşağı yükle"
+                : "ESC duraklat · E al · G kanat · V bakış · Shift koş\n"
+                  + "F5 kaydet · F9 yükle";
+
         /// <summary>Duraklatır ya da devam eder.</summary>
         public void Duraklat(bool dur)
         {
@@ -412,7 +434,7 @@ namespace Hezarfen.Arayuz
                     GUI.Box(ir, "", _kutu);
                     var eski = _yazi.alignment;
                     _yazi.alignment = TextAnchor.MiddleCenter;
-                    GUI.Label(ir, $"[E]  {ip}", _yazi);
+                    GUI.Label(ir, $"[{Glif("E", "X")}]  {ip}", _yazi);
                     _yazi.alignment = eski;
                 }
             }
@@ -444,10 +466,7 @@ namespace Hezarfen.Arayuz
             // --- duraklat ---
             if (!Duraklatildi)
             {
-                GUI.Label(new Rect(_en - 250, 10, 240, 20),
-                          "ESC duraklat · E al · G kanat · V bakış · Shift koş" + "\n"
-                          + "F5 kaydet · F9 yükle",
-                          _yazi);
+                GUI.Label(new Rect(_en - 250, 10, 240, 20), Tuslar(), _yazi);
                 // OLCEK GERI VERILIR.
                 //
                 // Bu erken donus `GUI.matrix`i olcekli birakiyordu ve

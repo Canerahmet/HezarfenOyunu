@@ -118,5 +118,71 @@ namespace Hezarfen.Tests
                 + "AddObjectToAsset cagrilmadan eklenmis bilesenlerdir "
                 + "ve oyun onlari HIC gormez.");
         }
+
+        /// <summary>
+        /// <b>Gece gündüzden koyu mu.</b>
+        ///
+        /// Bir tur boyunca ay eklendi, fener yazıldı, gece karesi
+        /// ölçüldü — ve aynı profildeki otomatik pozlama hepsini geri
+        /// aldı: <c>limitMin</c> −1,0'dayken kelepçe ısırmıyor,
+        /// histogram geceyi de orta griye çekiyordu. Ay ışığında bir
+        /// sıva duvarın pozu EV ≈ −1,25; sınır onun <b>üstünde</b>
+        /// olmazsa gece diye bir şey yok.
+        ///
+        /// Bu test o sayıyı diskten okur, çünkü kaynaktan okusaydı
+        /// yalnız benim niyetimi ölçerdi.
+        /// </summary>
+        [Test]
+        public void NightIsActuallyDarkerThanDay()
+        {
+            var p = Profil();
+            Assert.IsTrue(p.TryGet<UnityEngine.Rendering.HighDefinition.Exposure>(
+                              out var poz), "Profilde poz bileseni yok.");
+            Assert.GreaterOrEqual(poz.limitMin.value, 1.5f,
+                $"Poz alt siniri {poz.limitMin.value:F2} EV. Gecenin "
+                + "kendi pozu ~ -1,25 EV; sinir onun altinda kalirsa "
+                + "kelepce hic isirmaz ve gece gunduzle ayni "
+                + "parlaklikta cizilir.");
+            Assert.Greater(poz.limitMax.value, poz.limitMin.value + 8f,
+                "Gunduz ile gece arasinda sekiz duraktan az fark var.");
+        }
+
+        /// <summary>
+        /// <b>Uzaktaki şehir gölge düşürüyor mu.</b>
+        ///
+        /// Profilde <c>HDShadowSettings</c> hiç yoktu ve HDRP
+        /// varsayılanı 150 m: kule şerefesinden bakan oyuncu için
+        /// Süleymaniye, Ayasofya ve bütün Sûriçi gölgesizdi.
+        /// </summary>
+        [Test]
+        public void TheCityCastsShadowsBeyondTheNeighbourhood()
+        {
+            var p = Profil();
+            Assert.IsTrue(p.TryGet<UnityEngine.Rendering.HighDefinition.HDShadowSettings>(
+                              out var g), "Profilde golge ayari yok.");
+            Assert.GreaterOrEqual(g.maxShadowDistance.value, 300f,
+                $"Golge mesafesi {g.maxShadowDistance.value:F0} m. "
+                + "Bir acik dunyada bu, sehri kesilmis karton yapar.");
+        }
+
+        /// <summary>
+        /// <b>Hiçbir evde sert LOD sıçraması kalmadı mı.</b>
+        ///
+        /// Geçiş yumuşatma komutu yazıldı, koştu ve <b>ev ailesi 26'dan
+        /// 201'e büyümeden önce</b> koştu. Ölçüldüğünde 213 prefab hâlâ
+        /// <c>FadeMode: None</c> taşıyordu ve 201'i evdi — yani şehrin
+        /// 10.868 evinin tamamı tek karede mesh değiştiriyordu.
+        ///
+        /// Tek atımlık bir düzeltme, varlık üretiminin arkasında kalır.
+        /// Kapıya bağlanan bir sayı kalmaz.
+        /// </summary>
+        [Test]
+        public void NoPrefabStillSnapsBetweenLods()
+        {
+            int n = Hezarfen.Editor.Lighting.LodGecisi.SertSicramaSayisi();
+            Assert.AreEqual(0, n,
+                $"{n} prefabta hala sert LOD sicramasi var. Kur: "
+                + "Hezarfen -> Aydinlatma -> LOD gecislerini yumusat.");
+        }
     }
 }

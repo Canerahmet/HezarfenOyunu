@@ -54,9 +54,35 @@ namespace Hezarfen.Flight
                 fontStyle = FontStyle.Bold
             };
 
+            // 1920x1080 SANAL UZAY — OyunHud ile ayni sozlesme.
+            //
+            // Bu HUD sabit piksel dikdortgenlerine ciziyordu; yani
+            // 4K'da yuruyus HUD'i normal, ucus HUD'i yari boyda
+            // goruluyordu. Ayni oyunun iki arayuzu ayni olcegi
+            // kullanmali.
+            var eskiMatris = GUI.matrix;
+            float k = Mathf.Min(Screen.width / 1920f, Screen.height / 1080f);
+            GUI.matrix = Matrix4x4.Scale(new Vector3(k, k, 1f));
+            float _en = Screen.width / k, _boy = Screen.height / k;
+
             var rb = glider.GetComponent<Rigidbody>();
             float altitude = glider.transform.position.y;
-            float vertical = rb != null ? rb.linearVelocity.y : 0f;
+            float hamDikey = rb != null ? rb.linearVelocity.y : 0f;
+
+            // NETTO VARIO: HAVAYA GORE, YERE GORE DEGIL.
+            //
+            // ADR 0083 tam bu hatayi otomatik pilotta bulup duzeltti —
+            // dalisdan alinan hizin irtifaya cevrilmesi "termik" diye
+            // okunuyor ve bir dal-zoom-don limit cevrimi doguruyordu.
+            // Ama **oyuncunun baktigi alet** duzeltilmemisti: o hala
+            // yer eksenli dikey hizi gosteriyordu, yani otomatik
+            // pilotu yaniltan sinyalin aynisini.
+            //
+            // Termik +1,87 m/s ve 33 derece yatista batis 2,12 m/s
+            // olan bir modelde oyuncunun dogru karar verme sansi,
+            // aletin dogru sayiyi gostermesine bagli.
+            float ruzgarY = glider.WindAtCraft.y;
+            float vertical = hamDikey - ruzgarY;
 
             float distance = 0f;
             if (target != null)
@@ -73,9 +99,10 @@ namespace Hezarfen.Flight
                 $"HÜCUM AÇISI {glider.AngleOfAttackDeg:F1}°\n" +
                 $"YATIŞ       {glider.BankAngleDeg:F0}°\n" +
                 $"HEDEFE      {distance:F0} m\n" +
-                $"RÜZGÂR      {glider.WindAtCraft.magnitude:F1} m/s  (dikey {glider.WindAtCraft.y:+0.0;-0.0;0.0})";
+                $"RÜZGÂR      {glider.WindAtCraft.magnitude:F1} m/s "
+                + $"{YonAdi(glider.WindAtCraft)} (dikey {ruzgarY:+0.0;-0.0;0.0})";
 
-            GUI.Label(new Rect(14, 14, 320, 150), text, box);
+            GUI.Label(new Rect(14, 14, 340, 165), text, box);
 
             DrawVario(vertical);
 
@@ -83,12 +110,42 @@ namespace Hezarfen.Flight
             {
                 var prev = GUI.color;
                 GUI.color = new Color(1f, 0.35f, 0.25f, 0.95f);
-                GUI.Label(new Rect(Screen.width * 0.5f - 110f, 40f, 220f, 40f), "STALL — BURNU İNDİR", warn);
+                GUI.Label(new Rect(_en * 0.5f - 110f, 40f, 220f, 40f), "STALL — BURNU İNDİR", warn);
                 GUI.color = prev;
             }
 
-            GUI.Label(new Rect(14, Screen.height - 46f, 460f, 32f),
-                "W/S veya ↑/↓ : burun  •  A/D veya ←/→ : yatış  •  gamepad sol çubuk", box);
+            GUI.Label(new Rect(14, _boy - 46f, 480f, 32f), Tuslar(), box);
+            GUI.matrix = eskiMatris;
+        }
+
+        /// <summary>
+        /// Kumanda satırı — <b>elindeki aygıta göre</b>.
+        ///
+        /// Ekranda "W/S veya ↑/↓" yazıyordu ve kolla oynayan oyuncunun
+        /// elinde o tuşlar yok. Uçuşun kolla oynanabilmesi kodda
+        /// düzeltilmişti; arayüzde düzeltilmemişti.
+        /// </summary>
+        private static string Tuslar() =>
+            UnityEngine.InputSystem.Gamepad.current != null
+                ? "Sol çubuk: burun ve yatış  •  RB: kanat  •  Start: duraklat"
+                : "W/S veya ↑/↓ : burun  •  A/D veya ←/→ : yatış  •  G: kanat";
+
+        /// <summary>
+        /// Rüzgârın geldiği yön, okunur adla.
+        ///
+        /// HUD yalnız <c>magnitude</c> yazıyordu — yani oyuncu rüzgârın
+        /// <b>olduğunu</b> biliyor, <b>nereden</b> geldiğini bilmiyordu.
+        /// Süzülüşte kaldıracı bulmanın tek ipucu bu ve o ipucu ekranda
+        /// yoktu.
+        /// </summary>
+        private static string YonAdi(Vector3 v)
+        {
+            var yatay = new Vector2(v.x, v.z);
+            if (yatay.magnitude < 0.5f) return "";
+            float aci = Mathf.Atan2(yatay.x, yatay.y) * Mathf.Rad2Deg;
+            if (aci < 0f) aci += 360f;
+            string[] ad = { "K", "KD", "D", "GD", "G", "GB", "B", "KB" };
+            return ad[Mathf.RoundToInt(aci / 45f) % 8] + "'ya";
         }
 
         /// <summary>Dikey hız çubuğu — yükseliyor mu batıyor mu, bir bakışta.</summary>

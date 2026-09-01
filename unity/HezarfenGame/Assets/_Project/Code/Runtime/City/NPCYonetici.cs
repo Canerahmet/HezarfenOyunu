@@ -151,6 +151,22 @@ namespace Hezarfen.Sehir
         /// <summary>Bütün sakinler (görünür olsun olmasın).</summary>
         public IReadOnlyList<NPCAjan> Sakinler => _sakinler;
 
+        /// <summary>
+        /// Bu karede <b>gövdesi çizilen</b> sakinler.
+        ///
+        /// <see cref="Sakinler"/> kırk bin kişidir ve şehrin tamamıdır;
+        /// gövdesi olan altmışıdır. Aradaki fark bir kolaylık değil bir
+        /// <b>ücret</b>: <see cref="BarkGosterici"/> her karede kırk bin
+        /// kişiyi tarayıp mesafe soruyordu ve ölçülen bedeli 1,0 ms
+        /// (bütçenin %6'sı) — ekranda en çok iki yazı için.
+        ///
+        /// Bir kareyi ölçmek, o karede kimin var olduğunu bilmekle
+        /// başlar.
+        /// </summary>
+        public IReadOnlyList<NPCAjan> GorunurSakinler => _gorunurler;
+
+        private readonly List<NPCAjan> _gorunurler = new();
+
         private readonly List<NPCAjan> _sakinler = new();
         private readonly Stack<Transform> _havuz = new();
         private int _dilimSayaci;
@@ -455,6 +471,7 @@ namespace Hezarfen.Sehir
 
             // AL ve yerlestir.
             int cizilen = 0;
+            _gorunurler.Clear();
             foreach (var a in _sakinler)
             {
                 if (!a.gorunmeli) continue;
@@ -511,6 +528,7 @@ namespace Hezarfen.Sehir
                                     QueryTriggerInteraction.Ignore))
                     yer.y = vurus.point.y;
                 a.govde.position = yer;
+                _gorunurler.Add(a);
                 if (a.hiz > 0.05f && yon.sqrMagnitude > 1e-4f)
                     a.govde.rotation = Quaternion.LookRotation(yon);
                 var an = a.govde.GetComponentInChildren<Animator>();

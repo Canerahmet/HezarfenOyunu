@@ -104,12 +104,46 @@ namespace Hezarfen.Sehir
             foreach (int h in _karsilar) _adlar.Add(YerAdi(h));
         }
 
-        /// <summary>Şu an geçilecek iskele; yoksa −1.</summary>
+        /// <summary>
+        /// Şu an geçilecek iskele; yoksa −1.
+        ///
+        /// ## Belgenin söylediği, kodun yapmadığı
+        ///
+        /// Bu sınıfın başlığı *"görev varsa hedefe en yakın karşı
+        /// iskeleye geçilir"* diyordu. Kod bunu <b>yapmıyordu</b>:
+        /// yalnız <c>_secili</c> sırasını okuyordu ve <c>_secili</c>
+        /// sadece <b>ödeme başarısız olunca</b> artıyordu. Yani parası
+        /// olan oyuncu her seferinde aynı iskeleye gidiyor ve hedefini
+        /// seçemiyordu — "karşıya yolcu götür" görevi kuzeydoğuyu
+        /// gösterirken kayık onu Eyüp'e bırakıyordu.
+        ///
+        /// Bu depoda dördüncü kez aynı desen: yazılı ama bağlı değil.
+        /// Buradaki hâli daha sinsi, çünkü <b>belge</b> bağlı olduğunu
+        /// söylüyordu.
+        /// </summary>
         public int Hedef
         {
             get
             {
                 if (_karsilar.Count == 0) return -1;
+
+                // Gorev varsa: hedefe en yakin karsi iskele.
+                var hk = gorev != null ? gorev.HedefKonum : null;
+                if (hk != null && graf != null)
+                {
+                    int enIyi = -1;
+                    float enKisa = float.MaxValue;
+                    foreach (int h in _karsilar)
+                    {
+                        if (h < 0 || h >= graf.dugumler.Count) continue;
+                        float m2 = (graf.dugumler[h].konum - hk.Value)
+                                   .sqrMagnitude;
+                        if (m2 >= enKisa) continue;
+                        enKisa = m2; enIyi = h;
+                    }
+                    if (enIyi >= 0) return enIyi;
+                }
+
                 return _karsilar[Mathf.Abs(_secili) % _karsilar.Count];
             }
         }
@@ -134,9 +168,9 @@ namespace Hezarfen.Sehir
                 int h = Hedef;
                 if (h < 0) return "";
                 if (Gece) return "Kayık gece işlemez";
-                int i = Mathf.Abs(_secili) % _karsilar.Count;
-                string ad = i < _adlar.Count ? _adlar[i] : YerAdi(h);
-                return $"{ad}'ya geç · {Ucret} akçe";
+                int i = _karsilar.IndexOf(h);
+                string ad = i >= 0 && i < _adlar.Count ? _adlar[i] : YerAdi(h);
+                return $"{ad}'ya geç · {Ucret} akçe · {Sure(h):0} dk";
             }
         }
 
@@ -183,6 +217,19 @@ namespace Hezarfen.Sehir
             return bulunan != null ? Duzelt(bulunan) : "karsiya";
         }
 
+        /// <summary>Kürek hızı (m/s) — RESEARCH §6, pereme kayığı.</summary>
+        public const float KurekHizi = 1.5f;
+
+        /// <summary>Bu geçişin süresi (dakika, oyun saati).</summary>
+        public float Sure(int hedef)
+        {
+            if (graf == null || Dugum < 0 || hedef < 0
+                || hedef >= graf.dugumler.Count) return 0f;
+            float d = Vector3.Distance(graf.dugumler[Dugum].konum,
+                                       graf.dugumler[hedef].konum);
+            return d / KurekHizi / 60f;
+        }
+
         private static bool Gecerli(string semt) =>
             !string.IsNullOrEmpty(semt) && semt != "TERRAIN";
 
@@ -226,6 +273,22 @@ namespace Hezarfen.Sehir
                 return false;
             }
             kese.Ode(ucret);
+
+            // GECIS ZAMANA MAL OLUR.
+            //
+            // Once gecis **sifir saniyeydi**: Galata'dan Uskudar'a ~4 km
+            // Bogaz gecisi 3 akce ve hicbir sey. Oyunun tasarim
+            // diregi — "Halic'te kopru yok" — boylece 3 akcelik bir
+            // hizli seyahat dugmesine donusuyordu; oyuncu 875 m'lik bir
+            // gorev icin yedi dakika yururken 4 km'yi bedavaya
+            // gectigi bir dunyada mesafenin bir anlami kalmaz.
+            //
+            // Kurek hizi 1,5 m/s (RESEARCH §6: pereme kayigi, iki
+            // kurekci, akintiya karsi). Oyun saati bu kadar ilerler:
+            // Halic gecisi ~8 dk, Bogaz gecisi ~45 dk. Vakit
+            // kayabilir, hava kararabilir — ve iste o zaman gecmek bir
+            // karar olur.
+            if (zaman != null) zaman.saat += Sure(h) / 60f;
 
             var varis = graf.dugumler[h].konum;
 

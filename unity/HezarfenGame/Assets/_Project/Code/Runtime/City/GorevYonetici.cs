@@ -84,6 +84,22 @@ namespace Hezarfen.Sehir
             }
         }
 
+        /// <summary>
+        /// Durağa varmak için izin verilen en büyük yükseklik farkı (m).
+        ///
+        /// <see cref="HedefMesafe"/> yatay ölçüyor ve bu <b>pusula</b>
+        /// için doğru; <b>varış</b> için değildi. Kule tepesinden kanadı
+        /// açan oyuncu 200 m irtifada mescidin üstünden geçerken durak
+        /// 1/3'ü, çeşmenin üstünden geçerken 2/3'ü atlıyor ve eve hiç
+        /// inmeden görevi bitiriyordu — akçe keseye düşüyordu.
+        ///
+        /// Yani oyunun reklam yüzü olan uçuş, oyunun tek döngüsünü
+        /// havadan iptal ediyordu. Dört metre: bir evin kat yüksekliği,
+        /// merdivenden ya da sedirden varmayı bozmaz, çatıdan varmayı
+        /// bozar.
+        /// </summary>
+        public const float VarisDikeyPayi = 4f;
+
         /// <summary>Sıradaki durağa yatay mesafe (m); görev yoksa −1.</summary>
         public float HedefMesafe
         {
@@ -96,6 +112,9 @@ namespace Hezarfen.Sehir
                 return Vector2.Distance(a, b);
             }
         }
+
+        [Tooltip("Uçuş durumu — boşsa sahnede aranır. Uçarken durak geçilmez.")]
+        public Player.UcusDizisi ucus;
 
         public event Action<Gorev> GorevBasladi;
         public event Action<Gorev> GorevBitti;
@@ -110,6 +129,7 @@ namespace Hezarfen.Sehir
                 if (go != null) oyuncu = go.transform;
             }
             if (zaman == null) zaman = FindAnyObjectByType<ZamanSistemi>();
+            if (ucus == null) ucus = FindAnyObjectByType<Player.UcusDizisi>();
             if (envanter == null) envanter = FindAnyObjectByType<Envanter>();
             if (graf == null)
             {
@@ -241,6 +261,19 @@ namespace Hezarfen.Sehir
 
             float d = HedefMesafe;
             if (d < 0f || d > varisMesafesi) return;
+
+            // UCARKEN DURAK GECILMEZ.
+            //
+            // Iki bagimsiz kosul, cunku ikisi ayri seyi soruyor:
+            // ucus durumu "kanat acik mi", dikey fark "orada miyim".
+            // Kanat kapaliyken bir dama tirmanip ustunden gecmek de
+            // varis sayilmamali.
+            if (ucus != null && ucus.Simdiki != Player.UcusDizisi.Durum.Yerde)
+                return;
+            var hk = HedefKonum;
+            if (hk != null
+                && Mathf.Abs(oyuncu.position.y - hk.Value.y) > VarisDikeyPayi)
+                return;
 
             int oncekiDurak = Simdiki.siradaki;
             Simdiki.DurakTamam();
