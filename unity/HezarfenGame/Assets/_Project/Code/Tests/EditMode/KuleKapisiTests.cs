@@ -95,6 +95,58 @@ namespace Hezarfen.Tests
                 + "yazisi hic belirmez.");
         }
 
+        /// <summary>
+        /// <b>Çıkılan yerde zemin var mı.</b>
+        ///
+        /// ## Neden bu test var
+        ///
+        /// Önceki üç test kapıyı ölçüyordu — tek mi, taşın dışında mı,
+        /// kotu eşiğin üstünde mi — ve üçü de geçiyordu. Bir oyuncu
+        /// yine de kuleye çıkamadı, çünkü hiçbiri <b>varılan yeri</b>
+        /// sormuyordu: kapı doğru yerdeydi, kapının bıraktığı nokta
+        /// külahın 1,2 m üstünde ve 3,4 m yanındaydı. Oyuncu bir
+        /// saniye manzarayı görüyor, sonra düşüyordu.
+        ///
+        /// Onun cümlesi: *"Kapıyı çalan bir test var, içeri giren
+        /// yok."* Ve istediği ölçü tam olarak buydu — iniş noktasının
+        /// altına bir ışın.
+        ///
+        /// Bu, bu oturumun en sık tekrarlanan kusurunun test
+        /// hâlidir: <b>bir şeyin var olduğunu ölçmek, işe yaradığını
+        /// ölçmek değildir.</b>
+        /// </summary>
+        [Test]
+        public void WhereTheDoorPutsYouHasFloorUnderIt()
+        {
+            var k = Kapilar();
+            Assert.AreEqual(1, k.Length, "Once kapi sayisi duzelmeli.");
+            var kapi = k[0];
+
+            var eksen = kapi.transform.parent != null
+                        ? kapi.transform.parent.position
+                        : kapi.transform.position;
+            var yon = kapi.transform.position - eksen;
+            yon.y = 0f;
+            yon = yon.sqrMagnitude > 1e-4f
+                  ? yon.normalized : -kapi.transform.forward;
+
+            var nokta = eksen + Vector3.up * kapi.serefeKotu
+                        + yon * kapi.serefeYaricapi;
+
+            bool zemin = Physics.Raycast(nokta + Vector3.up * 4f,
+                                         Vector3.down, out var v, 9f, ~0,
+                                         QueryTriggerInteraction.Ignore);
+            Assert.IsTrue(zemin,
+                $"Kapinin biraktigi nokta ({nokta.x:F1}, {nokta.y:F1}, "
+                + $"{nokta.z:F1}) BOSLUKTA — altinda hicbir sey yok. "
+                + "Oyuncu manzarayi bir saniye gorup duser.");
+
+            float fark = Mathf.Abs(nokta.y - v.point.y);
+            Assert.Less(fark, 2.5f,
+                $"Zemin {fark:F1} m asagida. Oyuncu birakildigi yerden "
+                + "duserek varir; bu bir cikis degil bir dususun basi.");
+        }
+
         /// <summary>Şerefe kotu gerçekten kalkış eşiğinin üstünde mi.</summary>
         [Test]
         public void TheGalleryIsHighEnoughToCountAsALaunch()

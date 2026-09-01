@@ -194,24 +194,50 @@ namespace Hezarfen.Player
         {
             if (Simdiki != Durum.Yerde) return;
 
-            // PARCALAR KUSANIRKEN TAKILIR.
-            //
-            // Kanadi sirtina alirken elindeki parcalari da takarsin;
-            // ucus sirasinda degil. Bu, ilerlemenin oyuncuya gorunur
-            // oldugu andir ve dogru an odur.
-            var env = GetComponentInParent<Sehir.Envanter>();
-            if (env != null && suzulme != null)
-                suzulme.kanatParcasi = Mathf.Clamp(
-                    env.Adet(Sehir.EsyaTuru.KanatParcasi), 0, 3);
+            ParcalariTak();
             animasyon?.Kusan();
             _sayac = kusanmaSuresi;
             Gec(Durum.Kusaniyor);
         }
 
+        /// <summary>
+        /// Envanterdeki kanat parçalarını kanada işler.
+        ///
+        /// ## Neden iki yerde çağrılıyor
+        ///
+        /// Önce yalnız <see cref="Kusan"/> içindeydi, yani yalnız
+        /// <c>Yerde</c> durumundayken. Bir oyuncu sonucu buldu: kanat
+        /// zaten sırtındayken parça alırsan, kanadı çıkarıp tekrar
+        /// takmadan o parça uçuşuna girmiyor — ve oyun bunu
+        /// söylemiyordu. *"75 akçe verip hiçbir fark hissetmemek."*
+        ///
+        /// Bir yatırımın karşılığını almak, oyuncunun hangi sırayla
+        /// hareket ettiğine bağlı olmamalı.
+        /// </summary>
+        private void ParcalariTak()
+        {
+            var env = GetComponentInParent<Sehir.Envanter>();
+            if (env == null || suzulme == null) return;
+
+            int yeni = Mathf.Clamp(
+                env.Adet(Sehir.EsyaTuru.KanatParcasi), 0, 3);
+            if (yeni == suzulme.kanatParcasi) return;
+
+            suzulme.kanatParcasi = yeni;
+            ParcaTakildi?.Invoke(yeni);
+        }
+
+        /// <summary>Kanada parça takılınca — HUD okur.</summary>
+        public event System.Action<int> ParcaTakildi;
+
         /// <summary>Atla: yürüme fiziği kapanır, uçuş fiziği açılır.</summary>
         public void Atla()
         {
             if (Simdiki != Durum.Hazir) return;
+
+            // Atlamadan hemen once bir kez daha: kanat sirtindayken
+            // alinan parca da bu ucusa girsin.
+            ParcalariTak();
             animasyon?.Atla();
             HavayaGec();
             Gec(Durum.Ucuyor);

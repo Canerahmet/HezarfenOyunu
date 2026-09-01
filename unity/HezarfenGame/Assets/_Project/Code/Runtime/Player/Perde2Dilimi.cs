@@ -91,10 +91,17 @@ namespace Hezarfen.Player
         /// <summary>
         /// Kalkışın sayılması için kule tabanının kaç metre üstü (m).
         ///
-        /// Şerefe 98,2 m, kule tabanı 52 m. 40 m, şerefeyi ister ve
-        /// yakındaki bir damdan atlamayı istemez.
+        /// <b>40 idi ve yanlış bir ölçümden geliyordu.</b> "Şerefe
+        /// 98,2 m" diye yazmıştım; o sayı yukarıdan aşağı bir ışının
+        /// bulduğu <b>konik külahın tepe noktası</b>. Durulacak yer
+        /// kâgir gövdenin üstü: taban + 34,50 m, mazgallı korkuluğun
+        /// arkası. 40 m'lik eşik oraya çıkan oyuncuya "kalkış
+        /// sayılmadı" derdi.
+        ///
+        /// 30 m: sahanlığın (34,5) altında, çevredeki damların
+        /// (en yükseği ~12 m) üstünde.
         /// </summary>
-        public const float KalkisKotu = 40f;
+        public const float KalkisKotu = 30f;
 
         /// <summary>
         /// Bir uçuşun uçuş sayılması için en az yatay yol (m).

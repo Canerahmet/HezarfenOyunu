@@ -92,6 +92,7 @@ namespace Hezarfen.Arayuz
             {
                 dizi.DurumDegisti += UcusDurumu;
                 dizi.SuyaDustu += SuyaDustu;
+                dizi.ParcaTakildi += ParcaTakildi;
             }
             if (aranma != null) aranma.DurumDegisti += AranmaDurumu;
 
@@ -119,6 +120,7 @@ namespace Hezarfen.Arayuz
             {
                 dizi.DurumDegisti -= UcusDurumu;
                 dizi.SuyaDustu -= SuyaDustu;
+                dizi.ParcaTakildi -= ParcaTakildi;
             }
             if (aranma != null) aranma.DurumDegisti -= AranmaDurumu;
             if (perde != null)
@@ -138,6 +140,19 @@ namespace Hezarfen.Arayuz
         /// tekneyle duruyor; onu çıkaran onlar.
         /// </summary>
         private void SuyaDustu() => Bildir("Kayıkçılar seni kıyıya çıkardı.");
+
+        /// <summary>
+        /// Kanada parça takılınca söylenir.
+        ///
+        /// Bir oyuncu 75 akçe verip üç parça aldı ve hiçbir fark
+        /// hissetmedi — çünkü ne takıldığını gören bir şey yoktu.
+        /// Ödenen bir bedelin karşılığı görünmüyorsa ödenmemiş
+        /// sayılır.
+        /// </summary>
+        private void ParcaTakildi(int n)
+            => Bildir(n > 0
+                      ? $"Kanada {n} parça takıldı · süzülüş arttı"
+                      : "Kanatta parça yok");
 
         /// <summary>
         /// Oyunun <b>kendi</b> hikâyesi — ekrana ilk kez ulaşıyor.
