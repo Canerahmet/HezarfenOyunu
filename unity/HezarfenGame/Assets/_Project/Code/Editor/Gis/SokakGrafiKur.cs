@@ -144,6 +144,25 @@ namespace Hezarfen.Editor.Gis
             ("PF_Sinagog", SokakGrafi.Tur.Mabet),
             ("PF_Turbe", SokakGrafi.Tur.Turbe),
             ("PF_Iskele", SokakGrafi.Tur.Iskele),
+
+            // OKMEYDANI — OYUNUN ILK PERDESI VE GRAFTA HIC YOKTU.
+            //
+            // Tekke, namazgah ve dokuz menzil tasi sahnede duruyor ama
+            // bu tablo hicbirini tanimiyordu; sonucu olculdu:
+            // Okmeydani'nin **1.000 m yaricapinda sifir dugum**, en
+            // yakini 1.782 m otede. Sakinler graf dugumlerine
+            // dagitildigi icin orada sifir insan var.
+            //
+            // Bir oyuncu on dakika kosup vardi ve yazdi: *"Bir okcu
+            // tekkesindeyim, icinde okcu yok. Bir talim meydanindayim,
+            // talim eden yok."* Taslari koymak binayi yapmak; bir
+            // perdenin acilisi icin lazim olan sey birileri.
+            //
+            // Namazgah bir MESCIT: acik havada namaz kilinan yer ve
+            // rutinin `Mescit` adimi tam onu ariyor. Tekke bir
+            // MEDRESE: ogretilen ve toplanilan yer.
+            ("PF_Namazgah", SokakGrafi.Tur.Mescit),
+            ("PF_Tekke", SokakGrafi.Tur.Medrese),
             ("PF_UskudarIskelesi", SokakGrafi.Tur.Iskele),
 
             // CUMA CAMILERI (ADR 0071).
@@ -168,6 +187,22 @@ namespace Hezarfen.Editor.Gis
         [MenuItem("Hezarfen/GIS/Sokak grafini kur")]
         public static void Kur()
         {
+            // ARAZI SAHNESI ACIK DEGILSE ACILIR.
+            //
+            // Once acik olmasi bekleniyordu ve toplu kipte hicbir sahne
+            // acik olmaz: uretec "TR_Istanbul yok" deyip **hic
+            // kosmadan** cikiyor, diskteki eski graf oldugu gibi
+            // kaliyordu. Okmeydani'na alti hucre ekledim, grafi
+            // "kurdum" ve dugum sayisi 1.541'de sabit kaldi — sessizce.
+            //
+            // `KareBolusumu` bu dersi yazmisti: *elle yapilan adim,
+            // yapilmayan adimdir.* Bir uretec, calismasi icin gereken
+            // durumu kendisi kurmali.
+            if (GameObject.Find("TR_Istanbul") == null)
+                EditorSceneManager.OpenScene(
+                    "Assets/_Project/Scenes/Faz1_Terrain.unity",
+                    OpenSceneMode.Single);
+
             var terrainGo = GameObject.Find("TR_Istanbul");
             var terrain = terrainGo != null ? terrainGo.GetComponent<Terrain>() : null;
             if (terrain == null)

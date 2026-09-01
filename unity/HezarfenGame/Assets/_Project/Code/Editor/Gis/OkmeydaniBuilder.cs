@@ -257,6 +257,42 @@ namespace Hezarfen.Editor.Gis
                                      + "1632'de YEDI YILLIK. Mihrap kibleye "
                                      + $"({QiblaAzimuthDeg:F1} derece) doner.");
 
+            // --- TEKKE HUCRELERI: burada YASAYAN insanlar -----------
+            //
+            // ## Neden gerekti
+            //
+            // Sakinler yalniz `Ev` turundeki graf dugumlerine
+            // dagitiliyor (`SehirGunu.Sakinler`). Okmeydani'nda hic
+            // `Ev` yoktu, dolayisiyla hic insan yoktu ve oyunun **ilk
+            // perdesi** sehrin insan ayagi basmayan tek kosesinde
+            // geciyordu. Bir oyuncu on dakika kosup vardi: *"Bir okcu
+            // tekkesindeyim, icinde okcu yok."*
+            //
+            // ## Neden mesken degil hucre
+            //
+            // `DD_D_Okmeydani.settlementDensity: 0` bilincli ve dogru:
+            // II. Bayezid vakfiyesi meydana yapi yapilmasini yasaklar,
+            // burasi bir yerlesim degil talim alanidir. O karari
+            // bozmuyoruz.
+            //
+            // Ama bir tekkede seyh ve dervisler **yasar** — tekke bir
+            // ibadet yeri degil, bir yasama yeridir. Alti hucre, hepsi
+            // tekkenin kendi avlusunda ve meydanin disinda. T2:
+            // konumlari makul rekonstruksiyon, varliklari degil.
+            int hucre = 0;
+            for (int i = 0; i < 6; i++)
+            {
+                float a = 128f + 180f + (i - 2.5f) * 14f;
+                Vector2 hp = edge + Dir(a) * (11f + (i % 2) * 4f);
+                if (Place(root.transform, "PF_AvluKapi", terrain, hp,
+                          yaw: a + 180f,
+                          note: "Tekke hucresi (T2). Bir tekkede seyh ve "
+                              + "dervisler yasar; graf sakinleri yalniz "
+                              + "Ev dugumlerine dagitir ve Okmeydani'nda "
+                              + "hic Ev yoktu.") != null)
+                    hucre++;
+            }
+
             // --- MENZILLER: her biri kendi ayak tasi + kendi koridoru.
             var feet = new Dictionary<string, Vector2>();
             var lines = new List<string>();
@@ -336,6 +372,7 @@ namespace Hezarfen.Editor.Gis
             EditorSceneManager.SaveScene(scene, TerrainScene);
 
             Debug.Log($"[Hezarfen] Okmeydani: tekke {(tekke != null ? "OK" : "YOK")}, "
+                      + $"{hucre} hucre, "
                       + $"namazgah {(namazgah != null ? "OK" : "YOK")}, "
                       + $"{Menzils.Length} menzil, {feet.Count} ayak tasi, "
                       + $"{stones} bas tasi.\n" + string.Join("\n", lines));
