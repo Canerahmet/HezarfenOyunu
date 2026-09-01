@@ -53,6 +53,8 @@ namespace Hezarfen.Tests
             public float boyun_genisligi;
             public float etek_kotu;
             public bool dizlik;
+            public string tip;
+            public float taban_boy;
             public int tris_lod0;
             public int tris_lod1;
             public int kemik;
@@ -189,10 +191,18 @@ namespace Hezarfen.Tests
         [Test]
         public void TheSittingMansCoatIsLongerThanTheWorkingMans()
         {
+            // YALNIZ HEZARFEN'IN IKI VARYANTI.
+            //
+            // Dongu butun giyinik varyantlari geziyordu ve yedi sakin
+            // eklenince "uzun" degiskenine son dolasan sakin (kiz
+            // cocugu) yaziliyordu. Test yine YESIL dondu — cunku kizin
+            // etegi tesadufen ucus entarisinden kisaydi. Yanlis seyi
+            // olcup dogru cevap veren bir test, olcmuyor demektir.
             Entry_ uzun = null, kisa = null;
             foreach (var v in Katalog())
             {
                 if (v.state != "dressed") continue;
+                if (!v.name.StartsWith("Hezarfen")) continue;
                 if (v.dizlik) kisa = v; else uzun = v;
             }
             Assert.IsNotNull(uzun, "Sivil (uzun entari) varyanti yok.");
@@ -211,13 +221,22 @@ namespace Hezarfen.Tests
             foreach (var v in Katalog())
             {
                 if (v.state != "dressed") continue;
-                Assert.Greater(v.boy, taban.boy,
+                // CIPLAK BOY VARYANTIN KENDISININDIR.
+                //
+                // Burada tek bir "base" kaydinin boyu (1,70 m) olcut
+                // aliniyordu ve tek govde varken dogruydu. Yedi arketip
+                // gelince yalan soylemeye basladi: 1,58 m'lik kadin
+                // "giyinik boy 1,600 m, ciplak 1,700 m — sarik hic
+                // yukseklik eklememis" diye reddedildi. Sarik yerli
+                // yerindeydi; KIYASLANAN GOVDE baskasiydi.
+                float ciplak = v.taban_boy > 0.1f ? v.taban_boy : taban.boy;
+                Assert.Greater(v.boy, ciplak,
                     $"{v.name}: giyinik boy {v.boy:0.000} m, ciplak "
-                    + $"{taban.boy:0.000} m — sarik hic yukseklik eklememis, "
+                    + $"{ciplak:0.000} m — baslik hic yukseklik eklememis, "
                     + "yani basin ustunde degil.");
-                Assert.Less(v.boy, taban.boy * 1.10f,
-                    $"{v.name}: {v.boy:0.000} m — bir sarik 17 cm'den fazla "
-                    + "eklemez; bir parca govdeden kopmus olmali.");
+                Assert.Less(v.boy, ciplak * 1.10f,
+                    $"{v.name}: {v.boy:0.000} m — bir baslik boyun %10'undan "
+                    + "fazlasini eklemez; bir parca govdeden kopmus olmali.");
             }
         }
         /// <summary>Humanoid'in istediği her kemik var.</summary>

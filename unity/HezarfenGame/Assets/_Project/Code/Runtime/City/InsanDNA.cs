@@ -50,6 +50,21 @@ namespace Hezarfen.Sehir
         /// <summary>Animasyon faz kayması — herkes aynı adımda olmasın.</summary>
         public readonly float faz;
 
+        /// <summary>Kadın mı — gövde arketipini bu ve <see cref="yas"/> seçer.</summary>
+        public readonly bool kadin;
+
+        /// <summary>
+        /// Bu insanın hedef boyu (m).
+        ///
+        /// <see cref="olcek"/> bunun 1,70 m'ye bölünmüş hâliydi ve tek
+        /// gövde varken ikisi aynı şeydi. Yedi arketip gelince ayrıldılar:
+        /// oğlan gövdesinin kendi boyu 1,24 m ve onu 1,70'lik bir çarpanla
+        /// ölçeklemek çocuğu 0,9 m'lik bir cüceye çevirirdi. Ölçek artık
+        /// gövdenin <b>kendi</b> tabanına göre hesaplanıyor
+        /// (<see cref="SakinGovde.tabanBoy"/>), o yüzden asıl sayı budur.
+        /// </summary>
+        public readonly float boy;
+
         /// <summary>Karakterin sözleşmedeki boyu (m).</summary>
         public const float TabanBoy = 1.70f;
 
@@ -59,13 +74,36 @@ namespace Hezarfen.Sehir
         /// <summary>Boy standart sapması (m).</summary>
         public const float BoySapma = 0.062f;
 
-        private InsanDNA(float olcek, float hiz, Color ton, float yas, float faz)
+        private InsanDNA(float olcek, float hiz, Color ton, float yas,
+                         float faz, bool kadin, float boy)
         {
             this.olcek = olcek;
             this.hiz = hiz;
             this.ton = ton;
             this.yas = yas;
             this.faz = faz;
+            this.kadin = kadin;
+            this.boy = boy;
+        }
+
+        /// <summary>
+        /// Yaşın bandı: 0 çocuk, 1 genç, 2 yetişkin, 3 yaşlı.
+        /// <see cref="SakinGovde.BandDizini"/> ile aynı ölçek.
+        ///
+        /// Sınırlar <see cref="Uret"/>'in kendi eşikleriyle aynı yerde:
+        /// çocuk 0,16'nın altı (boy çarpanı orada bükülüyor), yaşlı
+        /// 0,82'nin üstü (orada da). Üçüncü bir yerde ayrı sayı yazmak,
+        /// gövdeyle boyun farklı yaşlarda değişmesi demek olurdu.
+        /// </summary>
+        public int Band
+        {
+            get
+            {
+                if (yas < 0.16f) return 0;
+                if (yas < 0.34f) return 1;
+                if (yas > 0.82f) return 3;
+                return 2;
+            }
         }
 
         /// <summary>
@@ -97,6 +135,25 @@ namespace Hezarfen.Sehir
             // daha kısadır.
             float normal = (b + c - 1.0f);                 // -1..1, tepe 0
             float boy = OrtalamaBoy + normal * BoySapma * 1.9f;
+
+            // CINSIYET: sehrin yarisi kadin.
+            //
+            // Sokakta hic kadin yoktu ve bunu bir oyuncu yazdi. Sebebi
+            // ideoloji degil eksiklikti: tek bir govde vardi ve o govde
+            // erkekti. Payi 0,48 tutuyorum — 17. yy Istanbul'unda erkek
+            // nufus, tasradan gelen bekar isci akini yuzunden bir miktar
+            // fazladir; bu bir tahmin degil, kaynaklarin tekrar tekrar
+            // soyledigi bir dengesizlik (T2).
+            //
+            // `d` daha once yalniz TON icin kullaniliyordu; ayri bir
+            // karma cekmiyorum ki eski tohumlarin boyu ve hizi
+            // degismesin — kaydedilmis bir oyunda ayni kisi ayni kisi
+            // kalmali.
+            bool kadin = Karma(ref h) < 0.48f;
+            // Donem kadini erkekten ~12 cm kisadir (1,54 / 1,66 = 0,928).
+            // Ayni oran arketip boylarinda da var (`sakin_kit`), cunku
+            // ikisi de ayni yerden okundu.
+            if (kadin) boy *= 0.928f;
             // Çocuk ölçeği 0,62 ile başlıyordu — 1,03 m, yani dört
             // yaşında. Sokakta görünen çocuk çoğunlukla daha büyüktür;
             // bebek kucakta taşınır, sokakta yürümez.
@@ -117,7 +174,8 @@ namespace Hezarfen.Sehir
             float tonAci = TonAcisi(d, e);
             Color ton = Color.HSVToRGB(tonAci, doygun, parlak);
 
-            return new InsanDNA(boy / TabanBoy, hiz, ton, yas, Karma(ref h));
+            return new InsanDNA(boy / TabanBoy, hiz, ton, yas, Karma(ref h),
+                                kadin, boy);
         }
 
         /// <summary>

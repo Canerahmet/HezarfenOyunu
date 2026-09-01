@@ -314,6 +314,139 @@ def bacak_kesit(govde, z, sx, kalinlik=0.02):
     return ((x0 + x1) * 0.5, (x1 - x0) * 0.5, (y1 - y0) * 0.5)
 
 
+def cizgi_yaricapi(obj, cizgi, filtre, oranlar=(0.08, 0.5, 0.92),
+                   yuzde=0.86, pencere=0.15, en_cok=None):
+    """Bir uzvun merkez çizgisi boyunca **ölçülen** yarıçapı.
+
+    ## Neden ölçülüyor
+
+    Kol kalınlıkları boyun oranı olarak yazılıydı (`boy * 0,052`) ve tek
+    gövde varken bu bir sabitle aynı şeydi. İnceleme paketinde sonucu
+    görüldü: omuzda 8,8 cm yarıçap, yani kolun kendisinin iki katı —
+    entari değil **balon** kol. Kumaş payını doğru seçebilmek için
+    altındaki kolun kaç santim olduğunu bilmek gerekir; boy onu
+    bilmiyor, ağ biliyor.
+
+    Yedi arketip gelince mesele büyüdü: çocuğun kolu adamınkinin yarısı
+    kadar ve aynı oran ona iki kat kalın bir kol giydiriyordu.
+
+    Yüzdelik (varsayılan %86) kullanılıyor, en büyük değer değil: tek bir
+    aykırı köşe (parmak ucu, koltuk altı) ölçüyü tek başına şişirirdi.
+    """
+    if not cizgi or len(cizgi) < 2:
+        return [None] * len(oranlar)
+    mw = obj.matrix_world
+    yay = [0.0]
+    for a, b in zip(cizgi, cizgi[1:]):
+        yay.append(yay[-1] + (b - a).length)
+    toplam = yay[-1]
+    if toplam < 1e-6:
+        return [None] * len(oranlar)
+
+    kova = [[] for _ in oranlar]
+    for v in obj.data.vertices:
+        c = mw @ v.co
+        if not filtre(c):
+            continue
+        en_yakin = None
+        son = len(cizgi) - 2
+        for i in range(len(cizgi) - 1):
+            a, b = cizgi[i], cizgi[i + 1]
+            ab = b - a
+            L2 = ab.length_squared
+            if L2 < 1e-12:
+                continue
+            ham = (c - a).dot(ab) / L2
+            u = min(1.0, max(0.0, ham))
+            d = (c - (a + ab * u)).length
+            # CIZGININ UCUNA SIKISMIS KOSELER SAYILMAZ.
+            #
+            # Cizgi bilekte kesiliyor ama filtre eli ve parmaklari hala
+            # iceriyor: onlarin en yakin noktasi her zaman SON nokta
+            # oluyor ve uzakligi bir el boyu. Ilk olcumde bilek yaricapi
+            # 31,8 cm cikti — kolun degil, elin uzunlugu. Ayni sey
+            # omuzun otesindeki govde icin bastan olur.
+            #
+            # Yalniz cizginin YANINDAKI koseler uzvun kalinligini
+            # anlatir; ucundan tasanlar baska bir uzvu anlatir.
+            if (i == 0 and ham <= 0.0) or (i == son and ham >= 1.0):
+                continue
+            if en_yakin is None or d < en_yakin[0]:
+                en_yakin = (d, (yay[i] + ab.length * u) / toplam)
+        if en_yakin is None:
+            continue
+        d, t = en_yakin
+        # UZAK KOSE BU UZVUN KOSESI DEGILDIR.
+        #
+        # Filtre `|x| >= kol_esik ve z >= z_kol_alt` diyor ve bu, kalcanin
+        # dis yuzunu de iceriye aliyor: bilek hizasi kalca hizasidir, yani
+        # o koseler cizginin SONUNA en yakin duser. Ucta 37 cm yaricap
+        # olctum — bir kolun degil, kolla kalca arasindaki bosluk. Bir
+        # ust sinir (boyun %9'u) o kalabaligi disarida birakir; hicbir
+        # insan kolunun yaricapi 15 cm degildir.
+        if en_cok is not None and d > en_cok:
+            continue
+        for k, o in enumerate(oranlar):
+            if abs(t - o) <= pencere:
+                kova[k].append(d)
+
+    cikti = []
+    for k in range(len(oranlar)):
+        vs = sorted(kova[k])
+        cikti.append(vs[min(len(vs) - 1, int(len(vs) * yuzde))] if vs else None)
+    return cikti
+
+
+def cizgi_kes(cizgi, t):
+    """Merkez çizgisini **yay uzunluğunun** `t` oranında keser."""
+    if not cizgi or len(cizgi) < 2 or t >= 0.999:
+        return list(cizgi)
+    yay = [0.0]
+    for a, b in zip(cizgi, cizgi[1:]):
+        yay.append(yay[-1] + (b - a).length)
+    hedef = yay[-1] * max(0.0, t)
+    cikti = []
+    for i in range(len(cizgi)):
+        if yay[i] <= hedef:
+            cikti.append(cizgi[i].copy())
+            continue
+        onceki = yay[i - 1]
+        aralik = yay[i] - onceki
+        u = 0.0 if aralik < 1e-9 else (hedef - onceki) / aralik
+        cikti.append(cizgi[i - 1].lerp(cizgi[i], u))
+        break
+    return cikti if len(cikti) >= 2 else list(cizgi[:2])
+
+
+def bilek_olc(obj, cizgi, filtre, en_cok, alt=0.45):
+    """Kolun **en ince** yeri — `(yay_orani, yaricap)`. Ölçülür, yazılmaz.
+
+    Kol çizgisi bilekte `z_parmak + boy * 0,105` ile kesiliyordu. O sabit
+    bir el boyu varsayıyor ve yanılıyordu: ölçülen "bilek yarıçapı"
+    13 cm çıktı, yani bileğin değil **elin** yarısı, ve entari kolu ele
+    kadar inen 26 cm çapında bir çan oldu.
+
+    Bilek bir sabit değil bir **biçim**dir: kol dirsekten aşağı incelir,
+    bilekte en dardır, elde yeniden genişler. En dar yeri aramak hem
+    çocukta hem yetişkinde doğru yeri bulur.
+    """
+    oranlar = [alt + (1.0 - alt) * i / 10.0 for i in range(11)]
+    profil = cizgi_yaricapi(obj, cizgi, filtre, oranlar=oranlar,
+                            yuzde=0.86, pencere=0.055, en_cok=en_cok)
+    gecerli = [(r, o) for r, o in zip(profil, oranlar) if r is not None]
+    if not gecerli:
+        return 1.0, None
+    # YARICAP DA BURADAN DONER, YENIDEN OLCULMEZ.
+    #
+    # Once yalniz oran donuyordu ve cagiran taraf yaricapi bir kez daha
+    # olcuyordu — kesilmis cizginin ucunda, yani ELIN yaninda. Yetiskinde
+    # 13,5 cm veriyordu (cocukta 3,2 cm, cunku onun eli cizgiye
+    # yetismiyordu) ve iki gövde ayni kodla iki farkli seyi olcuyordu.
+    # En ince yeri bulan tarama zaten oradaki yaricapi biliyor.
+    r, o = min(gecerli)
+    return o, r
+
+
 def etek(ad, col, z_ust, z_alt, r_ust, r_alt, kalinlik, segment=32,
          yarik=False, cy=0.0, cy_alt=None):
     """Belden aşağı **serbest** düşen etek — bacakları takip etmez.
@@ -346,11 +479,37 @@ def etek(ad, col, z_ust, z_alt, r_ust, r_alt, kalinlik, segment=32,
     on = int(round(n * 0.75))          # -y yonundeki dilim
     for i in range(n):
         j = (i + 1) % n
-        # Yarik TEK dilim: 32 segmentte ~11 derece. Ilk yazimda iki
-        # dilimdi ve etek iki ayri panel gibi acildi.
-        if yarik and i == on:
-            continue
         bm.faces.new((ust[i], ust[j], alt[j], alt[i]))
+
+    # YARIK BIR DELIK DEGIL, BIR BINDIRMEDIR.
+    #
+    # Once yarik "o dilimin yuzunu atla" diye yaziliyordu ve inceleme
+    # paketinde ne oldugu gorundu: entarinin onunde bacak boyu bir
+    # DELIK var, icinden kirmizi salvarin ic yuzu gorunuyor. Gercek
+    # entari onden acilir ama iki kenar BINER; arasindan govde
+    # gorunmez. Delik acmak "acik entari" degil "yirtik entari"ydi.
+    #
+    # Bindirme: on dilimin uzerine, disariya kaydirilmis dar bir kanat.
+    # Siluette dikey bir kumas kenari verir, delik acmaz.
+    if yarik:
+        pay = kalinlik * 2.6 + 0.004
+        kanat = []
+        for halka, zt in ((ust, 0.0), (alt, 1.0)):
+            sira = []
+            for d in (-1, 0, 1, 2):
+                k = halka[(on + d) % n]
+                v = k.co.copy()
+                cy_t = cy + (cy_a - cy) * zt
+                yon = Vector((v.x, v.y - cy_t, 0.0))
+                if yon.length > 1e-6:
+                    yon.normalize()
+                    v.x += yon.x * pay
+                    v.y += yon.y * pay
+                sira.append(bm.verts.new(v))
+            kanat.append(sira)
+        for i in range(len(kanat[0]) - 1):
+            bm.faces.new((kanat[0][i], kanat[0][i + 1],
+                          kanat[1][i + 1], kanat[1][i]))
     bm.normal_update()
 
     obj = hz.mesh_from_bmesh(ad, bm, col)
@@ -504,7 +663,7 @@ def band(ad, col, z, r, yukseklik, kalinlik, segment=20, fici=0.35, cy=0.0):
 
 
 def sarik(ad, col, z_taban, z_tepe, r, sarim=7, kalinlik=0.034,
-          segment=20):
+          segment=20, cy=0.0):
     """Sarık: kavuk çekirdeğinin üstüne sarılan bez.
 
     Kotlar **açıkça** verilir. İlk yazımda merkez + yarıçaptan türetiyordum
@@ -529,34 +688,56 @@ def sarik(ad, col, z_taban, z_tepe, r, sarim=7, kalinlik=0.034,
     dalgadan gelir; bez zaten sürekli bir şeydir.
     """
     bm = bmesh.new()
-    dilim = max(8, sarim * 4)
+    # DILIM SAYISI SARIM BASINA OLCULUR, TOPLAMA GORE DEGIL.
+    #
+    # Once `sarim * 4` yaziyordu: yedi sarim icin 28 dilim, yani her
+    # sinus donusune DORT ornek. Dort ornekle bir sinus cizilmez, bir
+    # zikzak cizilir — inceleme paketinde sarik dokuz ayri disk gibi
+    # okundu ve aralarindaki koyu cizgiler bosluk sanildi. Kusur
+    # geometride degil ORNEKLEMEDEYDI; on iki ornekle ayni dalga
+    # kumas gibi akiyor.
+    dilim = max(24, sarim * 12)
     yuk = z_tepe - z_taban
     halkalar = []
     for k in range(dilim + 1):
         t = k / float(dilim)
-        # Ana profil: ortada genis, iki ucta dar — sarik bir ficidir.
-        taban = 0.74 + 0.50 * math.sin(math.pi * min(1.0, t * 0.94 + 0.03))
+        # Ana profil: TABANDA BASTAN GENIS.
+        #
+        # Once taban orani 0,787 idi — yani sarigin en alt halkasi basin
+        # kendisinden %21 DARDI. Sonuc renderda gorundu: sarik kafanin
+        # tepesine tunemis bir yay gibi duruyor, altindan cipla kafa
+        # derisi cikiyordu. Sarik basa GECIRILIR; alni ortmesi
+        # gerekiyorsa taban yaricapi bastan buyuk olmali.
+        taban = (1.02 + 0.22 * math.sin(math.pi * (t ** 0.85)))             * (1.0 - 0.72 * (t ** 2.4))
         # Sarim dalgasi: gorunen yatay cizgiler.
-        dalga = 1.0 + 0.055 * math.sin(2.0 * math.pi * sarim * t)
-        rr = r * taban * dalga
+        dalga = 1.0 + 0.048 * math.sin(2.0 * math.pi * sarim * t)
+        rr = max(r * 0.06, r * taban * dalga)
         z = z_taban + yuk * t
+        # `cy` — BASIN KENDI MERKEZI, y=0 DEGIL.
+        #
+        # Etekte ve kusakta bir kez olculup duzeltilen kusurun ayni sinin
+        # basta duruyordu: govdenin yerel y ekseni ortasindan degil
+        # ONUNDEN geciyor, o yuzden y=0'a kurulan sarik kafanin on
+        # yarisina kayiyor. Renderda sarik gozleri ortuyor ve ensede
+        # ciplak kafa derisi kaliyordu; "sarik kucuk" sanilmisti, oysa
+        # sarik YANLIS YERDEYDI.
         halkalar.append([bm.verts.new(
             (math.cos(2 * math.pi * i / segment) * rr,
-             math.sin(2 * math.pi * i / segment) * rr * 0.92, z))
+             cy + math.sin(2 * math.pi * i / segment) * rr * 0.92, z))
             for i in range(segment)])
     for a, b in zip(halkalar, halkalar[1:]):
         for i in range(segment):
             j = (i + 1) % segment
             bm.faces.new((a[i], a[j], b[j], b[i]))
     # Tepe kapagi: acik kalirsa sarigin ici gorunur.
-    tepe = bm.verts.new((0.0, 0.0, z_tepe + yuk * 0.06))
+    tepe = bm.verts.new((0.0, cy, z_tepe + yuk * 0.06))
     ust = halkalar[-1]
     for i in range(segment):
         bm.faces.new((ust[i], ust[(i + 1) % segment], tepe))
     # Taban kapagi: kavugun icinde kalir ama ag KAPALI olmali —
     # acik kenar hem normalleri hem katilastirmayi bozar.
     alt = halkalar[0]
-    dip = bm.verts.new((0.0, 0.0, z_taban))
+    dip = bm.verts.new((0.0, cy, z_taban))
     for i in range(segment):
         bm.faces.new((alt[(i + 1) % segment], alt[i], dip))
     bm.normal_update()
@@ -662,7 +843,7 @@ def zemine_otur(obj, z=0.0):
 
 
 def giysi_kolu(ad, col, cizgi, r_omuz, r_dirsek, r_bilek, kalinlik,
-               segment=16):
+               segment=16, ic_olcek=0.70, ic_bolge=0.13):
     """
     Entari kolu — **gövdenin kopyası değil, kendi hacmi olan bir giysi**.
 
@@ -693,8 +874,22 @@ def giysi_kolu(ad, col, cizgi, r_omuz, r_dirsek, r_bilek, kalinlik,
     def yaricap(t):
         # Omuz -> dirsek -> bilek: parcali dogrusal.
         if t <= 0.5:
-            return r_omuz + (r_dirsek - r_omuz) * (t / 0.5)
-        return r_dirsek + (r_bilek - r_dirsek) * ((t - 0.5) / 0.5)
+            r = r_omuz + (r_dirsek - r_omuz) * (t / 0.5)
+        else:
+            r = r_dirsek + (r_bilek - r_dirsek) * ((t - 0.5) / 0.5)
+        # IC UC DARALIR — YOKSA OMUZDA TOP OLUR.
+        #
+        # Cizginin ilk noktasi govdenin ICINE uzatiliyor (dikisi
+        # gizlemek icin) ve o halka kolun yonune DIK duruyor; omuzda
+        # kol asagi-disari baktigi icin, tam yaricapli bir halka
+        # omuz cizgisinin USTUNE tasiyor. Inceleme paketinde her iki
+        # omuzda birer kure gorundu — kumas degil, egik bir disk.
+        # Kolun yalniz omzu daraltmak yetmedi (2,0 -> 1,7 -> 1,0 cm),
+        # cunku sorun yaricapin buyuklugu degil EGIKLIGIYDI: govdenin
+        # icinde kalan uc daralinca top kayboluyor, dikis hala gizli.
+        if t < ic_bolge:
+            r *= ic_olcek + (1.0 - ic_olcek) * (t / ic_bolge)
+        return r
 
     bm = bmesh.new()
     halkalar = []

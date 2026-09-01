@@ -40,9 +40,27 @@ namespace Hezarfen.Sehir
         public ZamanSistemi zaman;
 
         [Header("Görsel")]
-        [Tooltip("NPC gövdesi. Şimdilik karakter prefabı — gövde " +
-                 "varyantları ayrı tur (ADR 0068).")]
+        [Tooltip("NPC gövdesi — tek varyant. Yedek: govdePrefablar boşsa " +
+                 "kullanılır.")]
         public GameObject govdePrefab;
+
+        /// <summary>
+        /// <b>Sakin gövdeleri</b> — yedi arketip (yetişkin erkek, genç,
+        /// yaşlı, kadın, yaşlı kadın, oğlan, kız).
+        ///
+        /// Bir oyuncu şunu yazdı: *"sokaktaki herkes aynı sakallı adamın
+        /// kopyası; çocuklar minik sakallı adamlar, kadın hiç yok."*
+        /// Ölçüldü ve doğruydu — <see cref="InsanDNA"/> ölçek, ton ve
+        /// tempo çeşitlendiriyordu ama hepsi <b>tek bir gövdeye</b>
+        /// uygulanıyordu. Tonlamak ve ölçeklemek çeşitlilik değil
+        /// tekrardır: gözü ayıran şey renk değil <b>siluet</b>.
+        ///
+        /// Hangi gövdenin kime gideceğini <see cref="TurSec"/> seçer ve
+        /// seçim gövdenin kendi kimliğinden okunur
+        /// (<see cref="SakinGovde"/>), burada yazılı bir tablodan değil.
+        /// </summary>
+        [Tooltip("Sakin arketipleri. Boşsa govdePrefab kullanılır.")]
+        public GameObject[] govdePrefablar = new GameObject[0];
 
         [Tooltip("Kamerayı/oyuncuyu izler. Boşsa ana kamera aranır.")]
         public Transform oyuncu;
@@ -171,6 +189,16 @@ namespace Hezarfen.Sehir
         private Hezarfen.Zaman.ZamanSistemi _zaman;
 
         private readonly List<NPCAjan> _sakinler = new();
+        /// <summary>
+        /// Her arketip KENDI havuzunu tutar.
+        ///
+        /// Tek havuz kolaydı ve yanlıştı: havuzdan çıkan gövde bir
+        /// önceki sahibinin arketipiydi, yani bir kadın ajanı pekâlâ
+        /// oğlan gövdesi alabilirdi. Ölçek ve ton yeniden uygulandığı
+        /// için bu bir hata gibi görünmez — sokakta 1,58 m'ye
+        /// ölçeklenmiş çocuk gövdeleri gezerdi.
+        /// </summary>
+        private Stack<Transform>[] _havuzlar = new Stack<Transform>[0];
         private readonly Stack<Transform> _havuz = new();
         private int _dilimSayaci;
         private float _sonGuncelleme;
@@ -481,7 +509,7 @@ namespace Hezarfen.Sehir
             {
                 if (!a.gorunmeli) continue;
                 bool yeniGovde = a.govde == null;
-                if (yeniGovde) a.govde = GovdeAl();
+                if (yeniGovde) a.govde = GovdeAl(TurSec(InsanDNA.Uret(a.tohum)));
                 if (a.govde == null) continue;
                 // DNA GOVDE DEGISTIGINDE UYGULANIR.
                 //
@@ -565,17 +593,100 @@ namespace Hezarfen.Sehir
         /// dolaşımda binlerce tahsis ve düzenli çöp toplama duraksaması
         /// demekti — yani tam olarak kabul ölçütünün kaybedildiği yer.
         /// </summary>
-        private Transform GovdeAl()
+        /// <summary>Kullanılabilir arketip sayısı (yedeğiyle birlikte).</summary>
+        private int TurSayisi =>
+            govdePrefablar != null && govdePrefablar.Length > 0
+                ? govdePrefablar.Length : 1;
+
+        private GameObject TurPrefab(int tur)
         {
-            if (_havuz.Count > 0)
+            if (govdePrefablar == null || govdePrefablar.Length == 0)
+                return govdePrefab;
+            if (tur < 0 || tur >= govdePrefablar.Length) tur = 0;
+            return govdePrefablar[tur] != null ? govdePrefablar[tur]
+                                               : govdePrefab;
+        }
+
+        private Stack<Transform> Havuz(int tur)
+        {
+            int n = TurSayisi;
+            if (_havuzlar.Length != n)
             {
-                var t = _havuz.Pop();
+                var yeni = new Stack<Transform>[n];
+                for (int i = 0; i < n; i++)
+                    yeni[i] = i < _havuzlar.Length && _havuzlar[i] != null
+                        ? _havuzlar[i] : new Stack<Transform>();
+                _havuzlar = yeni;
+            }
+            if (tur < 0 || tur >= n) tur = 0;
+            return _havuzlar[tur];
+        }
+
+        /// <summary>
+        /// Bu insana hangi gövde gider — <b>cinsiyet ve yaş bandına</b> göre.
+        ///
+        /// Eşleşme prefabın kendi kimliğinden okunur
+        /// (<see cref="SakinGovde"/>), burada yazılı bir sıralamadan
+        /// değil: dizideki sıra değişirse ya da bir arketip eklenirse
+        /// bu işlev kendini düzeltir. Sabit bir indeks tablosu yazsaydım,
+        /// prefab dizisini Inspector'da sürüklemek sessizce kadınları
+        /// çocuk yapardı.
+        ///
+        /// Cinsiyet, yaştan <b>ağır basar</b> (4'e 1): bir kadını yaşlı
+        /// erkek gövdesiyle göstermek, orta yaşlı kadını yaşlı kadın
+        /// gövdesiyle göstermekten çok daha yanlış görünür.
+        /// </summary>
+        private int TurSec(InsanDNA dna) => ArketipSec(govdePrefablar, dna);
+
+        /// <summary>
+        /// Seçimin kendisi — <b>statik</b>, çünkü ölçülebilir olmalı.
+        ///
+        /// Örnek bir işlev olarak yazsaydım kalabalığın dağılımını ancak
+        /// oyunu oynayıp bakarak denetleyebilirdim; bu depoda "bakarak
+        /// denetlemek" birkaç kez yanlış sonuç verdi. Statik hâliyle bir
+        /// EditMode testi bin tohum üretip *sokakta kaç kadın, kaç çocuk
+        /// var* diye SAYABILIYOR.
+        /// </summary>
+        public static int ArketipSec(GameObject[] govdePrefablar,
+                                     InsanDNA dna)
+        {
+            if (govdePrefablar == null || govdePrefablar.Length == 0) return 0;
+            int enIyi = 0;
+            float enIyiCeza = float.MaxValue;
+            for (int i = 0; i < govdePrefablar.Length; i++)
+            {
+                var p = govdePrefablar[i];
+                if (p == null) continue;
+                var sg = p.GetComponent<SakinGovde>();
+                // Kimliksiz prefab en sona: hicbir sey bilmiyoruz, ama
+                // hicbir govde olmamasindan iyidir.
+                if (sg == null)
+                {
+                    if (enIyiCeza == float.MaxValue) enIyi = i;
+                    continue;
+                }
+                float ceza = (sg.Kadin == dna.kadin ? 0f : 4f)
+                           + Mathf.Abs(sg.BandDizini - dna.Band);
+                if (ceza < enIyiCeza) { enIyiCeza = ceza; enIyi = i; }
+            }
+            return enIyi;
+        }
+
+        private Transform GovdeAl(int tur)
+        {
+            var havuz = Havuz(tur);
+            if (havuz != null && havuz.Count > 0)
+            {
+                var t = havuz.Pop();
                 t.gameObject.SetActive(true);
                 return t;
             }
-            if (govdePrefab == null) return null;
-            var go = Instantiate(govdePrefab, transform);
+            var kaynak = TurPrefab(tur);
+            if (kaynak == null) return null;
+            var go = Instantiate(kaynak, transform);
             UretilenGovde++;
+            var etiket = go.GetComponent<SakinGovde>();
+            if (etiket != null) etiket.havuzDizini = tur;
 
             // GOVDEYE DOKUNULABILMELI.
             //
@@ -585,11 +696,18 @@ namespace Hezarfen.Sehir
             // Tetikleyici, cunku gövde oyuncunun yolunu KESMEMELI —
             // kalabalik bir carsida her insan bir duvar olsaydi
             // yurunmezdi.
+            // KAPSUL GOVDENIN BOYUNDAN — 1,7 SABITINDEN DEGIL.
+            //
+            // Yedi arketip gelince sabit yalan soylemeye basladi:
+            // 1,24 m'lik oglanin dokunma kapsulu basinin 46 cm ustune
+            // cikiyor ve oyuncu cocugun yaninda BOSLUGA dokununca
+            // konusma acilıyordu.
+            float kapBoy = etiket != null ? etiket.tabanBoy : 1.7f;
             var kap = go.AddComponent<CapsuleCollider>();
             kap.isTrigger = true;
-            kap.height = 1.7f;
-            kap.radius = 0.35f;
-            kap.center = new Vector3(0f, 0.85f, 0f);
+            kap.height = kapBoy;
+            kap.radius = kapBoy * 0.206f;
+            kap.center = new Vector3(0f, kapBoy * 0.5f, 0f);
             go.AddComponent<Sakin>();
 
             return go.transform;
@@ -608,7 +726,26 @@ namespace Hezarfen.Sehir
         private void DNAUygula(NPCAjan a)
         {
             var dna = InsanDNA.Uret(a.tohum);
-            a.govde.localScale = Vector3.one * dna.olcek;
+            // OLCEK GOVDENIN KENDI TABANINA GORE.
+            //
+            // Once `dna.olcek` dogrudan uygulaniyordu ve o, hedef boyun
+            // 1,70'e bolunmus haliydi. Tek govde varken dogruydu; yedi
+            // arketiple yanlis oldu: 1,24 m'lik oglan govdesine 1,58/1,70
+            // carpani uygulamak 1,15 m'lik bir cocuk degil, YANLIS
+            // olcekli bir cocuk yapar — cunku hedef boy zaten bir
+            // YETISKIN kadinin boyuydu ve o ajan cocuk govdesi almadi
+            // demektir.
+            //
+            // Dogrusu: gövde arketipi zaten dogru bandda secildi
+            // (`TurSec`), o yuzden burada yalniz o arketipin ICINDEKI
+            // fark uygulanir. Sinir +-%12: birey farki bu kadardir,
+            // daha fazlasi arketip degistirmek demektir ve onu `TurSec`
+            // yapar.
+            var sg = a.govde.GetComponent<SakinGovde>();
+            float olcek = dna.olcek;
+            if (sg != null && sg.tabanBoy > 0.1f)
+                olcek = Mathf.Clamp(dna.boy / sg.tabanBoy, 0.88f, 1.12f);
+            a.govde.localScale = Vector3.one * olcek;
             a.yurumeHizi = dna.hiz;
 
             if (_tonBlok == null) _tonBlok = new MaterialPropertyBlock();
@@ -726,7 +863,9 @@ namespace Hezarfen.Sehir
             if (sk != null) sk.ajan = null;
 
             t.gameObject.SetActive(false);
-            _havuz.Push(t);
+            var etiket = t.GetComponent<SakinGovde>();
+            var havuz = Havuz(etiket != null ? etiket.havuzDizini : 0);
+            (havuz ?? _havuz).Push(t);
         }
     }
 

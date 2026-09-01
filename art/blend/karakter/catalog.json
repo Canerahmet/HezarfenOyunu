@@ -34,8 +34,8 @@
    "tris_lod1": 9364,
    "uv_var": true,
    "boy": 1.7,
-   "bas_boy": 0.2209,
-   "bas_orani": 7.69,
+   "bas_boy": 0.204,
+   "bas_orani": 8.33,
    "en_genis": 1.0957,
    "derinlik": 0.4556,
    "boyun_genisligi": 0.1099,
@@ -56,10 +56,14 @@
    "kiyafet_tier": "T2",
    "source": "KIYAFET: Ralamb kiyafet albumunden (1657-58, kamu mali, refs/ralamb/) OKUNAN dilbilgisi. Minyatur kopyalanmadi; okunan sey oranlardir — entarinin boyu isi soyler (oturan ayak bilegine, calisan baldira), kusak dogal belde ve dar, salvar entarinin altindan GORUNUR, kol agzi astari ters cevrilir, dizlik gercek bir ogedir (plaka 50), baslik rutbe gostergesidir ve Hezarfen ne pasa ne asker. UYARI: album 1657-58, oyun 1632 — YIRMI BES YIL fark. Ana hatlar (salvar-gomlek-entari-kusak-sarik) bu aralikta degismedi ama ayrinti degisebilir. Peter Mundy (1618) obur yandan yaklasiyor; 1632'nin TAM ORTASINDA BIR KAYNAK YOK ve bu bosluk kapatilamaz, ancak soylenebilir.",
    "why": "yerdeki Hezarfen — uzun entari, oturan adamin boyu",
-   "boy": 1.799,
+   "boy": 1.7776,
    "en_genis": 1.0957,
    "derinlik": 0.5829,
-   "etek_kotu": 0.093,
+   "etek_kotu": 0.094,
+   "tip": "erkek",
+   "taban_boy": 1.7,
+   "cinsiyet": "erkek",
+   "yas_bandi": "yetiskin",
    "dizlik": false,
    "giysi_parca": 26,
    "giysi_adlari": [
@@ -90,10 +94,10 @@
     "Salvar",
     "Sarik"
    ],
-   "tris_lod0": 53920,
-   "tris_lod1": 16174,
+   "tris_lod0": 58432,
+   "tris_lod1": 17526,
    "agirliksiz_kose": 0,
-   "kose_lod0": 27000,
+   "kose_lod0": 29256,
    "kemik": 38,
    "kemikler": [
     {
@@ -399,7 +403,7 @@
     {
      "ad": "Etek_0_0.001",
      "bas": [
-      0.3508,
+      0.3507,
       0.0,
       1.02
      ],
@@ -409,7 +413,7 @@
     {
      "ad": "Etek_0_1.001",
      "bas": [
-      0.3508,
+      0.3507,
       0.0,
       0.5567
      ],
@@ -420,17 +424,17 @@
      "ad": "Etek_1_0.001",
      "bas": [
       0.0,
-      0.3508,
+      0.3507,
       1.02
      ],
-     "uzunluk": 0.4633,
+     "uzunluk": 0.4632,
      "kot_orani": 0.6
     },
     {
      "ad": "Etek_1_1.001",
      "bas": [
       0.0,
-      0.3508,
+      0.3507,
       0.5567
      ],
      "uzunluk": 0.4632,
@@ -439,7 +443,7 @@
     {
      "ad": "Etek_2_0.001",
      "bas": [
-      -0.3508,
+      -0.3507,
       0.0,
       1.02
      ],
@@ -449,7 +453,7 @@
     {
      "ad": "Etek_2_1.001",
      "bas": [
-      -0.3508,
+      -0.3507,
       0.0,
       0.5567
      ],
@@ -460,7 +464,7 @@
      "ad": "Etek_3_0.001",
      "bas": [
       -0.0,
-      -0.3508,
+      -0.3507,
       1.02
      ],
      "uzunluk": 0.4632,
@@ -470,7 +474,7 @@
      "ad": "Etek_3_1.001",
      "bas": [
       -0.0,
-      -0.3508,
+      -0.3507,
       0.5567
      ],
      "uzunluk": 0.4632,
@@ -490,10 +494,14 @@
    "kiyafet_tier": "T2",
    "source": "KIYAFET: Ralamb kiyafet albumunden (1657-58, kamu mali, refs/ralamb/) OKUNAN dilbilgisi. Minyatur kopyalanmadi; okunan sey oranlardir — entarinin boyu isi soyler (oturan ayak bilegine, calisan baldira), kusak dogal belde ve dar, salvar entarinin altindan GORUNUR, kol agzi astari ters cevrilir, dizlik gercek bir ogedir (plaka 50), baslik rutbe gostergesidir ve Hezarfen ne pasa ne asker. UYARI: album 1657-58, oyun 1632 — YIRMI BES YIL fark. Ana hatlar (salvar-gomlek-entari-kusak-sarik) bu aralikta degismedi ama ayrinti degisebilir. Peter Mundy (1618) obur yandan yaklasiyor; 1632'nin TAM ORTASINDA BIR KAYNAK YOK ve bu bosluk kapatilamaz, ancak soylenebilir.",
    "why": "kuleye cikan ve ucan Hezarfen — kisa entari + dizlik",
-   "boy": 1.799,
+   "boy": 1.7776,
    "en_genis": 1.0957,
    "derinlik": 0.5941,
-   "etek_kotu": 0.535,
+   "etek_kotu": 0.536,
+   "tip": "erkek",
+   "taban_boy": 1.7,
+   "cinsiyet": "erkek",
+   "yas_bandi": "yetiskin",
    "dizlik": true,
    "giysi_parca": 28,
    "giysi_adlari": [
@@ -526,10 +534,10 @@
     "Salvar",
     "Sarik"
    ],
-   "tris_lod0": 54400,
-   "tris_lod1": 16318,
+   "tris_lod0": 58912,
+   "tris_lod1": 17670,
    "agirliksiz_kose": 0,
-   "kose_lod0": 27240,
+   "kose_lod0": 29496,
    "kemik": 38,
    "kemikler": [
     {
@@ -835,7 +843,7 @@
     {
      "ad": "Etek_0_0.001",
      "bas": [
-      0.3508,
+      0.3507,
       0.0,
       1.02
      ],
@@ -845,7 +853,7 @@
     {
      "ad": "Etek_0_1.001",
      "bas": [
-      0.3508,
+      0.3507,
       0.0,
       0.7778
      ],
@@ -856,7 +864,7 @@
      "ad": "Etek_1_0.001",
      "bas": [
       0.0,
-      0.3508,
+      0.3507,
       1.02
      ],
      "uzunluk": 0.2422,
@@ -866,7 +874,7 @@
      "ad": "Etek_1_1.001",
      "bas": [
       0.0,
-      0.3508,
+      0.3507,
       0.7778
      ],
      "uzunluk": 0.2423,
@@ -875,7 +883,7 @@
     {
      "ad": "Etek_2_0.001",
      "bas": [
-      -0.3508,
+      -0.3507,
       0.0,
       1.02
      ],
@@ -885,7 +893,7 @@
     {
      "ad": "Etek_2_1.001",
      "bas": [
-      -0.3508,
+      -0.3507,
       0.0,
       0.7778
      ],
@@ -896,7 +904,7 @@
      "ad": "Etek_3_0.001",
      "bas": [
       -0.0,
-      -0.3508,
+      -0.3507,
       1.02
      ],
      "uzunluk": 0.2422,
@@ -906,11 +914,3009 @@
      "ad": "Etek_3_1.001",
      "bas": [
       -0.0,
-      -0.3508,
+      -0.3507,
       0.7778
      ],
      "uzunluk": 0.2423,
      "kot_orani": 0.4575
+    }
+   ]
+  },
+  {
+   "name": "Sakin_Erkek",
+   "prefab": null,
+   "prefab_notu": "Ara urun: rig tamamlanmadan prefab uretilmez.",
+   "kind": "karakter",
+   "state": "dressed",
+   "status": "draft",
+   "accuracy": "D3",
+   "tier": "T3",
+   "kiyafet_tier": "T2",
+   "source": "KIYAFET: Ralamb kiyafet albumunden (1657-58, kamu mali, refs/ralamb/) OKUNAN dilbilgisi. Minyatur kopyalanmadi; okunan sey oranlardir — entarinin boyu isi soyler (oturan ayak bilegine, calisan baldira), kusak dogal belde ve dar, salvar entarinin altindan GORUNUR, kol agzi astari ters cevrilir, dizlik gercek bir ogedir (plaka 50), baslik rutbe gostergesidir ve Hezarfen ne pasa ne asker. UYARI: album 1657-58, oyun 1632 — YIRMI BES YIL fark. Ana hatlar (salvar-gomlek-entari-kusak-sarik) bu aralikta degismedi ama ayrinti degisebilir. Peter Mundy (1618) obur yandan yaklasiyor; 1632'nin TAM ORTASINDA BIR KAYNAK YOK ve bu bosluk kapatilamaz, ancak soylenebilir.",
+   "why": "yetiskin erkek — entari, kusak, sarik, sakal",
+   "boy": 1.7776,
+   "en_genis": 1.1042,
+   "derinlik": 0.5906,
+   "etek_kotu": 0.094,
+   "tip": "erkek",
+   "taban_boy": 1.7,
+   "cinsiyet": "erkek",
+   "yas_bandi": "yetiskin",
+   "dizlik": false,
+   "giysi_parca": 26,
+   "giysi_adlari": [
+    "Biyik_-1",
+    "Biyik_1",
+    "Entari_Etek",
+    "Entari_Kol_Sag",
+    "Entari_Kol_Sol",
+    "Entari_Ust",
+    "Gomlek",
+    "Kavuk",
+    "Kusak",
+    "Mest_-1",
+    "Mest_1",
+    "Sac_-1_0",
+    "Sac_-1_1",
+    "Sac_-1_2",
+    "Sac_1_0",
+    "Sac_1_1",
+    "Sac_1_2",
+    "Sakal",
+    "SakalUc_-1_0",
+    "SakalUc_-1_1",
+    "SakalUc_-1_2",
+    "SakalUc_-1_3",
+    "SakalUc_1_2",
+    "SakalUc_1_3",
+    "Salvar",
+    "Sarik"
+   ],
+   "tris_lod0": 58556,
+   "tris_lod1": 17562,
+   "agirliksiz_kose": 0,
+   "kose_lod0": 29314,
+   "kemik": 38,
+   "kemikler": [
+    {
+     "ad": "Hips",
+     "bas": [
+      0.0,
+      0.1143,
+      0.902
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.5306
+    },
+    {
+     "ad": "Spine",
+     "bas": [
+      0.0,
+      0.0934,
+      1.0229
+     ],
+     "uzunluk": 0.1407,
+     "kot_orani": 0.6017
+    },
+    {
+     "ad": "Chest",
+     "bas": [
+      0.0,
+      0.11,
+      1.1626
+     ],
+     "uzunluk": 0.1305,
+     "kot_orani": 0.6839
+    },
+    {
+     "ad": "UpperChest",
+     "bas": [
+      0.0,
+      0.102,
+      1.2929
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.7605
+    },
+    {
+     "ad": "Neck",
+     "bas": [
+      0.0,
+      0.106,
+      1.4246
+     ],
+     "uzunluk": 0.068,
+     "kot_orani": 0.838
+    },
+    {
+     "ad": "Head",
+     "bas": [
+      0.0,
+      0.106,
+      1.4926
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.878
+    },
+    {
+     "ad": "LeftShoulder",
+     "bas": [
+      -0.0653,
+      0.0,
+      1.3974
+     ],
+     "uzunluk": 0.1421,
+     "kot_orani": 0.822
+    },
+    {
+     "ad": "LeftUpperArm",
+     "bas": [
+      -0.2059,
+      0.0,
+      1.377
+     ],
+     "uzunluk": 0.2822,
+     "kot_orani": 0.81
+    },
+    {
+     "ad": "LeftLowerArm",
+     "bas": [
+      -0.3541,
+      0.0882,
+      1.1537
+     ],
+     "uzunluk": 0.2865,
+     "kot_orani": 0.6786
+    },
+    {
+     "ad": "LeftHand",
+     "bas": [
+      -0.4695,
+      -0.1364,
+      1.0183
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.599
+    },
+    {
+     "ad": "RightShoulder",
+     "bas": [
+      0.0653,
+      0.0,
+      1.3974
+     ],
+     "uzunluk": 0.1421,
+     "kot_orani": 0.822
+    },
+    {
+     "ad": "RightUpperArm",
+     "bas": [
+      0.2059,
+      0.0,
+      1.377
+     ],
+     "uzunluk": 0.2822,
+     "kot_orani": 0.81
+    },
+    {
+     "ad": "RightLowerArm",
+     "bas": [
+      0.3541,
+      0.0882,
+      1.1537
+     ],
+     "uzunluk": 0.2865,
+     "kot_orani": 0.6786
+    },
+    {
+     "ad": "RightHand",
+     "bas": [
+      0.4695,
+      -0.1364,
+      1.0183
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.599
+    },
+    {
+     "ad": "LeftUpperLeg",
+     "bas": [
+      -0.0945,
+      0.1183,
+      0.884
+     ],
+     "uzunluk": 0.3993,
+     "kot_orani": 0.52
+    },
+    {
+     "ad": "LeftLowerLeg",
+     "bas": [
+      -0.1565,
+      0.1175,
+      0.4895
+     ],
+     "uzunluk": 0.4279,
+     "kot_orani": 0.288
+    },
+    {
+     "ad": "LeftFoot",
+     "bas": [
+      -0.1953,
+      0.0883,
+      0.0644
+     ],
+     "uzunluk": 0.1175,
+     "kot_orani": 0.0379
+    },
+    {
+     "ad": "LeftToes",
+     "bas": [
+      -0.1953,
+      -0.0207,
+      0.0204
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.012
+    },
+    {
+     "ad": "RightUpperLeg",
+     "bas": [
+      0.0945,
+      0.1183,
+      0.884
+     ],
+     "uzunluk": 0.3993,
+     "kot_orani": 0.52
+    },
+    {
+     "ad": "RightLowerLeg",
+     "bas": [
+      0.1565,
+      0.1175,
+      0.4895
+     ],
+     "uzunluk": 0.4279,
+     "kot_orani": 0.288
+    },
+    {
+     "ad": "RightFoot",
+     "bas": [
+      0.1953,
+      0.0883,
+      0.0644
+     ],
+     "uzunluk": 0.1175,
+     "kot_orani": 0.0379
+    },
+    {
+     "ad": "RightToes",
+     "bas": [
+      0.1953,
+      -0.0207,
+      0.0204
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.012
+    },
+    {
+     "ad": "Etek_0_0",
+     "bas": [
+      0.3533,
+      0.0,
+      1.02
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.6
+    },
+    {
+     "ad": "Etek_0_1",
+     "bas": [
+      0.3533,
+      0.0,
+      0.5567
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.3275
+    },
+    {
+     "ad": "Etek_1_0",
+     "bas": [
+      0.0,
+      0.3533,
+      1.02
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.6
+    },
+    {
+     "ad": "Etek_1_1",
+     "bas": [
+      0.0,
+      0.3533,
+      0.5567
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.3275
+    },
+    {
+     "ad": "Etek_2_0",
+     "bas": [
+      -0.3533,
+      0.0,
+      1.02
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.6
+    },
+    {
+     "ad": "Etek_2_1",
+     "bas": [
+      -0.3533,
+      0.0,
+      0.5567
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.3275
+    },
+    {
+     "ad": "Etek_3_0",
+     "bas": [
+      -0.0,
+      -0.3533,
+      1.02
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.6
+    },
+    {
+     "ad": "Etek_3_1",
+     "bas": [
+      -0.0,
+      -0.3533,
+      0.5567
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.3275
+    },
+    {
+     "ad": "Etek_0_0.001",
+     "bas": [
+      0.3534,
+      0.0,
+      1.02
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.6
+    },
+    {
+     "ad": "Etek_0_1.001",
+     "bas": [
+      0.3534,
+      0.0,
+      0.5567
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.3275
+    },
+    {
+     "ad": "Etek_1_0.001",
+     "bas": [
+      0.0,
+      0.3534,
+      1.02
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.6
+    },
+    {
+     "ad": "Etek_1_1.001",
+     "bas": [
+      0.0,
+      0.3534,
+      0.5567
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.3275
+    },
+    {
+     "ad": "Etek_2_0.001",
+     "bas": [
+      -0.3534,
+      0.0,
+      1.02
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.6
+    },
+    {
+     "ad": "Etek_2_1.001",
+     "bas": [
+      -0.3534,
+      0.0,
+      0.5567
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.3275
+    },
+    {
+     "ad": "Etek_3_0.001",
+     "bas": [
+      -0.0,
+      -0.3534,
+      1.02
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.6
+    },
+    {
+     "ad": "Etek_3_1.001",
+     "bas": [
+      -0.0,
+      -0.3534,
+      0.5567
+     ],
+     "uzunluk": 0.4632,
+     "kot_orani": 0.3275
+    }
+   ]
+  },
+  {
+   "name": "Sakin_Erkek_Genc",
+   "prefab": null,
+   "prefab_notu": "Ara urun: rig tamamlanmadan prefab uretilmez.",
+   "kind": "karakter",
+   "state": "dressed",
+   "status": "draft",
+   "accuracy": "D3",
+   "tier": "T3",
+   "kiyafet_tier": "T2",
+   "source": "KIYAFET: Ralamb kiyafet albumunden (1657-58, kamu mali, refs/ralamb/) OKUNAN dilbilgisi. Minyatur kopyalanmadi; okunan sey oranlardir — entarinin boyu isi soyler (oturan ayak bilegine, calisan baldira), kusak dogal belde ve dar, salvar entarinin altindan GORUNUR, kol agzi astari ters cevrilir, dizlik gercek bir ogedir (plaka 50), baslik rutbe gostergesidir ve Hezarfen ne pasa ne asker. UYARI: album 1657-58, oyun 1632 — YIRMI BES YIL fark. Ana hatlar (salvar-gomlek-entari-kusak-sarik) bu aralikta degismedi ama ayrinti degisebilir. Peter Mundy (1618) obur yandan yaklasiyor; 1632'nin TAM ORTASINDA BIR KAYNAK YOK ve bu bosluk kapatilamaz, ancak soylenebilir.",
+   "why": "genc erkek — kisa entari, takke, sakalsiz",
+   "boy": 1.7283,
+   "en_genis": 1.0605,
+   "derinlik": 0.5597,
+   "etek_kotu": 0.529,
+   "tip": "genc",
+   "taban_boy": 1.68,
+   "cinsiyet": "erkek",
+   "yas_bandi": "genc",
+   "dizlik": false,
+   "giysi_parca": 16,
+   "giysi_adlari": [
+    "Entari_Etek",
+    "Entari_Kol_Sag",
+    "Entari_Kol_Sol",
+    "Entari_Ust",
+    "Gomlek",
+    "Kusak",
+    "Mest_-1",
+    "Mest_1",
+    "Sac_-1_0",
+    "Sac_-1_1",
+    "Sac_-1_2",
+    "Sac_1_0",
+    "Sac_1_1",
+    "Sac_1_2",
+    "Salvar",
+    "Takke"
+   ],
+   "tris_lod0": 48060,
+   "tris_lod1": 14418,
+   "agirliksiz_kose": 0,
+   "kose_lod0": 24042,
+   "kemik": 38,
+   "kemikler": [
+    {
+     "ad": "Hips",
+     "bas": [
+      0.0,
+      0.0979,
+      0.8892
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.5231
+    },
+    {
+     "ad": "Spine",
+     "bas": [
+      0.0,
+      0.0838,
+      1.0075
+     ],
+     "uzunluk": 0.1445,
+     "kot_orani": 0.5926
+    },
+    {
+     "ad": "Chest",
+     "bas": [
+      0.0,
+      0.0991,
+      1.1512
+     ],
+     "uzunluk": 0.129,
+     "kot_orani": 0.6772
+    },
+    {
+     "ad": "UpperChest",
+     "bas": [
+      0.0,
+      0.0997,
+      1.2802
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.753
+    },
+    {
+     "ad": "Neck",
+     "bas": [
+      0.0,
+      0.0956,
+      1.4078
+     ],
+     "uzunluk": 0.0672,
+     "kot_orani": 0.8281
+    },
+    {
+     "ad": "Head",
+     "bas": [
+      0.0,
+      0.0956,
+      1.475
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.8677
+    },
+    {
+     "ad": "LeftShoulder",
+     "bas": [
+      -0.0617,
+      0.0,
+      1.381
+     ],
+     "uzunluk": 0.1344,
+     "kot_orani": 0.8123
+    },
+    {
+     "ad": "LeftUpperArm",
+     "bas": [
+      -0.1946,
+      0.0,
+      1.3608
+     ],
+     "uzunluk": 0.279,
+     "kot_orani": 0.8005
+    },
+    {
+     "ad": "LeftLowerArm",
+     "bas": [
+      -0.3299,
+      0.092,
+      1.1348
+     ],
+     "uzunluk": 0.2815,
+     "kot_orani": 0.6675
+    },
+    {
+     "ad": "LeftHand",
+     "bas": [
+      -0.4564,
+      -0.1192,
+      0.9983
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.5872
+    },
+    {
+     "ad": "RightShoulder",
+     "bas": [
+      0.0617,
+      0.0,
+      1.381
+     ],
+     "uzunluk": 0.1344,
+     "kot_orani": 0.8123
+    },
+    {
+     "ad": "RightUpperArm",
+     "bas": [
+      0.1946,
+      0.0,
+      1.3608
+     ],
+     "uzunluk": 0.279,
+     "kot_orani": 0.8005
+    },
+    {
+     "ad": "RightLowerArm",
+     "bas": [
+      0.3299,
+      0.092,
+      1.1348
+     ],
+     "uzunluk": 0.2815,
+     "kot_orani": 0.6675
+    },
+    {
+     "ad": "RightHand",
+     "bas": [
+      0.4564,
+      -0.1192,
+      0.9983
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.5872
+    },
+    {
+     "ad": "LeftUpperLeg",
+     "bas": [
+      -0.081,
+      0.1134,
+      0.8745
+     ],
+     "uzunluk": 0.4234,
+     "kot_orani": 0.5144
+    },
+    {
+     "ad": "LeftLowerLeg",
+     "bas": [
+      -0.159,
+      0.0971,
+      0.4587
+     ],
+     "uzunluk": 0.3975,
+     "kot_orani": 0.2698
+    },
+    {
+     "ad": "LeftFoot",
+     "bas": [
+      -0.1967,
+      0.0803,
+      0.0634
+     ],
+     "uzunluk": 0.1135,
+     "kot_orani": 0.0373
+    },
+    {
+     "ad": "LeftToes",
+     "bas": [
+      -0.1967,
+      -0.0247,
+      0.0202
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.0119
+    },
+    {
+     "ad": "RightUpperLeg",
+     "bas": [
+      0.081,
+      0.1134,
+      0.8745
+     ],
+     "uzunluk": 0.4234,
+     "kot_orani": 0.5144
+    },
+    {
+     "ad": "RightLowerLeg",
+     "bas": [
+      0.159,
+      0.0971,
+      0.4587
+     ],
+     "uzunluk": 0.3975,
+     "kot_orani": 0.2698
+    },
+    {
+     "ad": "RightFoot",
+     "bas": [
+      0.1967,
+      0.0803,
+      0.0634
+     ],
+     "uzunluk": 0.1135,
+     "kot_orani": 0.0373
+    },
+    {
+     "ad": "RightToes",
+     "bas": [
+      0.1967,
+      -0.0247,
+      0.0202
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.0119
+    },
+    {
+     "ad": "Etek_0_0",
+     "bas": [
+      0.3394,
+      0.0,
+      1.008
+     ],
+     "uzunluk": 0.2394,
+     "kot_orani": 0.5929
+    },
+    {
+     "ad": "Etek_0_1",
+     "bas": [
+      0.3394,
+      0.0,
+      0.7686
+     ],
+     "uzunluk": 0.2394,
+     "kot_orani": 0.4521
+    },
+    {
+     "ad": "Etek_1_0",
+     "bas": [
+      0.0,
+      0.3394,
+      1.008
+     ],
+     "uzunluk": 0.2394,
+     "kot_orani": 0.5929
+    },
+    {
+     "ad": "Etek_1_1",
+     "bas": [
+      0.0,
+      0.3394,
+      0.7686
+     ],
+     "uzunluk": 0.2394,
+     "kot_orani": 0.4521
+    },
+    {
+     "ad": "Etek_2_0",
+     "bas": [
+      -0.3394,
+      0.0,
+      1.008
+     ],
+     "uzunluk": 0.2394,
+     "kot_orani": 0.5929
+    },
+    {
+     "ad": "Etek_2_1",
+     "bas": [
+      -0.3394,
+      0.0,
+      0.7686
+     ],
+     "uzunluk": 0.2394,
+     "kot_orani": 0.4521
+    },
+    {
+     "ad": "Etek_3_0",
+     "bas": [
+      -0.0,
+      -0.3394,
+      1.008
+     ],
+     "uzunluk": 0.2394,
+     "kot_orani": 0.5929
+    },
+    {
+     "ad": "Etek_3_1",
+     "bas": [
+      -0.0,
+      -0.3394,
+      0.7686
+     ],
+     "uzunluk": 0.2394,
+     "kot_orani": 0.4521
+    },
+    {
+     "ad": "Etek_0_0.001",
+     "bas": [
+      0.3395,
+      0.0,
+      1.008
+     ],
+     "uzunluk": 0.2394,
+     "kot_orani": 0.5929
+    },
+    {
+     "ad": "Etek_0_1.001",
+     "bas": [
+      0.3395,
+      0.0,
+      0.7686
+     ],
+     "uzunluk": 0.2394,
+     "kot_orani": 0.4521
+    },
+    {
+     "ad": "Etek_1_0.001",
+     "bas": [
+      0.0,
+      0.3395,
+      1.008
+     ],
+     "uzunluk": 0.2394,
+     "kot_orani": 0.5929
+    },
+    {
+     "ad": "Etek_1_1.001",
+     "bas": [
+      0.0,
+      0.3395,
+      0.7686
+     ],
+     "uzunluk": 0.2394,
+     "kot_orani": 0.4521
+    },
+    {
+     "ad": "Etek_2_0.001",
+     "bas": [
+      -0.3395,
+      0.0,
+      1.008
+     ],
+     "uzunluk": 0.2394,
+     "kot_orani": 0.5929
+    },
+    {
+     "ad": "Etek_2_1.001",
+     "bas": [
+      -0.3395,
+      0.0,
+      0.7686
+     ],
+     "uzunluk": 0.2394,
+     "kot_orani": 0.4521
+    },
+    {
+     "ad": "Etek_3_0.001",
+     "bas": [
+      -0.0,
+      -0.3395,
+      1.008
+     ],
+     "uzunluk": 0.2394,
+     "kot_orani": 0.5929
+    },
+    {
+     "ad": "Etek_3_1.001",
+     "bas": [
+      -0.0,
+      -0.3395,
+      0.7686
+     ],
+     "uzunluk": 0.2394,
+     "kot_orani": 0.4521
+    }
+   ]
+  },
+  {
+   "name": "Sakin_Erkek_Yasli",
+   "prefab": null,
+   "prefab_notu": "Ara urun: rig tamamlanmadan prefab uretilmez.",
+   "kind": "karakter",
+   "state": "dressed",
+   "status": "draft",
+   "accuracy": "D3",
+   "tier": "T3",
+   "kiyafet_tier": "T2",
+   "source": "KIYAFET: Ralamb kiyafet albumunden (1657-58, kamu mali, refs/ralamb/) OKUNAN dilbilgisi. Minyatur kopyalanmadi; okunan sey oranlardir — entarinin boyu isi soyler (oturan ayak bilegine, calisan baldira), kusak dogal belde ve dar, salvar entarinin altindan GORUNUR, kol agzi astari ters cevrilir, dizlik gercek bir ogedir (plaka 50), baslik rutbe gostergesidir ve Hezarfen ne pasa ne asker. UYARI: album 1657-58, oyun 1632 — YIRMI BES YIL fark. Ana hatlar (salvar-gomlek-entari-kusak-sarik) bu aralikta degismedi ama ayrinti degisebilir. Peter Mundy (1618) obur yandan yaklasiyor; 1632'nin TAM ORTASINDA BIR KAYNAK YOK ve bu bosluk kapatilamaz, ancak soylenebilir.",
+   "why": "yasli erkek — uzun entari, buyuk sarik, ak sakal",
+   "boy": 1.7083,
+   "en_genis": 1.0778,
+   "derinlik": 0.56,
+   "etek_kotu": 0.09,
+   "tip": "yasli",
+   "taban_boy": 1.63,
+   "cinsiyet": "erkek",
+   "yas_bandi": "yasli",
+   "dizlik": false,
+   "giysi_parca": 26,
+   "giysi_adlari": [
+    "Biyik_-1",
+    "Biyik_1",
+    "Entari_Etek",
+    "Entari_Kol_Sag",
+    "Entari_Kol_Sol",
+    "Entari_Ust",
+    "Gomlek",
+    "Kavuk",
+    "Kusak",
+    "Mest_-1",
+    "Mest_1",
+    "Sac_-1_0",
+    "Sac_-1_1",
+    "Sac_-1_2",
+    "Sac_1_0",
+    "Sac_1_1",
+    "Sac_1_2",
+    "Sakal",
+    "SakalUc_-1_0",
+    "SakalUc_-1_1",
+    "SakalUc_-1_2",
+    "SakalUc_-1_3",
+    "SakalUc_1_2",
+    "SakalUc_1_3",
+    "Salvar",
+    "Sarik"
+   ],
+   "tris_lod0": 57632,
+   "tris_lod1": 17286,
+   "agirliksiz_kose": 0,
+   "kose_lod0": 28844,
+   "kemik": 38,
+   "kemikler": [
+    {
+     "ad": "Hips",
+     "bas": [
+      0.0,
+      0.0901,
+      0.8621
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.5071
+    },
+    {
+     "ad": "Spine",
+     "bas": [
+      0.0,
+      0.0965,
+      0.9803
+     ],
+     "uzunluk": 0.1362,
+     "kot_orani": 0.5766
+    },
+    {
+     "ad": "Chest",
+     "bas": [
+      0.0,
+      0.0951,
+      1.1164
+     ],
+     "uzunluk": 0.1248,
+     "kot_orani": 0.6567
+    },
+    {
+     "ad": "UpperChest",
+     "bas": [
+      0.0,
+      0.0872,
+      1.241
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.73
+    },
+    {
+     "ad": "Neck",
+     "bas": [
+      0.0,
+      0.0858,
+      1.3659
+     ],
+     "uzunluk": 0.0652,
+     "kot_orani": 0.8035
+    },
+    {
+     "ad": "Head",
+     "bas": [
+      0.0,
+      0.0858,
+      1.4311
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.8418
+    },
+    {
+     "ad": "LeftShoulder",
+     "bas": [
+      -0.0638,
+      0.0,
+      1.3399
+     ],
+     "uzunluk": 0.1388,
+     "kot_orani": 0.7882
+    },
+    {
+     "ad": "LeftUpperArm",
+     "bas": [
+      -0.2012,
+      0.0,
+      1.3203
+     ],
+     "uzunluk": 0.4661,
+     "kot_orani": 0.7766
+    },
+    {
+     "ad": "LeftLowerArm",
+     "bas": [
+      -0.4065,
+      -0.089,
+      0.9114
+     ],
+     "uzunluk": 0.4874,
+     "kot_orani": 0.5361
+    },
+    {
+     "ad": "LeftHand",
+     "bas": [
+      -0.1804,
+      0.0904,
+      0.5187
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.3051
+    },
+    {
+     "ad": "RightShoulder",
+     "bas": [
+      0.0638,
+      0.0,
+      1.3399
+     ],
+     "uzunluk": 0.1388,
+     "kot_orani": 0.7882
+    },
+    {
+     "ad": "RightUpperArm",
+     "bas": [
+      0.2012,
+      0.0,
+      1.3203
+     ],
+     "uzunluk": 0.4661,
+     "kot_orani": 0.7766
+    },
+    {
+     "ad": "RightLowerArm",
+     "bas": [
+      0.4065,
+      -0.089,
+      0.9114
+     ],
+     "uzunluk": 0.4874,
+     "kot_orani": 0.5361
+    },
+    {
+     "ad": "RightHand",
+     "bas": [
+      0.1804,
+      0.0904,
+      0.5187
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.3051
+    },
+    {
+     "ad": "LeftUpperLeg",
+     "bas": [
+      -0.0832,
+      0.1102,
+      0.8464
+     ],
+     "uzunluk": 0.366,
+     "kot_orani": 0.4979
+    },
+    {
+     "ad": "LeftLowerLeg",
+     "bas": [
+      -0.1234,
+      0.0997,
+      0.4828
+     ],
+     "uzunluk": 0.424,
+     "kot_orani": 0.284
+    },
+    {
+     "ad": "LeftFoot",
+     "bas": [
+      -0.1699,
+      0.0745,
+      0.0621
+     ],
+     "uzunluk": 0.1118,
+     "kot_orani": 0.0365
+    },
+    {
+     "ad": "LeftToes",
+     "bas": [
+      -0.1699,
+      -0.0289,
+      0.0196
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.0115
+    },
+    {
+     "ad": "RightUpperLeg",
+     "bas": [
+      0.0832,
+      0.1102,
+      0.8464
+     ],
+     "uzunluk": 0.366,
+     "kot_orani": 0.4979
+    },
+    {
+     "ad": "RightLowerLeg",
+     "bas": [
+      0.1234,
+      0.0997,
+      0.4828
+     ],
+     "uzunluk": 0.424,
+     "kot_orani": 0.284
+    },
+    {
+     "ad": "RightFoot",
+     "bas": [
+      0.1699,
+      0.0745,
+      0.0621
+     ],
+     "uzunluk": 0.1118,
+     "kot_orani": 0.0365
+    },
+    {
+     "ad": "RightToes",
+     "bas": [
+      0.1699,
+      -0.0289,
+      0.0196
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.0115
+    },
+    {
+     "ad": "Etek_0_0",
+     "bas": [
+      0.3449,
+      0.0,
+      0.978
+     ],
+     "uzunluk": 0.4442,
+     "kot_orani": 0.5753
+    },
+    {
+     "ad": "Etek_0_1",
+     "bas": [
+      0.3449,
+      0.0,
+      0.5338
+     ],
+     "uzunluk": 0.4442,
+     "kot_orani": 0.314
+    },
+    {
+     "ad": "Etek_1_0",
+     "bas": [
+      0.0,
+      0.3449,
+      0.978
+     ],
+     "uzunluk": 0.4442,
+     "kot_orani": 0.5753
+    },
+    {
+     "ad": "Etek_1_1",
+     "bas": [
+      0.0,
+      0.3449,
+      0.5338
+     ],
+     "uzunluk": 0.4442,
+     "kot_orani": 0.314
+    },
+    {
+     "ad": "Etek_2_0",
+     "bas": [
+      -0.3449,
+      0.0,
+      0.978
+     ],
+     "uzunluk": 0.4442,
+     "kot_orani": 0.5753
+    },
+    {
+     "ad": "Etek_2_1",
+     "bas": [
+      -0.3449,
+      0.0,
+      0.5338
+     ],
+     "uzunluk": 0.4442,
+     "kot_orani": 0.314
+    },
+    {
+     "ad": "Etek_3_0",
+     "bas": [
+      -0.0,
+      -0.3449,
+      0.978
+     ],
+     "uzunluk": 0.4442,
+     "kot_orani": 0.5753
+    },
+    {
+     "ad": "Etek_3_1",
+     "bas": [
+      -0.0,
+      -0.3449,
+      0.5338
+     ],
+     "uzunluk": 0.4442,
+     "kot_orani": 0.314
+    },
+    {
+     "ad": "Etek_0_0.001",
+     "bas": [
+      0.3449,
+      0.0,
+      0.978
+     ],
+     "uzunluk": 0.4442,
+     "kot_orani": 0.5753
+    },
+    {
+     "ad": "Etek_0_1.001",
+     "bas": [
+      0.3449,
+      0.0,
+      0.5338
+     ],
+     "uzunluk": 0.4442,
+     "kot_orani": 0.314
+    },
+    {
+     "ad": "Etek_1_0.001",
+     "bas": [
+      0.0,
+      0.3449,
+      0.978
+     ],
+     "uzunluk": 0.4442,
+     "kot_orani": 0.5753
+    },
+    {
+     "ad": "Etek_1_1.001",
+     "bas": [
+      0.0,
+      0.3449,
+      0.5338
+     ],
+     "uzunluk": 0.4442,
+     "kot_orani": 0.314
+    },
+    {
+     "ad": "Etek_2_0.001",
+     "bas": [
+      -0.3449,
+      0.0,
+      0.978
+     ],
+     "uzunluk": 0.4442,
+     "kot_orani": 0.5753
+    },
+    {
+     "ad": "Etek_2_1.001",
+     "bas": [
+      -0.3449,
+      0.0,
+      0.5338
+     ],
+     "uzunluk": 0.4442,
+     "kot_orani": 0.314
+    },
+    {
+     "ad": "Etek_3_0.001",
+     "bas": [
+      -0.0,
+      -0.3449,
+      0.978
+     ],
+     "uzunluk": 0.4442,
+     "kot_orani": 0.5753
+    },
+    {
+     "ad": "Etek_3_1.001",
+     "bas": [
+      -0.0,
+      -0.3449,
+      0.5338
+     ],
+     "uzunluk": 0.4442,
+     "kot_orani": 0.314
+    }
+   ]
+  },
+  {
+   "name": "Sakin_Kadin",
+   "prefab": null,
+   "prefab_notu": "Ara urun: rig tamamlanmadan prefab uretilmez.",
+   "kind": "karakter",
+   "state": "dressed",
+   "status": "draft",
+   "accuracy": "D3",
+   "tier": "T3",
+   "kiyafet_tier": "T2",
+   "source": "KIYAFET: Ralamb kiyafet albumunden (1657-58, kamu mali, refs/ralamb/) OKUNAN dilbilgisi. Minyatur kopyalanmadi; okunan sey oranlardir — entarinin boyu isi soyler (oturan ayak bilegine, calisan baldira), kusak dogal belde ve dar, salvar entarinin altindan GORUNUR, kol agzi astari ters cevrilir, dizlik gercek bir ogedir (plaka 50), baslik rutbe gostergesidir ve Hezarfen ne pasa ne asker. UYARI: album 1657-58, oyun 1632 — YIRMI BES YIL fark. Ana hatlar (salvar-gomlek-entari-kusak-sarik) bu aralikta degismedi ama ayrinti degisebilir. Peter Mundy (1618) obur yandan yaklasiyor; 1632'nin TAM ORTASINDA BIR KAYNAK YOK ve bu bosluk kapatilamaz, ancak soylenebilir.",
+   "why": "yetiskin kadin — ferace ve yasmak (sokak kiyafeti)",
+   "boy": 1.6001,
+   "en_genis": 0.9643,
+   "derinlik": 0.5173,
+   "etek_kotu": 0.087,
+   "tip": "kadin",
+   "taban_boy": 1.58,
+   "cinsiyet": "kadin",
+   "yas_bandi": "yetiskin",
+   "dizlik": false,
+   "giysi_parca": 10,
+   "giysi_adlari": [
+    "Entari_Etek",
+    "Entari_Kol_Sag",
+    "Entari_Kol_Sol",
+    "Entari_Ust",
+    "Ferace_Bel",
+    "Gomlek",
+    "Mest_-1",
+    "Mest_1",
+    "Salvar",
+    "Yasmak"
+   ],
+   "tris_lod0": 48760,
+   "tris_lod1": 14628,
+   "agirliksiz_kose": 0,
+   "kose_lod0": 24394,
+   "kemik": 38,
+   "kemikler": [
+    {
+     "ad": "Hips",
+     "bas": [
+      0.0,
+      0.0901,
+      0.8351
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.4912
+    },
+    {
+     "ad": "Spine",
+     "bas": [
+      0.0,
+      0.0604,
+      0.9484
+     ],
+     "uzunluk": 0.1357,
+     "kot_orani": 0.5579
+    },
+    {
+     "ad": "Chest",
+     "bas": [
+      0.0,
+      0.0535,
+      1.0839
+     ],
+     "uzunluk": 0.1179,
+     "kot_orani": 0.6376
+    },
+    {
+     "ad": "UpperChest",
+     "bas": [
+      0.0,
+      0.0729,
+      1.2002
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.706
+    },
+    {
+     "ad": "Neck",
+     "bas": [
+      0.0,
+      0.0808,
+      1.324
+     ],
+     "uzunluk": 0.0632,
+     "kot_orani": 0.7788
+    },
+    {
+     "ad": "Head",
+     "bas": [
+      0.0,
+      0.0808,
+      1.3872
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.816
+    },
+    {
+     "ad": "LeftShoulder",
+     "bas": [
+      -0.0556,
+      0.0,
+      1.2988
+     ],
+     "uzunluk": 0.1212,
+     "kot_orani": 0.764
+    },
+    {
+     "ad": "LeftUpperArm",
+     "bas": [
+      -0.1753,
+      0.0,
+      1.2798
+     ],
+     "uzunluk": 0.2585,
+     "kot_orani": 0.7528
+    },
+    {
+     "ad": "LeftLowerArm",
+     "bas": [
+      -0.3077,
+      0.0709,
+      1.0693
+     ],
+     "uzunluk": 0.2469,
+     "kot_orani": 0.629
+    },
+    {
+     "ad": "LeftHand",
+     "bas": [
+      -0.4173,
+      -0.107,
+      0.9376
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.5515
+    },
+    {
+     "ad": "RightShoulder",
+     "bas": [
+      0.0556,
+      0.0,
+      1.2988
+     ],
+     "uzunluk": 0.1212,
+     "kot_orani": 0.764
+    },
+    {
+     "ad": "RightUpperArm",
+     "bas": [
+      0.1753,
+      0.0,
+      1.2798
+     ],
+     "uzunluk": 0.2585,
+     "kot_orani": 0.7528
+    },
+    {
+     "ad": "RightLowerArm",
+     "bas": [
+      0.3077,
+      0.0709,
+      1.0693
+     ],
+     "uzunluk": 0.2469,
+     "kot_orani": 0.629
+    },
+    {
+     "ad": "RightHand",
+     "bas": [
+      0.4173,
+      -0.107,
+      0.9376
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.5515
+    },
+    {
+     "ad": "LeftUpperLeg",
+     "bas": [
+      -0.0854,
+      0.0693,
+      0.8224
+     ],
+     "uzunluk": 0.3443,
+     "kot_orani": 0.4838
+    },
+    {
+     "ad": "LeftLowerLeg",
+     "bas": [
+      -0.124,
+      0.0552,
+      0.4805
+     ],
+     "uzunluk": 0.4234,
+     "kot_orani": 0.2827
+    },
+    {
+     "ad": "LeftFoot",
+     "bas": [
+      -0.171,
+      0.054,
+      0.0597
+     ],
+     "uzunluk": 0.1092,
+     "kot_orani": 0.0351
+    },
+    {
+     "ad": "LeftToes",
+     "bas": [
+      -0.171,
+      -0.0473,
+      0.019
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.0112
+    },
+    {
+     "ad": "RightUpperLeg",
+     "bas": [
+      0.0854,
+      0.0693,
+      0.8224
+     ],
+     "uzunluk": 0.3443,
+     "kot_orani": 0.4838
+    },
+    {
+     "ad": "RightLowerLeg",
+     "bas": [
+      0.124,
+      0.0552,
+      0.4805
+     ],
+     "uzunluk": 0.4234,
+     "kot_orani": 0.2827
+    },
+    {
+     "ad": "RightFoot",
+     "bas": [
+      0.171,
+      0.054,
+      0.0597
+     ],
+     "uzunluk": 0.1092,
+     "kot_orani": 0.0351
+    },
+    {
+     "ad": "RightToes",
+     "bas": [
+      0.171,
+      -0.0473,
+      0.019
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.0112
+    },
+    {
+     "ad": "Etek_0_0",
+     "bas": [
+      0.3086,
+      0.0,
+      0.948
+     ],
+     "uzunluk": 0.4306,
+     "kot_orani": 0.5576
+    },
+    {
+     "ad": "Etek_0_1",
+     "bas": [
+      0.3086,
+      0.0,
+      0.5175
+     ],
+     "uzunluk": 0.4306,
+     "kot_orani": 0.3044
+    },
+    {
+     "ad": "Etek_1_0",
+     "bas": [
+      0.0,
+      0.3086,
+      0.948
+     ],
+     "uzunluk": 0.4306,
+     "kot_orani": 0.5576
+    },
+    {
+     "ad": "Etek_1_1",
+     "bas": [
+      0.0,
+      0.3086,
+      0.5175
+     ],
+     "uzunluk": 0.4306,
+     "kot_orani": 0.3044
+    },
+    {
+     "ad": "Etek_2_0",
+     "bas": [
+      -0.3086,
+      0.0,
+      0.948
+     ],
+     "uzunluk": 0.4306,
+     "kot_orani": 0.5576
+    },
+    {
+     "ad": "Etek_2_1",
+     "bas": [
+      -0.3086,
+      0.0,
+      0.5175
+     ],
+     "uzunluk": 0.4306,
+     "kot_orani": 0.3044
+    },
+    {
+     "ad": "Etek_3_0",
+     "bas": [
+      -0.0,
+      -0.3086,
+      0.948
+     ],
+     "uzunluk": 0.4306,
+     "kot_orani": 0.5576
+    },
+    {
+     "ad": "Etek_3_1",
+     "bas": [
+      -0.0,
+      -0.3086,
+      0.5175
+     ],
+     "uzunluk": 0.4306,
+     "kot_orani": 0.3044
+    },
+    {
+     "ad": "Etek_0_0.001",
+     "bas": [
+      0.3087,
+      0.0,
+      0.948
+     ],
+     "uzunluk": 0.4306,
+     "kot_orani": 0.5576
+    },
+    {
+     "ad": "Etek_0_1.001",
+     "bas": [
+      0.3087,
+      0.0,
+      0.5175
+     ],
+     "uzunluk": 0.4306,
+     "kot_orani": 0.3044
+    },
+    {
+     "ad": "Etek_1_0.001",
+     "bas": [
+      0.0,
+      0.3087,
+      0.948
+     ],
+     "uzunluk": 0.4306,
+     "kot_orani": 0.5576
+    },
+    {
+     "ad": "Etek_1_1.001",
+     "bas": [
+      0.0,
+      0.3087,
+      0.5175
+     ],
+     "uzunluk": 0.4306,
+     "kot_orani": 0.3044
+    },
+    {
+     "ad": "Etek_2_0.001",
+     "bas": [
+      -0.3087,
+      0.0,
+      0.948
+     ],
+     "uzunluk": 0.4306,
+     "kot_orani": 0.5576
+    },
+    {
+     "ad": "Etek_2_1.001",
+     "bas": [
+      -0.3087,
+      0.0,
+      0.5175
+     ],
+     "uzunluk": 0.4306,
+     "kot_orani": 0.3044
+    },
+    {
+     "ad": "Etek_3_0.001",
+     "bas": [
+      -0.0,
+      -0.3087,
+      0.948
+     ],
+     "uzunluk": 0.4306,
+     "kot_orani": 0.5576
+    },
+    {
+     "ad": "Etek_3_1.001",
+     "bas": [
+      -0.0,
+      -0.3087,
+      0.5175
+     ],
+     "uzunluk": 0.4306,
+     "kot_orani": 0.3044
+    }
+   ]
+  },
+  {
+   "name": "Sakin_Kadin_Yasli",
+   "prefab": null,
+   "prefab_notu": "Ara urun: rig tamamlanmadan prefab uretilmez.",
+   "kind": "karakter",
+   "state": "dressed",
+   "status": "draft",
+   "accuracy": "D3",
+   "tier": "T3",
+   "kiyafet_tier": "T2",
+   "source": "KIYAFET: Ralamb kiyafet albumunden (1657-58, kamu mali, refs/ralamb/) OKUNAN dilbilgisi. Minyatur kopyalanmadi; okunan sey oranlardir — entarinin boyu isi soyler (oturan ayak bilegine, calisan baldira), kusak dogal belde ve dar, salvar entarinin altindan GORUNUR, kol agzi astari ters cevrilir, dizlik gercek bir ogedir (plaka 50), baslik rutbe gostergesidir ve Hezarfen ne pasa ne asker. UYARI: album 1657-58, oyun 1632 — YIRMI BES YIL fark. Ana hatlar (salvar-gomlek-entari-kusak-sarik) bu aralikta degismedi ama ayrinti degisebilir. Peter Mundy (1618) obur yandan yaklasiyor; 1632'nin TAM ORTASINDA BIR KAYNAK YOK ve bu bosluk kapatilamaz, ancak soylenebilir.",
+   "why": "yasli kadin — ferace ve yasmak",
+   "boy": 1.5595,
+   "en_genis": 0.9504,
+   "derinlik": 0.5537,
+   "etek_kotu": 0.085,
+   "tip": "kadin",
+   "taban_boy": 1.54,
+   "cinsiyet": "kadin",
+   "yas_bandi": "yasli",
+   "dizlik": false,
+   "giysi_parca": 10,
+   "giysi_adlari": [
+    "Entari_Etek",
+    "Entari_Kol_Sag",
+    "Entari_Kol_Sol",
+    "Entari_Ust",
+    "Ferace_Bel",
+    "Gomlek",
+    "Mest_-1",
+    "Mest_1",
+    "Salvar",
+    "Yasmak"
+   ],
+   "tris_lod0": 49048,
+   "tris_lod1": 14714,
+   "agirliksiz_kose": 0,
+   "kose_lod0": 24542,
+   "kemik": 38,
+   "kemikler": [
+    {
+     "ad": "Hips",
+     "bas": [
+      0.0,
+      0.098,
+      0.8175
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.4809
+    },
+    {
+     "ad": "Spine",
+     "bas": [
+      0.0,
+      0.1065,
+      0.9259
+     ],
+     "uzunluk": 0.1341,
+     "kot_orani": 0.5447
+    },
+    {
+     "ad": "Chest",
+     "bas": [
+      0.0,
+      0.0805,
+      1.0575
+     ],
+     "uzunluk": 0.1147,
+     "kot_orani": 0.6221
+    },
+    {
+     "ad": "UpperChest",
+     "bas": [
+      0.0,
+      0.0803,
+      1.1722
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.6896
+    },
+    {
+     "ad": "Neck",
+     "bas": [
+      0.0,
+      0.0807,
+      1.2905
+     ],
+     "uzunluk": 0.0616,
+     "kot_orani": 0.7591
+    },
+    {
+     "ad": "Head",
+     "bas": [
+      0.0,
+      0.0807,
+      1.3521
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.7954
+    },
+    {
+     "ad": "LeftShoulder",
+     "bas": [
+      -0.0533,
+      0.0,
+      1.2659
+     ],
+     "uzunluk": 0.1163,
+     "kot_orani": 0.7446
+    },
+    {
+     "ad": "LeftUpperArm",
+     "bas": [
+      -0.1681,
+      0.0,
+      1.2474
+     ],
+     "uzunluk": 0.2489,
+     "kot_orani": 0.7338
+    },
+    {
+     "ad": "LeftLowerArm",
+     "bas": [
+      -0.3076,
+      0.0524,
+      1.048
+     ],
+     "uzunluk": 0.2354,
+     "kot_orani": 0.6165
+    },
+    {
+     "ad": "LeftHand",
+     "bas": [
+      -0.4077,
+      -0.1296,
+      0.9373
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.5513
+    },
+    {
+     "ad": "RightShoulder",
+     "bas": [
+      0.0533,
+      0.0,
+      1.2659
+     ],
+     "uzunluk": 0.1163,
+     "kot_orani": 0.7446
+    },
+    {
+     "ad": "RightUpperArm",
+     "bas": [
+      0.1681,
+      0.0,
+      1.2474
+     ],
+     "uzunluk": 0.2489,
+     "kot_orani": 0.7338
+    },
+    {
+     "ad": "RightLowerArm",
+     "bas": [
+      0.3076,
+      0.0524,
+      1.048
+     ],
+     "uzunluk": 0.2354,
+     "kot_orani": 0.6165
+    },
+    {
+     "ad": "RightHand",
+     "bas": [
+      0.4077,
+      -0.1296,
+      0.9373
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.5513
+    },
+    {
+     "ad": "LeftUpperLeg",
+     "bas": [
+      -0.0968,
+      0.0865,
+      0.8014
+     ],
+     "uzunluk": 0.3511,
+     "kot_orani": 0.4714
+    },
+    {
+     "ad": "LeftLowerLeg",
+     "bas": [
+      -0.1168,
+      0.0847,
+      0.4509
+     ],
+     "uzunluk": 0.397,
+     "kot_orani": 0.2652
+    },
+    {
+     "ad": "LeftFoot",
+     "bas": [
+      -0.1794,
+      0.0882,
+      0.0589
+     ],
+     "uzunluk": 0.1079,
+     "kot_orani": 0.0346
+    },
+    {
+     "ad": "LeftToes",
+     "bas": [
+      -0.1794,
+      -0.0119,
+      0.0185
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.0109
+    },
+    {
+     "ad": "RightUpperLeg",
+     "bas": [
+      0.0968,
+      0.0865,
+      0.8014
+     ],
+     "uzunluk": 0.3511,
+     "kot_orani": 0.4714
+    },
+    {
+     "ad": "RightLowerLeg",
+     "bas": [
+      0.1168,
+      0.0847,
+      0.4509
+     ],
+     "uzunluk": 0.397,
+     "kot_orani": 0.2652
+    },
+    {
+     "ad": "RightFoot",
+     "bas": [
+      0.1794,
+      0.0882,
+      0.0589
+     ],
+     "uzunluk": 0.1079,
+     "kot_orani": 0.0346
+    },
+    {
+     "ad": "RightToes",
+     "bas": [
+      0.1794,
+      -0.0119,
+      0.0185
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.0109
+    },
+    {
+     "ad": "Etek_0_0",
+     "bas": [
+      0.3041,
+      0.0,
+      0.924
+     ],
+     "uzunluk": 0.4197,
+     "kot_orani": 0.5435
+    },
+    {
+     "ad": "Etek_0_1",
+     "bas": [
+      0.3041,
+      0.0,
+      0.5044
+     ],
+     "uzunluk": 0.4197,
+     "kot_orani": 0.2967
+    },
+    {
+     "ad": "Etek_1_0",
+     "bas": [
+      0.0,
+      0.3041,
+      0.924
+     ],
+     "uzunluk": 0.4197,
+     "kot_orani": 0.5435
+    },
+    {
+     "ad": "Etek_1_1",
+     "bas": [
+      0.0,
+      0.3041,
+      0.5044
+     ],
+     "uzunluk": 0.4197,
+     "kot_orani": 0.2967
+    },
+    {
+     "ad": "Etek_2_0",
+     "bas": [
+      -0.3041,
+      0.0,
+      0.924
+     ],
+     "uzunluk": 0.4197,
+     "kot_orani": 0.5435
+    },
+    {
+     "ad": "Etek_2_1",
+     "bas": [
+      -0.3041,
+      0.0,
+      0.5044
+     ],
+     "uzunluk": 0.4197,
+     "kot_orani": 0.2967
+    },
+    {
+     "ad": "Etek_3_0",
+     "bas": [
+      -0.0,
+      -0.3041,
+      0.924
+     ],
+     "uzunluk": 0.4197,
+     "kot_orani": 0.5435
+    },
+    {
+     "ad": "Etek_3_1",
+     "bas": [
+      -0.0,
+      -0.3041,
+      0.5044
+     ],
+     "uzunluk": 0.4197,
+     "kot_orani": 0.2967
+    },
+    {
+     "ad": "Etek_0_0.001",
+     "bas": [
+      0.3043,
+      0.0,
+      0.924
+     ],
+     "uzunluk": 0.4197,
+     "kot_orani": 0.5435
+    },
+    {
+     "ad": "Etek_0_1.001",
+     "bas": [
+      0.3043,
+      0.0,
+      0.5044
+     ],
+     "uzunluk": 0.4197,
+     "kot_orani": 0.2967
+    },
+    {
+     "ad": "Etek_1_0.001",
+     "bas": [
+      0.0,
+      0.3043,
+      0.924
+     ],
+     "uzunluk": 0.4197,
+     "kot_orani": 0.5435
+    },
+    {
+     "ad": "Etek_1_1.001",
+     "bas": [
+      0.0,
+      0.3043,
+      0.5044
+     ],
+     "uzunluk": 0.4197,
+     "kot_orani": 0.2967
+    },
+    {
+     "ad": "Etek_2_0.001",
+     "bas": [
+      -0.3043,
+      0.0,
+      0.924
+     ],
+     "uzunluk": 0.4197,
+     "kot_orani": 0.5435
+    },
+    {
+     "ad": "Etek_2_1.001",
+     "bas": [
+      -0.3043,
+      0.0,
+      0.5044
+     ],
+     "uzunluk": 0.4197,
+     "kot_orani": 0.2967
+    },
+    {
+     "ad": "Etek_3_0.001",
+     "bas": [
+      -0.0,
+      -0.3043,
+      0.924
+     ],
+     "uzunluk": 0.4197,
+     "kot_orani": 0.5435
+    },
+    {
+     "ad": "Etek_3_1.001",
+     "bas": [
+      -0.0,
+      -0.3043,
+      0.5044
+     ],
+     "uzunluk": 0.4197,
+     "kot_orani": 0.2967
+    }
+   ]
+  },
+  {
+   "name": "Sakin_Kiz",
+   "prefab": null,
+   "prefab_notu": "Ara urun: rig tamamlanmadan prefab uretilmez.",
+   "kind": "karakter",
+   "state": "dressed",
+   "status": "draft",
+   "accuracy": "D3",
+   "tier": "T3",
+   "kiyafet_tier": "T2",
+   "source": "KIYAFET: Ralamb kiyafet albumunden (1657-58, kamu mali, refs/ralamb/) OKUNAN dilbilgisi. Minyatur kopyalanmadi; okunan sey oranlardir — entarinin boyu isi soyler (oturan ayak bilegine, calisan baldira), kusak dogal belde ve dar, salvar entarinin altindan GORUNUR, kol agzi astari ters cevrilir, dizlik gercek bir ogedir (plaka 50), baslik rutbe gostergesidir ve Hezarfen ne pasa ne asker. UYARI: album 1657-58, oyun 1632 — YIRMI BES YIL fark. Ana hatlar (salvar-gomlek-entari-kusak-sarik) bu aralikta degismedi ama ayrinti degisebilir. Peter Mundy (1618) obur yandan yaklasiyor; 1632'nin TAM ORTASINDA BIR KAYNAK YOK ve bu bosluk kapatilamaz, ancak soylenebilir.",
+   "why": "kiz cocuk — kisa entari, basortu",
+   "boy": 1.2272,
+   "en_genis": 0.7489,
+   "derinlik": 0.3945,
+   "etek_kotu": 0.515,
+   "tip": "kiz",
+   "taban_boy": 1.21,
+   "cinsiyet": "kadin",
+   "yas_bandi": "cocuk",
+   "dizlik": false,
+   "giysi_parca": 10,
+   "giysi_adlari": [
+    "Entari_Etek",
+    "Entari_Kol_Sag",
+    "Entari_Kol_Sol",
+    "Entari_Ust",
+    "Gomlek",
+    "Kusak",
+    "Mest_-1",
+    "Mest_1",
+    "Salvar",
+    "Yasmak"
+   ],
+   "tris_lod0": 51204,
+   "tris_lod1": 15360,
+   "agirliksiz_kose": 0,
+   "kose_lod0": 25740,
+   "kemik": 38,
+   "kemikler": [
+    {
+     "ad": "Hips",
+     "bas": [
+      0.0,
+      0.0749,
+      0.6396
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.3762
+    },
+    {
+     "ad": "Spine",
+     "bas": [
+      0.0,
+      0.0657,
+      0.7247
+     ],
+     "uzunluk": 0.1066,
+     "kot_orani": 0.4263
+    },
+    {
+     "ad": "Chest",
+     "bas": [
+      0.0,
+      0.061,
+      0.8312
+     ],
+     "uzunluk": 0.0897,
+     "kot_orani": 0.4889
+    },
+    {
+     "ad": "UpperChest",
+     "bas": [
+      0.0,
+      0.0695,
+      0.9206
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.5415
+    },
+    {
+     "ad": "Neck",
+     "bas": [
+      0.0,
+      0.0337,
+      1.014
+     ],
+     "uzunluk": 0.0484,
+     "kot_orani": 0.5965
+    },
+    {
+     "ad": "Head",
+     "bas": [
+      0.0,
+      0.0337,
+      1.0624
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.6249
+    },
+    {
+     "ad": "LeftShoulder",
+     "bas": [
+      -0.0342,
+      0.0,
+      0.9946
+     ],
+     "uzunluk": 0.0751,
+     "kot_orani": 0.5851
+    },
+    {
+     "ad": "LeftUpperArm",
+     "bas": [
+      -0.1079,
+      0.0,
+      0.9801
+     ],
+     "uzunluk": 0.2261,
+     "kot_orani": 0.5765
+    },
+    {
+     "ad": "LeftLowerArm",
+     "bas": [
+      -0.2217,
+      0.0779,
+      0.8009
+     ],
+     "uzunluk": 0.2097,
+     "kot_orani": 0.4711
+    },
+    {
+     "ad": "LeftHand",
+     "bas": [
+      -0.3184,
+      -0.0751,
+      0.695
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.4088
+    },
+    {
+     "ad": "RightShoulder",
+     "bas": [
+      0.0342,
+      0.0,
+      0.9946
+     ],
+     "uzunluk": 0.0751,
+     "kot_orani": 0.5851
+    },
+    {
+     "ad": "RightUpperArm",
+     "bas": [
+      0.1079,
+      0.0,
+      0.9801
+     ],
+     "uzunluk": 0.2261,
+     "kot_orani": 0.5765
+    },
+    {
+     "ad": "RightLowerArm",
+     "bas": [
+      0.2217,
+      0.0779,
+      0.8009
+     ],
+     "uzunluk": 0.2097,
+     "kot_orani": 0.4711
+    },
+    {
+     "ad": "RightHand",
+     "bas": [
+      0.3184,
+      -0.0751,
+      0.695
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.4088
+    },
+    {
+     "ad": "LeftUpperLeg",
+     "bas": [
+      -0.0627,
+      0.0707,
+      0.63
+     ],
+     "uzunluk": 0.2677,
+     "kot_orani": 0.3706
+    },
+    {
+     "ad": "LeftLowerLeg",
+     "bas": [
+      -0.0971,
+      0.0433,
+      0.366
+     ],
+     "uzunluk": 0.3235,
+     "kot_orani": 0.2153
+    },
+    {
+     "ad": "LeftFoot",
+     "bas": [
+      -0.1354,
+      0.0635,
+      0.0453
+     ],
+     "uzunluk": 0.0781,
+     "kot_orani": 0.0267
+    },
+    {
+     "ad": "LeftToes",
+     "bas": [
+      -0.1354,
+      -0.0082,
+      0.0145
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.0085
+    },
+    {
+     "ad": "RightUpperLeg",
+     "bas": [
+      0.0627,
+      0.0707,
+      0.63
+     ],
+     "uzunluk": 0.2677,
+     "kot_orani": 0.3706
+    },
+    {
+     "ad": "RightLowerLeg",
+     "bas": [
+      0.0971,
+      0.0433,
+      0.366
+     ],
+     "uzunluk": 0.3235,
+     "kot_orani": 0.2153
+    },
+    {
+     "ad": "RightFoot",
+     "bas": [
+      0.1354,
+      0.0635,
+      0.0453
+     ],
+     "uzunluk": 0.0781,
+     "kot_orani": 0.0267
+    },
+    {
+     "ad": "RightToes",
+     "bas": [
+      0.1354,
+      -0.0082,
+      0.0145
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.0085
+    },
+    {
+     "ad": "Etek_0_0",
+     "bas": [
+      0.2396,
+      0.0,
+      0.726
+     ],
+     "uzunluk": 0.1057,
+     "kot_orani": 0.4271
+    },
+    {
+     "ad": "Etek_0_1",
+     "bas": [
+      0.2396,
+      0.0,
+      0.6203
+     ],
+     "uzunluk": 0.1057,
+     "kot_orani": 0.3649
+    },
+    {
+     "ad": "Etek_1_0",
+     "bas": [
+      0.0,
+      0.2396,
+      0.726
+     ],
+     "uzunluk": 0.1057,
+     "kot_orani": 0.4271
+    },
+    {
+     "ad": "Etek_1_1",
+     "bas": [
+      0.0,
+      0.2396,
+      0.6203
+     ],
+     "uzunluk": 0.1057,
+     "kot_orani": 0.3649
+    },
+    {
+     "ad": "Etek_2_0",
+     "bas": [
+      -0.2396,
+      0.0,
+      0.726
+     ],
+     "uzunluk": 0.1057,
+     "kot_orani": 0.4271
+    },
+    {
+     "ad": "Etek_2_1",
+     "bas": [
+      -0.2396,
+      0.0,
+      0.6203
+     ],
+     "uzunluk": 0.1057,
+     "kot_orani": 0.3649
+    },
+    {
+     "ad": "Etek_3_0",
+     "bas": [
+      -0.0,
+      -0.2396,
+      0.726
+     ],
+     "uzunluk": 0.1057,
+     "kot_orani": 0.4271
+    },
+    {
+     "ad": "Etek_3_1",
+     "bas": [
+      -0.0,
+      -0.2396,
+      0.6203
+     ],
+     "uzunluk": 0.1057,
+     "kot_orani": 0.3649
+    },
+    {
+     "ad": "Etek_0_0.001",
+     "bas": [
+      0.2397,
+      0.0,
+      0.726
+     ],
+     "uzunluk": 0.1057,
+     "kot_orani": 0.4271
+    },
+    {
+     "ad": "Etek_0_1.001",
+     "bas": [
+      0.2397,
+      0.0,
+      0.6203
+     ],
+     "uzunluk": 0.1057,
+     "kot_orani": 0.3649
+    },
+    {
+     "ad": "Etek_1_0.001",
+     "bas": [
+      0.0,
+      0.2397,
+      0.726
+     ],
+     "uzunluk": 0.1057,
+     "kot_orani": 0.4271
+    },
+    {
+     "ad": "Etek_1_1.001",
+     "bas": [
+      0.0,
+      0.2397,
+      0.6203
+     ],
+     "uzunluk": 0.1057,
+     "kot_orani": 0.3649
+    },
+    {
+     "ad": "Etek_2_0.001",
+     "bas": [
+      -0.2397,
+      0.0,
+      0.726
+     ],
+     "uzunluk": 0.1057,
+     "kot_orani": 0.4271
+    },
+    {
+     "ad": "Etek_2_1.001",
+     "bas": [
+      -0.2397,
+      0.0,
+      0.6203
+     ],
+     "uzunluk": 0.1057,
+     "kot_orani": 0.3649
+    },
+    {
+     "ad": "Etek_3_0.001",
+     "bas": [
+      -0.0,
+      -0.2397,
+      0.726
+     ],
+     "uzunluk": 0.1057,
+     "kot_orani": 0.4271
+    },
+    {
+     "ad": "Etek_3_1.001",
+     "bas": [
+      -0.0,
+      -0.2397,
+      0.6203
+     ],
+     "uzunluk": 0.1057,
+     "kot_orani": 0.3649
+    }
+   ]
+  },
+  {
+   "name": "Sakin_Oglan",
+   "prefab": null,
+   "prefab_notu": "Ara urun: rig tamamlanmadan prefab uretilmez.",
+   "kind": "karakter",
+   "state": "dressed",
+   "status": "draft",
+   "accuracy": "D3",
+   "tier": "T3",
+   "kiyafet_tier": "T2",
+   "source": "KIYAFET: Ralamb kiyafet albumunden (1657-58, kamu mali, refs/ralamb/) OKUNAN dilbilgisi. Minyatur kopyalanmadi; okunan sey oranlardir — entarinin boyu isi soyler (oturan ayak bilegine, calisan baldira), kusak dogal belde ve dar, salvar entarinin altindan GORUNUR, kol agzi astari ters cevrilir, dizlik gercek bir ogedir (plaka 50), baslik rutbe gostergesidir ve Hezarfen ne pasa ne asker. UYARI: album 1657-58, oyun 1632 — YIRMI BES YIL fark. Ana hatlar (salvar-gomlek-entari-kusak-sarik) bu aralikta degismedi ama ayrinti degisebilir. Peter Mundy (1618) obur yandan yaklasiyor; 1632'nin TAM ORTASINDA BIR KAYNAK YOK ve bu bosluk kapatilamaz, ancak soylenebilir.",
+   "why": "erkek cocuk — kisa entari, takke",
+   "boy": 1.2764,
+   "en_genis": 0.7756,
+   "derinlik": 0.4547,
+   "etek_kotu": 0.391,
+   "tip": "cocuk",
+   "taban_boy": 1.24,
+   "cinsiyet": "erkek",
+   "yas_bandi": "cocuk",
+   "dizlik": false,
+   "giysi_parca": 16,
+   "giysi_adlari": [
+    "Entari_Etek",
+    "Entari_Kol_Sag",
+    "Entari_Kol_Sol",
+    "Entari_Ust",
+    "Gomlek",
+    "Kusak",
+    "Mest_-1",
+    "Mest_1",
+    "Sac_-1_0",
+    "Sac_-1_1",
+    "Sac_-1_2",
+    "Sac_1_0",
+    "Sac_1_1",
+    "Sac_1_2",
+    "Salvar",
+    "Takke"
+   ],
+   "tris_lod0": 50428,
+   "tris_lod1": 15128,
+   "agirliksiz_kose": 0,
+   "kose_lod0": 25246,
+   "kemik": 38,
+   "kemikler": [
+    {
+     "ad": "Hips",
+     "bas": [
+      0.0,
+      0.074,
+      0.6589
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.3876
+    },
+    {
+     "ad": "Spine",
+     "bas": [
+      0.0,
+      0.0654,
+      0.7447
+     ],
+     "uzunluk": 0.1084,
+     "kot_orani": 0.4381
+    },
+    {
+     "ad": "Chest",
+     "bas": [
+      0.0,
+      0.0561,
+      0.8528
+     ],
+     "uzunluk": 0.0921,
+     "kot_orani": 0.5016
+    },
+    {
+     "ad": "UpperChest",
+     "bas": [
+      0.0,
+      0.0673,
+      0.9442
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.5554
+    },
+    {
+     "ad": "Neck",
+     "bas": [
+      0.0,
+      0.0196,
+      1.0391
+     ],
+     "uzunluk": 0.0496,
+     "kot_orani": 0.6112
+    },
+    {
+     "ad": "Head",
+     "bas": [
+      0.0,
+      0.0196,
+      1.0887
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.6404
+    },
+    {
+     "ad": "LeftShoulder",
+     "bas": [
+      -0.0376,
+      0.0,
+      1.0193
+     ],
+     "uzunluk": 0.0823,
+     "kot_orani": 0.5996
+    },
+    {
+     "ad": "LeftUpperArm",
+     "bas": [
+      -0.1185,
+      0.0,
+      1.0044
+     ],
+     "uzunluk": 0.2284,
+     "kot_orani": 0.5908
+    },
+    {
+     "ad": "LeftLowerArm",
+     "bas": [
+      -0.2335,
+      0.0734,
+      0.8212
+     ],
+     "uzunluk": 0.2137,
+     "kot_orani": 0.4831
+    },
+    {
+     "ad": "LeftHand",
+     "bas": [
+      -0.3318,
+      -0.083,
+      0.7138
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.4199
+    },
+    {
+     "ad": "RightShoulder",
+     "bas": [
+      0.0376,
+      0.0,
+      1.0193
+     ],
+     "uzunluk": 0.0823,
+     "kot_orani": 0.5996
+    },
+    {
+     "ad": "RightUpperArm",
+     "bas": [
+      0.1185,
+      0.0,
+      1.0044
+     ],
+     "uzunluk": 0.2284,
+     "kot_orani": 0.5908
+    },
+    {
+     "ad": "RightLowerArm",
+     "bas": [
+      0.2335,
+      0.0734,
+      0.8212
+     ],
+     "uzunluk": 0.2137,
+     "kot_orani": 0.4831
+    },
+    {
+     "ad": "RightHand",
+     "bas": [
+      0.3318,
+      -0.083,
+      0.7138
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.4199
+    },
+    {
+     "ad": "LeftUpperLeg",
+     "bas": [
+      -0.0683,
+      0.0866,
+      0.6442
+     ],
+     "uzunluk": 0.2804,
+     "kot_orani": 0.3789
+    },
+    {
+     "ad": "LeftLowerLeg",
+     "bas": [
+      -0.0999,
+      0.0567,
+      0.3671
+     ],
+     "uzunluk": 0.3237,
+     "kot_orani": 0.216
+    },
+    {
+     "ad": "LeftFoot",
+     "bas": [
+      -0.1419,
+      0.0598,
+      0.0462
+     ],
+     "uzunluk": 0.0801,
+     "kot_orani": 0.0272
+    },
+    {
+     "ad": "LeftToes",
+     "bas": [
+      -0.1419,
+      -0.0139,
+      0.0149
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.0088
+    },
+    {
+     "ad": "RightUpperLeg",
+     "bas": [
+      0.0683,
+      0.0866,
+      0.6442
+     ],
+     "uzunluk": 0.2804,
+     "kot_orani": 0.3789
+    },
+    {
+     "ad": "RightLowerLeg",
+     "bas": [
+      0.0999,
+      0.0567,
+      0.3671
+     ],
+     "uzunluk": 0.3237,
+     "kot_orani": 0.216
+    },
+    {
+     "ad": "RightFoot",
+     "bas": [
+      0.1419,
+      0.0598,
+      0.0462
+     ],
+     "uzunluk": 0.0801,
+     "kot_orani": 0.0272
+    },
+    {
+     "ad": "RightToes",
+     "bas": [
+      0.1419,
+      -0.0139,
+      0.0149
+     ],
+     "uzunluk": 0.06,
+     "kot_orani": 0.0088
+    },
+    {
+     "ad": "Etek_0_0",
+     "bas": [
+      0.2482,
+      0.0,
+      0.744
+     ],
+     "uzunluk": 0.1767,
+     "kot_orani": 0.4376
+    },
+    {
+     "ad": "Etek_0_1",
+     "bas": [
+      0.2482,
+      0.0,
+      0.5673
+     ],
+     "uzunluk": 0.1767,
+     "kot_orani": 0.3337
+    },
+    {
+     "ad": "Etek_1_0",
+     "bas": [
+      0.0,
+      0.2482,
+      0.744
+     ],
+     "uzunluk": 0.1767,
+     "kot_orani": 0.4376
+    },
+    {
+     "ad": "Etek_1_1",
+     "bas": [
+      0.0,
+      0.2482,
+      0.5673
+     ],
+     "uzunluk": 0.1767,
+     "kot_orani": 0.3337
+    },
+    {
+     "ad": "Etek_2_0",
+     "bas": [
+      -0.2482,
+      0.0,
+      0.744
+     ],
+     "uzunluk": 0.1767,
+     "kot_orani": 0.4376
+    },
+    {
+     "ad": "Etek_2_1",
+     "bas": [
+      -0.2482,
+      0.0,
+      0.5673
+     ],
+     "uzunluk": 0.1767,
+     "kot_orani": 0.3337
+    },
+    {
+     "ad": "Etek_3_0",
+     "bas": [
+      -0.0,
+      -0.2482,
+      0.744
+     ],
+     "uzunluk": 0.1767,
+     "kot_orani": 0.4376
+    },
+    {
+     "ad": "Etek_3_1",
+     "bas": [
+      -0.0,
+      -0.2482,
+      0.5673
+     ],
+     "uzunluk": 0.1767,
+     "kot_orani": 0.3337
+    },
+    {
+     "ad": "Etek_0_0.001",
+     "bas": [
+      0.2482,
+      0.0,
+      0.744
+     ],
+     "uzunluk": 0.1767,
+     "kot_orani": 0.4376
+    },
+    {
+     "ad": "Etek_0_1.001",
+     "bas": [
+      0.2482,
+      0.0,
+      0.5673
+     ],
+     "uzunluk": 0.1767,
+     "kot_orani": 0.3337
+    },
+    {
+     "ad": "Etek_1_0.001",
+     "bas": [
+      0.0,
+      0.2482,
+      0.744
+     ],
+     "uzunluk": 0.1767,
+     "kot_orani": 0.4376
+    },
+    {
+     "ad": "Etek_1_1.001",
+     "bas": [
+      0.0,
+      0.2482,
+      0.5673
+     ],
+     "uzunluk": 0.1767,
+     "kot_orani": 0.3337
+    },
+    {
+     "ad": "Etek_2_0.001",
+     "bas": [
+      -0.2482,
+      0.0,
+      0.744
+     ],
+     "uzunluk": 0.1767,
+     "kot_orani": 0.4376
+    },
+    {
+     "ad": "Etek_2_1.001",
+     "bas": [
+      -0.2482,
+      0.0,
+      0.5673
+     ],
+     "uzunluk": 0.1767,
+     "kot_orani": 0.3337
+    },
+    {
+     "ad": "Etek_3_0.001",
+     "bas": [
+      -0.0,
+      -0.2482,
+      0.744
+     ],
+     "uzunluk": 0.1767,
+     "kot_orani": 0.4376
+    },
+    {
+     "ad": "Etek_3_1.001",
+     "bas": [
+      -0.0,
+      -0.2482,
+      0.5673
+     ],
+     "uzunluk": 0.1767,
+     "kot_orani": 0.3337
     }
    ]
   }

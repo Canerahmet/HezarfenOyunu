@@ -88,6 +88,17 @@ CLOTH_SARIK = (0.845, 0.830, 0.780)    # plaka 35 ve 50: beyaz sarik
 CLOTH_KAVUK = (0.360, 0.075, 0.090)    # plaka 35/50: sarigin altindaki kirmizi tepe
 MEST = (0.560, 0.395, 0.115)           # plaka 35 ve 50: sari mest
 
+#: --- SEHIR SAKINLERI (kadin, cocuk, yasli) ------------------------------
+#: Kaynak ayni albumun kadin plakalari. Ferace koyu ve sade bir DIS
+#: giysidir: sokakta dikkat cekmemek icindir, bu yuzden entarinin
+#: mavi-yesilinden daha kisik. Yasmak keten gomlekle ayni beyaz DEGIL —
+#: yuzu ortenin daha soguk ve daha acik olmasi gerekiyor ki siluette
+#: bas ile govde ayrilsin (ilk turda ikisi ayni renkti ve kadinin basi
+#: omzunun icinde kayboluyordu).
+CLOTH_FERACE = (0.148, 0.118, 0.185)   # koyu mor-lacivert dis giysi
+CLOTH_YASMAK = (0.855, 0.865, 0.870)   # ince beyaz ortu, hafif soguk
+CLOTH_TAKKE = (0.315, 0.130, 0.105)    # cocugun kirmizi keceden takkesi
+
 #: **Kartal tüyü** — kanat yüzeyi. Koyu kahve gövde, uçlarda soluk.
 #: Tek bir renkle verilir; kanadın alacalığı GEOMETRIDEN gelir
 #: (üst üste binen tüy dizileri), dokudan değil.
@@ -303,12 +314,20 @@ PALETTES = {
         # Renk `sac_kit.sakal_material` ile ayni: tam siyah bir sakal
         # isik almadigi icin yuzde delik gibi okunuyordu.
         "beard":   ((0.105, 0.072, 0.052), 0.72, "M_Beard"),
+        # Yaslinin AK sakali. Ayni malzemeyi acik renkle kullanmak
+        # olmazdi: `hz.assign` malzemeyi ADA gore paylastirir, yani
+        # yaslinin sakalini beyazlatmak genc adamin sakalini da
+        # beyazlatirdi. Ayri ad = ayri malzeme.
+        "beard_ak": ((0.760, 0.745, 0.720), 0.70, "M_Beard_Ak"),
         "entari":  (CLOTH_ENTARI, 0.80, "M_Cloth_Entari"),
         "salvar":  (CLOTH_SALVAR, 0.82, "M_Cloth_Salvar"),
         "gomlek":  (CLOTH_GOMLEK, 0.86, "M_Cloth_Gomlek"),
         "kusak":   (CLOTH_KUSAK, 0.78, "M_Cloth_Kusak"),
         "sarik":   (CLOTH_SARIK, 0.84, "M_Cloth_Sarik"),
         "kavuk":   (CLOTH_KAVUK, 0.80, "M_Cloth_Kavuk"),
+        "ferace":  (CLOTH_FERACE, 0.86, "M_Cloth_Ferace"),
+        "yasmak":  (CLOTH_YASMAK, 0.88, "M_Cloth_Yasmak"),
+        "takke":   (CLOTH_TAKKE, 0.82, "M_Cloth_Takke"),
         "mest":    (MEST, 0.66, "M_Leather_Mest"),
         "feather": (FEATHER, 0.62, "M_Feather"),
         "foliage_servi": ((0.038, 0.068, 0.034), 0.78, "M_Foliage_Servi"),
@@ -376,12 +395,20 @@ PALETTES = {
         # Renk `sac_kit.sakal_material` ile ayni: tam siyah bir sakal
         # isik almadigi icin yuzde delik gibi okunuyordu.
         "beard":   ((0.105, 0.072, 0.052), 0.72, "M_Beard"),
+        # Yaslinin AK sakali. Ayni malzemeyi acik renkle kullanmak
+        # olmazdi: `hz.assign` malzemeyi ADA gore paylastirir, yani
+        # yaslinin sakalini beyazlatmak genc adamin sakalini da
+        # beyazlatirdi. Ayri ad = ayri malzeme.
+        "beard_ak": ((0.760, 0.745, 0.720), 0.70, "M_Beard_Ak"),
         "entari":  (CLOTH_ENTARI, 0.80, "M_Cloth_Entari"),
         "salvar":  (CLOTH_SALVAR, 0.82, "M_Cloth_Salvar"),
         "gomlek":  (CLOTH_GOMLEK, 0.86, "M_Cloth_Gomlek"),
         "kusak":   (CLOTH_KUSAK, 0.78, "M_Cloth_Kusak"),
         "sarik":   (CLOTH_SARIK, 0.84, "M_Cloth_Sarik"),
         "kavuk":   (CLOTH_KAVUK, 0.80, "M_Cloth_Kavuk"),
+        "ferace":  (CLOTH_FERACE, 0.86, "M_Cloth_Ferace"),
+        "yasmak":  (CLOTH_YASMAK, 0.88, "M_Cloth_Yasmak"),
+        "takke":   (CLOTH_TAKKE, 0.82, "M_Cloth_Takke"),
         "mest":    (MEST, 0.66, "M_Leather_Mest"),
         "feather": (FEATHER, 0.62, "M_Feather"),
         "foliage_servi": ((0.038, 0.068, 0.034), 0.78, "M_Foliage_Servi"),

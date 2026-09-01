@@ -31,8 +31,17 @@ namespace Hezarfen.Editor.Pipeline
         private const string ModelDir = "Assets/_Project/Art/Models/Karakter";
         private const string PrefabDir = "Assets/_Project/Art/Prefabs";
 
-        /// <summary>Karakter FBX'leri bu önekle tanınır.</summary>
-        private const string Prefix = "SK_Hezarfen_";
+        /// <summary>
+        /// Karakter FBX'leri bu öneklerden biriyle tanınır.
+        ///
+        /// Önce yalnız <c>SK_Hezarfen_</c> vardı ve şehrin yedi sakini
+        /// üretilip <c>_Import</c>'a yazıldığında bu adım onları hiç
+        /// görmedi: FBX'ler diskte durdu, Unity'ye hiç girmedi ve
+        /// çalıştırdığım menü "gecerli avatar: 2/2" diyerek yeşil döndü.
+        /// Bir filtrenin sessizce eledigi sey, hata olarak hic gorunmez.
+        /// </summary>
+        private static readonly string[] Prefixes =
+            { "SK_Hezarfen_", "SK_Sakin_" };
 
         [MenuItem("Hezarfen/Boru Hatti/Karakteri yerlestir (Humanoid)")]
         public static void Place()
@@ -41,7 +50,9 @@ namespace Hezarfen.Editor.Pipeline
             if (!Directory.Exists(PrefabDir)) Directory.CreateDirectory(PrefabDir);
 
             var fbx = Directory.Exists(ImportDir)
-                ? Directory.GetFiles(ImportDir, Prefix + "*.fbx")
+                ? Prefixes.SelectMany(p => Directory.GetFiles(ImportDir,
+                                                              p + "*.fbx"))
+                          .Distinct().ToArray()
                 : new string[0];
             if (fbx.Length == 0)
             {
@@ -312,6 +323,8 @@ namespace Hezarfen.Editor.Pipeline
                 ImportLanding.SetLodThresholds(grup);
             }
 
+            SakinKimligi(go, kisa);
+
             var tag = go.GetComponent<Hezarfen.Core.HistoricalTag>();
             if (tag == null) tag = go.AddComponent<Hezarfen.Core.HistoricalTag>();
             if (AssetCatalog.TryGet(kisa, out var kayit))
@@ -329,6 +342,70 @@ namespace Hezarfen.Editor.Pipeline
             Object.DestroyImmediate(go);
             return $"  {ad}: prefab {yol} ({smr.Length} kademe, "
                    + $"{tag.tier})";
+        }
+
+        /// <summary>
+        /// Sakin gövdesine <b>kimliğini</b> yazar: cinsiyet, yaş bandı,
+        /// çıplak boy.
+        ///
+        /// Bu üç değerin tek sahibi üreteçtir (`sakin_kit.ARKETIPLER`) ve
+        /// buraya `catalog.json` üzerinden gelirler. Unity tarafında
+        /// "kadın 1,58 m'dir" diye bir tablo yazmak, bu depoda üç kez
+        /// bedeli ölçülmüş <b>bir sayının iki sahibi</b> hatasının
+        /// dördüncüsü olurdu: arketipin boyu Blender'da değişir, buradaki
+        /// tablo eskir ve yalanı ancak oyunda — yanlış ölçekli bir çocuk
+        /// olarak — görünür.
+        /// </summary>
+        private static void SakinKimligi(GameObject go, string kisa)
+        {
+            if (!kisa.StartsWith("Sakin_")) return;
+            var kayit = SakinKatalog(kisa);
+            if (kayit == null)
+            {
+                Debug.LogWarning($"[Hezarfen] {kisa}: katalogda tip/boy yok "
+                                 + "— SakinGovde yazilmadi.");
+                return;
+            }
+            var sg = go.GetComponent<Hezarfen.Sehir.SakinGovde>();
+            if (sg == null) sg = go.AddComponent<Hezarfen.Sehir.SakinGovde>();
+            sg.tip = kayit.tip;
+            sg.cinsiyet = kayit.cinsiyet;
+            sg.yasBandi = kayit.yas_bandi;
+            sg.tabanBoy = kayit.taban_boy;
+        }
+
+        private static List<SakinKayit> _sakinler;
+
+        private static SakinKayit SakinKatalog(string ad)
+        {
+            if (_sakinler == null)
+            {
+                _sakinler = new List<SakinKayit>();
+                string yol = Path.Combine(AssetCatalog.RepoRoot,
+                                          "art/blend/karakter/catalog.json");
+                if (File.Exists(yol))
+                {
+                    var kat = JsonUtility.FromJson<SakinDosya>(
+                        File.ReadAllText(yol));
+                    if (kat?.variants != null) _sakinler = kat.variants;
+                }
+            }
+            foreach (var k in _sakinler)
+                if (k.name == ad && !string.IsNullOrEmpty(k.tip)) return k;
+            return null;
+        }
+
+        [System.Serializable]
+        private class SakinDosya { public List<SakinKayit> variants; }
+
+        [System.Serializable]
+        private class SakinKayit
+        {
+            public string name;
+            public string tip;
+            public string cinsiyet;
+            public string yas_bandi;
+            public float taban_boy;
         }
 
         /// <summary>

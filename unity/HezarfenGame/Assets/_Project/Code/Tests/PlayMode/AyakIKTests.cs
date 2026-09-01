@@ -32,14 +32,33 @@ namespace Hezarfen.Tests
         /// <summary>Kabul eşiği: taban zeminden bu kadar sapabilir (m).</summary>
         private const float Esik = 0.05f;
 
+        /// <summary>
+        /// Rampanın kurulduğu yer — <b>başka hiçbir testin dokunmadığı</b>
+        /// bir köşe.
+        ///
+        /// Rampa önce başlangıç noktasına kuruluyordu ve orası kalabalık:
+        /// başka test sınıflarının düz zeminleri de oraya kuruluyor,
+        /// sahne aralarında hepsi silinmiyor ve ışın önce onlardan birine
+        /// çarpıyor. Sonuç ölçüldü: negatif kontrol IK <i>kapalıyken</i>
+        /// ±0,000 m dedi — oysa 18°'lik rampada iki ayak arası
+        /// 0,382 × tan18° ≈ 12 cm olmalıydı. Yani test rampayı değil
+        /// başkasının düz zeminini ölçüyordu.
+        ///
+        /// Adla temizlemeyi denemek (o da burada yazılıydı) yanlış cinsten
+        /// bir çözümdü: her yeni test sınıfının zeminine ad uydurmak
+        /// gerekirdi ve unutulan ilk adda ölçüm sessizce bozulurdu.
+        /// Uzaklık böyle bir anlaşma istemez.
+        /// </summary>
+        private const float Uzak = 2000f;
+
         private GameObject _yokus;
         private GameObject _ornek;
 
         [SetUp]
         public void Kur()
         {
-            // 18 derecelik bir rampa. Galata'nin sokak egimleri bu
-            // aralikta; duz bir zemin bu testi anlamsiz kilardi.
+            // Rampanin kendisi `Rampa()`'da kuruluyor; buradaki is
+            // yalniz devralinan zeminleri temizlemek.
             //
             // EGIM Z EKSENINDE, X'te DEGIL. Once X ekseninde (ileri-geri)
             // egiliyordu ve duruş klibi degisince kontrol sondu: yeni
@@ -66,11 +85,78 @@ namespace Hezarfen.Tests
                     Object.DestroyImmediate(eski);
             }
 
+            Rampa();
+        }
+
+        /// <summary>
+        /// Işını <b>rampanın kendi çarpıştırıcısına</b> atar.
+        ///
+        /// <c>Physics.Raycast</c> sahnedeki her şeye çarpar ve test
+        /// sahnesinde ne olduğu testin denetiminde değil: bir kez
+        /// başka bir sınıfın düz zeminine çarptı ve ölçüm sessizce
+        /// yanlış oldu, bir kez de hiçbir şeye çarpmadı ve test
+        /// "rampa bulunamadı" dedi. İkisi de aynı sebepten — testin
+        /// ölçtüğü yüzey, testin kurduğu yüzey olmalı.
+        /// </summary>
+        /// <summary>
+        /// Rampanın (x, z)'deki yüzey kotu — <b>düzlemden hesaplanır,
+        /// ışınla aranmaz</b>.
+        ///
+        /// Bu satır üç kez ışın attı ve üçünde de başka bir şey ölçtü:
+        /// bir kez başka bir testin düz zeminine çarptı (negatif kontrol
+        /// ±0,000 m dedi), iki kez de hiçbir şeye çarpmadı ("rampa
+        /// bulunamadı") — çünkü çarpıştırıcı, yeni kurulmuş bir nesnede
+        /// bir fizik adımı geçmeden yerine oturmuş olmayabiliyor.
+        ///
+        /// Rampanın kendisi bir düzlem ve düzlemin kotu hesaplanabilir
+        /// bir sayı. Hesaplanabilen bir şeyi aramak, aramanın
+        /// başarısızlığını ölçüme karıştırmak demek.
+        /// </summary>
+        private float ZeminKotu(float x, float z)
+        {
+            var t = Rampa().transform;
+            Vector3 n = t.up;                       // ust yuzun normali
+            Vector3 p = t.position + n * (t.localScale.y * 0.5f);
+            // Duzlem: n . (X - p) = 0  ->  y = p.y - (n.x dx + n.z dz)/n.y
+            return p.y - (n.x * (x - p.x) + n.z * (z - p.z)) / n.y;
+        }
+
+        /// <summary>
+        /// Rampayı <b>gerektiğinde</b> kurar.
+        ///
+        /// Rampa yalnız <c>[SetUp]</c>'ta kuruluyordu ve ikinci test
+        /// "rampa ışınla bulunamadı" diyerek düştü: bu koşumda alan
+        /// (<c>_yokus</c>) ikinci teste taşınmıyor. Neden taşınmadığını
+        /// aramak yerine testi o varsayımdan kurtarmak daha sağlam —
+        /// bir test, kendi ölçtüğü yüzeyin var olduğundan kendi emin
+        /// olmalı. Kurulum yine <c>[SetUp]</c>'ta duruyor (temizlik
+        /// oradan yapılıyor), burası yalnızca eksikse tamamlıyor.
+        /// </summary>
+        private GameObject Rampa()
+        {
+            if (_yokus != null) return _yokus;
             _yokus = GameObject.CreatePrimitive(PrimitiveType.Cube);
             _yokus.name = "TestYokusu";
-            _yokus.transform.position = new Vector3(0f, -0.5f, 0f);
+            _yokus.transform.position = new Vector3(Uzak, -0.5f, Uzak);
             _yokus.transform.localScale = new Vector3(20f, 1f, 20f);
-            _yokus.transform.rotation = Quaternion.Euler(0f, 0f, 18f);
+            // EGIM 26 DERECE — OLCU ALETI, SOKAK DEGIL.
+            //
+            // Once 18 dereceydi ("Galata'nin sokak egimleri bu
+            // aralikta") ve olcum yapilinca yetmedigi gorundu: duruş
+            // pozunda ayaklar x = +-0,148 m'de, yani IK'siz sapma
+            // 0,148 x tan18 = 4,8 cm. Kabul esigi 5 cm. Yani negatif
+            // kontrolun gostermesi gereken kusur, kabul esiginin
+            // ALTINDA kaliyor ve iki kosul ayni anda saglanamiyor.
+            //
+            // Bir rampa Galata'yi temsil etmek zorunda degil; olcunun
+            // gorunur olmasi icin yeterince dik olmak zorunda.
+            // 26 derecede sapma 7,2 cm: esigin bir buçuk kati.
+            _yokus.transform.rotation = Quaternion.Euler(0f, 0f, 26f);
+            // AyakIK'nin kendi isini carpistiriciyi bulabilsin: yeni
+            // kurulmus bir nesnenin PhysX bicimi, bir fizik adimi
+            // gecmeden yerine oturmus olmayabilir.
+            Physics.SyncTransforms();
+            return _yokus;
         }
 
         [TearDown]
@@ -96,11 +182,9 @@ namespace Hezarfen.Tests
                 + "kontrolcusunu uret.");
 
             // Karakteri rampanin ortasina, yuzeyin hemen ustune koy.
-            Vector3 tepe = new Vector3(0f, 3f, 0f);
-            Assert.IsTrue(
-                Physics.Raycast(tepe, Vector3.down, out RaycastHit v, 10f),
-                "Test rampasi isinla bulunamadi.");
-            _ornek.transform.position = v.point;
+            Vector3 tepe = new Vector3(Uzak, 3f, Uzak);
+            _ornek.transform.position =
+                new Vector3(tepe.x, ZeminKotu(tepe.x, tepe.z), tepe.z);
             // KAMERASIZ SAHNEDE ANIMATOR CALISMAZ.
             //
             // Varsayilan culling "ekranda degilse guncelleme"dir ve test
@@ -163,11 +247,18 @@ namespace Hezarfen.Tests
             var anim = _ornek.GetComponentInChildren<Animator>();
             Assert.IsNotNull(anim, "Prefabda Animator yok.");
 
-            Assert.IsTrue(
-                Physics.Raycast(new Vector3(0f, 3f, 0f), Vector3.down,
-                                out RaycastHit v, 10f),
-                "Test rampasi isinla bulunamadi.");
-            _ornek.transform.position = v.point;
+            _ornek.transform.position =
+                new Vector3(Uzak, ZeminKotu(Uzak, Uzak), Uzak);
+
+            // POZ ILERLEMELI — YOKSA IKI TEST AYNI SEYI KIYASLAMIYOR.
+            //
+            // Ustteki test `AlwaysAnimate` kuruyor, bu kurmuyordu:
+            // kamerasiz sahnede animator hic guncellenmiyor ve ayaklar
+            // BIND pozunda kaliyor. Yani "IK kapaliyken" olculen sey
+            // duruş klibinin pozu degil, hic oynamamis bir iskeletti.
+            // Bir negatif kontrol, kontrol ettigi seyle ayni kosullarda
+            // kosmali.
+            anim.cullingMode = AnimatorCullingMode.AlwaysAnimate;
 
             var ik = anim.GetComponent<AyakIK>();
             if (ik != null) ik.Etkin = false;
@@ -192,8 +283,8 @@ namespace Hezarfen.Tests
         /// çıkarılarak bulunur; ofset karakterin kökünden ölçülür, elle
         /// yazılmaz.
         /// </summary>
-        private static float TabanFarki(Animator anim, HumanBodyBones kemik,
-                                        AyakIK _ = null)
+        private float TabanFarki(Animator anim, HumanBodyBones kemik,
+                                 AyakIK _ = null)
         {
             Transform t = anim.GetBoneTransform(kemik);
             Assert.IsNotNull(t, $"{kemik} kemigi yok.");
@@ -201,12 +292,7 @@ namespace Hezarfen.Tests
             float ofset = OlculenOfset(anim);
             float taban = t.position.y - ofset;
 
-            Vector3 bas = new Vector3(t.position.x, t.position.y + 1f,
-                                      t.position.z);
-            Assert.IsTrue(
-                Physics.Raycast(bas, Vector3.down, out RaycastHit v, 4f),
-                $"{kemik} altinda zemin bulunamadi.");
-            return taban - v.point.y;
+            return taban - ZeminKotu(t.position.x, t.position.z);
         }
 
         /// <summary>

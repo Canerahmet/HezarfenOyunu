@@ -1,0 +1,156 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &7892797108819048084
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+      propertyPath: m_Name
+      value: PF_Sakin_Erkek_Genc
+      objectReference: {fileID: 0}
+    - target: {fileID: 1347557831206587068, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.082925275
+      objectReference: {fileID: 0}
+    - target: {fileID: 1347557831206587068, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.08468922
+      objectReference: {fileID: 0}
+    - target: {fileID: 2295656754576846773, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.082925275
+      objectReference: {fileID: 0}
+    - target: {fileID: 2295656754576846773, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.08468922
+      objectReference: {fileID: 0}
+    - target: {fileID: 4742473837712756890, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+      propertyPath: m_Size
+      value: 2.0792031
+      objectReference: {fileID: 0}
+    - target: {fileID: 4742473837712756890, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+      propertyPath: m_FadeMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4742473837712756890, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+      propertyPath: m_LocalReferencePoint.y
+      value: 0.85280395
+      objectReference: {fileID: 0}
+    - target: {fileID: 4742473837712756890, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+      propertyPath: m_LocalReferencePoint.z
+      value: -0.043592274
+      objectReference: {fileID: 0}
+    - target: {fileID: 4742473837712756890, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+      propertyPath: m_LODs.Array.data[0].fadeTransitionWidth
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 4742473837712756890, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+      propertyPath: m_LODs.Array.data[0].screenRelativeHeight
+      value: 0.22
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 03e4a326de9ab51429ad0ca6e94aada2, type: 2}
+    - target: {fileID: 5866666021909216657, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 473754919279877825}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 515650263298047845}
+  m_SourcePrefab: {fileID: 100100000, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+--- !u!1 &7010328869738548165 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
+  m_PrefabInstance: {fileID: 7892797108819048084}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &473754919279877825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7010328869738548165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cf35be851fbc2648b3cc378eddce1ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Sehir.SakinGovde
+  tip: genc
+  cinsiyet: erkek
+  yasBandi: genc
+  tabanBoy: 1.68
+--- !u!114 &515650263298047845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7010328869738548165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e60ea5c86c339049bcad6a3d68c5042, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hezarfen.Runtime::Hezarfen.Core.HistoricalTag
+  tier: 3
+  sourceNote: "KIYAFET: Ralamb kiyafet albumunden (1657-58, kamu mali, refs/ralamb/)
+    OKUNAN dilbilgisi. Minyatur kopyalanmadi; okunan sey oranlardir \u2014 entarinin
+    boyu isi soyler (oturan ayak bilegine, calisan baldira), kusak dogal belde ve
+    dar, salvar entarinin altindan GORUNUR, kol agzi astari ters cevrilir, dizlik
+    gercek bir ogedir (plaka 50), baslik rutbe gostergesidir ve Hezarfen ne pasa
+    ne asker. UYARI: album 1657-58, oyun 1632 \u2014 YIRMI BES YIL fark. Ana hatlar
+    (salvar-gomlek-entari-kusak-sarik) bu aralikta degismedi ama ayrinti degisebilir.
+    Peter Mundy (1618) obur yandan yaklasiyor; 1632'nin TAM ORTASINDA BIR KAYNAK
+    YOK ve bu bosluk kapatilamaz, ancak soylenebilir."

@@ -138,6 +138,36 @@ namespace Hezarfen.Editor.Pipeline
             sehir.graf = graf;
             sehir.meslekler = meslekler;
             sehir.govdePrefab = govde;
+
+            // SAKIN ARKETIPLERI — DISKTEN TARANIR, ELLE SAYILMAZ.
+            //
+            // `PF_Sakin_*` prefablarini burada bir listeye yazsaydim,
+            // Blender'da sekizinci bir arketip uretmek sessizce ise
+            // yaramazdi: dosya diskte olur, sahnede olmazdi. Bu depoda
+            // "yazildi, diske gecti, olculmedi" kusuru tekrar tekrar
+            // ayni sekilde dogdu.
+            var arketipler = AssetDatabase
+                .FindAssets("PF_Sakin_ t:Prefab",
+                            new[] { "Assets/_Project/Art/Prefabs" })
+                .Select(AssetDatabase.GUIDToAssetPath)
+                .Where(y => System.IO.Path.GetFileName(y)
+                              .StartsWith("PF_Sakin_"))
+                .OrderBy(y => y)
+                .Select(AssetDatabase.LoadAssetAtPath<GameObject>)
+                .Where(g => g != null)
+                .ToArray();
+            sehir.govdePrefablar = arketipler;
+
+            // Kimliksiz bir arketip `TurSec`'te en sona duser ve
+            // kalabalik sessizce tek tipe geri doner — yani kusur
+            // "hicbir sey olmadi" gibi gorunur. Onun icin SAYILIR.
+            int kimlikli = arketipler.Count(
+                g => g.GetComponent<Hezarfen.Sehir.SakinGovde>() != null);
+            rapor.Add($"Sakin arketipi: {arketipler.Length} prefab, "
+                      + $"{kimlikli} tanesi kimlikli (cinsiyet/yas/boy)");
+            if (arketipler.Length > 0 && kimlikli < arketipler.Length)
+                rapor.Add("  UYARI: kimliksiz arketip var — once "
+                          + "Hezarfen > Boru Hatti > Karakteri yerlestir.");
             sehir.oyuncu = oyuncu.transform;
             sehir.zaman = zaman;
 

@@ -246,7 +246,73 @@ namespace Hezarfen.Editor.Pipeline
             sb.AppendLine($"  {sm.states.Length} durum, "
                           + $"{ac.parameters.Length} parametre");
             sb.AppendLine($"  -> {Cikti}");
+            sb.AppendLine(SakinlereBagla(ac));
             Debug.Log("[Hezarfen] " + sb);
+        }
+
+        /// <summary>
+        /// Kontrolcüyü <b>sakin gövdelerine bağlar</b>.
+        ///
+        /// ## Ölçülen kusur
+        ///
+        /// <c>NPCYonetici</c> her karede <c>an.SetFloat("hiz", …)</c>
+        /// çağırıyordu ve o satır yıllardır oradaydı. Ama sakin
+        /// prefablarının Animator'ında <b>hiçbir kontrolcü yoktu</b>:
+        /// FBX içe aktarımı Animator bileşenini kurar, kontrolcüyü
+        /// kurmaz. Yani şehirdeki dokuz bin kişi bind pozunda, kollarını
+        /// açmış, kayarak yürüyordu — ve hiçbir test kırmızı dönmüyordu,
+        /// çünkü <c>SetFloat</c> kontrolcüsüz bir Animator'da sessizce
+        /// hiçbir şey yapar.
+        ///
+        /// Oyuncunun gövdesi kontrolcüyü <c>HezarfenSpawner</c>'da
+        /// alıyordu; sakinlerin böyle bir adımı hiç yoktu. Bu, bu
+        /// depodaki en sık kusurun bir örneği daha: <b>yazıldı, diske
+        /// geçti, hiç bağlanmadı.</b>
+        ///
+        /// Bağlama işi kontrolcüyü ÜRETEN adımın parçası: ayrı bir menü
+        /// maddesi olsaydı atlanabilirdi, ve bu depoda atlanabilir bir
+        /// adım bir kez atlandı (`KarakterYonu.Duzelt`).
+        /// </summary>
+        private static string SakinlereBagla(RuntimeAnimatorController ac)
+        {
+            var yollar = AssetDatabase
+                .FindAssets("PF_ t:Prefab",
+                            new[] { "Assets/_Project/Art/Prefabs" })
+                .Select(AssetDatabase.GUIDToAssetPath)
+                .Where(y =>
+                {
+                    string ad = System.IO.Path.GetFileName(y);
+                    return ad.StartsWith("PF_Sakin_")
+                           || ad.StartsWith("PF_Hezarfen_");
+                })
+                .OrderBy(y => y).ToList();
+
+            int bagli = 0;
+            foreach (string yol in yollar)
+            {
+                var kok = PrefabUtility.LoadPrefabContents(yol);
+                try
+                {
+                    var an = kok.GetComponentInChildren<Animator>(true);
+                    if (an == null) an = kok.AddComponent<Animator>();
+                    if (an.runtimeAnimatorController == ac
+                        && !an.applyRootMotion) continue;
+                    an.runtimeAnimatorController = ac;
+                    // Yer degistirmeyi kontrolcu degil bizim kod yazar
+                    // (NPCAjan yolu yuruyor); kok hareketi acik kalirsa
+                    // sakin klibin kendi yer degistirmesiyle CIFTE
+                    // ilerler ve yoldan cikar.
+                    an.applyRootMotion = false;
+                    PrefabUtility.SaveAsPrefabAsset(kok, yol);
+                    bagli++;
+                }
+                finally
+                {
+                    PrefabUtility.UnloadPrefabContents(kok);
+                }
+            }
+            AssetDatabase.SaveAssets();
+            return $"  kontrolcu baglandi: {bagli}/{yollar.Count} prefab";
         }
 
         /// <summary>

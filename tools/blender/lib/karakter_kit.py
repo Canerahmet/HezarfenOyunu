@@ -379,11 +379,6 @@ def olcu_al(obj):
     mw = obj.matrix_world
     vs = [mw @ v.co for v in obj.data.vertices]
 
-    # Bas: en ust %13 — kabaca cene ustu.
-    bas_z = mn[2] + boy * 0.87
-    bas = [v for v in vs if v.z >= bas_z]
-    bas_boy = (max(v.z for v in bas) - min(v.z for v in bas)) if bas else 0.0
-
     def acik(z, kalinlik):
         dilim = [v.x for v in vs if abs(v.z - z) < kalinlik]
         return (max(dilim) - min(dilim)) if len(dilim) > 1 else 0.0
@@ -406,6 +401,22 @@ def olcu_al(obj):
     # secmek kirilgan olurdu — omuz egimi govdeden govdeye degisir; en
     # genis dilimi aramak o degiskenlige bagisiktir.
     omuz = max(acik(boyun_z - 0.12 * i / 8.0, kal) for i in range(9))
+
+    # BAS BOYU: boynun en dar kotundan tepeye.
+    #
+    # Burada once "en ust %13" yaziyordu ve bu bir olcum DEGILDI: bas
+    # boyu tanim geregi boyun 0,13'u oluyor, dolayisiyla `bas_orani` her
+    # govdede 1/7,69 cikiyordu. Sabiti bolup sonucu "olculen oran" diye
+    # yazmak — ve `denetle` ile "1/7 ile 1/8 arasinda olmali" diye
+    # denetlemek — kendi kendini onaylayan bir denetimdi: bir cocugun
+    # buyuk kafasi da, bir devin kucuk kafasi da ayni 1/7,69'u verirdi.
+    # Yedi arketip uretmeye baslayinca ortaya cikti; tek govde varken
+    # yanlis oldugu hic gorunmemisti.
+    #
+    # Boynun en dar kotu zaten YUKARIDA bulunuyor (agin kendi biciminden).
+    # Cene ondan birkac milimetre yukaridadir, yani bu olcu bas + kisa
+    # bir boyun payidir; sabit degildir ve govde degisince degisir.
+    bas_boy = mx[2] - boyun_z
 
     return dict(boy=round(boy, 4),
                 bas_boy=round(bas_boy, 4),

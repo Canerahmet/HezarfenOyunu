@@ -41,7 +41,7 @@
   {
    "dosya": "Walking",
    "ad": "Yurume",
-  "unity_hiz_ms": 1.6934,
+  "unity_hiz_ms": 1.6925,
    "dongu": true,
    "neden": "yurume",
    "kare": 31,
@@ -94,7 +94,7 @@
   {
    "dosya": "Fast Run",
    "ad": "Kosma",
-  "unity_hiz_ms": 5.3617,
+  "unity_hiz_ms": 5.3613,
    "dongu": true,
    "neden": "kosma — 6,0 m/s dugumu",
    "kare": 16,
