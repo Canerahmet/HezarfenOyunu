@@ -194,7 +194,16 @@ namespace Hezarfen.Arayuz
                 // anlatiliyordu. Oyuncunun ne yapacagini bilmesi
                 // icin neyin olmadigini bilmesi gerekir.
                 string neydi = etkilesim.Ipucu;
-                if (etkilesim.Tetikle()) Bildir(neydi + " · alındı");
+                var kim = etkilesim.Hedef as Sakin;
+                if (etkilesim.Tetikle())
+                    // KONUSULAN SEY DUYULMALI.
+                    //
+                    // Bir insanla konusmanin karsiligi "Konus ·
+                    // alindi" olamaz; soylenen sozun kendisi
+                    // gorunmeli. Oteki etkilesimler icin eski dil
+                    // dogru: kupten su ALINIR.
+                    Bildir(kim != null && kim.SonSoz.Length > 0
+                           ? kim.SonSoz : neydi + " · alındı");
                 else if (neydi.Length > 0) Bildir(Sebep());
             }
         }
@@ -380,6 +389,19 @@ namespace Hezarfen.Arayuz
                           $"durak {isim.siradaki + 1}/{isim.duraklar.Count}"
                           + $"  ·  {isim.akce} akçe", _yazi);
                 ust += 82f;
+            }
+            else if (gorev != null)
+            {
+                // ISSIZKEN NE YAPACAGINI SOYLE.
+                //
+                // Is artik konusulan kisiden geliyor. Oyuncuya bunu
+                // soylemeyen bir tasarim, isi kaldirmakla ayni sey:
+                // ekranda hicbir sey yoksa yapilacak bir sey de yoktur.
+                GUI.Box(new Rect(10, ust, 330, 30), "", _kutu);
+                GUI.Label(new Rect(20, ust + 6, 320, 22),
+                          $"İşsizsin — birine {Glif("E", "X")} ile iş sor",
+                          _yazi);
+                ust += 38f;
             }
 
             if (gorev != null)

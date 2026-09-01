@@ -138,7 +138,35 @@ namespace Hezarfen.Sehir
             }
         }
 
-        private void Start() => YeniGorev();
+        /// <summary>
+        /// <b>Oyun işsiz başlar.</b>
+        ///
+        /// Önce burada <c>YeniGorev()</c> vardı: oyunun sıfırıncı
+        /// saniyesinde HUD'da "Yeni iş: Kayıp eşya" beliriyordu. Kimin
+        /// eşyası, kim sordu, neden — hiçbirinin cevabı yok. Biten
+        /// görevin yerine de anında yenisi konuyordu; sonsuz bir
+        /// konveyör.
+        ///
+        /// İş artık <see cref="Sakin"/>'den, yani <b>konuştuğun
+        /// kişiden</b> gelir. Bu bir kolaylık kaybı değil: bir işin
+        /// sahibi olması, o işin var olmasının şartı.
+        /// </summary>
+        private void Start() { }
+
+        /// <summary>
+        /// Belirtilen yerin yakınında bir iş üret ve <b>ver</b>.
+        ///
+        /// <see cref="Sakin.Etkiles"/> çağırır. Görev konuşulan kişinin
+        /// durduğu yere göre üretilir; böylece iş her zaman oradan
+        /// başlar ve "işi verecek kimse uğramadı" diye bir kilit
+        /// oluşamaz.
+        /// </summary>
+        public bool IsIste(Vector3 nerede)
+        {
+            if (Simdiki != null) return false;
+            YeniGorev(nerede);
+            return Simdiki != null;
+        }
 
         /// <summary>
         /// Yeni bir görev üretir. Arketip <b>tarihe uygun</b> olanlar
@@ -160,6 +188,9 @@ namespace Hezarfen.Sehir
         public const float YuruyusTavani = 1200f;
 
         public void YeniGorev()
+            => YeniGorev(oyuncu != null ? oyuncu.position : Vector3.zero);
+
+        public void YeniGorev(Vector3 nerede)
         {
             Simdiki = null;
             if (graf == null || oyuncu == null) return;
@@ -209,11 +240,11 @@ namespace Hezarfen.Sehir
             {
                 var a = hepsi[(_sayac + i) % hepsi.Length];
                 if (!GorevUretici.Uygun(a, yil, gun)) continue;
-                var g = GorevUretici.Uret(graf, a, oyuncu.position,
+                var g = GorevUretici.Uret(graf, a, nerede,
                                           tohum + _sayac * 7919, yil, gun);
                 if (g == null || g.duraklar.Count == 0) continue;
 
-                float yol = Yol(g);
+                float yol = Yol(g, nerede);
                 if (siradaki == null && yol <= YuruyusTavani) siradaki = g;
                 if (yol >= enIyiYol) continue;
                 enIyi = g;
@@ -232,12 +263,12 @@ namespace Hezarfen.Sehir
             Debug.LogWarning("[Hezarfen] Uretilecek uygun gorev bulunamadi.");
         }
 
-        /// <summary>Görevin kuş uçuşu toplam yolu (m).</summary>
-        private float Yol(Gorev g)
+        /// <summary>Görevin kuş uçuşu toplam yolu (m), verilen noktadan.</summary>
+        private float Yol(Gorev g, Vector3 nereden)
         {
-            if (graf == null || oyuncu == null) return float.MaxValue;
+            if (graf == null) return float.MaxValue;
             float t = 0f;
-            var son = oyuncu.position;
+            var son = nereden;
             foreach (int d in g.duraklar)
             {
                 if (d < 0 || d >= graf.dugumler.Count) return float.MaxValue;
@@ -285,7 +316,14 @@ namespace Hezarfen.Sehir
             Kese.Kazan(Simdiki.akce);
             Bitirilen++;
             GorevBitti?.Invoke(Simdiki);
-            YeniGorev();
+
+            // YENISI KENDILIGINDEN GELMEZ.
+            //
+            // Once burada `YeniGorev()` vardi ve oyuncu bir isi
+            // bitirdigi karede elinde yenisi oluyordu. Bir isin
+            // bitmesi bir an olmali; birine gidip yenisini sormak da
+            // oyunun parcasi.
+            Simdiki = null;
         }
 
         /// <summary>

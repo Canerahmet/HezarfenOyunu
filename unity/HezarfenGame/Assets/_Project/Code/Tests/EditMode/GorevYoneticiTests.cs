@@ -152,8 +152,24 @@ namespace Hezarfen.Tests
                 "Gorev bitti ve kese bos — akce hicbir yerde "
                 + "kazanilmiyorsa ekonomi bir sabitler dosyasidir, "
                 + "oyun ekonomisi degil.");
-            Assert.IsNotNull(_y.Simdiki,
-                "Bir gorev bitti ve yenisi verilmedi — dongu kapanmiyor.");
+            // DONGU KAPANIR, AMA BIR INSANDAN GECEREK.
+            //
+            // Bu satir once `IsNotNull` diyordu ve o zaman dogruydu:
+            // biten gorevin yerine yoneticinin kendisi aninda yenisini
+            // koyuyordu. O tasarim degisti — is artik `Sakin`'den, yani
+            // konusulan kisiden geliyor; cunku kimin isi, kim sordu,
+            // neden sorularinin cevabi olmadan bir gorev bir konveyor
+            // bandidir.
+            //
+            // Test gevsetilmiyor: ayni iddia — "dongu kapaniyor" —
+            // yeni yolundan olculuyor.
+            Assert.IsNull(_y.Simdiki,
+                "Gorev bitti ve yerine kendiliginden yenisi kondu. "
+                + "Bir isin bitmesi bir an olmali.");
+            Assert.IsTrue(_y.IsIste(_oyuncu.position),
+                "Bitirdikten sonra yeni is istenemiyor — dongu "
+                + "kapanmiyor.");
+            Assert.IsNotNull(_y.Simdiki, "Is istendi ama gelmedi.");
         }
 
         [Test]

@@ -167,6 +167,9 @@ namespace Hezarfen.Sehir
 
         private readonly List<NPCAjan> _gorunurler = new();
 
+        private GorevYonetici _gorev;
+        private Hezarfen.Zaman.ZamanSistemi _zaman;
+
         private readonly List<NPCAjan> _sakinler = new();
         private readonly Stack<Transform> _havuz = new();
         private int _dilimSayaci;
@@ -177,6 +180,8 @@ namespace Hezarfen.Sehir
         {
             if (oyuncu == null && Camera.main != null)
                 oyuncu = Camera.main.transform;
+            _gorev = FindAnyObjectByType<GorevYonetici>();
+            _zaman = FindAnyObjectByType<Hezarfen.Zaman.ZamanSistemi>();
             Kur();
         }
 
@@ -529,6 +534,20 @@ namespace Hezarfen.Sehir
                     yer.y = vurus.point.y;
                 a.govde.position = yer;
                 _gorunurler.Add(a);
+
+                // GOVDE EL DEGISTIRDIGINDE KIM OLDUGU DA DEGISIR.
+                if (yeniGovde)
+                {
+                    var sk = a.govde.GetComponent<Sakin>();
+                    if (sk != null)
+                    {
+                        sk.gorev = _gorev;
+                        sk.zaman = _zaman;
+                        sk.aranma = aranma;
+                    }
+                }
+                var s2 = a.govde.GetComponent<Sakin>();
+                if (s2 != null) s2.ajan = a;
                 if (a.hiz > 0.05f && yon.sqrMagnitude > 1e-4f)
                     a.govde.rotation = Quaternion.LookRotation(yon);
                 var an = a.govde.GetComponentInChildren<Animator>();
@@ -557,6 +576,22 @@ namespace Hezarfen.Sehir
             if (govdePrefab == null) return null;
             var go = Instantiate(govdePrefab, transform);
             UretilenGovde++;
+
+            // GOVDEYE DOKUNULABILMELI.
+            //
+            // `EtkilesimAlgila` fizikten geciyor ve NPC govdesinde
+            // hicbir carpistirici yoktu: kirk bin sakinin altmisi her
+            // an ekranda yuruyor ve hicbirine dokunulamiyordu.
+            // Tetikleyici, cunku gövde oyuncunun yolunu KESMEMELI —
+            // kalabalik bir carsida her insan bir duvar olsaydi
+            // yurunmezdi.
+            var kap = go.AddComponent<CapsuleCollider>();
+            kap.isTrigger = true;
+            kap.height = 1.7f;
+            kap.radius = 0.35f;
+            kap.center = new Vector3(0f, 0.85f, 0f);
+            go.AddComponent<Sakin>();
+
             return go.transform;
         }
 
@@ -682,6 +717,14 @@ namespace Hezarfen.Sehir
 
         private void GovdeBirak(Transform t)
         {
+            // KIMLIK GOVDEYLE BIRLIKTE BIRAKILIR.
+            //
+            // Havuza donen govde bir sonraki sahibine kadar KIMSE
+            // degil; ustunde eski sahibinin ajani kalirsa oyuncu
+            // orada olmayan biriyle konusur.
+            var sk = t.GetComponent<Sakin>();
+            if (sk != null) sk.ajan = null;
+
             t.gameObject.SetActive(false);
             _havuz.Push(t);
         }
