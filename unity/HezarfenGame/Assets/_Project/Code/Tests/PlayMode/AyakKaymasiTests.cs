@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Hezarfen.Player;
+using Hezarfen.Sehir;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
@@ -114,13 +115,39 @@ namespace Hezarfen.Tests
         }
 
         /// <summary>
+        /// <b>Sakin kendi temposunda yürürken ayağı kayıyor mu.</b>
+        ///
+        /// Oyuncu 2,2 m/s yürüyor ve karışım ağacının yürüme düğümü o
+        /// eşikte, oynatma çarpanı da tam o hız için ayarlı. Şehrin
+        /// sakinleri ise <see cref="InsanDNA"/>'dan gelen ~1,4 m/s ile
+        /// yürüyor — yani hiçbiri eşikte değil. Bu, ADR 0076'nın kök
+        /// sebebinin (klip hızı ile oyun hızının iki ayrı sahibi
+        /// olması) kalabalıktaki tekrarıydı ve oyuncuda çözüldüğü gün
+        /// sakinlerde hiç sorulmamıştı.
+        ///
+        /// Eşik oyuncununkiyle aynı (%22): kayma göze kalabalıkta daha
+        /// da çok batar, çünkü aynı anda altmış kişide olur.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator TheResidentsFeetKeepUpWithTheirOwnPace()
+        {
+            // 1,4 m/s: InsanDNA'nin urettigi tempo bandinin ortasi
+            // (1,42 taban, yasla ve boyla +-%20).
+            yield return Olc(1.4f, "SAKIN",
+                "Assets/_Project/Art/Prefabs/PF_Sakin_Erkek.prefab",
+                sakin: true);
+        }
+
+        /// <summary>
         /// Karakteri `hiz` m/s ileri yürütür ve basılı ayağın dünyadaki
         /// kaymasını ölçer.
         /// </summary>
-        private IEnumerator Olc(float hiz, string etiket)
+        private IEnumerator Olc(float hiz, string etiket,
+                               string prefab = null, bool sakin = false)
         {
-            var pf = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabYolu);
-            Assert.IsNotNull(pf, $"{PrefabYolu} yok.");
+            var pf = AssetDatabase.LoadAssetAtPath<GameObject>(
+                prefab ?? PrefabYolu);
+            Assert.IsNotNull(pf, $"{prefab ?? PrefabYolu} yok.");
 
             _ornek = Object.Instantiate(pf);
             _ornek.transform.position = Vector3.zero;
@@ -146,7 +173,13 @@ namespace Hezarfen.Tests
             var ik = anim.GetComponent<AyakIK>();
             if (ik != null) ik.Etkin = false;
 
-            anim.SetFloat("hiz", hiz);
+            // SAKIN, URETIMDEKI YOLDAN SURULUR.
+            //
+            // Burada `SetFloat("hiz", …)` yazmak testi kendi
+            // uydurmasini dogrulamaya cevirirdi: olculmesi gereken sey
+            // NPCYonetici'nin gercekte ne yaptigi.
+            if (sakin) NPCYonetici.YuruyusuAyarla(anim, hiz);
+            else anim.SetFloat("hiz", hiz);
             anim.SetBool("ucuyor", false);
 
             Transform sol = anim.GetBoneTransform(HumanBodyBones.LeftFoot);

@@ -579,7 +579,7 @@ namespace Hezarfen.Sehir
                 if (a.hiz > 0.05f && yon.sqrMagnitude > 1e-4f)
                     a.govde.rotation = Quaternion.LookRotation(yon);
                 var an = a.govde.GetComponentInChildren<Animator>();
-                if (an != null) an.SetFloat("hiz", a.hiz);
+                if (an != null) YuruyusuAyarla(an, a.hiz);
                 cizilen++;
             }
             GorunurSayisi = cizilen;
@@ -593,6 +593,49 @@ namespace Hezarfen.Sehir
         /// dolaşımda binlerce tahsis ve düzenli çöp toplama duraksaması
         /// demekti — yani tam olarak kabul ölçütünün kaybedildiği yer.
         /// </summary>
+        /// <summary>
+        /// Sakinin yürüyüşü — <b>adım sıklığı gerçek yer hızına eşitlenir</b>.
+        /// </summary>
+        /// <remarks>
+        /// Buraya <c>an.SetFloat("hiz", a.hiz)</c> yazılıydı ve doğru
+        /// görünüyordu. Ölçüldüğünde değildi: karışım ağacının yürüme
+        /// düğümü <c>WalkController.VarsayilanYurume</c> (2,2 m/s)
+        /// eşiğinde duruyor ve klibin oynatma çarpanı <b>tam o hız
+        /// için</b> ayarlanmış (1,299). Sakin ise 1,4 m/s yürüyor.
+        ///
+        /// İki sonucu birden vardı. Birincisi, 1,4 değeri ağaçta
+        /// %64 yürüme + %36 duruş karışımı demek — yani sokaktaki
+        /// herkes yarı uykulu bir pozda süzülüyor. İkincisi ve daha
+        /// görünürü: adım sıklığı 2,2 m/s'lik bir yürüyüşünkü, yer
+        /// hızı 1,4 m/s — <b>ayak her adımda kayıyor.</b> Bu, ADR
+        /// 0076'nın kök sebebinin (klip hızı ile oyun hızının iki ayrı
+        /// sahibi olması) sakinlerdeki tekrarıdır; oyuncuda çözülmüş,
+        /// kalabalıkta hiç sorulmamıştı.
+        ///
+        /// Doğrusu: ağaca <b>eşiğin kendisini</b> ver (yürüme düğümü tam
+        /// ağırlıkla çalsın) ve klibi <c>gerçek hız / eşik</c> oranında
+        /// yavaşlat. Çarpan zaten "eşikte adım = eşik hızı" olacak
+        /// şekilde kurulduğu için, oranla ölçeklemek adım boyunu
+        /// koruyup sıklığı düşürür — kayma yapısal olarak sıfırlanır.
+        /// </remarks>
+        public static void YuruyusuAyarla(Animator an, float hiz)
+        {
+            const float esik = Hezarfen.Player.WalkController.VarsayilanYurume;
+            // Duran sakin duruş klibini oynar; hizi sifir vermek
+            // animatoru dondururdu (`an.speed = 0`).
+            if (hiz < 0.15f)
+            {
+                an.SetFloat("hiz", 0f);
+                an.speed = 1f;
+                return;
+            }
+            an.SetFloat("hiz", esik);
+            // Alt sinir 0,45: cok yavas bir klip donmus gibi gorunur ve
+            // o noktada kaymayi duzeltmek, yurumenin durmasindan daha
+            // az onemli. Ust sinir 1,6: sakin kosmaz.
+            an.speed = Mathf.Clamp(hiz / esik, 0.45f, 1.6f);
+        }
+
         /// <summary>Kullanılabilir arketip sayısı (yedeğiyle birlikte).</summary>
         private int TurSayisi =>
             govdePrefablar != null && govdePrefablar.Length > 0
@@ -861,6 +904,10 @@ namespace Hezarfen.Sehir
             // orada olmayan biriyle konusur.
             var sk = t.GetComponent<Sakin>();
             if (sk != null) sk.ajan = null;
+            // Oynatma carpani da birakilir: havuzdan cikan govde bir
+            // onceki sahibinin temposuyla baslamasin.
+            var an = t.GetComponentInChildren<Animator>();
+            if (an != null) an.speed = 1f;
 
             t.gameObject.SetActive(false);
             var etiket = t.GetComponent<SakinGovde>();
