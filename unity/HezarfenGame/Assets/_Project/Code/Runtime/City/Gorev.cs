@@ -201,6 +201,64 @@ namespace Hezarfen.Sehir
             return g;
         }
 
+        /// <summary>
+        /// Bu meslek hangi işleri verebilir.
+        ///
+        /// ## Neden bu tablo var
+        ///
+        /// İş artık konuşulan kişiden geliyor — ama <b>kim olduğu hiç
+        /// sorulmuyordu</b>. Meslek payları ölçüldü: 40.000 sakinin
+        /// 7.200'ü <b>çocuk</b> (%18), 2.400'ü yeniçeri, 1.600'ü ases.
+        /// Yani konuşulan her üç kişiden biri, mantıken bir yük
+        /// sözleşmesi yapamayacak biri — ve bir çocuk oyuncuya
+        /// *«Sesini alçalt. Bir yük var, görünmesin.»* diyordu.
+        ///
+        /// İşi kimin verdiği, o işin ne olduğunun bir parçası.
+        ///
+        /// Ases ve yeniçeri <b>boş küme</b> döner: onlar iş vermez.
+        /// Bu bir eksiklik değil bir karakterizasyon — kolluk sana iş
+        /// teklif etmez, seni süzer.
+        /// </summary>
+        public static GorevArketip[] Verebilir(NPCMeslek.Tip t) => t switch
+        {
+            // Hamal yuku tasiyan adamdir; teslimat onun isi.
+            NPCMeslek.Tip.Hamal => new[]
+            { GorevArketip.Teslimat },
+
+            // Kayikci karsiya gecirir, bazen de yuk tasir.
+            NPCMeslek.Tip.Kayikci => new[]
+            { GorevArketip.KayikYolcu, GorevArketip.Teslimat },
+
+            // Esnaf sehrin ticaretidir: tedarik, teslimat — ve yasak
+            // donemde gizli yuk de onun elinden gecer.
+            NPCMeslek.Tip.Esnaf => new[]
+            { GorevArketip.Tedarik, GorevArketip.Teslimat,
+              GorevArketip.Kacakcilik },
+
+            // Su saticisi kendi tedarik zincirini bilir.
+            NPCMeslek.Tip.SuSaticisi => new[]
+            { GorevArketip.Tedarik },
+
+            // Imam kefalet duzeninin merkezi — kayip ona sorulur
+            // (RESEARCH: mahalle kefaleti).
+            NPCMeslek.Tip.Imam => new[]
+            { GorevArketip.Kayip },
+            NPCMeslek.Tip.Medreseli => new[]
+            { GorevArketip.Kayip },
+
+            // Cocuk kaybi HABER VERIR; bu onun soyleyebilecegi tek is
+            // ve tam da cocugun soyleyecegi sey.
+            NPCMeslek.Tip.Cocuk => new[]
+            { GorevArketip.Kayip },
+
+            // Dilenci sokagi herkesten iyi bilir.
+            NPCMeslek.Tip.Dilenci => new[]
+            { GorevArketip.Kayip, GorevArketip.Kacakcilik },
+
+            // Ases ve Yeniceri: is vermez.
+            _ => System.Array.Empty<GorevArketip>(),
+        };
+
         /// <summary>Arketipin durak türleri, sırayla.</summary>
         private static SokakGrafi.Tur[] Duraklar(GorevArketip a) => a switch
         {

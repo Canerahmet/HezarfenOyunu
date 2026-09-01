@@ -161,10 +161,10 @@ namespace Hezarfen.Sehir
         /// başlar ve "işi verecek kimse uğramadı" diye bir kilit
         /// oluşamaz.
         /// </summary>
-        public bool IsIste(Vector3 nerede)
+        public bool IsIste(Vector3 nerede, GorevArketip[] izinli = null)
         {
             if (Simdiki != null) return false;
-            YeniGorev(nerede);
+            YeniGorev(nerede, izinli);
             return Simdiki != null;
         }
 
@@ -190,7 +190,12 @@ namespace Hezarfen.Sehir
         public void YeniGorev()
             => YeniGorev(oyuncu != null ? oyuncu.position : Vector3.zero);
 
-        public void YeniGorev(Vector3 nerede)
+        /// <param name="izinli">
+        /// Konuşulan kişinin verebileceği işler
+        /// (<see cref="GorevUretici.Verebilir"/>). <c>null</c> ise
+        /// tümü — testler ve eski çağrı yolu için.
+        /// </param>
+        public void YeniGorev(Vector3 nerede, GorevArketip[] izinli = null)
         {
             Simdiki = null;
             if (graf == null || oyuncu == null) return;
@@ -240,6 +245,10 @@ namespace Hezarfen.Sehir
             {
                 var a = hepsi[(_sayac + i) % hepsi.Length];
                 if (!GorevUretici.Uygun(a, yil, gun)) continue;
+
+                // KIM SORDUYSA ONUN VEREBILECEGI IS.
+                if (izinli != null && System.Array.IndexOf(izinli, a) < 0)
+                    continue;
                 var g = GorevUretici.Uret(graf, a, nerede,
                                           tohum + _sayac * 7919, yil, gun);
                 if (g == null || g.duraklar.Count == 0) continue;

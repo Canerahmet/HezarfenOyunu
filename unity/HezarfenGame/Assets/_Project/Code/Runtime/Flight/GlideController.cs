@@ -161,11 +161,31 @@ namespace Hezarfen.Flight
             // Yatış açısı ÖNCE hesaplanır: hedef hücum açısı ona bağlı.
             BankAngleDeg = ComputeBankAngleDeg();
 
-            // Pilot hedef hücum açısı komut eder.
-            float targetAlpha = Mathf.Lerp(
-                tuning.minCommandAlphaDeg,
-                tuning.maxCommandAlphaDeg,
-                (pitchIn + 1f) * 0.5f);
+            // ELLER SERBEST = EN IYI SUZULUS.
+            //
+            // Once dogrusal esleme vardi: pitch −1 → 1°, +1 → 24°,
+            // yani **notr cubuk 12,5°**. O aci bir tesadüf degil, EN AZ
+            // BATIS acisi (0,94 m/s) — termikte donmek icin dogru,
+            // mesafe icin yanlis. En iyi suzulus 6,2°'de ve L/D orada
+            // 11,56; 12,5°'de 9,84.
+            //
+            // Olculen bedel: 51,6 m'den menzil 596 m yerine **508 m**,
+            // yani her ucusun **%15'i**. Ve klavye oyuncusu bu 88 m'yi
+            // geri alamiyordu bile: `1DAxis` kompoziti yalniz −1, 0, +1
+            // uretir, arada bir yer TUTTURULAMAZ. Yani kanadin gercek
+            // menzili oyuncunun ulasabildigi uc trimin de disindaydi.
+            //
+            // Yeni esleme uc noktalari korur (−1 hala 1°, +1 hala 24°)
+            // ama merkezi kanadin kendi en iyi noktasina tasir: itmek
+            // hizlandirir, cekmek yavaslatir, birakmak **en uzaga**
+            // goturur. Bir suzulme oyununda notr girdinin karsiligi
+            // budur.
+            float enIyiAlfa = Aerodynamics.BestGlideRatio(tuning).alphaDeg;
+            enIyiAlfa = Mathf.Clamp(enIyiAlfa, tuning.minCommandAlphaDeg,
+                                    tuning.maxCommandAlphaDeg);
+            float targetAlpha = pitchIn >= 0f
+                ? Mathf.Lerp(enIyiAlfa, tuning.maxCommandAlphaDeg, pitchIn)
+                : Mathf.Lerp(enIyiAlfa, tuning.minCommandAlphaDeg, -pitchIn);
 
             // YATIŞTA DAHA ÇOK TAŞIMA GEREKİR — VE MODEL BUNU İSTEMİYORDU.
             //
@@ -199,8 +219,40 @@ namespace Hezarfen.Flight
             float cosBank = Mathf.Cos(BankAngleDeg * Mathf.Deg2Rad);
             float yukKatsayisi = Mathf.Min(2.5f, 1f / Mathf.Max(0.25f,
                                                                  cosBank));
-            targetAlpha = Mathf.Min(targetAlpha * yukKatsayisi,
-                                    tuning.maxCommandAlphaDeg);
+            // ...AMA TELAFI STALL'A SOKMAMALI.
+            //
+            // Kirpma siniri `maxCommandAlphaDeg` = 24 idi, oysa
+            // `stallAngleDeg` = 15. Notr pitch'te taban aci 12,5
+            // oldugu icin hesap sudur: φ = 33,6° → komut 15,0° = tam
+            // stall esigi; φ = 55° (izin verilen en cok yatis) →
+            // 21,8°, yani stall'in **6,8 derece icinde**. Donus
+            // araliginin ust 21 derecesi, tanimi geregi bir stall
+            // komutuydu.
+            //
+            // Ve testler bunu goremedi: suzulme testleri yatissiz
+            // uciyor, sarmal testi 33°'de olcuyor — cetvel kusurun bir
+            // milimetre berisinde duruyordu.
+            //
+            // Tavan stall acisinin 1,5 derece altinda. Fazla yuk artik
+            // stall'a degil **hiz kaybina** doner; asili planörün de
+            // yaptigi sey budur.
+            // ...AMA TAVAN PILOTUN KENDI KOMUTUNU KIRPMAZ.
+            //
+            // Ilk halde tavan kosulsuz uygulandi ve olcum aninda
+            // soyledi: "tam burun yukarida stall'a girilemiyor,
+            // alpha 10,3 derece". Yani stall'i kaza olmaktan
+            // cikarayim derken onu SECILEMEZ yapmistim — oysa
+            // burnu tam yukari cekmek bir hatanin degil bir
+            // KARARIN karsiligi olmali (kisa alana inmek, hizi
+            // hizlica kirmak).
+            //
+            // Tavan yalnizca telafinin FAZLASINI tutar: kendi
+            // komutun her zaman gecer, yatis yuzunden eklenen pay
+            // seni stall'a itemez.
+            float alfaTavani = Mathf.Max(targetAlpha,
+                Mathf.Min(tuning.maxCommandAlphaDeg,
+                          tuning.stallAngleDeg - 1.5f));
+            targetAlpha = Mathf.Min(targetAlpha * yukKatsayisi, alfaTavani);
 
             float alphaErrorRad = (targetAlpha - AngleOfAttackDeg) * Mathf.Deg2Rad;
             float sideslipRad = SideslipDeg * Mathf.Deg2Rad;

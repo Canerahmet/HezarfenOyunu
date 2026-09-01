@@ -90,6 +90,16 @@ namespace Hezarfen.Arayuz
             var dizi = FindAnyObjectByType<Player.UcusDizisi>();
             if (dizi != null) dizi.DurumDegisti += UcusDurumu;
             if (aranma != null) aranma.DurumDegisti += AranmaDurumu;
+
+            if (perde == null) perde = FindAnyObjectByType<Player.Perde2Dilimi>();
+            if (perde != null)
+            {
+                perde.AsamaDegisti += AsamaDegisti;
+                // Ilk kareden itibaren gorunmeli: oyuncu ne yapacagini
+                // ancak bir asama DEGISTIGINDE ogrenirse, hic
+                // ogrenmez.
+                Bildir(AsamaMetni(perde.Simdiki));
+            }
         }
 
         private void OnDisable()
@@ -102,9 +112,41 @@ namespace Hezarfen.Arayuz
             var dizi = FindAnyObjectByType<Player.UcusDizisi>();
             if (dizi != null) dizi.DurumDegisti -= UcusDurumu;
             if (aranma != null) aranma.DurumDegisti -= AranmaDurumu;
+            if (perde != null) perde.AsamaDegisti -= AsamaDegisti;
         }
 
         private void IsBasladi(Gorev g) => Bildir($"Yeni iş: {g.baslik}");
+
+        /// <summary>
+        /// Oyunun <b>kendi</b> hikâyesi — ekrana ilk kez ulaşıyor.
+        ///
+        /// <see cref="Player.Perde2Dilimi"/> sahnede duruyor ve beş
+        /// aşamalı bir zincir işletiyor: Okmeydanı'nda talim → kuleye
+        /// çıkış → uçuş → Doğancılar'a iniş → tepki. <c>AsamaDegisti</c>
+        /// olayının depoda <b>sıfır abonesi</b> vardı.
+        ///
+        /// Yani oyuncu Galata'da doğuyor, prosedürel bir "kayıp eşya"
+        /// işi görüyor ve oyunun adını taşıyan görevin var olduğunu
+        /// <b>asla öğrenmiyordu</b>. Okmeydanı kuleden 3,5 km ötede;
+        /// kimse oraya kazara gitmez.
+        /// </summary>
+        private void AsamaDegisti(Player.Perde2Dilimi.Asama a)
+            => Bildir(AsamaMetni(a));
+
+        private static string AsamaMetni(Player.Perde2Dilimi.Asama a)
+            => a switch
+            {
+                Player.Perde2Dilimi.Asama.Talim =>
+                    "Okmeydanı'nda talim et — kanadı tanıman lazım.",
+                Player.Perde2Dilimi.Asama.Kule =>
+                    "Talim bitti. Galata Kulesi'ne çık.",
+                Player.Perde2Dilimi.Asama.Ucus => "Boğaz'ı geç.",
+                Player.Perde2Dilimi.Asama.Inis =>
+                    "Doğancılar Meydanı'na in.",
+                Player.Perde2Dilimi.Asama.Tepki =>
+                    "İncili Köşk'e git — padişah seni görmek istiyor.",
+                _ => "",
+            };
 
         private void IsBitti(Gorev g) =>
             Bildir($"Teslim edildi · +{g.akce} akçe");
@@ -177,6 +219,16 @@ namespace Hezarfen.Arayuz
 
             if (Basildi(duraklatTusu, kol?.startButton))
                 Duraklat(!Duraklatildi);
+
+            // Duraklatilmisken kol menuyu gezer.
+            if (Duraklatildi)
+            {
+                if (Basildi(Key.DownArrow, kol?.dpad.down)) _menuSecili++;
+                if (Basildi(Key.UpArrow, kol?.dpad.up)) _menuSecili--;
+                _menuSecili = (_menuSecili + 4) % 4;
+                if (Basildi(Key.Enter, kol?.buttonSouth)) _menuOnay = true;
+                return;   // duraklatilmisken kaydet/yukle kisayolu yok
+            }
             if (Basildi(kaydetTusu, kol?.dpad.up)) Kaydet();
             if (Basildi(yukleTusu, kol?.dpad.down)) Yukle();
 
@@ -229,6 +281,26 @@ namespace Hezarfen.Arayuz
                   + "D-pad yukarı kaydet · D-pad aşağı yükle"
                 : "ESC duraklat · E al · G kanat · V bakış · Shift koş\n"
                   + "F5 kaydet · F9 yükle";
+
+        /// <summary>Duraklat menüsünde seçili satır.</summary>
+        private int _menuSecili;
+        private bool _menuOnay;
+
+        /// <summary>Duraklat menüsünde bir satırı uygular.</summary>
+        private void MenuSec(int i)
+        {
+            switch (i)
+            {
+                case 0: Duraklat(false); break;
+                case 1: Kaydet(); break;
+                case 2: Yukle(); break;
+                case 3:
+                    Time.timeScale = 1f;
+                    UnityEngine.SceneManagement.SceneManager
+                        .LoadScene("Acilis");
+                    break;
+            }
+        }
 
         /// <summary>Duraklatır ya da devam eder.</summary>
         public void Duraklat(bool dur)
@@ -307,6 +379,24 @@ namespace Hezarfen.Arayuz
             string[] ad = { "kuzey", "kuzeydoğu", "doğu", "güneydoğu",
                             "güney", "güneybatı", "batı", "kuzeybatı" };
             return ad[Mathf.RoundToInt(aci / 45f) % 8];
+        }
+
+        [Tooltip("Ana hikâye zinciri — boşsa sahnede aranır.")]
+        public Player.Perde2Dilimi perde;
+
+        /// <summary>Ana zincirin şu anki hedefi — dünyada bir yer.</summary>
+        private Vector3? PerdeHedefi()
+        {
+            if (perde == null) return null;
+            return perde.Simdiki switch
+            {
+                Player.Perde2Dilimi.Asama.Talim => perde.okmeydani,
+                Player.Perde2Dilimi.Asama.Kule => perde.kule,
+                Player.Perde2Dilimi.Asama.Ucus => perde.dogancilar,
+                Player.Perde2Dilimi.Asama.Inis => perde.dogancilar,
+                Player.Perde2Dilimi.Asama.Tepki => perde.incilikosk,
+                _ => null,
+            };
         }
 
         private Transform _oyuncuT;
@@ -390,7 +480,34 @@ namespace Hezarfen.Arayuz
                           + $"  ·  {isim.akce} akçe", _yazi);
                 ust += 82f;
             }
-            else if (gorev != null)
+            // ANA ZINCIR — HER ZAMAN EKRANDA.
+            //
+            // Bir bildirim uc saniye durur ve gecer; oyunun kendi
+            // hikayesi ekranda kalmali. `talimHedefi = 3` ve
+            // `talimMesafesi = 60 m` esikleri vardi ve ikisi de
+            // oyuncuya hic gorunmuyordu: kimse "3 suzulusten 1'i
+            // tamam" demeden ucmayi ogrenemez.
+            if (perde != null && perde.Simdiki != Player.Perde2Dilimi.Asama.Bitti)
+            {
+                string ek = perde.Simdiki == Player.Perde2Dilimi.Asama.Talim
+                    ? $"  ({perde.TalimSayisi}/{perde.talimHedefi})" : "";
+                var pk = PerdeHedefi();
+                string yon = pk != null ? YonAdi(pk) : "";
+                float pm = pk != null && OyuncuT != null
+                    ? Vector2.Distance(
+                        new Vector2(OyuncuT.position.x, OyuncuT.position.z),
+                        new Vector2(pk.Value.x, pk.Value.z)) : -1f;
+
+                GUI.Box(new Rect(10, ust, 330, 52), "", _kutu);
+                GUI.Label(new Rect(20, ust + 5, 320, 22),
+                          AsamaMetni(perde.Simdiki) + ek, _yazi);
+                if (pm >= 0f)
+                    GUI.Label(new Rect(20, ust + 27, 320, 22),
+                              $"{yon}  ·  {pm:F0} m", _yazi);
+                ust += 60f;
+            }
+
+            if (gorev != null && gorev.Simdiki == null)
             {
                 // ISSIZKEN NE YAPACAGINI SOYLE.
                 //
@@ -503,18 +620,37 @@ namespace Hezarfen.Arayuz
             var r = new Rect((_en - g) * 0.5f,
                              (_boy - y) * 0.5f, g, y);
             GUI.Box(r, "DURAKLATILDI", _kutu);
-            if (GUI.Button(new Rect(r.x + 30, r.y + 50, g - 60, 36),
-                           "Devam et")) Duraklat(false);
-            if (GUI.Button(new Rect(r.x + 30, r.y + 96, g - 60, 36),
-                           "Kaydet")) Kaydet();
-            if (GUI.Button(new Rect(r.x + 30, r.y + 142, g - 60, 36),
-                           "Yükle")) Yukle();
-            if (GUI.Button(new Rect(r.x + 30, r.y + 188, g - 60, 36),
-                           "Ana menü"))
+
+            // MENU KOLLA GEZILEBILMELI.
+            //
+            // Bu menu `GUI.Button` ile ciziliyordu ve `GUI.Button`
+            // IMLEC ISTER. `Duraklat(true)` imleci serbest birakiyor
+            // ama kolla oynayan biri isletim sistemi imlecini
+            // OYNATAMAZ: Steam Deck'te Start'a basan oyuncu dort
+            // dugme goruyor ve hicbirine erisemiyordu — "Ana menu"
+            // gamepad'le ulasilamaz, oyundan cikmanin yolu Alt+F4.
+            //
+            // Acilis menusu bu dersi ogrenmisti
+            // (`AcilisMenusu.Sec`, EventSystem ile ilk dugmeyi secer);
+            // duraklat menusu ayni projede o dersten habersizdi. 2010'dan
+            // beri konsol sertifikasyon sarti.
+            string[] secenekler = { "Devam et", "Kaydet", "Yükle", "Ana menü" };
+            for (int i = 0; i < secenekler.Length; i++)
             {
-                Time.timeScale = 1f;
-                UnityEngine.SceneManagement.SceneManager.LoadScene("Acilis");
+                var dr = new Rect(r.x + 30, r.y + 50 + i * 46, g - 60, 36);
+
+                // Secili olan gorunur olmali: kolla gezen oyuncunun
+                // nerede oldugunu bilmesinin TEK yolu bu.
+                var eskiRenk = GUI.color;
+                if (i == _menuSecili)
+                    GUI.color = new Color(1f, 0.86f, 0.45f, 1f);
+                bool tiklandi = GUI.Button(dr, secenekler[i]);
+                GUI.color = eskiRenk;
+
+                if (tiklandi || (i == _menuSecili && _menuOnay))
+                    MenuSec(i);
             }
+            _menuOnay = false;
             GUI.matrix = eskiMatris;
         }
     }

@@ -87,6 +87,20 @@ namespace Hezarfen.Editor.Diagnostics
 
             internal IEnumerator Kos()
             {
+                // PROFIL SURUCUSU DENENDI VE GERI ALINDI.
+                //
+                // Sahne cizim cagrisi 0 okununca once "sayaclar kapali"
+                // sandim ve `Profiler.enabled` + `ProfilerDriver.enabled`
+                // actim. Olcum iki sey soyledi: sayaclar YINE 0 dondu
+                // (UnityStats toplu kipte Game view'a bagli), ve
+                // surucuyu acmak kareyi 10,8'den **12,4 ms'ye**
+                // cikardi — yani hicbir sey kazandirmayan 1,6 ms'lik
+                // bir olcum bozulmasi. Cetveli duzeltmeye calisirken
+                // cetveli bozmak.
+                //
+                // Dogru davranis asagida: sifiri sonuc diye yazmamak
+                // ve okunamadigini SOYLEMEK.
+
                 var sb = new System.Text.StringBuilder();
                 sb.AppendLine("# Kare süresi bölüşümü");
                 sb.AppendLine();
@@ -153,12 +167,35 @@ namespace Hezarfen.Editor.Diagnostics
                     agac.enabled = true;
                 }
 
+                // EKRANI BELIRLEYEN IKI SAYI BU RAPORDA HIC YOKTU.
+                //
+                // Son satir "cizim cagrisi=862" yaziyordu ve o sayi
+                // `AgacCizici.CizimCagrisi` — yani YALNIZ agacin
+                // `RenderMeshInstanced` cagrilari. Sahnenin geri
+                // kalani (12.248 ev, 60 govde, arazi, son islem) o
+                // sayiya hic girmiyordu. Kendi turumun ozetinde onu
+                // sahnenin cizim cagrisi sanip yayimladim.
+                //
+                // Dogru cetvel projede zaten vardi: `FrameTimeProbe`
+                // `UnityStats`'i okuyor. Kapiyi tutan olcum onu
+                // cagirmiyordu — yani iyilestirmeleri fiyatlayacak
+                // sayi yoktu ve bu, "olculmeyen sey iyilesmez"
+                // kuralinin en pahali hali.
+                sb.AppendLine();
+                sb.AppendLine("| sahne olcusu | deger |");
+                sb.AppendLine("|---|---:|");
+                int sahneCizim = UnityStats.drawCalls;
+                sb.AppendLine($"| cizim cagrisi (sahne) | {sahneCizim} |");
+                sb.AppendLine($"| SetPass cagrisi | {UnityStats.setPassCalls} |");
+                sb.AppendLine($"| SRP toplu | {UnityStats.srpBatcherDrawCalls} |");
+                sb.AppendLine($"| ucgen (milyon) | "
+                              + $"{UnityStats.triangles / 1e6f:0.00} |");
                 sb.AppendLine();
                 sb.AppendLine($"sakin={(npc != null ? npc.Sakinler.Count : 0)} "
                               + $"dilim={(npc != null ? npc.dilim : 0)} "
                               + $"gorunur govde={(npc != null ? npc.GorunurSayisi : 0)} "
                               + $"agac cizilen={(agac != null ? agac.CizilenAgac : 0)} "
-                              + $"cizim cagrisi={(agac != null ? agac.CizimCagrisi : 0)}");
+                              + $"agac cizim cagrisi={(agac != null ? agac.CizimCagrisi : 0)}");
 
                 // BOS SAHNE OLCULMEZ.
                 //
@@ -176,6 +213,22 @@ namespace Hezarfen.Editor.Diagnostics
                         + "YAZILMADI.");
                     if (Toplu) EditorApplication.Exit(1);
                     yield break;
+                }
+
+                // OLCULEMEYEN SAYI YAZILMAZ.
+                //
+                // `UnityStats` toplu kipte calismayabilir. O zaman
+                // dogru davranis sifiri raporlamak degil, olculemedigini
+                // SOYLEMEKTIR — bir cetvel, olcemedigini bildirebilmeli.
+                if (sahneCizim == 0)
+                {
+                    sb.AppendLine();
+                    sb.AppendLine("> **Sahne sayaclari okunamadi** "
+                                  + "(`UnityStats` toplu kipte sifir "
+                                  + "dondu). Yukaridaki sahne olcusu "
+                                  + "tablosu GECERSIZ; Editor'den "
+                                  + "`Hezarfen -> Olcum -> Kare suresini "
+                                  + "bolustur` ile okunmali.");
                 }
 
                 Directory.CreateDirectory(Cikti);

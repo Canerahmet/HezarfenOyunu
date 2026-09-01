@@ -573,6 +573,18 @@ namespace Hezarfen.Editor.Pipeline
                 Debug.LogError("[Hezarfen] WT_Faz0_Default yok — ucus "
                                + "aerodinamiksiz kalir.");
 
+            // SES: hizin duyulmasi.
+            //
+            // `Runtime/Flight/` altinda hic ses kaynagi yoktu ve tek
+            // ruzgar sesi IRTIFADAN besleniyordu — hava hizindan
+            // degil. 300 m'de referans nesnesi olmayan bir sahnede
+            // hizin oyuncuya ulasan tek kanali HUD'daki bir rakamdi.
+            var ucusSes = go.AddComponent<UcusSesi>();
+            ucusSes.yatak = AssetDatabase.LoadAssetAtPath<AudioClip>(
+                "Assets/_Project/Audio/Ortam/SFX_Ortam_Ruzgar.wav");
+            if (ucusSes.yatak == null)
+                Debug.LogError("[Hezarfen] SFX_Ortam_Ruzgar yok — ucus "
+                               + "sessiz kalir.");
             // GIRDI: bunlar olmadan havada W/A/S/D kanada hic ulasmaz.
             go.AddComponent<PlayerFlightInput>();
             var firlatma = go.AddComponent<FlightLaunch>();

@@ -61,7 +61,9 @@ namespace Hezarfen.Sehir
         /// <b>eli boşken</b>.
         /// </summary>
         private bool IsVerebilir =>
-            gorev != null && gorev.Simdiki == null;
+            gorev != null && gorev.Simdiki == null
+            && ajan?.meslek != null
+            && GorevUretici.Verebilir(ajan.meslek.tip).Length > 0;
 
         public bool Etkiles(GameObject aktor)
         {
@@ -69,13 +71,19 @@ namespace Hezarfen.Sehir
 
             if (IsVerebilir)
             {
-                bool oldu = gorev.IsIste(ajan.konum);
+                bool oldu = gorev.IsIste(
+                    ajan.konum, GorevUretici.Verebilir(ajan.meslek.tip));
                 SonSoz = oldu
                     ? $"«{IsSozu()}»"
                     : "«Bugün bir işim yok.»";
                 return oldu;
             }
 
+            // KOLLUK IS VERMEZ, SUZER.
+            //
+            // Ases ve yeniceri `Verebilir`'de bos kume doner. Bu bir
+            // eksiklik degil bir karakterizasyon — ve susmak olmamali:
+            // susan bir NPC dekordur, seni suzen bir NPC dunyadir.
             SonSoz = $"«{Lakirdi()}»";
             return true;
         }

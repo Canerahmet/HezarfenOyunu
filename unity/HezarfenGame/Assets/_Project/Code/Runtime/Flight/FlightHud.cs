@@ -85,10 +85,29 @@ namespace Hezarfen.Flight
             float vertical = hamDikey - ruzgarY;
 
             float distance = 0f;
+            string hedefYon = "", yetisme = "";
             if (target != null)
             {
                 Vector3 d = target.position - glider.transform.position;
                 distance = new Vector2(d.x, d.z).magnitude;
+                hedefYon = YonAdi(d);
+
+                // SUZULME KONISI: OYUNUN TEK GERCEK SORUSU.
+                //
+                // HUD "HEDEFE 3312 m" yaziyordu — bir bilgi degil bir
+                // sayi: oyuncu ne yone gidecegini de, yetisip
+                // yetismeyecegini de bilmiyordu. Oysa cevabin butun
+                // terimleri elde: irtifa farki ve anlik L/D.
+                //
+                // Bugun bunu ancak yere cakildiginda ogreniyor. Bir
+                // suzulus oyununda "yetisiyor mu" sorusunun cevabi
+                // UCUS BOYUNCA gorunmeli, ucus bitince degil.
+                float ld = glider.CurrentDrag > 1e-3f
+                           ? glider.CurrentLift / glider.CurrentDrag : 0f;
+                float ulasilir = Mathf.Max(0f, altitude - target.position.y) * ld;
+                yetisme = ulasilir >= distance
+                    ? "YETİŞİYOR"
+                    : $"{distance - ulasilir:F0} m EKSİK";
             }
 
             string vario = vertical >= 0f ? $"+{vertical:F1}" : $"{vertical:F1}";
@@ -98,7 +117,7 @@ namespace Hezarfen.Flight
                 $"DİKEY       {vario} m/s\n" +
                 $"HÜCUM AÇISI {glider.AngleOfAttackDeg:F1}°\n" +
                 $"YATIŞ       {glider.BankAngleDeg:F0}°\n" +
-                $"HEDEFE      {distance:F0} m\n" +
+                $"HEDEFE      {distance:F0} m  {hedefYon}  {yetisme}\n" +
                 $"RÜZGÂR      {glider.WindAtCraft.magnitude:F1} m/s "
                 + $"{YonAdi(glider.WindAtCraft)} (dikey {ruzgarY:+0.0;-0.0;0.0})";
 

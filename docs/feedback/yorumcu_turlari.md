@@ -155,3 +155,99 @@ Artık sahneyi kendisi açıyor ve boş sahneyi **reddediyor**.
   öğrenmiş, duraklat menüsü habersiz).
 - `Kacakcilik` 196 gerçek saat arkasında kilitli.
 - ADR 0084 hâlâ Caner'in kararını bekliyor.
+
+## 9. tur — 2026-09-01
+
+Üç yorumcu, yirmi bir bulgu. Turun iki büyük devredilen maddesi kapandı
+ve bir yayımlanmış sayı düzeltildi.
+
+### Düzeltme: "862 çizim çağrısı" sahnenin değildi
+
+8. turun özetinde bu sayıyı sahnenin çizim çağrısı diye yazdım.
+Değilmiş: `AgacCizici.CizimCagrisi`, yani yalnız ağacın
+`RenderMeshInstanced` çağrıları. 12.248 ev, 60 gövde, arazi ve son
+işlem o sayıya hiç girmiyordu. **Ekranı belirleyen iki sayı — sahne
+çizim çağrısı ve sahne üçgeni — hiç ölçülmüyordu**, ve doğru cetvel
+(`FrameTimeProbe` → `UnityStats`) projede zaten vardı.
+
+Ve cetveli düzeltmeye çalışırken iki kez cetveli bozdum:
+1. `UnityStats` toplu kipte **sıfır** dönüyor (Game view'a bağlı).
+   Sıfırı sonuç diye yazmak, tam da düzeltmeye çalıştığım kusurdu.
+2. Profil sürücüsünü açtım: sayaçlar yine sıfır, **ve kare 10,8'den
+   12,4 ms'ye çıktı**. Hiçbir şey kazandırmayan 1,6 ms'lik bir ölçüm
+   bozulması. Geri alındı.
+
+Bugünkü hâl: rapor sıfır yazmıyor, **okunamadığını söylüyor**. Sahne
+sayaçları Editor'den okunmalı — bu bilinen ve yazılı bir sınır.
+
+### Kapatılanlar
+
+**Dünya / sistem**
+- Kalabalıkla konuşulamıyordu; iş konveyörden geliyordu →
+  `Sakin` + iş **konuşulan kişinin yanında** üretiliyor. Görevi bir
+  düğüme bağlamak, oraya kimse uğramazsa oyunu kilitlerdi.
+- Oyun artık **işsiz başlıyor**, biten işin yerine kendiliğinden
+  yenisi konmuyor.
+- İşi kim verdiği önemsizdi: 7.200 çocuk kaçakçılık teklif ediyordu →
+  `GorevUretici.Verebilir(meslek)` tablosu. Ases ve yeniçeri iş
+  vermez ama **susmaz** — susan NPC dekordur.
+- Ana hikâye ekranda hiç yoktu (`AsamaDegisti` sıfır abone) → kalıcı
+  hedef satırı, yön ve talim sayacı (n/3).
+
+**Uçuş / his**
+- Nötr çubuk en iyi süzülüş değildi: 12,5° (en az batış) yerine 6,2°.
+  Ölçülen bedel menzilin %15'i, ve klavye o noktayı hiç tutturamıyordu.
+- Yatış telafisi 33,6°+ dönüşte **stall komut ediyordu** (tavan 24°,
+  stall 15°). Tavan artık yalnız telafinin fazlasını kırpıyor —
+  ilk hâlinde bilerek stall'a girmeyi de engellemiştim, ölçüm yakaladı.
+- Alan açısı oyunda **hiç yoktu** (`UcusKamerasi` iki sahnenin de
+  sıfırında, `fieldOfView` yazan çalışma zamanı satırı yok) →
+  `KameraKipi` 55°→78°.
+- Uçuşta ses yoktu → `UcusSesi`: hava hızına bağlı şiddet ve perde,
+  stall'da kumaş katmanı.
+- HUD yön ve "yetişir mi" demiyordu → pusula + süzülme konisi.
+- Duraklat menüsü kolla kullanılamıyordu → D-pad + görünür seçim.
+
+**Grafik**
+- Atmosfer 64 m'de bitiyordu → sis derinliği 900 m, ileri saçılma
+  0,45, çoklu saçılma 0,15. Ölçülen maliyet: **0,0 ms** (tahmin tuttu).
+- Kaskad bandı yoktu — geçen tur mesafeyi 150→320 yapıp bandı
+  koymamıştım, yani uzatmak halkaları daha görünür yapmıştı.
+- SSGI profilde tam donanımlı duruyordu ve etkin ardışık düzen onu
+  hiç derlemiyordu → profilden silindi (APV zaten pişirilmiş).
+
+### Ölçülen durum
+
+| ölçü | 8. tur | 9. tur |
+|---|---|---|
+| EditMode testi | 426 | **434 yeşil**, 0 derleme hatası |
+| Kare (toplu kip) | 11,1 ms | **11,0 ms** (bütçe 16,7) |
+| Replik ücreti | +0,3 ms | **+0,1 ms** |
+| İş veren | yönetici (konveyör) | **insan**, mesleğine uygun iş |
+
+### Devredilenler
+
+- **Okmeydanı build'in içinde yok**: 9 menzil taşı `Sandbox/`de kaldı,
+  250 m yarıçapında **0 graf düğümü, 0 sakin, 0 iş veren**. Oyunun
+  ilk perdesi şehrin tek boş odasında geçiyor.
+- **İtibar bağlanmamış**: `Odul`un beş bayrağından dördü hiçbir yerde
+  okunmuyor. 30 görev sonunda değişen tek şey kese.
+- **Kanat parçası enum adı**: dünyada 0 tane, satılmıyor, hiçbir görev
+  taşıtmıyor — oyunun adını taşıyan aygıtın parçası.
+- **Aranma katmanı 196 gerçek saat kilitli**: iki ihlalin ikisi de
+  1633 fermanına bağlı; `YasakBolge` ve `Kacmak` hiç aday olmuyor.
+  Feneri fermandan ayırmak bir tarih kararı → ADR gerek.
+- **775 `HistoricalTag` diskte, sıfır okuyucu** — kodeks yok, harita
+  yok.
+- **Adres katmanı**: 12.248 evin 142'si düğüm; "kayıp eşya" hep aynı
+  24 kapıdan birine gidiyor.
+- **NPC LOD2 yok**: 60 gövde × 16.548 üçgen; `KarakterUc` merdiveni
+  yazılı, prefabta üçüncü kademe olmadığı için hiç seçilmiyor.
+- **Kalabalık tek fazda yürüyor** (`m_CycleOffset: 0`), gövde tek
+  karede yok oluyor.
+- **LOD1 5 malzeme taşıyor** (56 üçgen, 5 alt-mesh); 201 varyantın
+  hepsi LOD1'de tek mesh'e çöküyor.
+- **Gökyüzü boş**: `cloudType: 0` ve gökyüzü rüzgârı literal olarak 0.
+- **SSR kapalı, su var**: Galata Kulesi Haliç'te görünmüyor.
+- **DLSS/dinamik çözünürlük kapalı** — 4070'te masada bırakılmış süre.
+- ADR 0084 hâlâ Caner'in kararını bekliyor.

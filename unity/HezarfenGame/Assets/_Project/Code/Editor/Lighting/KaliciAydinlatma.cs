@@ -397,6 +397,43 @@ namespace Hezarfen.Editor.Lighting
             golge.cascadeShadowSplitCount.overrideState = true;
             golge.cascadeShadowSplitCount.value = 4;
 
+            // KASKADLAR ARASI BANT: SERT HALKA OLMASIN.
+            //
+            // 320 m ve 0,05/0,15/0,3 bolunmeleriyle sinirlar 16, 48 ve
+            // 96 m'ye dusuyor; bant sifir oldugu icin yururken golge
+            // cozunurlugu o mesafelerde SERT HALKA halinde degisiyor.
+            // Gecen tur mesafeyi 150'den 320'ye cektim ve bandi
+            // koymadim — mesafeyi uzatmak halkalari daha gorunur
+            // yapti.
+            golge.cascadeShadowBorder0.overrideState = true;
+            golge.cascadeShadowBorder0.value = 0.10f;
+            golge.cascadeShadowBorder1.overrideState = true;
+            golge.cascadeShadowBorder1.value = 0.10f;
+            golge.cascadeShadowBorder2.overrideState = true;
+            golge.cascadeShadowBorder2.value = 0.10f;
+
+            // --- SSGI: PROFILDEN CIKARILIR (ADR 0086) ------------------
+            //
+            // Profil tam donanimli bir `GlobalIllumination` bileseni
+            // tasiyordu — `enable: 1`, `fullResolutionSS: 1`,
+            // `m_MaxRaySteps: 32` — ve etkin ardisik duzen
+            // (`HDRP Balanced`) `supportSSGI: 0` ile onu HIC
+            // DERLEMIYOR. Yani "11 override diskte" diye sayilan
+            // katmanlardan biri tamamen oluydu ve bir sonraki okuyan
+            // "GI acik" diye okuyacakti.
+            //
+            // Silmek aciktan yegdir: dolayli aydinlatma zaten APV'den
+            // geliyor ve APV GERCEKTEN pisirilmis (98 MB CellData
+            // diskte). Bir profil, tasidigi seyi yapmiyorsa yalan
+            // soyluyor demektir.
+            var gi = profil.components.Find(
+                c => c is UnityEngine.Rendering.HighDefinition.GlobalIllumination);
+            if (gi != null)
+            {
+                profil.Remove<UnityEngine.Rendering.HighDefinition.GlobalIllumination>();
+                Object.DestroyImmediate(gi, true);
+            }
+
             // --- SIS: Halic sabahi -------------------------------------
             var sis = Ensure<Fog>(profil);
             sis.enabled.overrideState = true;
@@ -406,7 +443,38 @@ namespace Hezarfen.Editor.Lighting
             sis.baseHeight.overrideState = true;
             sis.baseHeight.value = 0f;          // deniz seviyesi
             sis.maximumHeight.overrideState = true;
-            sis.maximumHeight.value = 140f;     // Galata sirtinin ustu
+            sis.maximumHeight.value = 220f;     // ucus kotunun ustu
+
+            // ATMOSFER 64 METREDE BITIYORDU.
+            //
+            // Volumetrik sis hacmi kameradan yalnizca **64 m**
+            // uzaniyordu (HDRP varsayilani); otesinde analitik sise
+            // dusuluyor. Yani isik huzmesi, gunesin sisteki halesi,
+            // minareler arasindan gecen isik — hepsi 64 m'nin
+            // icinde, ve ucusun TAMAMI o mesafenin disinda. Kuleden
+            // atladigin an atmosfer bitiyordu.
+            //
+            // Bedeli sifir: `m_FogControlMode` Balance ve butce
+            // `m_VolumetricFogBudget` ile sabit; `depthExtent` ayni
+            // froxel izgarasinin DUNYADAKI dagilimini degistirir,
+            // sayisini degil. Dilim dagilimi kameraya yaklastirilir
+            // (0,40) ki yakin hassasiyet kaybolmasin.
+            sis.depthExtent.overrideState = true;
+            sis.depthExtent.value = 900f;
+            sis.sliceDistributionUniformity.overrideState = true;
+            sis.sliceDistributionUniformity.value = 0.40f;
+
+            // ILERI SACILMA: GUNESE BAKINCA HALE.
+            //
+            // `anisotropy = 0` izotropik sacilma demek, yani gunese
+            // dogru bakmakla sirtini donmek arasinda fark yok. Gercek
+            // atmosferde fark buyuktur ve mesafeyi okunur kilan sey
+            // odur. 0,45 ileri sacilmali bir Henyey-Greenstein terimi;
+            // olcum gurultusunun altinda bir maliyet.
+            sis.anisotropy.overrideState = true;
+            sis.anisotropy.value = 0.45f;
+            sis.multipleScatteringIntensity.overrideState = true;
+            sis.multipleScatteringIntensity.value = 0.15f;
             sis.enableVolumetricFog.overrideState = true;
             sis.enableVolumetricFog.value = true;
 

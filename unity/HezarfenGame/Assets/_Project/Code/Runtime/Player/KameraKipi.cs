@@ -219,6 +219,50 @@ namespace Hezarfen.Player
         /// ettirir ve yürürken titreme olarak görünür — bu oyunda titreme
         /// zaten bir şikâyet konusu, ikincisini eklemeyelim.
         /// </summary>
+        /// <summary>Yürürken alan açısı (derece).</summary>
+        public const float YerFov = 55f;
+
+        /// <summary>En hızlı süzülüşte alan açısı (derece).</summary>
+        public const float UcusFov = 78f;
+
+        /// <summary>Eğrinin doyduğu hava hızı (m/s) — modelin üst ucu.</summary>
+        public const float DoygunHiz = 21f;
+
+        private Hezarfen.Flight.GlideController _suzulme;
+        private float _fov = YerFov;
+
+        /// <summary>
+        /// <b>Hızın görülmesi.</b>
+        ///
+        /// <c>UcusKamerasi</c> yazıldı, test edildi ve <b>hiçbir
+        /// sahneye konmadı</b> — ne oyun sahnesine ne uçuş dilimine.
+        /// Ölçüldü: projede çalışma zamanında <c>fieldOfView</c>'a
+        /// yazan tek satır yoktu, yani oyunda alan açısı Unity
+        /// varsayılanı <b>60°'de sabitti</b>. Model 6,9 ile 21,2 m/s
+        /// arasında uçuyor: üç katlık bir hız aralığı, sıfır görsel
+        /// karşılık.
+        /// </summary>
+        private void AlanAcisi()
+        {
+            if (_suzulme == null)
+                _suzulme = GetComponentInParent<Hezarfen.Flight.GlideController>();
+
+            float hiz = _suzulme != null && _suzulme.isActiveAndEnabled
+                        ? _suzulme.AirspeedMps : 0f;
+
+            // Kare alinir: dusuk hizda alan acisi oynamasin, cunku
+            // yuruyusteki her kucuk hiz degisimi kamerayi soluk
+            // aldirir ve bu bir ucus etkisi degil bir kusurdur.
+            float t = Mathf.Clamp01(hiz / DoygunHiz);
+            float hedef = Mathf.Lerp(YerFov, UcusFov, t * t);
+
+            // Ussel yaklasim: ani bir alan acisi degisimi mide
+            // bulandirir; 0,35 s bir nefes kadar.
+            _fov = Mathf.Lerp(_fov, hedef,
+                              1f - Mathf.Exp(-Time.deltaTime / 0.35f));
+            _kam.fieldOfView = _fov;
+        }
+
         private void LateUpdate()
         {
             // UCUSTA DA CALISIR.
@@ -229,6 +273,8 @@ namespace Hezarfen.Player
             // ve acisi neyse oyle kaliyor, fare hicbir sey yapmiyordu —
             // oyuncu butun ucus boyunca etrafina bakamiyordu.
             if (!Baglan()) return;
+
+            AlanAcisi();
 
             float pitch = _yurume.Pitch;
 
