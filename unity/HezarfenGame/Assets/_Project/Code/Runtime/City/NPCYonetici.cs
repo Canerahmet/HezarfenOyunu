@@ -827,11 +827,30 @@ namespace Hezarfen.Sehir
                 {
                     var m = malzemeler[i];
                     if (m == null || !m.HasProperty(TonKimlik)) continue;
+                    // TEN: kumastan BASKA bir yoldan boyanir.
+                    //
+                    // `Boya` tondan yalniz RENK YONUNU alir, parlakligi
+                    // tabandan birakir — kumasta dogru olan bu (kaftan
+                    // koyu kalsin, yalniz hangi koyu oldugu degissin).
+                    // Tende yanlis: ten farkinin yarisi ACIKLIKTIR.
+                    // Bu yuzden ten dogrudan carpilir.
+                    if (m.name.StartsWith("M_Skin"))
+                    {
+                        var t0 = m.GetColor(TonKimlik);
+                        r.GetPropertyBlock(_tonBlok, i);
+                        _tonBlok.SetColor(TonKimlik, new Color(
+                            t0.r * dna.ten.r, t0.g * dna.ten.g,
+                            t0.b * dna.ten.b, t0.a));
+                        r.SetPropertyBlock(_tonBlok, i);
+                        continue;
+                    }
                     if (!Boyanir(m.name)) continue;
 
                     r.GetPropertyBlock(_tonBlok, i);
                     _tonBlok.SetColor(TonKimlik,
-                                      Boya(m.GetColor(TonKimlik), dna.ton));
+                                      Boya(m.GetColor(TonKimlik),
+                                           TonKaydir(dna.ton, m.name)));
+                    r.SetPropertyBlock(_tonBlok, i);
                     r.SetPropertyBlock(_tonBlok, i);
                 }
             }
@@ -839,9 +858,14 @@ namespace Hezarfen.Sehir
             var anim = a.govde.GetComponentInChildren<Animator>();
             if (anim != null)
             {
-                // Adim hizi boyla olceklenir: kisa adam ayni mesafeyi
-                // daha cok adimda alir.
-                anim.speed = dna.hiz / 1.42f / Mathf.Max(0.6f, dna.olcek);
+                // OYNATMA HIZI BURADA YAZILMAZ.
+                //
+                // Bu satir `anim.speed`i bir kez, govde el degistirdiginde
+                // yaziyordu; `YuruyusuAyarla` ise her karede yaziyor ve
+                // uzerine biniyor. Yani deger iki sahipliydi ve buradaki
+                // hicbir zaman ekrana cikmiyordu — sessiz, olu bir satir.
+                // Adim sikligi artik yer hizindan turuyor (kayma %3,6
+                // olculdu); tek sahibi orasi.
                 // Faz kaymasi: herkes ayni ayakla yurumesin.
                 anim.Play(0, 0, dna.faz);
             }
@@ -893,11 +917,57 @@ namespace Hezarfen.Sehir
                 || malzemeAdi.StartsWith("M_Cloth_Takke");
         }
 
+        /// <summary>
+        /// Testler için: <paramref name="taban"/> renkli bir giysinin, bu
+        /// kişide ve bu malzeme adında görünen rengi. Üretimdeki yolun
+        /// aynısı — testin kendi kopyasını doğrulamaması için.
+        /// </summary>
+        public static Color MalzemeTonu(Color taban, Color ton,
+                                        string malzemeAdi) =>
+            Boya(taban, TonKaydir(ton, malzemeAdi));
+
         /// <summary>Testler için: bu ad tona göre boyanıyor mu.</summary>
         public static bool MalzemeBoyanir(string malzemeAdi) =>
             Boyanir(malzemeAdi);
 
         /// <summary>
+        /// <summary>
+        /// Aynı kişide her giysiyi **biraz farklı** tona kaydırır.
+        ///
+        /// Tek bir <c>dna.ton</c> bütün kumaşlara uygulanıyordu: bir
+        /// kişinin entarisi, şalvarı ve kuşağı aynı yöne kayıyor, yani
+        /// figür tek renge boyanmış gibi okunuyordu. Gerçek bir insan
+        /// tek küpten çıkmış giyinmez — parçalar ayrı ayrı, ayrı
+        /// zamanlarda ve ayrı boyalarla alınır.
+        ///
+        /// Kaydırma malzemenin ADINDAN türer, ayrı bir rastgelelikten
+        /// değil: aynı kişi her seferinde aynı kombinasyonu giyer
+        /// (determinizm kuralı), ama dört kumaş dört ayrı yöne kayar.
+        /// Böylece dört boya ailesi tek başına 4 değil, kişide görülen
+        /// bileşim olarak onlarca ayrı görüntü verir.
+        ///
+        /// Miktar küçük (±%7 ton, ±%12 doygunluk): dönem boya dünyası
+        /// dar ve bunu <see cref="InsanDNA.TonAcisi"/> zaten söylüyor.
+        /// Amaç yeni renkler icat etmek değil, aynı ailenin içinde
+        /// birbirinden ayrılmak.
+        /// </summary>
+        private static Color TonKaydir(Color ton, string malzemeAdi)
+        {
+            if (string.IsNullOrEmpty(malzemeAdi)) return ton;
+            unchecked
+            {
+                uint h = 2166136261u;
+                foreach (char c in malzemeAdi) { h ^= c; h *= 16777619u; }
+                float a = ((h >> 8) & 0xFFFF) / 65535f;
+                float b = ((h >> 24) & 0xFF) / 255f;
+                Color.RGBToHSV(ton, out float hue, out float sat, out float val);
+                hue = Mathf.Repeat(hue + (a - 0.5f) * 0.14f, 1f);
+                sat = Mathf.Clamp01(sat * (1f + (b - 0.5f) * 0.24f));
+                return Color.HSVToRGB(hue, sat, val);
+            }
+        }
+
+
         /// Tabanı DNA tonuna kaydırır — <b>parlaklığını bozmadan</b>.
         ///
         /// Düz çarpma (<c>taban * ton * 1.6f</c>) rengi kaydırırken

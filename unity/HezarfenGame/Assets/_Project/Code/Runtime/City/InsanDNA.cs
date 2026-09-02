@@ -54,6 +54,13 @@ namespace Hezarfen.Sehir
         public readonly bool kadin;
 
         /// <summary>
+        /// <b>Ten çarpanı</b> — kişiden kişiye değişen deri rengi.
+        /// Paletin ten rengiyle çarpılır; 0,62-1,20 arası açıklık ve
+        /// hafif bir sıcaklık kayması taşır.
+        /// </summary>
+        public readonly Color ten;
+
+        /// <summary>
         /// Bu insanın hedef boyu (m).
         ///
         /// <see cref="olcek"/> bunun 1,70 m'ye bölünmüş hâliydi ve tek
@@ -75,7 +82,7 @@ namespace Hezarfen.Sehir
         public const float BoySapma = 0.062f;
 
         private InsanDNA(float olcek, float hiz, Color ton, float yas,
-                         float faz, bool kadin, float boy)
+                         float faz, bool kadin, float boy, Color ten)
         {
             this.olcek = olcek;
             this.hiz = hiz;
@@ -83,6 +90,7 @@ namespace Hezarfen.Sehir
             this.yas = yas;
             this.faz = faz;
             this.kadin = kadin;
+            this.ten = ten;
             this.boy = boy;
         }
 
@@ -150,6 +158,32 @@ namespace Hezarfen.Sehir
             // degismesin — kaydedilmis bir oyunda ayni kisi ayni kisi
             // kalmali.
             bool kadin = Karma(ref h) < 0.48f;
+
+            // TEN: aciklik ve sicaklik — kisiden kisiye DEGISIR.
+            //
+            // Ten rengi bugune kadar hic degismiyordu: palette tek bir
+            // SKIN vardi ve `ton` yalniz kumasa uygulaniyordu. Yani yedi
+            // govde ve dokuz kumas rengi uretildikten sonra bile
+            // sehirdeki herkesin TENI ayniydi — ve ten, bir kalabalikta
+            // en cok degisen seydir.
+            //
+            // Us 0,85 dagilimi hafifce ACIGA kaydirir; Akdeniz'in kuzey
+            // kiyisinda beklenen budur (T2: dagilim gercek, birey degil).
+            // Carpan paletin ten rengiyle CARPILIYOR, yani tenin ne
+            // oldugunu hala palet soyluyor; DNA yalnizca ne kadar acik.
+            //
+            // Mavi kanal ayrica kisiliyor: koyu ten yalnizca daha
+            // karanlik degil daha SICAKTIR. Tek bir degeri uc kanala
+            // birden uygulamak griye kayan, cansiz bir ten verir.
+            float tenAcik = Mathf.Pow(Karma(ref h), 0.85f);
+            float tenSicak = Karma(ref h);
+            float tv = Mathf.Lerp(0.62f, 1.20f, tenAcik);
+            var ten = new Color(
+                tv * (1.00f + 0.06f * (tenSicak - 0.5f)),
+                tv * (0.99f - 0.02f * (tenSicak - 0.5f)),
+                tv * (0.94f - 0.10f * (tenSicak - 0.5f)
+                      - 0.08f * (1f - tenAcik)),
+                1f);
             // Donem kadini erkekten ~12 cm kisadir (1,54 / 1,66 = 0,928).
             // Ayni oran arketip boylarinda da var (`sakin_kit`), cunku
             // ikisi de ayni yerden okundu.
@@ -175,7 +209,7 @@ namespace Hezarfen.Sehir
             Color ton = Color.HSVToRGB(tonAci, doygun, parlak);
 
             return new InsanDNA(boy / TabanBoy, hiz, ton, yas, Karma(ref h),
-                                kadin, boy);
+                                kadin, boy, ten);
         }
 
         /// <summary>

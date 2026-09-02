@@ -58,7 +58,7 @@
    "why": "yerdeki Hezarfen — uzun entari, oturan adamin boyu",
    "boy": 1.7776,
    "en_genis": 1.0957,
-   "derinlik": 0.5829,
+   "derinlik": 0.5912,
    "etek_kotu": 0.094,
    "tip": "erkek",
    "taban_boy": 1.7,
@@ -94,10 +94,10 @@
     "Salvar",
     "Sarik"
    ],
-   "tris_lod0": 58432,
-   "tris_lod1": 17526,
+   "tris_lod0": 58688,
+   "tris_lod1": 17604,
    "agirliksiz_kose": 0,
-   "kose_lod0": 29256,
+   "kose_lod0": 29384,
    "kemik": 38,
    "kemikler": [
     {
@@ -496,7 +496,7 @@
    "why": "kuleye cikan ve ucan Hezarfen — kisa entari + dizlik",
    "boy": 1.7776,
    "en_genis": 1.0957,
-   "derinlik": 0.5941,
+   "derinlik": 0.6032,
    "etek_kotu": 0.536,
    "tip": "erkek",
    "taban_boy": 1.7,
@@ -534,10 +534,10 @@
     "Salvar",
     "Sarik"
    ],
-   "tris_lod0": 58912,
-   "tris_lod1": 17670,
+   "tris_lod0": 59168,
+   "tris_lod1": 17748,
    "agirliksiz_kose": 0,
-   "kose_lod0": 29496,
+   "kose_lod0": 29624,
    "kemik": 38,
    "kemikler": [
     {
@@ -936,7 +936,7 @@
    "why": "yetiskin erkek — entari, kusak, sarik, sakal",
    "boy": 1.7776,
    "en_genis": 1.1042,
-   "derinlik": 0.5906,
+   "derinlik": 0.5989,
    "etek_kotu": 0.094,
    "tip": "erkek",
    "taban_boy": 1.7,
@@ -972,10 +972,10 @@
     "Salvar",
     "Sarik"
    ],
-   "tris_lod0": 58556,
-   "tris_lod1": 17562,
+   "tris_lod0": 58812,
+   "tris_lod1": 17638,
    "agirliksiz_kose": 0,
-   "kose_lod0": 29314,
+   "kose_lod0": 29442,
    "kemik": 38,
    "kemikler": [
     {
@@ -1374,7 +1374,7 @@
    "why": "genc erkek — kisa entari, takke, sakalsiz",
    "boy": 1.7283,
    "en_genis": 1.0605,
-   "derinlik": 0.5597,
+   "derinlik": 0.5686,
    "etek_kotu": 0.529,
    "tip": "genc",
    "taban_boy": 1.68,
@@ -1400,10 +1400,10 @@
     "Salvar",
     "Takke"
    ],
-   "tris_lod0": 48060,
-   "tris_lod1": 14418,
+   "tris_lod0": 48316,
+   "tris_lod1": 14494,
    "agirliksiz_kose": 0,
-   "kose_lod0": 24042,
+   "kose_lod0": 24170,
    "kemik": 38,
    "kemikler": [
     {
@@ -1802,7 +1802,7 @@
    "why": "yasli erkek — uzun entari, buyuk sarik, ak sakal",
    "boy": 1.7083,
    "en_genis": 1.0778,
-   "derinlik": 0.56,
+   "derinlik": 0.5682,
    "etek_kotu": 0.09,
    "tip": "yasli",
    "taban_boy": 1.63,
@@ -1838,10 +1838,10 @@
     "Salvar",
     "Sarik"
    ],
-   "tris_lod0": 57632,
-   "tris_lod1": 17286,
+   "tris_lod0": 57888,
+   "tris_lod1": 17364,
    "agirliksiz_kose": 0,
-   "kose_lod0": 28844,
+   "kose_lod0": 28972,
    "kemik": 38,
    "kemikler": [
     {
@@ -2240,7 +2240,7 @@
    "why": "yetiskin kadin — ferace ve yasmak (sokak kiyafeti)",
    "boy": 1.6001,
    "en_genis": 0.9643,
-   "derinlik": 0.5173,
+   "derinlik": 0.5223,
    "etek_kotu": 0.087,
    "tip": "kadin",
    "taban_boy": 1.58,
@@ -2260,10 +2260,10 @@
     "Salvar",
     "Yasmak"
    ],
-   "tris_lod0": 48760,
-   "tris_lod1": 14628,
+   "tris_lod0": 49016,
+   "tris_lod1": 14704,
    "agirliksiz_kose": 0,
-   "kose_lod0": 24394,
+   "kose_lod0": 24522,
    "kemik": 38,
    "kemikler": [
     {
@@ -2662,7 +2662,7 @@
    "why": "yasli kadin — ferace ve yasmak",
    "boy": 1.5595,
    "en_genis": 0.9504,
-   "derinlik": 0.5537,
+   "derinlik": 0.5618,
    "etek_kotu": 0.085,
    "tip": "kadin",
    "taban_boy": 1.54,
@@ -2682,10 +2682,10 @@
     "Salvar",
     "Yasmak"
    ],
-   "tris_lod0": 49048,
-   "tris_lod1": 14714,
+   "tris_lod0": 49304,
+   "tris_lod1": 14790,
    "agirliksiz_kose": 0,
-   "kose_lod0": 24542,
+   "kose_lod0": 24670,
    "kemik": 38,
    "kemikler": [
     {
@@ -3084,7 +3084,7 @@
    "why": "kiz cocuk — kisa entari, basortu",
    "boy": 1.2272,
    "en_genis": 0.7489,
-   "derinlik": 0.3945,
+   "derinlik": 0.4008,
    "etek_kotu": 0.515,
    "tip": "kiz",
    "taban_boy": 1.21,
@@ -3104,10 +3104,10 @@
     "Salvar",
     "Yasmak"
    ],
-   "tris_lod0": 51204,
-   "tris_lod1": 15360,
+   "tris_lod0": 51460,
+   "tris_lod1": 15438,
    "agirliksiz_kose": 0,
-   "kose_lod0": 25740,
+   "kose_lod0": 25868,
    "kemik": 38,
    "kemikler": [
     {
@@ -3506,7 +3506,7 @@
    "why": "erkek cocuk — kisa entari, takke",
    "boy": 1.2764,
    "en_genis": 0.7756,
-   "derinlik": 0.4547,
+   "derinlik": 0.459,
    "etek_kotu": 0.391,
    "tip": "cocuk",
    "taban_boy": 1.24,
@@ -3532,10 +3532,10 @@
     "Salvar",
     "Takke"
    ],
-   "tris_lod0": 50428,
-   "tris_lod1": 15128,
+   "tris_lod0": 50684,
+   "tris_lod1": 15204,
    "agirliksiz_kose": 0,
-   "kose_lod0": 25246,
+   "kose_lod0": 25374,
    "kemik": 38,
    "kemikler": [
     {

@@ -53,12 +53,16 @@ PrefabInstance:
       value: PF_Sakin_Oglan
       objectReference: {fileID: 0}
     - target: {fileID: 4742473837712756890, guid: b63b0b1600fa473499145694b8d0a9a9, type: 3}
+      propertyPath: m_Size
+      value: 1.5847821
+      objectReference: {fileID: 0}
+    - target: {fileID: 4742473837712756890, guid: b63b0b1600fa473499145694b8d0a9a9, type: 3}
       propertyPath: m_FadeMode
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4742473837712756890, guid: b63b0b1600fa473499145694b8d0a9a9, type: 3}
-      propertyPath: m_LocalReferencePoint.z
-      value: -0.0153820515
+      propertyPath: m_LocalReferencePoint.y
+      value: 0.6331177
       objectReference: {fileID: 0}
     - target: {fileID: 4742473837712756890, guid: b63b0b1600fa473499145694b8d0a9a9, type: 3}
       propertyPath: m_LODs.Array.data[0].fadeTransitionWidth

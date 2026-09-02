@@ -447,8 +447,12 @@ def bilek_olc(obj, cizgi, filtre, en_cok, alt=0.45):
     return o, r
 
 
-def etek(ad, col, z_ust, z_alt, r_ust, r_alt, kalinlik, segment=32,
-         yarik=False, cy=0.0, cy_alt=None):
+# 64 dilim: dokuz kivrim 32 dilimle cizilemez (kivrim basina 3,5
+# ornek — dalga degil cokgen cikar). 64 ile kivrim basina 7 ornek
+# duser ve yumusatma isini yapabilir. Bedeli 64 dortgen.
+def etek(ad, col, z_ust, z_alt, r_ust, r_alt, kalinlik, segment=64,
+         yarik=False, cy=0.0, cy_alt=None,
+         kirisik=9, kirisik_pay=0.035):
     """Belden aşağı **serbest** düşen etek — bacakları takip etmez.
 
     Entarinin eteği gövdeye yapışmaz, konidir. Kabuk yöntemiyle üretseydim
@@ -469,9 +473,25 @@ def etek(ad, col, z_ust, z_alt, r_ust, r_alt, kalinlik, segment=32,
         halka = []
         for i in range(segment):
             a = 2.0 * math.pi * i / segment
-            # Yarik: on tarafta (-y) dar bir dilim atlanir.
+            # ETEK KIRISIR — DUZ KONI KUMAS DEGILDIR.
+            #
+            # Etek bugune kadar iki halkali duz bir koniydi ve dokuma
+            # gelince bile plastik okumaya devam etti: dokuma yuzeyi
+            # anlatir, SILUETI anlatmaz. Kumasin siluetini yapan sey
+            # dikey kivrimlardir — kumas belde toplanir, asagi dogru
+            # acilir ve o toplanma bir dizi oluk birakir.
+            #
+            # Genlik ETEK BOYUNCA BUYUR (`t`): belde kusagin altinda
+            # neredeyse yok, etek ucunda en cok. Kumas boyle davranir;
+            # sabit genlikli bir dalga oluklu sac gibi okurdu.
+            #
+            # Dokuz kivrim, cunku kivrim sayisi kumasin GENISLIGINDEN
+            # cikar: etek cevresi ~1,9 m, bir kivrim ~20 cm — el
+            # tezgahinda dokunan bezin eni kadar.
+            dalga = 1.0 + kirisik_pay * t * math.sin(kirisik * a)
             halka.append(bm.verts.new(
-                (math.cos(a) * rx, cy_t + math.sin(a) * ry, z)))
+                (math.cos(a) * rx * dalga,
+                 cy_t + math.sin(a) * ry * dalga, z)))
         halkalar.append(halka)
 
     ust, alt = halkalar
