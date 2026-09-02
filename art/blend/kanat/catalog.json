@@ -28,10 +28,10 @@
    "target_area": 15.0
   },
   {
-   "footprint_x": 3.084,
-   "footprint_y": 2.703,
-   "height": 0.758,
-   "pivot_min_z": -0.5,
+   "footprint_x": 1.635,
+   "footprint_y": 0.595,
+   "height": 0.684,
+   "pivot_min_z": -0.5094,
    "tris_lod0": 772,
    "tris_lod1": 88,
    "kind": "kanat",

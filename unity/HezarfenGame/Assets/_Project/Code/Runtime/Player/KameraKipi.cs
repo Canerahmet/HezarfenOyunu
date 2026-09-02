@@ -62,6 +62,18 @@ namespace Hezarfen.Player
 
         public float mesafe = 3.2f;
         public float enYakin = 1.4f;
+
+        /// <summary>
+        /// Sıkışınca kolun düştüğü mesafe (m) — pratikte gözün yeri.
+        ///
+        /// Sıfır değil: tam sıfırda kamera omuz ekseniyle çakışır ve
+        /// dönerken yakın kırpma düzlemi başı keser. 12 cm, başın
+        /// önünde kalacak kadar.
+        /// </summary>
+        private const float SikismaMesafesi = 0.12f;
+
+        /// <summary>Kol bir engele sıkışmış mı — gövde o an gizlenir.</summary>
+        private bool _sikisti;
         public float enUzak = 6.0f;
 
         [Tooltip("Fare tekerleğinin bir tıkı kaç metre.")]
@@ -150,6 +162,7 @@ namespace Hezarfen.Player
         public void Kip(Bakis yeni)
         {
             kip = yeni;
+            _sikisti = false;
             GovdeGoster(kip == Bakis.UcuncuSahis);
             if (kip == Bakis.UcuncuSahis) _suAnMesafe = mesafe;
         }
@@ -376,17 +389,34 @@ namespace Hezarfen.Player
                 // o durumda kolu en kisaya cekmek dogrudur.
                 if (v.distance < enKisa) enKisa = v.distance;
             }
+            // ENGEL 1,40 M'DEN YAKINSA KOL KISALMAZ — BIRINCI SAHSA DUSER.
+            //
+            // Alt sinir buraya "yarisi kamerayi kafanin icine sokuyor"
+            // diye konmustu ve o dogruydu; ama sinirin OTEKI yuzu hic
+            // olculmemisti: engel 1,40 m'den yakinsa kol yine 1,40'ta
+            // kaliyor, yani kamera duvarin ICINDE duruyor. Oyun turunda
+            // on duragin dordunde ekranin ust yarisini bir tas levha
+            // kapliyordu — o levha, icinde durdugumuz duvarin ic yuzuydu.
+            // Dar sokakli bir sehirde (4,6 m) bu istisna degil kural.
+            //
+            // Ucuncu sahis kamerasinin bu durumdaki dogru cevabi kolu
+            // zorlamak degil GORUS BICIMINI degistirmektir: govde
+            // gizlenir, kamera goze gecer. Ikisi de zaten vardi
+            // (`GovdeGoster`, `Bakis.BirinciSahis`); eksik olan, ikisini
+            // birbirine baglayan olcumdu.
+            bool sikisti = false;
             if (enKisa < float.MaxValue)
-                // Alt sinir enYakin'in YARISI degil KENDISI.
-                //
-                // Yarisi 0,70 m ediyordu ve olculdu: kaidenin ustunde
-                // duvara sirti donuk duran oyuncuda kol tam o degere
-                // cokuyor, kamera karakterin kafasinin icine giriyordu
-                // (turda uc durakta birden). 1,40 m'de sirt gorunur
-                // kalir; daha yakini zaten kadraj olmaktan cikar.
-                istenen = Mathf.Max(enYakin,
-                                    enKisa - carpismaYaricapi);
-
+            {
+                float ham = enKisa - carpismaYaricapi;
+                sikisti = ham < enYakin;
+                istenen = sikisti ? SikismaMesafesi
+                                  : Mathf.Max(enYakin, ham);
+            }
+            if (sikisti != _sikisti)
+            {
+                _sikisti = sikisti;
+                if (kip == Bakis.UcuncuSahis) GovdeGoster(!sikisti);
+            }
             // Engele DOGRU ani, engelden UZAKLASIRKEN yumusak: duvara
             // girerken gecikmek kamerayi tasin icine sokar, cikarken
             // aninda firlatmak ise goz yorar.

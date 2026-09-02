@@ -87,6 +87,42 @@ namespace Hezarfen.Editor.Diagnostics
                         neden = "Karsi yaka — semt akisi calisiyor mu." },
         };
 
+        /// <summary>Ölçümün yapılacağı sahne.</summary>
+        private const string OyunSahnesi =
+            "Assets/_Project/Scenes/Faz1_Terrain.unity";
+
+        /// <summary>Toplu koşumdan gelindiyse tur bitince çıkılır.</summary>
+        private static bool Toplu =>
+            System.Environment.CommandLine.Contains("OyunTuru.TopluKos");
+
+        /// <summary>
+        /// Toplu kipten koşulabilen giriş — <b>bakmak da bir adımdır</b>.
+        ///
+        /// Tur yalnız Editor penceresinden başlatılabiliyordu ve bu, "her
+        /// turda oyun karesi yakala ve BAK" adımını elle yapılan bir işe
+        /// bağlıyordu. Bu oturumda üç kusur yalnız bakınca göründü
+        /// (balon kollar, tepeye tünemiş sarık, abajur yaşmak) — yani
+        /// bakmak bir süs değil ölçümün kendisi. <c>KareBolusumu</c>
+        /// aynı sebeple toplu girişini kazanmıştı.
+        ///
+        /// <c>-nographics</c> <b>verilmemeli</b>: grafik aygıtı olmadan
+        /// yakalanan kare boş çıkar.
+        /// </summary>
+        public static void TopluKos()
+        {
+            UnityEditor.SceneManagement.EditorSceneManager
+                .OpenScene(OyunSahnesi);
+            EditorApplication.playModeStateChanged += DurumDegisti;
+            EditorApplication.EnterPlaymode();
+        }
+
+        private static void DurumDegisti(PlayModeStateChange d)
+        {
+            if (d != PlayModeStateChange.EnteredPlayMode) return;
+            EditorApplication.playModeStateChanged -= DurumDegisti;
+            Baslat();
+        }
+
         [MenuItem("Hezarfen/Denetim/Oyun turu (kare + olcum)")]
         public static void Baslat()
         {
@@ -162,6 +198,54 @@ namespace Hezarfen.Editor.Diagnostics
                 {
                     Debug.LogError("[Hezarfen] Oyuncu ya da kamera yok.");
                     yield break;
+                }
+
+                // TOPLU KIPTE POZ SABITLENIR — YOKSA KARE BEYAZ CIKAR.
+                //
+                // Olculdu: toplu kosumda yakalanan on karenin onu da
+                // tamamen beyazdi. Sebep sahne degil OLCUM ORTAMIYDI —
+                // kalici profil otomatik histogram pozu kullaniyor ve o,
+                // bir onceki karenin renk tamponunu okur; penceresiz
+                // toplu kipte o gecmis olusmuyor ve poz en parlak ucta
+                // takili kaliyor. Ayni sinif kisitin bir baskasi bu
+                // depoda zaten yazili: `UnityStats` toplu kipte sifir
+                // doner.
+                //
+                // Sabit poz VERILINCE ayni sahne dogru cikti (Surici
+                // sokagi, tezgah, kaldirim). Yani kare bir gozlem olarak
+                // ise yarar hale geliyor; kaydedilen sey oyunun pozu
+                // degil, TURUN pozudur ve rapor bunu yazar.
+                //
+                // Profil DOSYASINA dokunulmuyor: daha yuksek oncelikli
+                // gecici bir Volume kuruluyor ve tur bitince siliniyor.
+                GameObject pozGo = null;
+                if (Toplu)
+                {
+                    pozGo = new GameObject("TUR_POZ");
+                    var v = pozGo.AddComponent<
+                        UnityEngine.Rendering.Volume>();
+                    v.isGlobal = true;
+                    v.priority = 1000f;
+                    var pr = ScriptableObject
+                        .CreateInstance<UnityEngine.Rendering.VolumeProfile>();
+                    var poz = pr.Add<
+                        UnityEngine.Rendering.HighDefinition.Exposure>(true);
+                    poz.mode.overrideState = true;
+                    poz.mode.value = UnityEngine.Rendering.HighDefinition
+                        .ExposureMode.Fixed;
+                    poz.fixedExposure.overrideState = true;
+                    // 13 EV: acik gunes altinda disarisi. Olculdu —
+                    // 9 EV'de kare hala beyaz, 13'te sokak okunuyor.
+                    poz.fixedExposure.value = 13f;
+                    v.sharedProfile = pr;
+                    satirlar.Add("");
+                    satirlar.Add("> **Poz toplu kosum icin 13 EV'de "
+                                 + "sabitlendi.** Otomatik histogram pozu "
+                                 + "penceresiz kipte oturmuyor ve butun "
+                                 + "kareler beyaz cikiyordu; bu kareler "
+                                 + "oyunun pozunu degil TURUN pozunu "
+                                 + "gosterir.");
+                    satirlar.Add("");
                 }
 
                 var cc = oyuncu.GetComponent<CharacterController>();
@@ -338,7 +422,14 @@ namespace Hezarfen.Editor.Diagnostics
 
                 File.WriteAllText($"{Cikti}/tur.md",
                                   string.Join("\n", satirlar));
+                if (pozGo != null) Object.DestroyImmediate(pozGo);
                 Debug.Log($"[Hezarfen] OYUN TURU BITTI -> {Cikti}/tur.md");
+                if (Toplu)
+                {
+                    // Kare dosyalari diske yazilsin diye bir kare daha.
+                    yield return null;
+                    EditorApplication.Exit(0);
+                }
             }
         }
     }

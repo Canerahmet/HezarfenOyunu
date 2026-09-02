@@ -317,6 +317,28 @@ def build_kanat(p, col, asset_name, textured=False):
     lod0 = kit.join_parts(parts, f"SM_{asset_name}_LOD0", col)
     lod1 = kit.join_parts(l1, f"SM_{asset_name}_LOD1", col)
 
+    # KATLI KANAT GERCEKTEN KATLANIR.
+    #
+    # "Katli" hal bugune kadar yalnizca ACIKLIGI %30'a indiriyordu;
+    # veter (2,55 m) oldugu gibi kaliyordu. Sonuc 3,08 x 2,70 m'lik bir
+    # elmasti — yani sirtta tasinan sey adamin kendisinden buyuk bir
+    # tahta ucurtmaydi. Oyun turunda gorundu: ucuncu sahis kamerasinin
+    # onunde duran, sehri tamamen kapatan bir levha. Bir oyuncu bunu
+    # zaten bir kez yazmisti ("onumde 1,3 m cikinti yapan bir tezgah")
+    # ve o tur cozum onu DONDURMEK olmustu; donen sey hala bir levhaydi.
+    #
+    # Yelpaze citali bir kanat katlanirken citalar omurgaya dogru
+    # toplanir: aciklik da veter de kucululur, kalan sey uzun ve dar bir
+    # DENKTIR. Olculer o denkten: 1,50 x 0,59 m — bir kurek boyu, bir
+    # kucak eni. Fizik etkilenmez, cunku ucus alani (`wing_area`) ACIK
+    # kanattan olculur ve katli hal hicbir zaman ucmaz.
+    if p.state == "folded":
+        for obj in (lod0, lod1):
+            for v in obj.data.vertices:
+                v.co.x *= 0.53      # aciklik: 2,84 -> 1,50 m
+                v.co.y *= 0.22      # veter:   2,70 -> 0,59 m
+            obj.data.update()
+
     # Dihedral BIRLESTIRMEDEN SONRA ve UCX'ten ONCE: carpisma kutusu
     # kalkan uclari kapsasin.
     egim = math.tan(math.radians(DIHEDRAL_DEG))

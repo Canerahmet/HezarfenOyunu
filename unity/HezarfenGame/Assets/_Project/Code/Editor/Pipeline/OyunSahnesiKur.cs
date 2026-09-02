@@ -960,14 +960,26 @@ namespace Hezarfen.Editor.Pipeline
             // tasiyorum."*
             //
             // Katli hal sirta dayanmis bir denk gibidir: dik ve dar.
+            // KATLI KANAT ARTIK GERCEKTEN KATLI — OLCEK KUCULTMESI BITTI.
+            //
+            // Onceki hal "katli" kanadi 0,55 ile kucultuyordu, cunku
+            // uretilen sey aslinda katlanmamis 2,84 x 2,70 m'lik bir
+            // elmasti; kucultmek onu bir denk yapmadi, yalnizca daha
+            // kucuk bir levha yapti. Oyun turunda gorundu: ucuncu sahis
+            // kamerasinin onunde duran, sehri kapatan bir tahta.
+            //
+            // Uretec artik veteri de katliyor (`kanat_kit`): 1,64 x 0,60
+            // x 0,68 m — bir kurek boyu, bir kucak eni. Yani model dogru
+            // olcude ve burada kucultmeye gerek yok. Sirtta CAPRAZ
+            // durur: uzun ekseni omuzdan belin karsi yanina iner, bir
+            // sirikla tasinan denk gibi.
             bool acikKanat = ad.EndsWith("_Acik");
             ornek.transform.localPosition = acikKanat
                 ? new Vector3(0f, 1.35f, -0.12f)
-                : new Vector3(0f, 1.05f, -0.28f);
+                : new Vector3(0f, 1.02f, -0.24f);
             ornek.transform.localRotation = acikKanat
                 ? Quaternion.identity
-                : Quaternion.Euler(78f, 0f, 0f);
-            if (!acikKanat) ornek.transform.localScale = Vector3.one * 0.55f;
+                : Quaternion.Euler(8f, 0f, 62f);
 
             // KANAT GORULUR, CARPMAZ.
             //

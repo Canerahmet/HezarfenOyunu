@@ -521,6 +521,8 @@ namespace Hezarfen.Editor.Lighting
             // tonlamasına daha yakın.
             ton.mode.value = TonemappingMode.Neutral;
 
+            Bulutlar(profil);
+
             EditorUtility.SetDirty(profil);
                         // SILME EN SONDA — CUNKU BIR SEYI SILIP SONRA GERI EKLEDIM.
             //
@@ -544,6 +546,73 @@ namespace Hezarfen.Editor.Lighting
                 Debug.LogError("[Hezarfen] Kalici profil BOS kaldi — poz, "
                                + "sis ve SSGI yazilamadi.");
             return profil;
+        }
+
+        /// <summary>
+        /// <b>Hacimsel bulutlar</b> — uçuş oyununun asıl manzarası.
+        /// </summary>
+        /// <remarks>
+        /// HDRP'nin bulut desteği projede <b>kapalıydı</b>
+        /// (<c>supportVolumetricClouds: 0</c>) ve gökyüzü düz bir
+        /// gradyandı. Yerde yürüyen bir oyun için bu bir eksiklik bile
+        /// sayılmayabilir; <b>süzülen</b> bir oyun için gökyüzü zeminin
+        /// yarısı kadar önemlidir — yüksekliği, hızı ve yönü okutan
+        /// tek şey odur. 800 m'de düz mavi bir gökte süzülmek, hiç
+        /// hareket etmemek gibi görünüyordu.
+        ///
+        /// ## Ayarlar neden bunlar
+        ///
+        /// <c>Sparse</c>: Mayıs sabahı İstanbul'u. Kapalı bir gök
+        /// (<c>Overcast</c>) hem tarihsel olarak keyfî olurdu hem de
+        /// termal görselleştirmesini (ADR 0084) okunmaz yapardı —
+        /// oyuncunun yükselen havayı bulut tabanından okuması gerekiyor.
+        ///
+        /// <b>Gölge AÇIK.</b> Bedeli var ama asıl kazanç orada: bulut
+        /// gölgesi şehrin üstünden geçtiğinde yükseklik ve hız
+        /// hissedilir hâle gelir. Gölgesiz bulut bir duvar kâğıdıdır.
+        ///
+        /// Adım sayıları (32/8) HDRP'nin varsayılanının altında ve bu
+        /// bilinçli: kare bütçesi 16,7 ms ve bu oyunun kalabalığı da
+        /// var. Ölçüm neyin ödendiğini söyler — bu blok eklendikten
+        /// sonra kare 7,6 ms'den ne olduysa, tur raporuna o yazılır.
+        /// </remarks>
+        private static void Bulutlar(VolumeProfile profil)
+        {
+            var b = Ensure<VolumetricClouds>(profil);
+            b.enable.overrideState = true;
+            b.enable.value = true;
+
+            b.cloudControl.overrideState = true;
+            b.cloudControl.value = VolumetricClouds.CloudControl.Simple;
+            // `cloudPreset` bir VolumeParameter DEGIL, duz bir enum
+            // alani — ustune `.value` yazmak derlenmez.
+            b.cloudPreset = VolumetricClouds.CloudPresets.Sparse;
+
+            // TABAN KOTU UCUS ZARFINDAN TURER, ZEVKTEN DEGIL.
+            //
+            // Kule serefesi 35 m, en uzun sizulus ~200 m'ye cikiyor
+            // (UcusDizisi olcumleri). Bulut tabani 1.200 m: oyuncu asla
+            // bulutun icine girmez — girseydi kamera beyaza gomulur ve
+            // sehir kaybolurdu. Yeterince yakin ki olcek versin,
+            // yeterince uzak ki engel olmasin.
+            b.bottomAltitude.overrideState = true;
+            b.bottomAltitude.value = 1200f;
+            b.altitudeRange.overrideState = true;
+            b.altitudeRange.value = 1800f;
+
+            b.shadows.overrideState = true;
+            b.shadows.value = true;
+
+            b.numPrimarySteps.overrideState = true;
+            b.numPrimarySteps.value = 32;
+            b.numLightSteps.overrideState = true;
+            b.numLightSteps.value = 8;
+
+            // Zamansal birikim: gurultuyu karelere yayar. Yuksek deger
+            // ucusta iz birakir (kamera hizli doner), dusuk deger
+            // gurultulu olur. 0,90 ikisinin arasi.
+            b.temporalAccumulationFactor.overrideState = true;
+            b.temporalAccumulationFactor.value = 0.90f;
         }
 
         // --------------------------------------------------------------

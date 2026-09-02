@@ -31,6 +31,26 @@
    "baseColorFile": "T_BarkPlatanus_BC.jpg"
   },
   {
+   "name": "M_Beard",
+   "kind": "untextured",
+   "baseColor": [
+    0.105,
+    0.072,
+    0.052
+   ],
+   "roughness": 0.72
+  },
+  {
+   "name": "M_Beard_Ak",
+   "kind": "untextured",
+   "baseColor": [
+    0.76,
+    0.745,
+    0.72
+   ],
+   "roughness": 0.7
+  },
+  {
    "name": "M_Brick_Band",
    "kind": "pbr",
    "asset": "brick_band",
@@ -56,6 +76,16 @@
    "roughness": 0.8
   },
   {
+   "name": "M_Cloth_Ferace",
+   "kind": "untextured",
+   "baseColor": [
+    0.148,
+    0.118,
+    0.185
+   ],
+   "roughness": 0.86
+  },
+  {
    "name": "M_Cloth_Gomlek",
    "kind": "untextured",
    "baseColor": [
@@ -74,6 +104,16 @@
     0.09
    ],
    "roughness": 0.8
+  },
+  {
+   "name": "M_Cloth_Kilim",
+   "kind": "untextured",
+   "baseColor": [
+    0.42,
+    0.15,
+    0.13
+   ],
+   "roughness": 0.88
   },
   {
    "name": "M_Cloth_Kusak",
@@ -104,6 +144,26 @@
     0.78
    ],
    "roughness": 0.84
+  },
+  {
+   "name": "M_Cloth_Takke",
+   "kind": "untextured",
+   "baseColor": [
+    0.315,
+    0.13,
+    0.105
+   ],
+   "roughness": 0.82
+  },
+  {
+   "name": "M_Cloth_Yasmak",
+   "kind": "untextured",
+   "baseColor": [
+    0.855,
+    0.865,
+    0.87
+   ],
+   "roughness": 0.88
   },
   {
    "name": "M_Feather",
@@ -246,6 +306,16 @@
    "maskFile": "T_MarbleWhite_MASK.png",
    "normalFile": "T_MarbleWhite_N.png",
    "baseColorFile": "T_MarbleWhite_BC.png"
+  },
+  {
+   "name": "M_Metal_Bakir",
+   "kind": "untextured",
+   "baseColor": [
+    0.45,
+    0.26,
+    0.14
+   ],
+   "roughness": 0.42
   },
   {
    "name": "M_Opening_Shadow",
