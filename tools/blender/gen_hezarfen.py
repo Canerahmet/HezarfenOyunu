@@ -125,6 +125,19 @@ for _ad, _makro, _boy, _tip, _why in skn.ARKETIPLER:
                          tip=_tip, makro=_makro, boy=_boy, why=_why))
 
 
+def _kendi_uvsi_var(obj, esik=1e-6):
+    """Parçanın UV katmanında **veri** var mı (boş katman sayılmaz)."""
+    me = obj.data
+    if not me.uv_layers:
+        return False
+    veri = me.uv_layers[0].data
+    for i in range(min(len(veri), 64)):
+        u, v = veri[i].uv
+        if abs(u) > esik or abs(v) > esik:
+            return True
+    return False
+
+
 def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
     """Gövdeye kıyafeti giydirir; parça listesi döner.
 
@@ -599,23 +612,50 @@ def taban_kur(args, mats, makro=None, hedef_boy=None):
     """
     if getattr(args, "taban_kaynak", "mpfb") == "mpfb":
         import mpfb_kit as mp                       # noqa: PLC0415
-        govde = mp.taban_getir_mpfb(col=hz.collection(COLLECTION),
-                                    makro=makro or HEZARFEN_MAKRO,
-                                    hedef_boy=hedef_boy)
+        # GOZ KURESI OLCULDU VE REDDEDILDI.
+        #
+        # MakeHuman taban mesh'i `helper-l-eye` / `helper-r-eye`
+        # gruplarini tasiyor ve ilk bakista bunlar goz kuresi gibi
+        # duruyor. Olcum aksini soyledi: kurenin merkezine EN YAKIN
+        # govde kosesi 100,7 mm — yani kafes yuzun on santim ONUNDE.
+        # Adi "helper" olan sey gercekten yardimci: MakeHuman'in kendi
+        # goz VARLIGININ oturacagi kafes, ve o varlik kurulu degil
+        # (sistem varliklari indirilmemis; `AssetService` bos donuyor).
+        #
+        # Kafesi kucultup yuvaya oturtmayi denedim; her denemede baska
+        # bir sey kaydi (patlak goz, sonra kasin hizasinda beyaz halka).
+        # Bir seyi dogru yere koyabilmek icin once o yerin NEREDE
+        # oldugunu bilmek gerekiyor ve govde onu soylemiyor.
+        #
+        # Gozun yeri BILINEN tek yer UV uzayi: MPFB2'nin kendi
+        # `mpfb_eyelids` maskesi goz kapagi adalarini tam olarak
+        # isaretliyor. Bu yuzden goz artik geometri degil, deri
+        # dokusunun icine ciziliyor (`gen_deri_texture.py`) — bilinen
+        # bir olcuye, bilinmeyen bir tahmine degil.
+        govde = mp.taban_getir_mpfb(
+            col=hz.collection(COLLECTION),
+            makro=makro or HEZARFEN_MAKRO,
+            hedef_boy=hedef_boy)
+        goz = None      # gerekce yukarida: kafes goz degil
         hz.log(f"taban: MPFB2 parametrik — {mp.olc(govde)}")
     else:
         govde = kar.taban_getir(args.taban, col=hz.collection(COLLECTION))
+        goz = None      # paket govdesinde goz kuresi yok
         hz.log("taban: Blender Studio CC0 paketi")
     kar.temiz_ag(govde)
-    aci = kar.one_cevir(govde)
+    # Goz GOVDEYLE AYNI donusumleri alir — ayri hesaplanmaz.
+    aci = kar.one_cevir(govde, birlikte=(goz,))
     # Normalizasyon HEDEF BOYA gore yapilir, sabite gore degil. Ilk
     # kosuda burasi her zaman 1,70 m'ye normalize ediyordu: MPFB2
     # kadini dogru sekilde 1,58 m uretiyor, sonraki satir onu tekrar
     # 1,70'e cekiyor ve olcum "boy 1,58, hedef 1,7" diye patliyordu.
     # Yani cesitlilik uretiliyor, bir satir sonra siliniyordu.
-    k = kar.normalize(govde, hedef_boy or kar.HEDEF_BOY)
+    k = kar.normalize(govde, hedef_boy or kar.HEDEF_BOY, birlikte=(goz,))
     hz.assign(govde, mats["skin"])
-    return govde, aci, k
+    # Kure yuvasina OTURTULUR — buyuklugu varsayilmaz, yuva olculur.
+    mp.goz_yuvaya_otur(goz, govde)
+    skn.goz_boya(goz, mats)
+    return govde, aci, k, goz
 
 
 def denetle(olcu):
@@ -665,7 +705,7 @@ def main():
     col = hz.collection(COLLECTION)
     mats, tex_sizes = kit.build_materials("default", textured=not args.no_textures)
     asset = "SK_Hezarfen_Govde"
-    govde, aci, k = taban_kur(args, mats)
+    govde, aci, k, _goz = taban_kur(args, mats)
     govde.name = f"{asset}_LOD0"
     govde.data.name = govde.name
     olcu = kar.olcu_al(govde)
@@ -721,8 +761,8 @@ def main():
         mats, tex_sizes = kit.build_materials("default",
                                               textured=not args.no_textures)
         asset = f"SK_{ad}"
-        govde, _, _ = taban_kur(args, mats, makro=_v["makro"],
-                                hedef_boy=_v["boy"])
+        govde, _, _, goz = taban_kur(args, mats, makro=_v["makro"],
+                                     hedef_boy=_v["boy"])
         giysi, kol_esik, z_kol_alt = giydir(govde, col, mats, etek_orani,
                                             dizlik_var, tip=tip)
 
@@ -781,8 +821,61 @@ def main():
         # kabugu zaten govdeden kopyalandigi icin en yakin kemik, o
         # kosenin takip etmesi gereken kemiktir.
         arm = rk.iskelet_kur(f"AR_{ad}", eklem, col)
-        lod0 = kit.join_parts([govde] + giysi, f"{asset}_LOD0", col)
+        # GIYSIYE UV VER — BIRLESTIRMEDEN ONCE, GOVDEYE DOKUNMADAN.
+        #
+        # Bu satir yoktu ve zincirin basindaki kusur buydu: giysi
+        # parcalari bmesh'ten kuruluyor, hicbir UV uretilmiyor, dolayisiyla
+        # takilacak bir doku da olamiyordu. Olculdu: on iki kumas
+        # malzemesinin HEPSI `kind=untextured` — duz albedo, normal yok,
+        # purzuluk yok. HDRP'de dokusuz albedo her zaman plastik okur;
+        # karakterin "gercekci degil" gorunmesinin tek buyuk sebebi
+        # modelin bicimi degil YUZEYIYDI.
+        #
+        # Yansitma parca parca ve yuzun kendi duzleminde (`uv_project`);
+        # kumas icin dogru olan bu, cunku dokuma bir DESEN degil bir
+        # yuzey ozelligidir — nereden bakilirsa bakilsin iplik sikligi
+        # ayni olmali. Elle acilmis bir UV yerlesimi burada daha iyi bir
+        # sey vermezdi, yalnizca elle yapilan bir adim eklerdi.
+        #
+        # GOVDE DISARIDA: MPFB2 govdesi kendi insan UV yerlesimini
+        # tasiyor ve deri dokusu (Faz B) ona baglanacak. Dunya yansitmasi
+        # onu ezerdi.
+        # KENDI UV'SIYLE GELEN PARCAYA DOKUNULMAZ.
+        #
+        # Ilk yazimda dunya yansitmasi butun parcalara uygulaniyordu ve
+        # sac kartlarinin ELLE kurulmus UV'sini eziyordu. Renderda ne
+        # oldugu gorundu: sakal tutamlari ve sakak kartlari cenenin
+        # altinda kahverengi CUBUKLAR olarak asili kaldi — alfa kesme
+        # atlasin yanlis yerini ornekledigi icin kart saydam olmayi
+        # birakti.
+        #
+        # Kural: bir parca kendi UV'sini getiriyorsa onu daha iyi bilir.
+        # Denetim "katman var mi" degil "katmanda VERI var mi" — bmesh
+        # ile kurulan her ag bos bir katmanla geliyor ve varlik sinamasi
+        # butun giysiyi atlardi.
+        for _p in giysi:
+            if _kendi_uvsi_var(_p):
+                kit.uv_adini_duzelt(_p)
+                continue
+            kit.apply_uvs(_p, tex_sizes)
+        # Govdenin katmani da ayni adla — birlestirme ada bakiyor.
+        kit.uv_adini_duzelt(govde)
+
+        # GOZ DE BIRLESIR: ayri nesne kalsaydi deriye baglanmaz ve
+        # kafa donerken yerinde kalirdi.
+        _parcalar = [govde] + giysi + ([goz] if goz is not None else [])
+        lod0 = kit.join_parts(_parcalar, f"{asset}_LOD0", col)
         lod1 = kar.desimasyon(lod0, 0.30, f"{asset}_LOD1")
+        # BIRLESMIS AGDA DA TEK KATMAN.
+        #
+        # Parcalarin adi duzeltildi ama birlestirme yine ikinci bir
+        # katman birakabiliyor (kart ve mest gibi `apply_uvs`'e
+        # ugramayan parcalar kendi `Float2`siyle geliyor). Bos bir
+        # ikinci katman FBX'e de gider ve Unity'de hangisinin
+        # kullanildigi ice aktarma ayarina kalir — yani kusur geri
+        # gelebilecegi bir kapi acik kalir.
+        for _m in (lod0, lod1):
+            kit.uv_adini_duzelt(_m)
         hz.link(lod1, col)
         for m in (lod0, lod1):
             rk.deri_bagla(m, arm)

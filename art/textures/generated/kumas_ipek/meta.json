@@ -1,0 +1,28 @@
+{
+ "polyhaven_id": null,
+ "name": "kumas_ipek",
+ "resolution": "1024px",
+ "size_meters": [
+  0.1,
+  0.1
+ ],
+ "authors": {
+  "Hezarfen projesi (prosedürel üretim)": "All"
+ },
+ "license": "Kendi eserimiz — üçüncü taraf hakkı yok",
+ "source": "prosedürel; girdi yok",
+ "maps": {
+  "BC": "T_kumas_ipek_BC.png",
+  "N": "T_kumas_ipek_N.png",
+  "ARM": "T_kumas_ipek_ARM.png",
+  "R": "T_kumas_ipek_R.png",
+  "AO": "T_kumas_ipek_AO.png"
+ },
+ "normal_convention": "OpenGL (Y+) — Poly Haven nor_gl ile ayni",
+ "generated_by": "tools/textures/gen_kumas_texture.py",
+ "role": "kumas",
+ "use": "Kusak (M_Cloth_Kusak)",
+ "weave": "atlas 4/1, 128 iplik/10 cm; parlaklik atlamalarda",
+ "why": "Karakterin butun kumas malzemeleri dokusuzdu (olculdu: 12 malzeme kind=untextured) ve dokusuz albedo HDRP'de plastik okur. Indirmek yerine uretildi cunku albedonun NOTR kalmasi sart: kisiden kisiye ton NPCYonetici'de _BaseColor ile CARPILIYOR ve renkli bir albedo o carpimi bogardi.",
+ "base_color_note": "BC bilerek notr (gri tonlamali dokuma degeri). Renk paletten gelir; malzeme _BaseColor'i paletin rengiyle carpar."
+}

@@ -99,6 +99,16 @@ CLOTH_FERACE = (0.148, 0.118, 0.185)   # koyu mor-lacivert dis giysi
 CLOTH_YASMAK = (0.855, 0.865, 0.870)   # ince beyaz ortu, hafif soguk
 CLOTH_TAKKE = (0.315, 0.130, 0.105)    # cocugun kirmizi keceden takkesi
 
+#: --- GOZ ----------------------------------------------------------------
+#: Goz kuresi MakeHuman taban mesh'inin kendi geometrisi (`helper-l-eye`);
+#: renkler bizim. Ak SAF BEYAZ DEGIL — beyaz bir goz akı plastik okur ve
+#: hicbir insanda yoktur: damarli, hafif sicak, gri-krem. Iris kahve,
+#: cunku bolgede en yaygin olan o; bebek tam siyah degil cunku tam siyah
+#: bir yuzey isik almaz ve gozun icindeki derinlik kaybolur.
+EYE_AK = (0.640, 0.612, 0.585)
+EYE_IRIS = (0.118, 0.072, 0.042)
+EYE_BEBEK = (0.020, 0.018, 0.017)
+
 #: **Kartal tüyü** — kanat yüzeyi. Koyu kahve gövde, uçlarda soluk.
 #: Tek bir renkle verilir; kanadın alacalığı GEOMETRIDEN gelir
 #: (üst üste binen tüy dizileri), dokudan değil.
@@ -189,6 +199,64 @@ TEXTURE_ROLES = {
         # Gerekce: tools/textures/gen_brick_texture.py.
         "brick":  dict(asset="brick_band",
                        root=os.path.join("art", "textures", "generated")),
+        # --- KUMAS ROLLERI ---------------------------------------------
+        #
+        # Bu blogun ustunde yillarca "kumas rolleri bilerek
+        # TEXTURE_ROLES'a girmiyor: bu rollerin dokusu yok" yaziyordu ve
+        # o gun dogruydu. Bugun degil: `gen_kumas_texture.py` dort
+        # dokumayi uretiyor ve hepsi bizim eserimiz.
+        #
+        # Anahtarlar PALETIN anahtarlariyla ayni olmak zorunda
+        # (`build_unity_maps` `roles.get(key)` diyor); bu yuzden rol adi
+        # kumasin adi degil GIYSININ adidir.
+        #
+        # `tinted=True` YENI ve tam da asagidaki kitabe notunun tarif
+        # ettigi kusuru cozuyor: "dokulu bir malzemede taban rengi
+        # dokudan gelir — paletteki albedo tasinmaz." Kumasta bu kabul
+        # edilemez, cunku rengin kaynagi Ralamb plakalari ve kisiden
+        # kisiye ton `_BaseColor` ile CARPILIYOR. Kumas dokularinin
+        # albedosu bu yuzden NOTR uretildi; isaretli roller paletteki
+        # rengi `_BaseColor` olarak tasimaya devam ediyor.
+        #
+        # Hangi giysi hangi kumastan — kaynak degil MALZEME KURALI:
+        #   keten: ten'e degen ve agartilan her sey (gomlek, sarik, yasmak)
+        #   cuha : dinklenmis yun dis giysi (entari, ferace, salvar)
+        #   ipek : kusak — tek parlak parca, ve o parlaklik rutbe degil
+        #          dokuma (atlas atlamalari isigi tek yonde toplar)
+        #   kece : dovulmus baslik cekirdegi (kavuk, takke)
+        # --- TEN ---------------------------------------------------------
+        #
+        # `M_Skin` de dokusuzdu ve dokusuz ten HDRP'de MUM gibi okur.
+        # Doku MPFB2'nin kendi bolge maskelerinden bestelendi
+        # (`gen_deri_texture.py`): dudak, goz kapagi, kulak ve gozenek.
+        # `tinted` burada iki kat onemli — ten rengi kisiden kisiye
+        # degismek ZORUNDA, yoksa sehirdeki herkes ayni tende olur.
+        #
+        # UV: govde MakeHuman taban mesh'inden geliyor ve onun kendi
+        # yerlesimini tasiyor; bu yuzden `apply_uvs` govdeye UYGULANMAZ
+        # (dunya yansitmasi bu yerlesimi ezer ve dudak alna duserdi).
+        "skin":   dict(asset="deri_insan", tinted=True,
+                       root=os.path.join("art", "textures", "generated")),
+
+        "gomlek": dict(asset="kumas_keten", tinted=True,
+                       root=os.path.join("art", "textures", "generated")),
+        "sarik":  dict(asset="kumas_keten", tinted=True,
+                       root=os.path.join("art", "textures", "generated")),
+        "yasmak": dict(asset="kumas_keten", tinted=True,
+                       root=os.path.join("art", "textures", "generated")),
+        "entari": dict(asset="kumas_cuha", tinted=True,
+                       root=os.path.join("art", "textures", "generated")),
+        "ferace": dict(asset="kumas_cuha", tinted=True,
+                       root=os.path.join("art", "textures", "generated")),
+        "salvar": dict(asset="kumas_cuha", tinted=True,
+                       root=os.path.join("art", "textures", "generated")),
+        "kusak":  dict(asset="kumas_ipek", tinted=True,
+                       root=os.path.join("art", "textures", "generated")),
+        "kavuk":  dict(asset="kumas_kece", tinted=True,
+                       root=os.path.join("art", "textures", "generated")),
+        "takke":  dict(asset="kumas_kece", tinted=True,
+                       root=os.path.join("art", "textures", "generated")),
+
         # Kitabe'nin BURADA doku rolu YOK ve bu bilincli. Once mermerle ayni
         # dokuyu veriyordu; sonuc Unity'de iki AYNI malzemeydi, cunku dokulu
         # bir malzemede taban rengi dokudan gelir — paletteki albedo tasinmaz.
@@ -298,6 +366,11 @@ PALETTES = {
         # tuy daha da pürüzsüz cunku yagli.
         "leather": (LEATHER, 0.74, "M_Leather"),
         "skin":    (SKIN, 0.58, "M_Skin"),
+        # Goz: uc malzeme, cunku uc yuzey. Purzuluk ak ve iriste DUSUK
+        # (nemli kure), bebekte anlamsiz ama tutarli olsun diye ayni.
+        "goz_ak":    (EYE_AK, 0.22, "M_Eye_Sclera"),
+        "goz_iris":  (EYE_IRIS, 0.18, "M_Eye_Iris"),
+        "goz_bebek": (EYE_BEBEK, 0.18, "M_Eye_Pupil"),
         # SAKAL PALETE GIRER — CUNKU ARTIK OPAK.
         #
         # Sac palete giremiyor: alfa kesme istiyor ve `hair_material`
@@ -379,6 +452,11 @@ PALETTES = {
         # tuy daha da pürüzsüz cunku yagli.
         "leather": (LEATHER, 0.74, "M_Leather"),
         "skin":    (SKIN, 0.58, "M_Skin"),
+        # Goz: uc malzeme, cunku uc yuzey. Purzuluk ak ve iriste DUSUK
+        # (nemli kure), bebekte anlamsiz ama tutarli olsun diye ayni.
+        "goz_ak":    (EYE_AK, 0.22, "M_Eye_Sclera"),
+        "goz_iris":  (EYE_IRIS, 0.18, "M_Eye_Iris"),
+        "goz_bebek": (EYE_BEBEK, 0.18, "M_Eye_Pupil"),
         # SAKAL PALETE GIRER — CUNKU ARTIK OPAK.
         #
         # Sac palete giremiyor: alfa kesme istiyor ve `hair_material`
@@ -603,6 +681,26 @@ def build_materials(palette_name, textured=False):
             sizes[name] = (2.0, 2.0)
             continue
 
+        # `tinted`: RENGI PALETTEN GELEN DOKULU MALZEME.
+        #
+        # Blender tarafi bunu Unity tarafiyla AYNI sekilde yapmali;
+        # yoksa inceleme render'i ile oyun ici goruntu iki farkli
+        # yuzeyden konusur — bu depoda "bir sayinin iki sahibi" diye
+        # ucuncu kez odenen kusurun doku hali olurdu. Unity'de islem
+        # `_BaseColor` x `_BaseColorMap`; Blender'daki karsiligi
+        # MULTIPLY. Ahsapta COLOR kullanilmasinin sebebi dokunun kendi
+        # rengini de tasimasiydi; kumas dokusu NOTR uretildigi icin
+        # burada dogru olan carpmadir.
+        if role.get("tinted"):
+            mats[key] = mtl.make_pbr_material(
+                name, meta, tint=color, tint_factor=1.0,
+                value_gamma=role.get("value_gamma", 1.0),
+                tint_blend="MULTIPLY",
+                metallic=role.get("metallic", 0.0))
+            sizes[name] = mtl.material_size(meta)
+            continue
+
+
         mats[key] = mtl.make_pbr_material(
             name, meta,
             tint=role.get("tint"), tint_factor=role.get("tint_factor", 0.0),
@@ -618,6 +716,57 @@ def build_materials(palette_name, textured=False):
     return mats, sizes
 
 
+#: Boru hattının UV katmanı adı — **tek** ad, çünkü birleştirme ada bakar.
+UV_KATMANI = "UVMap"
+
+
+def uv_adini_duzelt(obj, ad=UV_KATMANI):
+    """
+    Nesnenin UV katmanını tek ve doğru adla bırakır.
+
+    ## Neden gerekti — sessiz ve pahalı bir kusur
+
+    Blender, bmesh'ten kurulan bir ağa UV katmanını bazen `Float2`
+    adıyla açıyor; MPFB2 gövdesininki ise `UVMap`. `join_parts`
+    katmanları **ada göre** eşleştirir, o yüzden iki ad iki ayrı katman
+    demek: birleşen ağda `Float2` ve `UVMap` yan yana duruyor, etkin
+    olan `Float2` ve gövde köşelerinin orada hiç verisi yok.
+
+    Sonuç ölçüldü: birleşmiş ağda ten yüzlerinin UV kutusu
+    **u 0,000-0,000 v 0,000-0,000**. Yani bütün deri, dokunun tek bir
+    köşe texel'ini örnekliyordu — dudak, göz, gözenek hepsi dokunun
+    içinde duruyor ve hiçbiri ekrana çıkmıyordu. Doku "bozuk" gibi
+    görünmüyordu; **düz renk** gibi görünüyordu, yani dokusuz hâlinin
+    aynısı. Bir kusurun en pahalısı, düzeltilmiş hâline benzeyenidir.
+
+    Ad birliği bu yüzden üslup değil sözleşme.
+    """
+    me = obj.data
+    if not me.uv_layers:
+        return obj
+    # SILME REFERANSI GECERSIZ KILAR.
+    #
+    # Ilk yazimda etkin katman bir degiskene alinip otekiler `k is not
+    # etkin` diye siliniyordu; ilk silme `etkin` isaretcisini gecersiz
+    # kildi, kiyas her katman icin dogru dondu ve HEPSI silindi
+    # ("index 0 out of range, size 0"). Silinen bir koleksiyonda
+    # tutulan isaretci, tuttugu sey degildir.
+    #
+    # Ad ile calisiliyor ve koleksiyon her adimda yeniden okunuyor.
+    aktif_ad = (me.uv_layers.active or me.uv_layers[0]).name
+    while len(me.uv_layers) > 1:
+        fazla = next((x.name for x in me.uv_layers if x.name != aktif_ad),
+                     None)
+        if fazla is None:
+            break
+        me.uv_layers.remove(me.uv_layers[fazla])
+    me.uv_layers[0].name = ad
+    me.uv_layers.active_index = 0
+
+    return obj
+
+
+
 def apply_uvs(obj, size_by_name):
     """Nesnenin malzeme sırasına göre dünya ölçekli UV üretir."""
     idx = {}
@@ -625,6 +774,7 @@ def apply_uvs(obj, size_by_name):
         if m is not None:
             idx[i] = size_by_name.get(m.name, (2.0, 2.0))
     mtl.uv_project(obj, idx)
+    uv_adini_duzelt(obj)
 
 
 # ------------------------------------------------------------------ parçalar

@@ -257,3 +257,75 @@ def yas_bandi(makro):
 def cinsiyet(makro):
     """Makrodan cinsiyet — `gender` 0 kadın, 1 erkek."""
     return "kadin" if float((makro or {}).get("gender", 1.0)) < 0.5         else "erkek"
+
+
+def goz_boya(obj, mats, iris_yari=29.0, bebek_yari=9.5):
+    """
+    Göz küresine **üç malzeme** verir: ak, iris, bebek.
+
+    ## Neden UV değil yön
+
+    Göz MakeHuman'ın helper geometrisinden geliyor ve o küre bir iris
+    için UV taşımıyor. Kendi UV'sini uydurmak, irisin nereye düşeceğini
+    tahmin etmek olurdu. Oysa bir göz küresinde iris **her zaman aynı
+    yerdedir**: bakış yönünde. Yani soru "UV nerede" değil, "bu yüz
+    hangi yöne bakıyor".
+
+    Açılar anatomiden: göz küresi ~24 mm, iris ~11,7 mm → yarı açı
+    asin(5,85/12) ≈ 29°; bebek ~4 mm → asin(2/12) ≈ 9,5°. Uydurulmuş
+    değil, ölçülebilir sayılar — ve bebek büyüklüğü ışıkla değişir,
+    burada gündüz değeri.
+
+    Bakış yönü **−Y**: hattın sözleşmesi burnu −Y'ye çevirir
+    (`karakter_kit.one_cevir`), göz de onunla beraber döner.
+    """
+    if obj is None:
+        return obj
+    me = obj.data
+    me.materials.clear()
+    for anahtar in ("goz_ak", "goz_iris", "goz_bebek"):
+        me.materials.append(mats[anahtar])
+
+    # HER GOZ KENDI MERKEZINE GORE OLCULUR.
+    #
+    # Iki goz tek mesh'te ve ortak bir merkez kullanmak irisleri ice
+    # dogru kaydirirdi (sasi bakan bir karakter). Koseler x isaretine
+    # gore ikiye ayrilir ve her yarim kendi merkezini bulur.
+    from mathutils import Vector
+    merkez = {}
+    for isaret in (-1, 1):
+        ps = [v.co for v in me.vertices if (v.co.x * isaret) > 0.0]
+        if not ps:
+            continue
+        merkez[isaret] = Vector((
+            sum(p.x for p in ps) / len(ps),
+            sum(p.y for p in ps) / len(ps),
+            sum(p.z for p in ps) / len(ps)))
+
+    ileri = Vector((0.0, -1.0, 0.0))
+    iris_cos = math.cos(math.radians(iris_yari))
+    bebek_cos = math.cos(math.radians(bebek_yari))
+    sayim = [0, 0, 0]
+    for poly in me.polygons:
+        c = Vector((0.0, 0.0, 0.0))
+        for i in poly.vertices:
+            c += me.vertices[i].co
+        c /= len(poly.vertices)
+        isaret = 1 if c.x > 0.0 else -1
+        m = merkez.get(isaret)
+        if m is None:
+            continue
+        d = c - m
+        if d.length < 1e-9:
+            continue
+        nokta = d.normalized().dot(ileri)
+        if nokta >= bebek_cos:
+            poly.material_index = 2
+        elif nokta >= iris_cos:
+            poly.material_index = 1
+        else:
+            poly.material_index = 0
+        poly.use_smooth = True
+        sayim[poly.material_index] += 1
+    hz.log(f"goz: {sayim[0]} ak / {sayim[1]} iris / {sayim[2]} bebek yuz")
+    return obj

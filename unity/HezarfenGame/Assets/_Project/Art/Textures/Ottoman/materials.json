@@ -67,43 +67,83 @@
   },
   {
    "name": "M_Cloth_Entari",
-   "kind": "untextured",
+   "kind": "pbr",
+   "asset": "kumas_cuha",
+   "sizeMeters": [
+    0.15,
+    0.15
+   ],
+   "roughness": 0.8,
+   "metallic": 0.0,
    "baseColor": [
     0.105,
     0.255,
     0.295
    ],
-   "roughness": 0.8
+   "baked": false,
+   "maskFile": "T_KumasCuha_MASK.png",
+   "normalFile": "T_KumasCuha_N.png",
+   "baseColorFile": "T_KumasCuha_BC.png"
   },
   {
    "name": "M_Cloth_Ferace",
-   "kind": "untextured",
+   "kind": "pbr",
+   "asset": "kumas_cuha",
+   "sizeMeters": [
+    0.15,
+    0.15
+   ],
+   "roughness": 0.86,
+   "metallic": 0.0,
    "baseColor": [
     0.148,
     0.118,
     0.185
    ],
-   "roughness": 0.86
+   "baked": false,
+   "maskFile": "T_KumasCuha_MASK.png",
+   "normalFile": "T_KumasCuha_N.png",
+   "baseColorFile": "T_KumasCuha_BC.png"
   },
   {
    "name": "M_Cloth_Gomlek",
-   "kind": "untextured",
+   "kind": "pbr",
+   "asset": "kumas_keten",
+   "sizeMeters": [
+    0.12,
+    0.12
+   ],
+   "roughness": 0.86,
+   "metallic": 0.0,
    "baseColor": [
     0.79,
     0.76,
     0.68
    ],
-   "roughness": 0.86
+   "baked": false,
+   "maskFile": "T_KumasKeten_MASK.png",
+   "normalFile": "T_KumasKeten_N.png",
+   "baseColorFile": "T_KumasKeten_BC.png"
   },
   {
    "name": "M_Cloth_Kavuk",
-   "kind": "untextured",
+   "kind": "pbr",
+   "asset": "kumas_kece",
+   "sizeMeters": [
+    0.18,
+    0.18
+   ],
+   "roughness": 0.8,
+   "metallic": 0.0,
    "baseColor": [
     0.36,
     0.075,
     0.09
    ],
-   "roughness": 0.8
+   "baked": false,
+   "maskFile": "T_KumasKece_MASK.png",
+   "normalFile": "T_KumasKece_N.png",
+   "baseColorFile": "T_KumasKece_BC.png"
   },
   {
    "name": "M_Cloth_Kilim",
@@ -117,53 +157,103 @@
   },
   {
    "name": "M_Cloth_Kusak",
-   "kind": "untextured",
+   "kind": "pbr",
+   "asset": "kumas_ipek",
+   "sizeMeters": [
+    0.1,
+    0.1
+   ],
+   "roughness": 0.78,
+   "metallic": 0.0,
    "baseColor": [
     0.45,
     0.085,
     0.15
    ],
-   "roughness": 0.78
+   "baked": false,
+   "maskFile": "T_KumasIpek_MASK.png",
+   "normalFile": "T_KumasIpek_N.png",
+   "baseColorFile": "T_KumasIpek_BC.png"
   },
   {
    "name": "M_Cloth_Salvar",
-   "kind": "untextured",
+   "kind": "pbr",
+   "asset": "kumas_cuha",
+   "sizeMeters": [
+    0.15,
+    0.15
+   ],
+   "roughness": 0.82,
+   "metallic": 0.0,
    "baseColor": [
     0.48,
     0.105,
     0.085
    ],
-   "roughness": 0.82
+   "baked": false,
+   "maskFile": "T_KumasCuha_MASK.png",
+   "normalFile": "T_KumasCuha_N.png",
+   "baseColorFile": "T_KumasCuha_BC.png"
   },
   {
    "name": "M_Cloth_Sarik",
-   "kind": "untextured",
+   "kind": "pbr",
+   "asset": "kumas_keten",
+   "sizeMeters": [
+    0.12,
+    0.12
+   ],
+   "roughness": 0.84,
+   "metallic": 0.0,
    "baseColor": [
     0.845,
     0.83,
     0.78
    ],
-   "roughness": 0.84
+   "baked": false,
+   "maskFile": "T_KumasKeten_MASK.png",
+   "normalFile": "T_KumasKeten_N.png",
+   "baseColorFile": "T_KumasKeten_BC.png"
   },
   {
    "name": "M_Cloth_Takke",
-   "kind": "untextured",
+   "kind": "pbr",
+   "asset": "kumas_kece",
+   "sizeMeters": [
+    0.18,
+    0.18
+   ],
+   "roughness": 0.82,
+   "metallic": 0.0,
    "baseColor": [
     0.315,
     0.13,
     0.105
    ],
-   "roughness": 0.82
+   "baked": false,
+   "maskFile": "T_KumasKece_MASK.png",
+   "normalFile": "T_KumasKece_N.png",
+   "baseColorFile": "T_KumasKece_BC.png"
   },
   {
    "name": "M_Cloth_Yasmak",
-   "kind": "untextured",
+   "kind": "pbr",
+   "asset": "kumas_keten",
+   "sizeMeters": [
+    0.12,
+    0.12
+   ],
+   "roughness": 0.88,
+   "metallic": 0.0,
    "baseColor": [
     0.855,
     0.865,
     0.87
    ],
-   "roughness": 0.88
+   "baked": false,
+   "maskFile": "T_KumasKeten_MASK.png",
+   "normalFile": "T_KumasKeten_N.png",
+   "baseColorFile": "T_KumasKeten_BC.png"
   },
   {
    "name": "M_Feather",
@@ -404,13 +494,23 @@
   },
   {
    "name": "M_Skin",
-   "kind": "untextured",
+   "kind": "pbr",
+   "asset": "deri_insan",
+   "sizeMeters": [
+    1.7,
+    1.7
+   ],
+   "roughness": 0.58,
+   "metallic": 0.0,
    "baseColor": [
     0.56,
     0.395,
     0.305
    ],
-   "roughness": 0.58
+   "baked": false,
+   "maskFile": "T_DeriInsan_MASK.png",
+   "normalFile": "T_DeriInsan_N.png",
+   "baseColorFile": "T_DeriInsan_BC.png"
   },
   {
    "name": "M_Stone_Cut",

@@ -223,6 +223,22 @@ namespace Hezarfen.Editor.Pipeline
                 mat.renderQueue = 2450;                    // AlphaTest
             }
 
+            // DOKULU AMA RENGI PALETTEN GELEN MALZEME.
+            //
+            // `_BaseColor` dokulu malzemelerde beyaz birakiliyordu ve tas
+            // ile ahsap icin dogruydu: onlarin dokusu rengini de tasir.
+            // Kumas oyle degil — dokumasinin albedosu bilerek NOTR
+            // uretiliyor (`gen_kumas_texture.py`) ve rengi paletten
+            // geliyor. Beyaz birakmak on iki kumasi tek bir gri tona
+            // dusururdu; ustelik `NPCYonetici` kisiden kisiye tonu
+            // `_BaseColor` ile CARPTIGI icin kalabaligin renk cesitliligi
+            // de sifira inerdi.
+            //
+            // Bayrak bildirimden gelir (`baseColor` dolu mu), koda gomulu
+            // bir malzeme listesinden degil.
+            if (e.baseColor != null && e.baseColor.Length >= 3)
+                mat.SetColor("_BaseColor", new Color(
+                    e.baseColor[0], e.baseColor[1], e.baseColor[2], 1f));
             mat.SetTexture("_BaseColorMap", LoadTex(e.baseColorFile, e.name, problems));
             mat.SetTexture("_NormalMap", LoadTex(e.normalFile, e.name, problems));
             mat.SetTexture("_MaskMap", LoadTex(e.maskFile, e.name, problems));

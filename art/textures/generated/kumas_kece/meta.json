@@ -1,0 +1,28 @@
+{
+ "polyhaven_id": null,
+ "name": "kumas_kece",
+ "resolution": "1024px",
+ "size_meters": [
+  0.18,
+  0.18
+ ],
+ "authors": {
+  "Hezarfen projesi (prosedürel üretim)": "All"
+ },
+ "license": "Kendi eserimiz — üçüncü taraf hakkı yok",
+ "source": "prosedürel; girdi yok",
+ "maps": {
+  "BC": "T_kumas_kece_BC.png",
+  "N": "T_kumas_kece_N.png",
+  "ARM": "T_kumas_kece_ARM.png",
+  "R": "T_kumas_kece_R.png",
+  "AO": "T_kumas_kece_AO.png"
+ },
+ "normal_convention": "OpenGL (Y+) — Poly Haven nor_gl ile ayni",
+ "generated_by": "tools/textures/gen_kumas_texture.py",
+ "role": "kumas",
+ "use": "Takke ve kavuk (M_Cloth_Takke/Kavuk)",
+ "weave": "dokuma yok — dovulmus lif",
+ "why": "Karakterin butun kumas malzemeleri dokusuzdu (olculdu: 12 malzeme kind=untextured) ve dokusuz albedo HDRP'de plastik okur. Indirmek yerine uretildi cunku albedonun NOTR kalmasi sart: kisiden kisiye ton NPCYonetici'de _BaseColor ile CARPILIYOR ve renkli bir albedo o carpimi bogardi.",
+ "base_color_note": "BC bilerek notr (gri tonlamali dokuma degeri). Renk paletten gelir; malzeme _BaseColor'i paletin rengiyle carpar."
+}

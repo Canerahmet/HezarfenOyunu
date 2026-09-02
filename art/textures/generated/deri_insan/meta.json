@@ -1,0 +1,29 @@
+{
+ "polyhaven_id": null,
+ "name": "deri_insan",
+ "resolution": "1024px",
+ "size_meters": [
+  1.7,
+  1.7
+ ],
+ "authors": {
+  "Hezarfen projesi (prosedürel üretim)": "All"
+ },
+ "license": "Kendi eserimiz — üçüncü taraf hakkı yok",
+ "source": "prosedürel; girdi yok",
+ "maps": {
+  "BC": "T_deri_insan_BC.png",
+  "N": "T_deri_insan_N.png",
+  "ARM": "T_deri_insan_ARM.png",
+  "R": "T_deri_insan_R.png",
+  "AO": "T_deri_insan_AO.png"
+ },
+ "normal_convention": "OpenGL (Y+) — Poly Haven nor_gl ile ayni",
+ "generated_by": "tools/textures/gen_deri_texture.py",
+ "role": "skin",
+ "use": "Insan teni (M_Skin) — MakeHuman UV yerlesiminde",
+ "why": "M_Skin dokusuzdu (kind=untextured) ve dokusuz ten HDRP'de mum gibi okur. Dudak, goz kapagi, kulak ve gozenek olmadan bir yuz yuz olmuyor.",
+ "inputs": "MPFB2 cekirdek bolge maskeleri (mpfb_face/lips/eyelids/ears) — CC0, refs/LICENSES.md MPFB 2.0.17 satirinin kapsaminda. Maskeler NEREDE NE oldugunu soyler; ten rengi, oranlar ve gozenek bizim.",
+ "uv_space": "MakeHuman taban mesh varsayilan UV — govde ayni mesh'ten turedigi icin hizali.",
+ "base_color_note": "BC bilerek NOTR carpan (taban 1,0). Ten rengi paletten gelir ve kisiden kisiye _BaseColor ile carpilir."
+}

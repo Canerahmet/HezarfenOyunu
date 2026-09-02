@@ -252,7 +252,7 @@ def on_yonu(o):
     return 1 if ileri > geri else -1
 
 
-def one_cevir(obj, hedef=Vector((0.0, -1.0, 0.0))):
+def one_cevir(obj, hedef=Vector((0.0, -1.0, 0.0)), birlikte=()):
     """Ölçülen yönü Blender **-Y**'ye (Unity +Z) döndürür.
 
     Dönüş nesne dönüşümüne değil **ağa** uygulanır: pipeline'in geri
@@ -277,7 +277,17 @@ def one_cevir(obj, hedef=Vector((0.0, -1.0, 0.0))):
                    f"olculebildi (guven {guven:.2f}); dondurulmedi.")
             return 0.0
         if yon > 0:
-            obj.data.transform(Matrix.Rotation(math.pi, 4, "Z"))
+            # BIRLIKTE DONEN NESNELER.
+            #
+            # Goz kuresi ayri bir mesh ve govdeyle AYNI donusumleri
+            # almak zorunda. Ayri hesaplansaydi bir gun biri degisir,
+            # oteki eskirdi — bu depoda uc kez odenen kusur.
+            _m = Matrix.Rotation(math.pi, 4, "Z")
+            obj.data.transform(_m)
+            for _e in birlikte:
+                if _e is not None:
+                    _e.data.transform(_m)
+                    _e.data.update()
             obj.data.update()
             hz.log(f"{obj.name}: yon ayaktan olculdu, 180 derece donduruldu.")
             return math.pi
@@ -321,7 +331,7 @@ def one_cevir(obj, hedef=Vector((0.0, -1.0, 0.0))):
     return aci
 
 
-def normalize(obj, hedef_boy=HEDEF_BOY):
+def normalize(obj, hedef_boy=HEDEF_BOY, birlikte=()):
     """Boyu hedefe ölçekler, ayakları z=0'a, gövdeyi x=0'a oturtur.
 
     Pivot **iki ayağın arasında, zeminde**. Kutunun merkezi değil: bir

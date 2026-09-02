@@ -1,0 +1,28 @@
+{
+ "polyhaven_id": null,
+ "name": "kumas_keten",
+ "resolution": "1024px",
+ "size_meters": [
+  0.12,
+  0.12
+ ],
+ "authors": {
+  "Hezarfen projesi (prosedürel üretim)": "All"
+ },
+ "license": "Kendi eserimiz — üçüncü taraf hakkı yok",
+ "source": "prosedürel; girdi yok",
+ "maps": {
+  "BC": "T_kumas_keten_BC.png",
+  "N": "T_kumas_keten_N.png",
+  "ARM": "T_kumas_keten_ARM.png",
+  "R": "T_kumas_keten_R.png",
+  "AO": "T_kumas_keten_AO.png"
+ },
+ "normal_convention": "OpenGL (Y+) — Poly Haven nor_gl ile ayni",
+ "generated_by": "tools/textures/gen_kumas_texture.py",
+ "role": "kumas",
+ "use": "Keten gomlek, sarik ve yasmak (M_Cloth_Gomlek/Sarik/Yasmak)",
+ "weave": "bez ayagi 1/1, 96 iplik/12 cm = 8 iplik/cm (el dokumasi)",
+ "why": "Karakterin butun kumas malzemeleri dokusuzdu (olculdu: 12 malzeme kind=untextured) ve dokusuz albedo HDRP'de plastik okur. Indirmek yerine uretildi cunku albedonun NOTR kalmasi sart: kisiden kisiye ton NPCYonetici'de _BaseColor ile CARPILIYOR ve renkli bir albedo o carpimi bogardi.",
+ "base_color_note": "BC bilerek notr (gri tonlamali dokuma degeri). Renk paletten gelir; malzeme _BaseColor'i paletin rengiyle carpar."
+}

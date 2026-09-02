@@ -239,6 +239,21 @@ def main():
                          roughness=rough,
                          metallic=1.0 if role.get("metallic") else 0.0)
 
+            # `tinted`: DOKULU AMA RENGI PALETTEN GELEN malzeme.
+            #
+            # Dokulu bir malzemede taban rengi normalde dokudan gelir ve
+            # `OttomanMaterialBuilder` `_BaseColor`'i beyaz birakir. Kumasta
+            # bu yanlis olurdu: dokumanin albedosu bilerek NOTR uretildi
+            # (`gen_kumas_texture.py`), rengin kaynagi Ralamb plakalari, ve
+            # kisiden kisiye ton `NPCYonetici`'de `_BaseColor` ile
+            # CARPILIYOR — beyaz bir taban o carpimi anlamsiz yapardi.
+            #
+            # Yani bu bayrak bir istisna degil, iki farkli malzeme
+            # sinifinin ayrimi: dokusu rengini de tasiyanlar (tas, ahsap)
+            # ve dokusu yalnizca YUZEYI tasiyanlar (kumas).
+            if role.get("tinted"):
+                entry["baseColor"] = [round(c, 5) for c in color[:3]]
+
             # Maske ve normal KAYNAK dokuya aittir, role degil.
             #
             # Ilk yazimda ikisi de malzeme adiyla yaziliyordu ve `weathered_planks`

@@ -250,3 +250,20 @@ varlığı bağlıyor ve indirilen bir dalga sesinin lisansını takip etmek,
 | varlık | kaynak | lisans | ticari |
 |---|---|---|---|
 | `Assets/_Project/Audio/Ortam/*.wav` | `tools/audio/gen_ortam.py` — kendi işimiz | proje telifi | ✔ |
+
+
+### Kumaş ve ten dokuları — prosedürel, kendi eserimiz (2026-09-02)
+
+`art/textures/generated/kumas_{keten,cuha,ipek,kece}` ve
+`art/textures/generated/deri_insan` **bizim ürettiğimiz** dokulardır;
+üçüncü taraf hakkı yoktur. Üreteçler: `tools/textures/gen_kumas_texture.py`
+ve `tools/textures/gen_deri_texture.py`.
+
+Ten dokusunun **girdisi** MPFB2'nin kendi bölge maskeleridir
+(`data/textures/mpfb_{face,lips,eyelids,ears}.jpg`) — yukarıdaki
+MPFB 2.0.17 satırının kapsadığı **CC0 çekirdek varlık** kümesi. Maskeler
+"nerede ne var" bilgisini taşır (yüz, dudak, göz kapağı, kulak);
+tenin rengi, oranları, gözeneği ve gözün çizimi bize aittir. Maske
+dosyaları depoya **girmez**; çıktı girer.
+
+Ticari kullanım: sorun yok. Kaynak CC0, çıktı bizim.
