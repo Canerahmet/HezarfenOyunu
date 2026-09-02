@@ -53,16 +53,12 @@ PrefabInstance:
       value: PF_Sakin_Erkek_Yasli
       objectReference: {fileID: 0}
     - target: {fileID: 4742473837712756890, guid: 96768770bcd5dd247a37685640408eee, type: 3}
+      propertyPath: m_Size
+      value: 2.3091202
+      objectReference: {fileID: 0}
+    - target: {fileID: 4742473837712756890, guid: 96768770bcd5dd247a37685640408eee, type: 3}
       propertyPath: m_FadeMode
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4742473837712756890, guid: 96768770bcd5dd247a37685640408eee, type: 3}
-      propertyPath: m_LocalReferencePoint.y
-      value: 0.79897285
-      objectReference: {fileID: 0}
-    - target: {fileID: 4742473837712756890, guid: 96768770bcd5dd247a37685640408eee, type: 3}
-      propertyPath: m_LocalReferencePoint.z
-      value: -0.09439254
       objectReference: {fileID: 0}
     - target: {fileID: 4742473837712756890, guid: 96768770bcd5dd247a37685640408eee, type: 3}
       propertyPath: m_LODs.Array.data[0].fadeTransitionWidth

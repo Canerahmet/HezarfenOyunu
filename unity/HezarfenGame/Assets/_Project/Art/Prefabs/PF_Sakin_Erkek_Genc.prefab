@@ -73,10 +73,6 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4742473837712756890, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
-      propertyPath: m_LocalReferencePoint.z
-      value: -0.043943614
-      objectReference: {fileID: 0}
-    - target: {fileID: 4742473837712756890, guid: e4269d42df7da7d429bf9cbbf35a07d4, type: 3}
       propertyPath: m_LODs.Array.data[0].fadeTransitionWidth
       value: 0.25
       objectReference: {fileID: 0}

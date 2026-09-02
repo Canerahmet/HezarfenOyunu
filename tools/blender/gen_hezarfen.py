@@ -190,7 +190,7 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
         tut=lambda c: (z_bel - boy * 0.035) <= c.z <= z_boyun and not kol(c),
         sisme=0.008, kalinlik=kiy.GOMLEK_KAL)
     if gomlek:
-        parts.append(hz.assign(kiy.yumusat(gomlek, 3), mats["gomlek"]))
+        parts.append(hz.assign(kiy.yumusat(gomlek, 9), mats["gomlek"]))
 
     # --- SALVAR ------------------------------------------------------------
     # Sisme kota GORE degisir: bilekte dar, uylukte bol, belde toplanir.
@@ -221,7 +221,7 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
         tut=lambda c: (z0 <= c.z <= z_bel) and not kol(c),
         sisme=salvar_sis, kalinlik=kiy.GOMLEK_KAL)
     if salvar:
-        parts.append(hz.assign(kiy.yumusat(salvar, 4), mats["salvar"]))
+        parts.append(hz.assign(kiy.yumusat(salvar, 11), mats["salvar"]))
 
     # --- ENTARI: govde + kollar --------------------------------------------
     #
@@ -246,7 +246,7 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
         tut=lambda c: z_ust_alt <= c.z <= z_boyun and not kol(c),
         sisme=ENTARI_SIS, kalinlik=kiy.ENTARI_KAL)
     if entari_ust:
-        parts.append(hz.assign(kiy.yumusat(entari_ust, 5), ust_mat))
+        parts.append(hz.assign(kiy.yumusat(entari_ust, 13), ust_mat))
 
     # --- ENTARI KOLLARI -----------------------------------------------------
     kol_sayisi = 0

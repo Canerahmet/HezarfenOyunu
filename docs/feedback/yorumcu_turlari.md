@@ -505,3 +505,68 @@ Unity'de ikinci bir tablo yok.
   sabitliyor ve bunu raporuna yazıyor. Hacimsel bulutların **GPU**
   bedeli toplu kipte okunamıyor.
 * ADR 0084 (uçuş kapısı) hâlâ Caner'in kararını bekliyor.
+
+---
+
+## Tur 16 — Yüzey: kumaş, ten, göz ve kişi başına ayrışma
+*(Caner, 2026-09-02: "yüzleri ve karakterleri daha gerçekçi nasıl
+oluşturabiliriz, kıyafetleri ile birlikte. lisans problemi olmadan." →
+"üç aşamayı da yap. fakat npcler birbirinin aynısı olmasın.")*
+
+### Kök sebep tek satırdı
+`gen_hezarfen` giysi parçalarını bmesh'ten kuruyor ve **hiç UV
+üretmiyordu**. Ölçüm: on iki kumaş malzemesinin ve tenin hepsi
+`kind=untextured`. HDRP'de dokusuz albedo her zaman plastik okur —
+"gerçekçi değil" görüntüsünün sebebi modelin biçimi değil yüzeyiydi.
+
+### Üretilenler (hepsi kendi eserimiz, lisans sorusu doğuşta yok)
+| doku | dokuma | nerede |
+|---|---|---|
+| `kumas_keten` | bez ayağı 1/1, 8 iplik/cm | gömlek, sarık, yaşmak |
+| `kumas_cuha` | dimi 2/1, dinklenmiş | entari, ferace, şalvar |
+| `kumas_ipek` | atlas 4/1 | kuşak |
+| `kumas_kece` | dokuma yok | kavuk, takke |
+| `deri_insan` | — | ten (MPFB2'nin CC0 bölge maskelerinden bestelendi) |
+
+Albedolar **nötr** — renk paletten gelir ve kişiden kişiye `_BaseColor`
+ile çarpılır. Hazır bir fotoğraf dokusu kendi rengini getirir ve o
+çarpımı boğardı: yedi gövdelik çeşitlilik bir doku yüzünden geri
+alınırdı. `tinted` bayrağı bu ayrımı hem Blender hem Unity tarafında
+tek yerde tutuyor.
+
+### Ölçülüp reddedilen
+* **Göz küresi.** MakeHuman `helper-l-eye` grubu göz gibi duruyor;
+  ölçüldü, merkezine en yakın gövde köşesi **100,7 mm** — kafes yüzün
+  on santim önünde. O bir *kafes*, ve oturacağı göz varlığı kurulu
+  değil. Göz artık deriye çiziliyor, yerini bilen tek uzayda: UV.
+* **Daire iris.** Kapak adasının ortasına daire çizmek hiçbir şey
+  göstermedi; maskeleri çiğ renkle boyayan bir tanı turu sebebini
+  gösterdi — adanın yalnızca ince bir şeridi görünür geometri. Göz
+  artık adanın kendi biçimini kullanıyor.
+
+### Her şeyi gizleyen kusur
+Birleşmiş ağda **iki UV katmanı** vardı: `Float2` (bmesh'in adı) ve
+`UVMap` (MPFB2'nin adı). `join_parts` katmanları **ada göre** eşleştiriyor;
+etkin katmanda gövdenin verisi yoktu ve **bütün deri tek bir köşe
+texel'ini** örneklüyordu (UV kutusu 0,000–0,000). Doku bozuk
+görünmüyordu — **düz renk** görünüyordu, yani dokusuz hâlinin aynısı.
+Bir kusurun en pahalısı, düzeltilmiş hâline benzeyenidir.
+
+### Kişi başına ayrışma — ölçüldü
+* Ten çarpanı 0,62–1,20 + sıcaklık kayması (önce hiç değişmiyordu).
+* Her giysi **kendi** tonuna kayıyor (önce hepsi tek `dna.ton`).
+* Etek dokuz dikey kıvrımla düşüyor (önce düz koni).
+* Yeni test: 60 kişilik kalabalıkta ayrı görünüş sayısı — kırk karenin
+  en kötüsünde **54/60**. Ten tek başına 8 kovaya, 0,35 aralığa yayılıyor.
+
+### Ölçüm
+EditMode **452/452**, PlayMode **50/50**, kare **7,1 ms** / 16,7.
+
+### Açık kalan
+* Gövde kabuğu hâlâ anatominin bir kısmını taşıyor (yumuşatma 3→9,
+  4→11, 5→13 yapıldı; göğüs formu kaldı — feracede doğru, gömlekte
+  tartışılır).
+* Sakak kartları çeneden omza inen ince teller bırakıyor (UV düzelince
+  görünür oldu).
+* Sûriçi sokağında kapı açıklığı gölge dörtgenleri **yere yatık**
+  duruyor.
