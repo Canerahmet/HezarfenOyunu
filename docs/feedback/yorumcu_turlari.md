@@ -570,3 +570,44 @@ EditMode **452/452**, PlayMode **50/50**, kare **7,1 ms** / 16,7.
   görünür oldu).
 * Sûriçi sokağında kapı açıklığı gölge dörtgenleri **yere yatık**
   duruyor.
+
+---
+
+## Tur 17 — Yüzdeki teller, dumanın rengi ve gölgenin gerçeği
+*(Caner: "devam et")*
+
+### Düzeltilenler
+| kusur | ölçü | sebep |
+|---|---|---|
+| Çeneden omza inen ince teller | saç malzemesi y −0,105, yüzün önü −0,031 | saç kartları `kesit` ile yerleştiriliyordu; `kesit` yarı-derinliği `max(\|y\|)` verir ve gövde y=0'da ortalı değil. **Aynı kusur bu depoda dördüncü kez** (etek, kuşak, sarık, şimdi saç) |
+| Bıyık yüzün önünde | `-boy * 0,052` sabiti | ağız kotundaki kesitin kendi önünden hesaplanıyor artık |
+| Sakal enseye dolanıyor | y +0,200'e kadar | çene yayına uzaklık tek başına yetmiyor (yay aynalı); sakal tanımı gereği ÖNDE |
+| Şakak tutamı tel gibi | — | kök %94 → %80, boy kısaldı, en iki katı, eğim üçte bir |
+| Baca dumanı **macenta** | — | `ParticleSystem` kuruluyor, malzemesi hiç verilmiyor. Prefablardaki 346 boş yuvanın çalışma zamanı kardeşi — kapı oraya konmuştu, bu çizici kodda doğuyor |
+| Sahnede aydınlatma ayarı yok | `m_LightingSettings: {fileID: 0}` | varsayılan → **Baked GI kapalı** → `AdaptiveProbeVolumes.BakeAsync` hiçbir şey yapmıyor |
+
+### Kişi başına silüet
+Kafa oranı artık kişiden kişiye ±%5 (genişlik ve derinlik ayrı).
+Humanoid yeniden hedefleme kemiğe **ölçek yazmaz**, bu yüzden bir kez
+verilen değer animasyon boyunca duruyor; havuz bırakırken sıfırlıyor.
+**Kalabalıkta ayrı görünüş 54/60 → 58/60.**
+
+### Ölçülüp "kusur değil" denilenler
+* **Simsiyah gölge.** Ölçüm: sokak gölgesi (36, 15, 0), pozu iki durak
+  açınca güneşli çatı 196→247 çıktı ama gölge 41'de kaldı — yani az
+  pozlanmış değil. Ama farklı gölgeler ölçülünce anlaşıldı: açık ağaç
+  gölgesi (51, 37, 20), güneşli zemin (230, 210, 180) — **normal bir
+  gölge**. Siyah sandığım yer üstü kapalı dar bir sokak; orada gök
+  görünmüyor ve ışık yalnız sıcak sekmeden geliyor.
+* **Kubbedeki benekler.** Bulut gölgesi sanıldı; kapatılıp ölçüldü,
+  değişmedi. Kurşunun kendi oksit örtüsü — kasıtlı ve kayıtlı.
+
+### Yan kazanç
+APV fırını toplu kipten koşabiliyor artık: `AdaptiveProbeVolumes.BakeAsync`
+penceresiz kipte hiç başlamıyor (120 sn boyunca `Lightmapping.isRunning`
+false), klasik `Lightmapping.BakeAsync` başlıyor. **2.829.507 prob,
+1,7 dakika.** Bekleyicinin ilk hâli işi görmeden "pişti" diyordu —
+bir bekleme, beklediği şeyin başladığını görmeden bitirmez.
+
+### Ölçüm
+EditMode **452/452**, PlayMode **50/50**, kare **7,1 ms** / 16,7.
