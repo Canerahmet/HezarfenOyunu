@@ -396,6 +396,49 @@ namespace Hezarfen.Editor.Diagnostics
                     cc.enabled = true;
                     Physics.SyncTransforms();
 
+                    // KALABALIK VARSA KAMERA ONA DONER.
+                    //
+                    // Duraklarin bakis acisi elle secilmisti ve iki
+                    // duragin amaci acikca "NPC yogunlugu" oldugu halde
+                    // kare hep bir duvar gosteriyordu: 40 m'de 93 kisi
+                    // sayiliyor, 60 govde ciziliyor ve karede kimse yok.
+                    // Sayan ile bakan ayni yere bakmiyorsa gozlem
+                    // sayidan kopar — bu oturumda uc kusur yalnizca
+                    // bakinca goruldu.
+                    //
+                    // Esik 12: birkac yoldan gecen kalabalik degildir.
+                    Vector3? kalabalikMerkez = null;
+                    if (npc != null && npc.Sakinler != null)
+                    {
+                        var toplam = Vector3.zero;
+                        int adet = 0;
+                        foreach (var ajan in npc.Sakinler)
+                        {
+                            var fark = ajan.konum - oyuncu.transform.position;
+                            fark.y = 0f;
+                            if (fark.sqrMagnitude > 40f * 40f) continue;
+                            toplam += ajan.konum;
+                            adet++;
+                        }
+                        if (adet >= 12)
+                        {
+                            kalabalikMerkez = toplam / adet;
+                        }
+                        if (adet >= 12)
+                        {
+                            var yon = toplam / adet - oyuncu.transform.position;
+                            yon.y = 0f;
+                            if (yon.sqrMagnitude > 1e-4f)
+                            {
+                                cc.enabled = false;
+                                oyuncu.transform.rotation =
+                                    Quaternion.LookRotation(yon.normalized);
+                                cc.enabled = true;
+                                Physics.SyncTransforms();
+                            }
+                        }
+                    }
+
                     // Semt akisi ve zemin otursun.
                     for (int i = 0; i < 90; i++) yield return null;
 
@@ -452,6 +495,73 @@ namespace Hezarfen.Editor.Diagnostics
                                        ImageConversion.EncodeToPNG(tex));
                     Object.DestroyImmediate(tex);
                     rt.Release();
+
+                    // --- KALABALIK KARESI --------------------------------
+                    //
+                    // Duraklarin bakis acisi elle secilmis ve iki duragin
+                    // amaci acikca "NPC yogunlugu" oldugu halde kare hep
+                    // bir duvar gosteriyordu: 40 m'de 93 kisi sayiliyor,
+                    // 60 govde ciziliyor, karede kimse yok. Kamerayi
+                    // kalabaliga DONDURMEK yetmedi — arada duvar var.
+                    //
+                    // Bir gozlem araci, gozleyecegi seyi goremiyorsa
+                    // olcum degil sus uretir. Bu kare kamerayi
+                    // kalabaligin USTUNE cikarir: insanlar orada mi,
+                    // birbirinden ayrisiyor mu, ancak boyle gorulur.
+                    // Oyunun kadraji degil, bir DENETIM karesidir ve
+                    // adi da bunu soyler.
+                    if (kalabalikMerkez.HasValue)
+                    {
+                        var eskiKonum = kam.transform.position;
+                        var eskiDonus = kam.transform.rotation;
+                        // KAMERA KIPI OYUNCUDA, KAMERADA DEGIL.
+                        //
+                        // Ilk denemede `kam.GetComponent<KameraKipi>()`
+                        // yaziliydi ve null donuyordu; bilesen her
+                        // LateUpdate'te kameranin konumunu yeniden
+                        // yaziyor, benim koydugum yer bir kare bile
+                        // yasamiyordu. Sonuc: "kalabalik karesi" normal
+                        // kareyle piksel piksel ayniydi — yani yeni bir
+                        // olcum uretmis gibi gorunup hicbir sey
+                        // olcmuyordu. Turun kendi `kip` degiskeni zaten
+                        // dogru nesneyi tutuyor.
+                        var kip2 = kip;
+                        if (kip2 != null) kip2.enabled = false;
+
+                        var mrk = kalabalikMerkez.Value;
+                        // YUKSEKLIK OLCULDU: 7,5 m'de kamera bir catinin
+                        // ARDINDA kaldi ve kare kiremit gosterdi. Sehrin
+                        // catilari 6-9 m; 13 m onlarin ustune cikar ve
+                        // 9 m'lik geri cekilme ~55 derecelik bir bakis
+                        // acisi verir — insanlarin hem boyu hem araligi
+                        // ayni karede okunur.
+                        kam.transform.position = mrk
+                            + new Vector3(0f, 13f, -9f);
+                        kam.transform.rotation = Quaternion.LookRotation(
+                            (mrk + Vector3.up * 1.0f)
+                            - kam.transform.position);
+                        for (int i = 0; i < 4; i++) yield return null;
+
+                        var rt2 = new RenderTexture(1280, 720, 24,
+                                                    RenderTextureFormat.ARGB32);
+                        kam.targetTexture = rt2;
+                        for (int i = 0; i < 6; i++) kam.Render();
+                        RenderTexture.active = rt2;
+                        var tex2 = new Texture2D(1280, 720,
+                                                 TextureFormat.RGB24, false);
+                        tex2.ReadPixels(new Rect(0, 0, 1280, 720), 0, 0);
+                        tex2.Apply();
+                        RenderTexture.active = null;
+                        kam.targetTexture = null;
+                        File.WriteAllBytes($"{Cikti}/{d.ad}_kalabalik.png",
+                                           ImageConversion.EncodeToPNG(tex2));
+                        Object.DestroyImmediate(tex2);
+                        rt2.Release();
+
+                        kam.transform.position = eskiKonum;
+                        kam.transform.rotation = eskiDonus;
+                        if (kip2 != null) kip2.enabled = true;
+                    }
 
                     satirlar.Add($"| {d.ad} | {altinda} | "
                                  + $"{p.y - araziKot:+0.0;-0.0} | "

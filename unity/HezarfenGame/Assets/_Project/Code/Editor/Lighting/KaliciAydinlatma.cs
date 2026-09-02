@@ -638,5 +638,171 @@ namespace Hezarfen.Editor.Lighting
             Debug.Log("[Hezarfen] Problar pisiriliyor (yalniz APV)...");
             AdaptiveProbeVolumes.BakeAsync();
         }
+
+        /// <summary>
+        /// Toplu kipten prob pişirme — <b>başlatır ve BEKLER</b>.
+        ///
+        /// Gölgeler ölçüldü ve ışık almadıkları görüldü: sokakta güneşli
+        /// yüzey 196/255, gölge 36/15/0. Pozu iki durak açınca güneş
+        /// 247'ye çıktı, gölge 41'de kaldı — yani gölge <b>az pozlanmış
+        /// değil, aydınlatılmamış</b>. Statik geometrinin dolaylı ışığı
+        /// APV'den geliyor (<c>lightProbeSystem: 1</c>) ve diskteki fırın
+        /// 31 Ağustos'tan kalma; şehir o günden beri defalarca yeniden
+        /// kuruldu.
+        ///
+        /// <c>BakeAsync</c> adı gibi çalışır: çağrı hemen döner. Toplu
+        /// kipte <c>-quit</c> ile birlikte bu, "fırınladım" deyip hiçbir
+        /// şey fırınlamamak olurdu — bu depoda aynı sınıf hata
+        /// (<c>-quit</c> ile <c>-runTests</c>) yıllarca testleri hiç
+        /// koşturmamıştı. Burada bitiş beklenir.
+        ///
+        /// Süre sınırı var, çünkü sonsuz bekleyen bir toplu koşum hata
+        /// verenden kötüdür: kimse ne olduğunu bilmez.
+        /// </summary>
+        public static void TopluPisir()
+        {
+            EditorSceneManager.OpenScene(ProbeSahnesi);
+            var pv = Object.FindAnyObjectByType<ProbeVolume>();
+            if (pv == null)
+            {
+                Debug.LogError("[Hezarfen] Sahnede prob hacmi yok.");
+                EditorApplication.Exit(1);
+                return;
+            }
+            // PISIRILECEK BIR SEY OLMASI ICIN BAKED GI ACIK OLMALI.
+            //
+            // Sahnenin `m_LightingSettings` alani BOSTU (fileID: 0), yani
+            // Unity'nin varsayilan ayarlari geciyordu ve orada "Baked
+            // Global Illumination" kapali. `BakeAsync` bu durumda hicbir
+            // sey yapmaz ve hicbir sey de soylemez — olculdu: 120 saniye
+            // boyunca `Lightmapping.isRunning` hep false kaldi ve
+            // diskteki firin 31 Agustos tarihiyle oldugu gibi durdu.
+            //
+            // Ayar bir varliga yazilir ve sahneye baglanir; boylece bir
+            // dahaki sefere "acik miydi" diye sorulmaz.
+            AydinlatmaAyari();
+
+            Debug.Log("[Hezarfen] APV pisirme basladi (toplu kip).");
+            _pisirmeBasi = System.DateTime.UtcNow;
+            AdaptiveProbeVolumes.BakeAsync();
+            EditorApplication.update += PisirmeyiBekle;
+        }
+
+        private const string AyarYolu =
+            "Assets/_Project/Settings/LS_Hezarfen.lighting";
+
+        /// <summary>
+        /// Sahnenin aydınlatma ayarı — <b>Baked GI açık</b>.
+        ///
+        /// APV'nin pişirebilmesi için "Baked Global Illumination" açık
+        /// olmak zorunda. Sahnede atanmış bir ayar yoktu ve varsayılanda
+        /// kapalı; ölçüm bunu gösterdi (pişirme hiç başlamadı).
+        ///
+        /// Örnek sayısı düşük tutuldu: bu bir ışık haritası pişirmesi
+        /// değil, yalnızca prob ızgarası. Şehir 9,6 × 7,8 km ve yüksek
+        /// örnekleme burada saatlere mal olur, karşılığında gölgedeki
+        /// gök ışığını daha doğru yapmaz — o ışık zaten yumuşak.
+        /// </summary>
+        private static void AydinlatmaAyari()
+        {
+            var ls = AssetDatabase.LoadAssetAtPath<LightingSettings>(AyarYolu);
+            if (ls == null)
+            {
+                ls = new LightingSettings { name = "LS_Hezarfen" };
+                const string dizin = "Assets/_Project/Settings";
+                if (!AssetDatabase.IsValidFolder(dizin))
+                    AssetDatabase.CreateFolder("Assets/_Project",
+                                               "Settings");
+                AssetDatabase.CreateAsset(ls, AyarYolu);
+            }
+            ls.bakedGI = true;
+            ls.realtimeGI = false;
+            ls.lightmapper = LightingSettings.Lightmapper.ProgressiveGPU;
+            ls.directSampleCount = 32;
+            ls.indirectSampleCount = 128;
+            ls.maxBounces = 2;
+            ls.ao = false;                 // AO ekranda zaten var (SSAO)
+            EditorUtility.SetDirty(ls);
+            Lightmapping.lightingSettings = ls;
+            AssetDatabase.SaveAssets();
+            Debug.Log("[Hezarfen] Aydinlatma ayari: Baked GI ACIK "
+                      + $"({ls.indirectSampleCount} dolayli ornek).");
+        }
+
+        private const string ProbeSahnesi =
+            "Assets/_Project/Scenes/Faz1_Terrain.unity";
+
+        private static System.DateTime _pisirmeBasi;
+        private static double _sonBildirim;
+
+        /// <summary>
+        /// Pişirmenin gerçekten <b>başladığı görüldü mü</b>.
+        ///
+        /// İlk yazımda beklemek yalnızca <c>Lightmapping.isRunning</c>'e
+        /// bakıyordu ve o, çağrıdan hemen sonraki karede hâlâ
+        /// <c>false</c>: koşum "APV pişti ve kaydedildi (0,0 dk)" yazıp
+        /// çıktı, diskteki dosyalar 31 Ağustos tarihiyle olduğu gibi
+        /// kaldı. Yani araç işini yapmadığını değil, YAPTIĞINI bildirdi.
+        ///
+        /// Bir beklemenin, beklediği şeyin başladığını görmeden bittiğine
+        /// karar vermesi bekleme değildir.
+        /// </summary>
+        private static bool _pisirmeGoruldu;
+        private static bool _yedekDenendi;
+
+        private static void PisirmeyiBekle()
+        {
+            double gecen = (System.DateTime.UtcNow - _pisirmeBasi)
+                .TotalSeconds;
+            if (gecen - _sonBildirim > 60.0)
+            {
+                _sonBildirim = gecen;
+                Debug.Log($"[Hezarfen] APV pisiyor... {gecen / 60.0:0.0} dk");
+            }
+            if (Lightmapping.isRunning) _pisirmeGoruldu = true;
+
+            // APV'NIN KENDI CAGRISI BASLAMAZSA KLASIK PISIRME DENENIR.
+            //
+            // Olculdu: `AdaptiveProbeVolumes.BakeAsync()` toplu kipte
+            // `Lightmapping.isRunning`i hic true yapmiyor ve diskteki
+            // firin degismiyor. Ikinci yol, ayni isi kuyruga sokan eski
+            // cagri; APV hacimleri sahnede oldugu icin o da problari
+            // pisirir.
+            if (!_pisirmeGoruldu && !_yedekDenendi && gecen > 20.0)
+            {
+                _yedekDenendi = true;
+                Debug.Log("[Hezarfen] APV cagrisi baslamadi — "
+                          + "Lightmapping.BakeAsync deneniyor.");
+                Lightmapping.BakeAsync();
+            }
+
+            // Baslamasi icin makul sure taniyoruz: is kuyruga giriyor.
+            if (!_pisirmeGoruldu && gecen < 120.0) return;
+            if (_pisirmeGoruldu && Lightmapping.isRunning && gecen < 3600.0)
+                return;
+
+            EditorApplication.update -= PisirmeyiBekle;
+            if (!_pisirmeGoruldu)
+            {
+                Debug.LogError("[Hezarfen] APV pisirme HIC BASLAMADI "
+                               + "(120 sn boyunca Lightmapping.isRunning "
+                               + "false). Diskteki fırın eski kaldi.");
+                EditorApplication.Exit(3);
+                return;
+            }
+            if (gecen >= 3600.0)
+            {
+                Debug.LogError("[Hezarfen] APV pisirme 60 dk'da bitmedi.");
+                Lightmapping.Cancel();
+                EditorApplication.Exit(2);
+                return;
+            }
+            EditorSceneManager.SaveOpenScenes();
+            AssetDatabase.SaveAssets();
+            Debug.Log($"[Hezarfen] APV pisti ve kaydedildi "
+                      + $"({gecen / 60.0:0.0} dk).");
+            EditorApplication.Exit(0);
+        }
+
     }
 }

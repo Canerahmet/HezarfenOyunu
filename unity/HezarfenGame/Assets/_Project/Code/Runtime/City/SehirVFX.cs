@@ -137,6 +137,21 @@ namespace Hezarfen.Sehir
             renk.color = new ParticleSystem.MinMaxGradient(gecis);
 
             var ciz = go.GetComponent<ParticleSystemRenderer>();
+            // MALZEME VERILMEZSE PARCACIK MACENTA CIZILIR.
+            //
+            // Bu satir yoktu: `ParticleSystem` kuruluyor, bicimi,
+            // omru, rengi ve golgesi ayarlaniyor ve malzemesi hic
+            // verilmiyordu. HDRP malzemesiz bir cizici icin hata
+            // vermez, uyarmaz — macenta boyar. Oyun turunun kalabalik
+            // karesinde sokagin kenarinda duran mor leke buydu ve
+            // bacalardan cikan "beyaz benekler" de ayni parcaciklardi.
+            //
+            // Kusur, prefablardaki bos malzeme yuvasi kusurunun
+            // (204 prefab, 346 yuva) calisma zamaninda uretilen
+            // kardesidir: oradaki kapi bir testle kapatildi, burasi
+            // testin bakmadigi yerdi cunku bu cizici sahnede degil
+            // KODDA doguyor.
+            ciz.sharedMaterial = DumanMalzeme();
             ciz.renderMode = ParticleSystemRenderMode.Billboard;
             ciz.shadowCastingMode =
                 UnityEngine.Rendering.ShadowCastingMode.Off;
@@ -184,6 +199,70 @@ namespace Hezarfen.Sehir
             m.RecalculateBounds();
             _martiAgi = m;
             return m;
+        }
+
+        private static Material _dumanMalzeme;
+
+        /// <summary>
+        /// Duman malzemesi — <b>saydam, ışıksız, yumuşak kenarlı</b>.
+        ///
+        /// Doku çalışma zamanında üretiliyor: 64×64 yumuşak bir nokta.
+        /// Diske bir dosya koymak için fazla küçük, ve prosedürel
+        /// olduğu için lisans sorusu doğmuyor.
+        ///
+        /// HDRP'de saydamlık malzeme üzerinde üç yerde birden yazılır
+        /// (yüzey tipi, harman kipi, anahtar kelimeler). Yalnız birini
+        /// yazmak sessizce opak bırakır — duman o zaman gökyüzünü
+        /// delen gri kareler olur.
+        /// </summary>
+        private static Material DumanMalzeme()
+        {
+            if (_dumanMalzeme != null) return _dumanMalzeme;
+            var s = Shader.Find("HDRP/Unlit") ?? Shader.Find("Unlit/Transparent");
+            _dumanMalzeme = new Material(s) { name = "M_Duman" };
+
+            const int n = 64;
+            var t = new Texture2D(n, n, TextureFormat.RGBA32, true);
+            var px = new Color[n * n];
+            for (int y = 0; y < n; y++)
+                for (int x = 0; x < n; x++)
+                {
+                    float dx = (x + 0.5f) / n - 0.5f;
+                    float dy = (y + 0.5f) / n - 0.5f;
+                    float d = Mathf.Sqrt(dx * dx + dy * dy) * 2f;
+                    // Yumusak dusus: kenarda sifir, ortada bir. Kare
+                    // bir kenar dumani "kagit parcasi" yapar.
+                    float a = Mathf.Clamp01(1f - d);
+                    px[y * n + x] = new Color(1f, 1f, 1f, a * a);
+                }
+            t.SetPixels(px);
+            t.Apply();
+            t.wrapMode = TextureWrapMode.Clamp;
+
+            foreach (string ad in new[] { "_UnlitColorMap", "_BaseColorMap",
+                                          "_MainTex" })
+                if (_dumanMalzeme.HasProperty(ad))
+                    _dumanMalzeme.SetTexture(ad, t);
+            foreach (string ad in new[] { "_UnlitColor", "_BaseColor",
+                                          "_Color" })
+                if (_dumanMalzeme.HasProperty(ad))
+                    _dumanMalzeme.SetColor(ad, new Color(0.62f, 0.60f, 0.57f,
+                                                         0.32f));
+
+            // HDRP saydamligi: uc yerde birden.
+            if (_dumanMalzeme.HasProperty("_SurfaceType"))
+            {
+                _dumanMalzeme.SetFloat("_SurfaceType", 1f);      // Transparent
+                _dumanMalzeme.SetFloat("_BlendMode", 0f);        // Alpha
+                _dumanMalzeme.SetFloat("_SrcBlend", 5f);         // SrcAlpha
+                _dumanMalzeme.SetFloat("_DstBlend", 10f);        // 1-SrcAlpha
+                _dumanMalzeme.SetFloat("_ZWrite", 0f);
+                _dumanMalzeme.SetFloat("_AlphaCutoffEnable", 0f);
+                _dumanMalzeme.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+                _dumanMalzeme.EnableKeyword("_BLENDMODE_ALPHA");
+            }
+            _dumanMalzeme.renderQueue = 3000;
+            return _dumanMalzeme;
         }
 
         private static Material _martiMalzeme;
