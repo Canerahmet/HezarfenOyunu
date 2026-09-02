@@ -45,6 +45,10 @@ namespace Hezarfen.Tests.EditMode
             var s = new System.Text.StringBuilder();
             s.Append(tur).Append('|').Append(Mathf.RoundToInt(boy / 0.03f));
 
+            // Kafa orani: silüetin en okunur farki. 20 kova.
+            s.Append('|').Append(Mathf.RoundToInt(dna.kafa.y * 20f))
+             .Append(':').Append(Mathf.RoundToInt(dna.kafa.x * 20f));
+
             // Ten: kanal basina 10 kova.
             s.Append('|').Append(Mathf.RoundToInt(dna.ten.r * 10f))
              .Append(Mathf.RoundToInt(dna.ten.g * 10f))
@@ -99,7 +103,11 @@ namespace Hezarfen.Tests.EditMode
             // 60 kisilik bir kalabalikta en az 54 ayri gorunus: yani en
             // cok uc cift ikiz. Ucten fazlasi goze "kopyalanmis
             // kalabalik" olarak carpar — sikayetin kendisi buydu.
-            Assert.GreaterOrEqual(enKotu, 54,
+            // Esik 54'ten 58'e cikti: kafa orani eklendikten sonra
+            // olculen en kotu kare 58/60 verdi. Bir esigi olculen
+            // degerin ALTINDA birakmak, kazanilan sey geri gittiginde
+            // testin susmasi demektir.
+            Assert.GreaterOrEqual(enKotu, 58,
                 $"En kotu karede 60 kisiden yalniz {enKotu} tanesi ayri "
                 + $"gorunuyor ({ornek}) — geri kalani birbirinin kopyasi.");
         }

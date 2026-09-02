@@ -61,6 +61,22 @@ namespace Hezarfen.Sehir
         public readonly Color ten;
 
         /// <summary>
+        /// <b>Kafa oranı</b> — gövdeye göre başın büyüklüğü ve biçimi.
+        ///
+        /// Uzaktan bir insanı ötekinden ayıran şey renk değil silüettir
+        /// ve silüetin en okunur oranı baş/gövdedir: aynı boyda iki
+        /// kişiden başı büyük olan daha genç, küçük olan daha uzun
+        /// görünür. Ölçüm bunu doğruladı — yedi arketip ve dokuz renk
+        /// üretildikten sonra bile kalabalıkta ayrışma tonlardan
+        /// geliyordu; silüet hâlâ arketip başına tekti.
+        ///
+        /// Aralık dar ve bilerek: yetişkinde baş boyu 1/7,5 ile 1/8,3
+        /// arasında gezinir, yani ±%5. Daha fazlası insan değil karikatür
+        /// olur. <c>x</c> ve <c>z</c> ayrı: yüz yuvarlak ya da uzun olur.
+        /// </summary>
+        public readonly Vector3 kafa;
+
+        /// <summary>
         /// Bu insanın hedef boyu (m).
         ///
         /// <see cref="olcek"/> bunun 1,70 m'ye bölünmüş hâliydi ve tek
@@ -82,7 +98,8 @@ namespace Hezarfen.Sehir
         public const float BoySapma = 0.062f;
 
         private InsanDNA(float olcek, float hiz, Color ton, float yas,
-                         float faz, bool kadin, float boy, Color ten)
+                         float faz, bool kadin, float boy, Color ten,
+                         Vector3 kafa)
         {
             this.olcek = olcek;
             this.hiz = hiz;
@@ -91,6 +108,7 @@ namespace Hezarfen.Sehir
             this.faz = faz;
             this.kadin = kadin;
             this.ten = ten;
+            this.kafa = kafa;
             this.boy = boy;
         }
 
@@ -184,6 +202,19 @@ namespace Hezarfen.Sehir
                 tv * (0.94f - 0.10f * (tenSicak - 0.5f)
                       - 0.08f * (1f - tenAcik)),
                 1f);
+
+            // KAFA ORANI: buyukluk ve bicim.
+            //
+            // `kafaBoy` genel olcek (bas/govde orani), `kafaEn` yuzun
+            // yuvarlakligi. Ikisi ayri karmadan geliyor ki buyuk ve
+            // uzun bir yuz de, kucuk ve yuvarlak bir yuz de olabilsin.
+            // Cocukta taban zaten buyuk basli (olculdu: 1/6,25), o
+            // yuzden burada YASA GORE bir kaydirma yok — arketip onu
+            // zaten soyluyor.
+            float kafaBoy = 0.95f + 0.10f * Karma(ref h);
+            float kafaEn = 0.96f + 0.08f * Karma(ref h);
+            var kafa = new Vector3(kafaBoy * kafaEn, kafaBoy,
+                                   kafaBoy * (1.96f - kafaEn) * 0.5f);
             // Donem kadini erkekten ~12 cm kisadir (1,54 / 1,66 = 0,928).
             // Ayni oran arketip boylarinda da var (`sakin_kit`), cunku
             // ikisi de ayni yerden okundu.
@@ -209,7 +240,7 @@ namespace Hezarfen.Sehir
             Color ton = Color.HSVToRGB(tonAci, doygun, parlak);
 
             return new InsanDNA(boy / TabanBoy, hiz, ton, yas, Karma(ref h),
-                                kadin, boy, ten);
+                                kadin, boy, ten, kafa);
         }
 
         /// <summary>

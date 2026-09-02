@@ -532,8 +532,22 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
         z_dip = boy * 0.806
         sakal_menzil = boy * 0.052
 
+        # Sakalin y merkezi: cene yayinin kendi ortalamasi. Sabit bir
+        # sayi yazmak yine "govde y=0'da ortali" varsayimi olurdu.
+        _cene_cy = sum(p.y for p in hat_p) / len(hat_p)
+
         def sakal_bolge(c):
             if c.z > z_agiz or c.z < z_dip:
+                return False
+            # SAKAL ENSEYE DOLANMAZ.
+            #
+            # Olculdu: sakal malzemesinin y siniri +0,200'e kadar
+            # gidiyordu, yani ensenin arkasina. Cene yayina uzaklik tek
+            # basina yetmiyor cunku yay AYNALANMIS iki yaridan olusuyor
+            # ve boynun arkasi da bir yariya yakin dusebiliyor. Sakal
+            # tanimi geregi ONDEDIR: cene ortasinin gerisinde kalan
+            # koseler disarida.
+            if c.y > _cene_cy + sakal_menzil * 0.9:
                 return False
             return min((c - p).length for p in hat_p) < sakal_menzil
 
@@ -562,7 +576,19 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
 
     # BIYIK: ust dudak. Plaka 20 ve 35'te sakalla birlikte var.
     for sx in ((-1, 1) if skn.sakalli(tip) else ()):
-        b = sk.kart(f"Biyik_{sx}", (sx * boy * 0.010, -boy * 0.052,
+        # BIYIK DUDAGIN ONUNE KONUR, MUTLAK BIR Y'YE DEGIL.
+        #
+        # Once `-boy * 0,052` yaziliyordu, yani y = -8,8 cm. Olculdu:
+        # kafanin ON yuzu y = -0,031. Biyik yuzun bes santim ONUNDE
+        # duruyordu ve UV kusuru duzelip alfa calisinca cenenin
+        # yaninda ince bir tel olarak gorundu.
+        #
+        # Dogru yer agiz kotundaki kesitin kendi onudur — govdenin y
+        # ekseni ortasindan gecmedigi icin `kesit_merkezli` sart.
+        _bk = kiy.kesit_merkezli(govde, boy * 0.905)
+        _brx, _bry, _bcy = _bk if _bk else (boy * 0.05, boy * 0.06, 0.0)
+        b = sk.kart(f"Biyik_{sx}", (sx * boy * 0.010,
+                                    _bcy - _bry * 0.92,
                                     boy * 0.905),
                     (sx * 0.85, -0.30, -0.42), (0.0, -1.0, 0.25),
                     boy * 0.026, boy * 0.020, col, serit=2, egim=0.10)
@@ -573,11 +599,34 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
     for sx in ((-1, 1) if tip not in ("kadin", "kiz") else ()):
         for i, (dy, dz, ser) in enumerate((
                 (0.30, 0.905, 0), (0.10, 0.895, 3), (-0.34, 0.900, 1))):
-            kesit = kiy.kesit(govde, boy * dz) or (boy * 0.05, boy * 0.06)
+            # KESIT DEGIL KESIT_MERKEZLI.
+            #
+            # `kesit` yari-derinligi `max(|y|)` diye verir ve bu ancak
+            # govde y=0'da ortaliysa dogrudur — degil. Ayni kusur bu
+            # depoda etekte, kusakta ve sarikta ucer kez odendi; burada
+            # dorduncusuydu ve olculdu: sac malzemesinin y sinirlari
+            # -0,105..+0,075, oysa yuzun onu y = -0,035. Yani kartlar
+            # yuzun YEDI SANTIM ONUNDE, cenenin iki yanindan omza inen
+            # ince teller olarak asili duruyordu — UV kusuru duzelip
+            # alfa calismaya baslayinca gorunur oldular.
+            _km = kiy.kesit_merkezli(govde, boy * dz)
+            if _km is None:
+                _km = (boy * 0.05, boy * 0.06, 0.0)
+            _rx, _ry, _cy = _km
+            # TUTAM KAFAYA YAPISIK VE GENIS OLMALI.
+            #
+            # Kok kafanin %94'unde ve kart uzun+dar+cok egimliydi;
+            # sonuc yuzun iki yaninda asili duran iki ince TEL oldu.
+            # Bir kart, kenardan bakildiginda bir cizgidir — sac gibi
+            # okunmasi icin genis ve yuzeye yapisik olmali.
+            #
+            # Kok %80'e cekildi (tutamin dibi kafanin ICINDE kalir),
+            # boy kisaldi, en iki katina cikti, egim ucte bire indi.
             k = sk.kart(f"Sac_{sx}_{i}",
-                        (sx * kesit[0] * 0.94, dy * kesit[1], boy * dz),
+                        (sx * _rx * 0.80, _cy + dy * _ry, boy * dz),
                         (sx * 0.35, dy * 0.3, -1.0), (sx, dy * 0.4, 0.25),
-                        boy * 0.034, boy * 0.030, col, serit=ser, egim=0.30)
+                        boy * 0.026, boy * 0.058, col, serit=ser,
+                        egim=0.10)
             parts.append(hz.assign(k, sac_mat))
 
     # --- MEST ------------------------------------------------------------------

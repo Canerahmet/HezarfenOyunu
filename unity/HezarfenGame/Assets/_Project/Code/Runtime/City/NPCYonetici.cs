@@ -648,6 +648,21 @@ namespace Hezarfen.Sehir
             an.speed = Mathf.Clamp(hiz / esik, 0.45f, 1.6f);
         }
 
+        /// <summary>
+        /// Gövdenin baş kemiği (yoksa null).
+        ///
+        /// Animator üzerinden aranıyor, ada göre değil: rig adları
+        /// değişebilir ama Humanoid eşlemesi değişmez ve bu eşlemeyi
+        /// zaten avatar kuruyor.
+        /// </summary>
+        private static Transform KafaKemigi(Transform govde)
+        {
+            if (govde == null) return null;
+            var an = govde.GetComponentInChildren<Animator>();
+            if (an == null || !an.isHuman) return null;
+            return an.GetBoneTransform(HumanBodyBones.Head);
+        }
+
         /// <summary>Kullanılabilir arketip sayısı (yedeğiyle birlikte).</summary>
         private int TurSayisi =>
             govdePrefablar != null && govdePrefablar.Length > 0
@@ -801,6 +816,19 @@ namespace Hezarfen.Sehir
             if (sg != null && sg.tabanBoy > 0.1f)
                 olcek = Mathf.Clamp(dna.boy / sg.tabanBoy, 0.88f, 1.12f);
             a.govde.localScale = Vector3.one * olcek;
+
+            // KAFA ORANI — SILUET FARKI.
+            //
+            // Ton ve boy kalabaligi ayirmaya yetmiyordu: uzaktan okunan
+            // sey silüet ve silüetin en okunur orani bas/govdedir.
+            // Humanoid yeniden hedefleme kemige konum ve donus yazar,
+            // OLCEK yazmaz — bu yuzden burada bir kez verilen olcek
+            // animasyon boyunca yerinde kalir.
+            //
+            // Havuzdan cikan govde bir oncekinin oraniyla gelmesin diye
+            // `GovdeBirak` bunu bire dondurur.
+            var _kafa = KafaKemigi(a.govde);
+            if (_kafa != null) _kafa.localScale = dna.kafa;
             a.yurumeHizi = dna.hiz;
 
             if (_tonBlok == null) _tonBlok = new MaterialPropertyBlock();
@@ -1014,6 +1042,8 @@ namespace Hezarfen.Sehir
             // onceki sahibinin temposuyla baslamasin.
             var an = t.GetComponentInChildren<Animator>();
             if (an != null) an.speed = 1f;
+            var kafa = KafaKemigi(t);
+            if (kafa != null) kafa.localScale = Vector3.one;
 
             t.gameObject.SetActive(false);
             var etiket = t.GetComponent<SakinGovde>();
