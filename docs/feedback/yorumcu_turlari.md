@@ -447,3 +447,61 @@ taşları, talim merdiveni ve sebebi söylemesi, ayak sesi.
 - Tekke ve namazgâhın 1 km ötede ikinci kopyası.
 - Birinci şahısta kanat kayboluyor.
 - Şehir dilsiz (8 ses dosyası), kadın yok.
+
+---
+
+## Tur 15 — NPC çeşitliliği ve "baştan sona benzer hatalar" taraması
+*(Caner, 2026-09-02: "npcleri de üret, kadın çocuk yaşlı genç yetişkin
+kız erkek farklı türde npcler olsun… tüm oyunu baştan sona benzer
+hatalar üzerine incele… iteratif, durma.")*
+
+### Üretilen
+Yedi arketip (`sakin_kit.ARKETIPLER`), MPFB2'nin kendi makro
+kaydırıcılarından: yetişkin erkek 1,70 · genç 1,68 · yaşlı 1,63 ·
+kadın 1,58 · yaşlı kadın 1,54 · oğlan 1,24 · kız 1,21 m. Giysi tipe
+göre: ferace + yaşmak, takke, ak sakal. Kimlik (cinsiyet / yaş bandı /
+çıplak boy) `catalog.json` → `SakinGovde` bileşeni yoluyla akıyor;
+Unity'de ikinci bir tablo yok.
+
+### Aynı sınıftan bulunan kusurlar — "sabit, ölçünün yerine geçmiş"
+| nerede | ne yazıyordu | ne olması gerekiyordu |
+|---|---|---|
+| `karakter_kit.olcu_al` | baş boyu = boyun %13'ü | boynun en dar kotundan tepeye — oran her gövdede 1/7,69 çıkıyordu |
+| `rig_kit` denetimi | diz kotu / 1,70 m | ölçülen gövdenin boyu — 1,24 m'lik oğlan reddediliyordu |
+| entari kolu | yarıçap = boy × 0,052 | kolun **ölçülen** yarıçapı + kumaş payı |
+| bilek | parmak ucu + 10,5 cm | kolun en ince yeri (13 cm yerine 4,5 cm) |
+| başlık | y = 0'a kuruluyordu | başın kendi merkezi (aynı kusur etek ve kuşakta bir kez ödenmişti) |
+| sakin hızı | kurulumda ayrı formül | `InsanDNA` — aynı kişi bakılırken başka hızda yürüyordu |
+| replik kotu | yerden 1,95 m | gövdenin kendi boyu (çocuğun 71 cm üstünde uçuyordu) |
+| kaptan kapsülü | 1,7 m | gövdenin kendi boyu |
+
+### Aynı sınıftan bulunan kusurlar — "yazıldı, bağlanmadı"
+* Sakin gövdelerinde **Animator kontrolcüsü yoktu**; `SetFloat("hiz")`
+  kontrolcüsüz bir Animator'da sessizce hiçbir şey yapar. Dokuz bin
+  kişi bind pozunda kayıyordu.
+* Adım sıklığı oyuncunun 2,2 m/s'sine ayarlıydı, sakin 1,4 m/s
+  yürüyor. Ölçüldü: kayma artık yer hızının %3,6'sı.
+* Kadının feracesi ve çocuğun takkesi ton listesinde yoktu: bütün
+  kadınlar aynı mor.
+* **204 prefabta 346 boş malzeme yuvası** — HDRP bunları macenta çizer.
+  `M_Beard.mat` hiç üretilmemişti.
+* Katlı kanat hiç katlanmıyordu (3,08 × 2,70 m); artık 1,64 × 0,60 m.
+* Kamera kolu 1,40 m'nin altına inemiyor, yani duvarın içinde kalıyordu;
+  sıkışınca birinci şahsa düşüyor.
+* Doğum noktası mektebin kurşun kubbesindeydi.
+
+### Ölçüm
+* EditMode **450/450**, PlayMode **50/50** — ayak IK testi ilk kez
+  geçiyor ve bu kez gerçekten IK'yı ölçüyor (rampası başka bir testin
+  düz zeminini ölçüyormuş).
+* Kare **7,1 ms** / 16,7 — yedi arketip ve hacimsel bulutlarla.
+* Kalabalık dağılımı (1.200 tohum): tek gövdeye yığılma < %55, kadın
+  %30–62 arası, çocuk %8–32 arası, her arketip en az bir kez seçiliyor.
+
+### Açık kalan
+* Doğum noktası artık zeminde ama **boş bir alanda**; şehir dokusunun
+  içinde bir meydan aranmalı.
+* Toplu kipte otomatik histogram pozu oturmuyor; tur kendi pozunu
+  sabitliyor ve bunu raporuna yazıyor. Hacimsel bulutların **GPU**
+  bedeli toplu kipte okunamıyor.
+* ADR 0084 (uçuş kapısı) hâlâ Caner'in kararını bekliyor.
