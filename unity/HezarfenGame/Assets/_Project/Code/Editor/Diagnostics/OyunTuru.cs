@@ -174,6 +174,25 @@ namespace Hezarfen.Editor.Diagnostics
                 return n;
             }
 
+            /// <summary>
+            /// O anda ekrana <b>çizilen</b> sakin gövdesi sayısı.
+            ///
+            /// Turda "40 m'de 93 NPC" yazıyordu ve karede sokak
+            /// bomboştu. İki sayı iki ayrı şeyi ölçüyor: biri kaç
+            /// AJANIN yakında olduğunu, öteki kaç GÖVDENİN gerçekten
+            /// çizildiğini. Aradaki fark, ajanın var olup gövdesinin
+            /// olmadığı yerdir — ve o fark ölçülmedikçe kalabalık
+            /// "sayıya göre kalabalık, ekrana göre boş" kalır.
+            /// </summary>
+            private static int CizilenGovde(Sehir.NPCYonetici npc)
+            {
+                if (npc == null) return 0;
+                int n = 0;
+                foreach (Transform t in npc.transform)
+                    if (t.gameObject.activeInHierarchy) n++;
+                return n;
+            }
+
             internal IEnumerator Kos(Durak[] duraklar)
             {
                 Directory.CreateDirectory(Cikti);
@@ -184,8 +203,8 @@ namespace Hezarfen.Editor.Diagnostics
                 satirlar.Add("sayilar yazildi. Kare bir GOZLEM, sayi bir KANIT.");
                 satirlar.Add("");
                 satirlar.Add("| durak | ayak altinda | arazi farki | kamera kolu "
-                             + "| 40 m'de NPC | replik | kare (ms) | neden |");
-                satirlar.Add("|---|---|---:|---:|---:|---:|---:|---|");
+                             + "| 40 m'de NPC | cizilen govde | replik | kare (ms) | neden |");
+                satirlar.Add("|---|---|---:|---:|---:|---:|---:|---:|---|");
 
                 var oyuncu = Object.FindAnyObjectByType<WalkController>();
                 var kip = Object.FindAnyObjectByType<KameraKipi>();
@@ -283,6 +302,14 @@ namespace Hezarfen.Editor.Diagnostics
                                 (new Vector2(b.x, b.z) - new Vector2(hedef.x, hedef.z))
                                     .sqrMagnitude));
 
+                            // IKI GECIS: once tepesi ACIK bir dugum
+                            // aranir, bulunamazsa eski davranisa dusulur
+                            // (Surici gercekten kapali olabilir ve kare
+                            // hic olmamasindan iyidir).
+                            for (int gecis = 0; gecis < 2; gecis++)
+                            {
+                            bool acikAra = gecis == 0;
+                            bool bulundu = false;
                             foreach (var aday in sirali)
                             {
                                 float ak2 = arazi != null
@@ -316,8 +343,26 @@ namespace Hezarfen.Editor.Diagnostics
                                         0.32f, ~0,
                                         QueryTriggerInteraction.Ignore))
                                     continue;
+                                // BASIN USTU DE ACIK OLMALI.
+                                //
+                                // Kapsul denetimi 1,55 m'ye bakiyor ve
+                                // cumbali bir sokakta o yukseklik hep
+                                // bostur; oysa cikma 2,5 m'de baslar.
+                                // Sonuc olculdu: on duragin dordunde kare,
+                                // oyuncunun UZERINDEKI katin tabanini
+                                // gosteriyordu — sehir degil, bir tavan.
+                                // Bir gozlem araci, gozleyecegi seyin
+                                // altinda duramaz.
+                                if (acikAra && Physics.Raycast(
+                                        new Vector3(aday.x, yz + 1.8f, aday.z),
+                                        Vector3.up, 3.2f, ~0,
+                                        QueryTriggerInteraction.Ignore))
+                                    continue;
                                 hedef = new Vector3(aday.x, hedef.y, aday.z);
+                                bulundu = true;
                                 break;
+                            }
+                            if (bulundu) break;
                             }
                         }
 
@@ -412,11 +457,13 @@ namespace Hezarfen.Editor.Diagnostics
                                  + $"{p.y - araziKot:+0.0;-0.0} | "
                                  + $"{(kip != null ? kip.SonMesafe.ToString("0.00") : "?")} | "
                                  + $"{YakindakiNpc(npc, oyuncu.transform.position)} | "
+                                 + $"{CizilenGovde(npc)} | "
                                  + $"{(bark != null ? bark.GorunurReplik : 0)} | "
                                  + $"{ms:0.0} | {d.neden} |");
                     Debug.Log($"[Hezarfen] tur {d.ad}: {altinda}, "
                               + $"kol {(kip != null ? kip.SonMesafe : 0f):0.0}, "
                               + $"npc {YakindakiNpc(npc, oyuncu.transform.position)}, "
+                              + $"govde {CizilenGovde(npc)}, "
                               + $"{ms:0.0} ms");
                 }
 

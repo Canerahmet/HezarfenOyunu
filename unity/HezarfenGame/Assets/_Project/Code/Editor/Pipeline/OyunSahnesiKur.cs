@@ -632,10 +632,57 @@ namespace Hezarfen.Editor.Pipeline
                     if (!Physics.Raycast(goz, Vector3.up, 8f, ~0,
                                          QueryTriggerInteraction.Ignore))
                         puan += 5;
+                    // ACIKLIK YETER OLMALI, EN COK OLMASI GEREKMEZ.
+                    //
+                    // "En acik adayi sec" kurali sessizce yanlis seyi
+                    // optimize ediyordu: en acik yer her zaman en BOS
+                    // yerdir. Uc turda sonucu goruldu — once bir
+                    // mektebin kursun kubbesi (bir cati sekiz yonde de
+                    // aciktir), cati denetimi eklenince sehrin
+                    // kenarindaki bos tarla. Ikisi de "acik", ikisi de
+                    // yanlis: oyun bir SEHIRDE baslamali.
+                    //
+                    // Dogru olcut yeterliliktir. Esik 10/13: sekiz yatay
+                    // yonun bes tanesi serbest ve tepe acik (5 puan) —
+                    // meydan ya da genis sokak, ama hala binalarin
+                    // ARASINDA. Yeter puani gecen ilk aday secilir;
+                    // adaylar baslangica gore sirali oldugu icin secilen,
+                    // tasarimin niyet ettigi yere en yakin olandir.
+                    // ACIK OLMAK YETMEZ, SEHIRDE OLMAK DA GEREKIR.
+                    //
+                    // Cati denetimi kubbeyi eledi ve olcum bir sonraki
+                    // kusuru gosterdi: en acik yer artik sehrin
+                    // kenarindaki BOS TARLAYDI. Kare bunu soyluyor —
+                    // ufka kadar toprak, uzakta bir tepe. "Acik" olcusu
+                    // tek basina bir yeri sehir yapmiyor.
+                    //
+                    // Yakinlik ayri bir soru ve ayri bir isinla sorulur:
+                    // sekiz yonde 30 m'de kac tanesi bir seye carpiyor.
+                    // Bos tarlada sifir; bir meydanda en az uc. Uc,
+                    // cunku bir meydanin bir yani acik olabilir ama uc
+                    // yani cevrilidir.
+                    int komsu = 0;
+                    for (int a = 0; a < 8; a++)
+                    {
+                        float rad = a * Mathf.PI * 0.25f;
+                        var yon3 = new Vector3(Mathf.Cos(rad), 0f,
+                                               Mathf.Sin(rad));
+                        if (Physics.Raycast(goz, yon3, 30f, ~0,
+                                            QueryTriggerInteraction.Ignore))
+                            komsu++;
+                    }
+                    if (komsu < 3) continue;
+
+                    const int YeterliAciklik = 10;
+                    if (puan >= YeterliAciklik)
+                    {
+                        enIyiPuan = puan;
+                        secilen = ayak;
+                        break;
+                    }
                     if (puan <= enIyiPuan) continue;
                     enIyiPuan = puan;
                     secilen = ayak;
-                    if (puan == 13) break;    // tam acik, daha iyisi yok
                 }
 
                 if (secilen.HasValue)
@@ -1114,6 +1161,48 @@ namespace Hezarfen.Editor.Pipeline
                 if (UstuneCikilmaz(t.name)) return false;
                 t = t.parent;
             }
+
+            // BIR DE CATI SORUSU VAR — VE ONU KIMLIK CEVAPLAMIYOR.
+            //
+            // Ret listesi avlu esyalari icin dogru calisiyor ama binanin
+            // KENDISI listede degil, cunku bir eve girmek mesru. Sonuc
+            // oyun turunda gorundu: oyuncu her acilista mektebin kursun
+            // KUBBESINDE doguyor (arazinin 5,8 m ustunde) ve oyunun ilk
+            // karesi bir cati kaplamasindan ibaret kaliyor.
+            //
+            // Burada yukseklik dogru olcudur — kimlik degil — cunku
+            // sorulan sey "bu nedir" degil "bu, ZEMINDEN ne kadar
+            // yukarida". Esik 0,60 m: kaldirim bir rihtta 0,17 m
+            // yukselir, uc riht 0,51 (kaldirim_denetimi.md), yani
+            // kaldirim ve kaide gecer; bir kubbe, bir dam, bir sacak
+            // gecmez. Yukaridaki "tek bir sayi hem yamaci hem cesmeyi
+            // eleyemez" tespiti hala dogru — bu sayi yamaci elemiyor,
+            // cunku ARAZIYE gore olcuyor, deniz seviyesine gore degil.
+            // ZEMIN KOTU ARAZININ KENDI CARPISTIRICISINDAN OLCULUR.
+            //
+            // Ilk deneme `SampleHeight` ile olctu ve esigi 0,60 m koydu:
+            // oyuncu kubbeden indi ama sehrin 214 m disina, bos bir
+            // tarlaya dustu — yani Galata'daki butun mesru adaylar da
+            // elendi. Sebep esik degil OLCUM: yamacta arazi orneklemesi
+            // ile arazi carpistiricisi yarim metreden fazla ayrisabiliyor
+            // ve kaldirim kubbe gibi gorunuyor.
+            //
+            // Ayni X/Z'de arazinin KENDISINE carpan isini aramak bu farki
+            // ortadan kaldirir; geriye kalan sayi gercekten "bu yuzey
+            // zeminden ne kadar yukarida"dir. Esik 1,20 m: kaide ve
+            // kaldirim (en cok ~0,5 m) gecer, bir kubbe (+5,8 m) gecmez.
+            var isinlar = Physics.RaycastAll(
+                new Vector3(nokta.x, yuzeyKotu + 120f, nokta.z),
+                Vector3.down, 260f, ~0, QueryTriggerInteraction.Ignore);
+            float araziKotu = float.NaN;
+            foreach (var i in isinlar)
+                if (i.collider is TerrainCollider)
+                {
+                    if (float.IsNaN(araziKotu) || i.point.y > araziKotu)
+                        araziKotu = i.point.y;
+                }
+            if (!float.IsNaN(araziKotu) && vurus.point.y - araziKotu > 1.20f)
+                return false;
             return true;
         }
 
