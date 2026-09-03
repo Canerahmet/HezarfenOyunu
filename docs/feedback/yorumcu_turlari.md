@@ -1076,6 +1076,39 @@ değil, örtmenin bedeli.
 Kesilen şey bu yüzden örnekleme ve aralık oldu (32 → 16, 4 m → 6 m),
 ikisi de kayıtta gerekçeli.
 
+### Kürek: bir sayı iki yerden türemişti
+
+Kayığın küreği yakın planda **iki parça** okuyordu — siyah bir çubuk,
+bir boşluk, ve ondan ayrı duran küçük bir tahta. Sayı da aynı şeyi
+söylüyor: sap 16° eğik ve yarı boyu 1,25 m, yani ucu merkezinden
+`1,25 · sin16 = 0,34 m` aşağıda. Palanın düşüşü ise elle **0,48 m**
+yazılıydı. Pala, parçası olduğu sapın ucundan **14 cm** aşağıdaydı.
+
+Açıyı bilen tek bir yer vardı ve pala orası değildi. Artık palanın yeri
+sapın kendi açısından hesaplanıyor. Genişlik de 8,5 cm'den 15 cm'ye
+çıktı — gerçek kürek palası 15-18 cm ve 8,5 cm'lik bir tahta uzaktan
+sapın kendisinden ayırt edilmiyor.
+
+Katalog değişikliği taşıyor: `footprint_y` 5,404 → 5,301 (kosinüs
+düzeltmesi palayı içeri aldı), üçgen sayısı aynı.
+
+### Vapur iskelesi ışınlanma, ama tekne HAZIR
+
+Taşınan maddelerden biri *"ferry is a teleport with no visible boat"*.
+Tekne var: `SM_Pereme`, 8,67 m, iki kürek çifti, ahşap dokulu, 502
+üçgen. Eksik olan model değil, **yerleştirme** — Unity tarafı.
+
+### Üç boş döngü silindi
+
+Sakal ucu, bıyık ve saç kartları tur tur kabuğa çevrilmişti ve her
+seferinde döngünün **içi boşaltılıp gövdesi bırakılmıştı**
+(`for sx in ():`). Altmış sekiz satır ölü kod, `sac_mat` ve
+`sac_kit.kart`/`hair_material`'a giden tek çağrılar. Dosyanın kendi
+cümlesi kendine uyuyor: *bir kararın yarısını uygulamak, kusurun
+yarısını bırakmaktır.* Gerekçe yorumları yerinde; kod gitti.
+Yeniden üretildi ve katalog on karakterde de **birebir aynı** —
+hiçbir geometri kımıldamadı.
+
 ### Çınar bir yeşil kütle — çünkü 356 üçgen
 
 Ağaç yakın planda gövdesi kararmış, dalsız, kapalı bir yeşil blob
