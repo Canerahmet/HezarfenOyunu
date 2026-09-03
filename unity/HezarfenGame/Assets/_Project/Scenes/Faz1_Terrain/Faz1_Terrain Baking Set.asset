@@ -52,8 +52,8 @@ MonoBehaviour:
     - hasProbeVolume: 1
       bakeScene: 1
       bounds:
-        m_Center: {x: -2754, y: 0, z: 3726}
-        m_Extent: {x: 162, y: 324, z: 486}
+        m_Center: {x: -2673, y: 0, z: 3645}
+        m_Extent: {x: 243, y: 486, z: 729}
     - hasProbeVolume: 1
       bakeScene: 1
       bounds:
@@ -1807,7 +1807,7 @@ MonoBehaviour:
   supportDataChunkSize: 163840
   lightingScenario: Default
   version: 2
-  freezePlacement: 0
+  freezePlacement: 1
   probeOffset: {x: 0, y: 0, z: 0}
   simplificationLevels: 3
   minDistanceBetweenProbes: 6
