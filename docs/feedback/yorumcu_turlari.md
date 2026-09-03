@@ -1076,6 +1076,29 @@ değil, örtmenin bedeli.
 Kesilen şey bu yüzden örnekleme ve aralık oldu (32 → 16, 4 m → 6 m),
 ikisi de kayıtta gerekçeli.
 
+### Çınar bir yeşil kütle — çünkü 356 üçgen
+
+Ağaç yakın planda gövdesi kararmış, dalsız, kapalı bir yeşil blob
+okuyor: siluet çokgen kenarlarını gösteriyor, ışık içinden geçmiyor.
+Sebep katalogda yazılı ve bir kusur değil bir **bütçe**:
+`tris_lod0 = 356`. Üç yüz elli altı üçgenle dal olmaz.
+
+Şehirde binlerce ağaç var, yani bu sayı kare süresiyle birlikte
+konuşulacak bir sayıdır. Bu yüzden burada **karar değil kayıt**
+duruyor: ağacı düzeltmek istiyorsan önce `Hezarfen → Olcum → Kare
+suresini bolustur` koşacak ve bütçede yer olduğunu gösterecek.
+
+### Kahvehane: kusur sanılan iki şey ölçümle düştü
+
+* Sundurmanın düz pembe göründüğü — yakın planda tahta derzleri
+  görünüyor; malzeme `timber`, rengi aşı boyası. Düşük çözünürlükte
+  yanlış okumuşum.
+* Çatı kiremitlerinin ince göründüğü — 8,5 m'lik çatıda kiremit sırası
+  ~9-15 cm ediyor; alaturka kiremit gerçekte 15-20 cm. Sınırda ama
+  kusur değil.
+
+Kayda geçiyor ki bir sonraki tur aynı iki şeye yeniden bakmasın.
+
 ### İki landmark gözlemi (dokular açıldıktan sonra görünenler)
 
 * **Yedikule'nin Altın Kapı bölümü** çevresindeki surlar taş dokusunu
