@@ -82,14 +82,14 @@
     "Salvar",
     "Sarik"
    ],
-   "tris_lod0": 62276,
-   "tris_lod1": 18682,
-   "tris_lod2": 4982,
+   "tris_lod0": 61356,
+   "tris_lod1": 18406,
+   "tris_lod2": 4908,
    "agirliksiz_kose": 0,
-   "kose_lod0": 31172,
+   "kose_lod0": 30718,
    "kol_donusu": 33.0,
-   "agirlik_farki_once": 1.2387,
-   "agirlik_farki": 0.0122,
+   "agirlik_farki_once": 1.2245,
+   "agirlik_farki": 0.0125,
    "kemik": 30,
    "kemikler": [
     {
@@ -434,14 +434,14 @@
     "Salvar",
     "Sarik"
    ],
-   "tris_lod0": 62756,
-   "tris_lod1": 18826,
-   "tris_lod2": 5020,
+   "tris_lod0": 61836,
+   "tris_lod1": 18550,
+   "tris_lod2": 4946,
    "agirliksiz_kose": 0,
-   "kose_lod0": 31412,
+   "kose_lod0": 30958,
    "kol_donusu": 33.0,
-   "agirlik_farki_once": 1.2411,
-   "agirlik_farki": 0.0156,
+   "agirlik_farki_once": 1.2271,
+   "agirlik_farki": 0.016,
    "kemik": 30,
    "kemikler": [
     {
@@ -784,14 +784,14 @@
     "Salvar",
     "Sarik"
    ],
-   "tris_lod0": 62416,
-   "tris_lod1": 18724,
-   "tris_lod2": 4992,
+   "tris_lod0": 61648,
+   "tris_lod1": 18494,
+   "tris_lod2": 4930,
    "agirliksiz_kose": 0,
-   "kose_lod0": 31252,
+   "kose_lod0": 30866,
    "kol_donusu": 24.9,
-   "agirlik_farki_once": 1.2513,
-   "agirlik_farki": 0.0116,
+   "agirlik_farki_once": 1.2436,
+   "agirlik_farki": 0.0118,
    "kemik": 30,
    "kemikler": [
     {
@@ -1481,14 +1481,14 @@
     "Salvar",
     "Sarik"
    ],
-   "tris_lod0": 62104,
-   "tris_lod1": 18630,
-   "tris_lod2": 4968,
+   "tris_lod0": 60824,
+   "tris_lod1": 18246,
+   "tris_lod2": 4864,
    "agirliksiz_kose": 0,
-   "kose_lod0": 31092,
+   "kose_lod0": 30456,
    "kol_donusu": 43.6,
-   "agirlik_farki_once": 1.344,
-   "agirlik_farki": 0.0144,
+   "agirlik_farki_once": 1.3231,
+   "agirlik_farki": 0.015,
    "kemik": 30,
    "kemikler": [
     {

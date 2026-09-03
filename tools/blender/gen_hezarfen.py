@@ -730,6 +730,26 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
     # kendiliginden bosa doner — ayri bir bayrak tutmaya gerek yok.
     hat = sk.cene_hatti(govde, boy) if skn.sakalli(tip) else []
 
+    # AGIZ KOTU OLCULUR, YAZILMAZ — VE SAKAL ILE BIYIK AYNI OLCUYU
+    # PAYLASIR.
+    #
+    # `boy * 0.897` (sakal ustu) ve `boy * 0.899-0.915` (biyik) yaziliydi
+    # ve inceleme karesi ikisinin de bedelini gosterdi: ak sakal agzin
+    # USTUNDEN gecip yuzun alt yarisini kulaktan kulaga kaplayan bir
+    # BANT gibi, biyik ise burun kokune yapisik yatay bir TAHTA gibi
+    # okunuyordu. Iki sabit, iki olcumun yerinde duruyordu.
+    #
+    # Agzin yerini MPFB2'nin kendi bolge maskesi biliyor
+    # (`sac_kit.dudak_kotu`); ten dokusu zaten ondan besteleniyor, yani
+    # kaynak yeni degil — yalnizca ikinci kez okunuyor.
+    _dudak = sk.dudak_kotu(govde) if skn.sakalli(tip) else None
+    _dudak_alt = _dudak[0] if _dudak else boy * 0.897
+    _dudak_ust = _dudak[1] if _dudak else boy * 0.907
+    if skn.sakalli(tip):
+        hz.log(f"agiz kotu: {'olculdu' if _dudak else 'TAHMIN'} "
+               f"z {_dudak_alt:.4f}-{_dudak_ust:.4f} "
+               f"(oran {_dudak_alt / boy:.4f}-{_dudak_ust / boy:.4f})")
+
     # --- SAKAL: KART DEGIL KABUK ------------------------------------------
     #
     # Sakali uc kat alfa kartiyla kuruyordum. Yakin cekimde ne oldugu
@@ -753,8 +773,19 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
         hat_p = [p for p, _ in hat]
         # Yay yalniz sag yarimdir; sol taraf aynalanarak eklenir.
         hat_p = hat_p + [Vector((-p.x, p.y, p.z)) for p in hat_p]
-        z_agiz = boy * 0.897
-        z_dip = boy * 0.806
+        z_agiz = _dudak_alt
+        # SAKALIN ALTI DA OLCULUR.
+        #
+        # `boy * 0.806` yaziliydi; cene 0,869'da olculdu. Yani sinir
+        # cenenin 10 cm ALTINDAYDI ve sakal kabugu o 10 cm boyunca
+        # BOYNU takip ediyordu — karede ak sakal bir sakal degil bir
+        # boyunluk gibi duruyordu. 3 cm: sakal ceneden sarkar ama kabuk
+        # yontemi sarkmayi veremez, boynu sarmadan biter.
+        _cene = sk.cene_kotu(govde)
+        z_dip = (_cene - boy * 0.030) if _cene else boy * 0.806
+        hz.log(f"sakal kotu: {'olculdu' if _cene else 'TAHMIN'} "
+               f"z {z_dip:.4f}-{z_agiz:.4f} "
+               f"(oran {z_dip / boy:.4f}-{z_agiz / boy:.4f})")
         sakal_menzil = boy * 0.052
 
         # Sakalin y merkezi: cene yayinin kendi ortalamasi. Sabit bir
@@ -826,15 +857,29 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
     # bakildiginda bir cizgidir — sakalda ve sacta ayni sebeple kabuga
     # gecildi; bu ucuncusu ve ayni kusurun ALTINCI ornegi.
     if skn.sakalli(tip):
-        _mk = kiy.kesit_merkezli(govde, boy * 0.905)
+        # BIYIK DUDAGIN USTUNDEDIR — VE DUDAK OLCULDU.
+        #
+        # `boy * 0.899 - 0.915` yaziliydi. Dudak maskesi 0,885-0,895'te
+        # olculunce ne oldugu anlasildi: serit dudagin degil BURNUN
+        # ustundeydi. Karede biyik, burun kokune yapisik yatay bir
+        # TAHTA gibi duruyordu — yandan disari tasan, yuzu izlemeyen
+        # bir levha.
+        #
+        # Dogru yer dudagin kendisinden turer: ust dudagin ortasindan
+        # baslar (biyik dudagin ustunu orter) ve 1,3 cm yukari cikar.
+        _biyik_alt = _dudak_alt + (_dudak_ust - _dudak_alt) * 0.5             if _dudak else boy * 0.899
+        _biyik_ust = (_dudak_ust + boy * 0.013) if _dudak             else boy * 0.915
+        # Kesit BIYIGIN kotunda olculur, burnun kotunda degil: eskisi
+        # `boy * 0.905`ti ve o kot artik burun.
+        _mk = kiy.kesit_merkezli(govde, (_biyik_alt + _biyik_ust) * 0.5)
         _mrx, _mry, _mcy = _mk if _mk else (boy * 0.05, boy * 0.06, 0.0)
 
         def _biyik_bolge(c):
-            # Ust dudak seridi: agzin hemen ustu, yalniz yuzun ONU.
-            # DAR VE KISA: biyik dudagi orter, burnu degil. Ilk
-            # denemede 0,897-0,921 ve %62 genislikti; renderda sakalla
-            # birlesip agzi tamamen kapatan koyu bir DIKDORTGEN oldu.
-            if not (boy * 0.899 <= c.z <= boy * 0.915):
+            # Ust dudak seridi: yalniz yuzun ONU. DAR VE KISA — biyik
+            # dudagi orter, burnu degil. Ilk denemede %62 genislikti;
+            # renderda sakalla birlesip agzi kapatan koyu bir
+            # DIKDORTGEN oldu.
+            if not (_biyik_alt <= c.z <= _biyik_ust):
                 return False
             if abs(c.x) > _mrx * 0.50:
                 return False
@@ -842,8 +887,9 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
 
         _biyik = kiy.kopya_kabuk(
             govde, "Biyik", col, tut=_biyik_bolge,
-            sisme=lambda c: 0.004 + 0.008 * min(
-                1.0, max(0.0, (c.z - boy * 0.897) / (boy * 0.024))),
+            sisme=lambda c: 0.004 + 0.006 * min(
+                1.0, max(0.0, (c.z - _biyik_alt)
+                         / max(1e-6, _biyik_ust - _biyik_alt))),
             kalinlik=0.003)
         if _biyik:
             while _biyik.data.uv_layers:

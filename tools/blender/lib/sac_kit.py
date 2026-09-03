@@ -251,3 +251,101 @@ def cene_hatti(govde, boy, adim=9):
         if en_uzak is not None:
             nokta.append((en_uzak.copy(), yon))
     return nokta
+
+
+#: MPFB2'nin çekirdek doku dizini — `tools/textures/gen_deri_texture.py`
+#: ile aynı arama listesi. Ten dokusu zaten bu maskelerden besteleniyor
+#: (`refs/LICENSES.md`, MPFB 2.0.17 satırı: çekirdek varlıklar CC0).
+MPFB_DOKU = [
+    os.path.expandvars(
+        r"%APPDATA%\Blender Foundation\Blender\5.2\extensions"
+        r"\user_default\mpfb\data\textures"),
+    os.path.expanduser(
+        "~/.config/blender/5.2/extensions/user_default/mpfb/data/textures"),
+]
+
+
+def bolge_kotu(govde, maske, esik=0.5):
+    """MPFB2 bölge maskesinin **ölçülen** kot aralığı: `(z_alt, z_ust)`.
+
+    ## Neden ölçülüyor
+
+    Sakalın üst sınırı `boy * 0.897` diye yazılıydı ve inceleme karesi
+    bunun ne demek olduğunu gösterdi: yaşlının ak sakalı **ağzın
+    üstünden** geçiyor, yüzün alt yarısını kulaktan kulağa kaplayan bir
+    **bant** gibi okunuyordu. Sakal değil, sargı.
+
+    0,897 bir ölçü değil bir tahmindi — ve bu depoda tekrar eden dersin
+    bir örneği daha: *bir sabit, bir ölçümün yerinde duruyordu.*
+
+    Ağız nerede olduğunu MPFB2'nin kendi bölge maskesi biliyor:
+    `mpfb_lips.jpg`, gövdenin UV atlasında dudak adalarını işaretler ve
+    ten dokusu zaten ondan besteleniyor. Yani kaynak yeni değil, yalnız
+    ikinci kez okunuyor.
+
+    ## Neden köşe başına UV
+
+    UV döngü (loop) başınadır, köşe başına değil. Bir köşenin dudakta
+    olup olmadığını sormak için köşeye ait **herhangi** bir döngünün
+    maskeyi geçmesi yeterli: dikişin iki yakasından biri dudakta
+    olabilir.
+    """
+    dizin = next((y for y in MPFB_DOKU if os.path.isdir(y)), None)
+    if dizin is None:
+        return None
+    yol = os.path.join(dizin, maske)
+    if not os.path.isfile(yol):
+        return None
+    if not govde.data.uv_layers:
+        return None
+
+    im = None
+    try:
+        im = bpy.data.images.load(yol, check_existing=True)
+        en, boy_px = im.size
+        if en == 0 or boy_px == 0:
+            return None
+        piksel = list(im.pixels)
+        kanal = im.channels
+
+        uv = govde.data.uv_layers[0].data
+        mw = govde.matrix_world
+        zs = []
+        dudakta = set()
+        for dongu in govde.data.loops:
+            u, v = uv[dongu.index].uv
+            x = min(en - 1, max(0, int(u % 1.0 * en)))
+            y = min(boy_px - 1, max(0, int(v % 1.0 * boy_px)))
+            if piksel[(y * en + x) * kanal] > esik:
+                dudakta.add(dongu.vertex_index)
+        for i in dudakta:
+            zs.append((mw @ govde.data.vertices[i].co).z)
+    finally:
+        if im is not None:
+            bpy.data.images.remove(im)
+
+    if len(zs) < 8:
+        return None
+    return (min(zs), max(zs))
+
+
+def dudak_kotu(govde, esik=0.5):
+    """Dudakların kot aralığı — sakalın üst sınırı."""
+    return bolge_kotu(govde, "mpfb_lips.jpg", esik)
+
+
+def cene_kotu(govde, esik=0.5):
+    """Çenenin (yüz maskesinin en alt noktası) kotu, ya da None.
+
+    Sakalın **alt** sınırı buradan türer. Eskiden `boy * 0.806`
+    yazılıydı ve ölçülünce ne olduğu görüldü: çene 0,869'da, yani sabit
+    sayı çenenin **10 cm altındaydı**. Sakal bir kabuk olduğu için o
+    10 cm boyunca boynu takip ediyordu — inceleme karesinde yaşlının
+    ak sakalı bir sakal değil bir **boyunluk** gibi duruyordu.
+
+    Sakal çeneden aşağı sarkar ama boyun silindirini sarmaz; kabuk
+    yöntemi sarkmayı zaten veremez, o yüzden alt sınır çenenin biraz
+    altında durur.
+    """
+    yuz = bolge_kotu(govde, "mpfb_face.jpg", esik)
+    return None if yuz is None else yuz[0]
