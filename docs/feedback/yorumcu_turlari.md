@@ -1054,6 +1054,39 @@ başarısızlığa izin vermeyecek:
   yazdığı beş hücreyle "başarılı" görünüyordu. *Başkasının işiyle
   karşılanabilen bir denetim, denetim değildir.*
 
+### Fırın niye bu kadar yavaş: sahne girdisi 4,17 GB
+
+`D_Galata` tek başına, taban sahneyle birlikte, altmış dakikada %21,9'a
+geldi. Kayıt sebebi bir satırda söylüyor:
+
+```
+Transformed OOTS snapshot into LightBaker scene input … Size: 4171.12MB
+Extracted OOTS snapshot with 11260 instances, 404 geometries, 0 lights
+```
+
+11.260 örnek 4 GB etmez; **arazi** eder — 15 km × 15 km'lik yükseklik
+haritası ışın izleme için üçgenleşince girdinin neredeyse tamamı o olur.
+
+**Araziyi fırından çıkarmak denenmedi ve sebebi yazılı:** arazi aynı
+zamanda probun ALT yarım küresini kapatan şeydir. Çıkarılsaydı yerdeki
+problar aşağıdan da gökyüzü görürdü ve sokak, karanlık yerine
+gerçekdışı biçimde aydınlık okurdu. Yani arazi maliyeti bir israf
+değil, örtmenin bedeli.
+
+Kesilen şey bu yüzden örnekleme ve aralık oldu (32 → 16, 4 m → 6 m),
+ikisi de kayıtta gerekçeli.
+
+### İki landmark gözlemi (dokular açıldıktan sonra görünenler)
+
+* **Yedikule'nin Altın Kapı bölümü** çevresindeki surlar taş dokusunu
+  taşırken düz beyaz üç kütle olarak duruyor. Mermer kaplama doğru
+  (Porta Aurea mermerdi) ama geometri üç kutu ve tek kemer; kapının
+  kendi mimarisi yok. T2 boşluğu, ayrı bir işin konusu.
+* **Süleymaniye'nin kesme taş derzleri iri okunuyor.** Doku
+  `large_sandstone_blocks` ve kendi `meta.json`'ı 3 × 3 m diyor; UV
+  dünya ölçeğinde, yani doku tarif edildiği gibi kullanılıyor. Blok
+  boyu bizim değil kaynağın; kusur değil, kayıt.
+
 ### İnceleme aletinin kendisi iki kez yanlış bakıyordu
 
 CLAUDE.md şunu yazıyor: *"Render bir gözlemdir, kanıt değil."* Bu turda
