@@ -89,7 +89,7 @@ def sakalli(tip):
 
 
 def yasmak(ad, col, bas_r, kotlar, cy=0.0, yuz_acik=False,
-           kalinlik=0.005, segment=24):
+           kalinlik=0.005, segment=40):
     """
     Kadının ve kızın **baş örtüsü** — başa oturur, koni değildir.
 
@@ -152,7 +152,14 @@ def yasmak(ad, col, bas_r, kotlar, cy=0.0, yuz_acik=False,
     bm = bmesh.new()
     halkalar = []
     kotlar_z = []
-    ara = 3                     # iki denetim noktasi arasindaki bolme
+    # BOLME 3 -> 6 VE DILIM 24 -> 40 — ACIKLIK KEMER OLUNCA GEREKTI.
+    #
+    # Aciklik duz kesildigi surece cozunurluk gorunmuyordu: bir dogru,
+    # kac parcaya bolunurse bolunsun dogrudur. Kemer yapilinca kenar
+    # MERDIVEN oldu — 24 dilim 15 derecelik basamaklar, 3 bolme ise
+    # goz ile alin arasinda yalnizca uc kot demek. Egri bir kenar,
+    # dogru bir kenardan daha cok ornek ister.
+    ara = 6                     # iki denetim noktasi arasindaki bolme
     for i in range(len(profil) - 1):
         z0, k0 = profil[i]
         z1, k1 = profil[i + 1]
@@ -190,21 +197,62 @@ def yasmak(ad, col, bas_r, kotlar, cy=0.0, yuz_acik=False,
         fark = abs(((a - 1.5 * math.pi + math.pi) % math.tau) - math.pi)
         return fark < yariacik
 
+    def yariacik(z):
+        """Bu kotta yüz açıklığının yarı açısı (rad); 0 ise kapalı."""
+        if yuz_acik:
+            if z >= z_alin:
+                return 0.0
+            t = (z_alin - z) / max(1e-6, z_alin - z_goz)
+            return math.radians(62) * min(1.0, max(0.0, t)) ** 0.5
+        return (math.radians(46) if z_goz <= z <= z_alin else 0.0)
+
     for i in range(len(halkalar) - 1):
         ust, alt = halkalar[i], halkalar[i + 1]
         z_orta = (kotlar_z[i] + kotlar_z[i + 1]) * 0.5
         for m in range(segment):
             m2 = (m + 1) % segment
             if yuz_acik:
-                # Cocuk: alindan asagi butun on yuz acik.
-                if z_orta < z_alin and on_mu(m, math.radians(62)):
+                # ACIKLIK BIR KEMER, DIKDORTGEN DEGIL.
+                #
+                # Once acilik yariaci her kotta 62 derece sabitti ve
+                # ust sinir z_alin'de duz kesiliyordu. Kizin yakin
+                # planinda sonucu goruldu: basortusu degil, on yuzunde
+                # DIKDORTGEN bir pencere acilmis sert bir MIGFER —
+                # aciklik iki dik kenar ve bir yatay ust cizgiyle
+                # sinirli.
+                #
+                # Bez oyle kesilmez. Ortu alinda yuze yaklasir, yanakta
+                # en cok acilir; aciklik bir KEMERDIR. Yariaci goz
+                # kotunda tam degerine ulasir ve alinda sifira iner;
+                # karekok, kemerin ustte hizli acilmasini verir — sert
+                # bir koseyi degil bir yayi.
+                _ya = yariacik(z_orta)
+                if _ya > 1e-3 and on_mu(m, _ya):
                     continue
             else:
                 # Yetiskin: yalniz GOZ bandi acik.
-                if (z_goz <= z_orta <= z_alin
-                        and on_mu(m, math.radians(46))):
+                _ya = yariacik(z_orta)
+                if _ya > 1e-3 and on_mu(m, _ya):
                     continue
             bm.faces.new((ust[m], ust[m2], alt[m2], alt[m]))
+
+    # KENAR HALA BASAMAKLI — VE SEBEBI YAPISAL.
+    #
+    # Aciklik yuzleri SILEREK aciliyor; silinen sey bir dortgen, yani
+    # kenar her zaman izgaraya uyar. Aciklik duz bir cizgiyken bu
+    # gorunmuyordu (bir dogru, kac parcaya bolunurse bolunsun
+    # dogrudur); kemer olunca kizin yakin planinda MERDIVEN okundu.
+    # Dilim 24->40 ve bolme 3->6 basamagi kucultuyor, YOK ETMIYOR.
+    #
+    # Kenardaki koseleri gercek aciya oturtmak DENENDI ve karede
+    # olculebilir bir fark yaratmadi: yuzler `m + 0,5` acisina gore
+    # siliniyor, koseler ise `m` acisinda duruyor, yani "ilk duran
+    # kose" zaten kenarin kendisi degil. Olcum fark gostermeyince
+    # degisiklik geri alindi.
+    #
+    # Dogru cozum acikligi bir sinir EGRISI olarak kurmak ve halkalari
+    # o egriye gore ornekleme: yuz silmek yerine yuz URETMEMEK. Ayri
+    # bir isin konusu; olculmeden yazilmayacak.
 
     # TEPE KAPAGI — acik kalirsa ortunun ici tepeden gorunur (ilk
     # yazimda gorunuyordu).
