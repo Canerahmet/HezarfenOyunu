@@ -215,7 +215,7 @@ namespace Hezarfen.Sehir
         /// yazmak sessizce opak bırakır — duman o zaman gökyüzünü
         /// delen gri kareler olur.
         /// </summary>
-        private static Material DumanMalzeme()
+        public static Material DumanMalzeme()
         {
             if (_dumanMalzeme != null) return _dumanMalzeme;
             var s = Shader.Find("HDRP/Unlit") ?? Shader.Find("Unlit/Transparent");
@@ -267,16 +267,53 @@ namespace Hezarfen.Sehir
 
         private static Material _martiMalzeme;
 
-        private static Material MartiMalzeme()
+        /// <summary>
+        /// <b>Martı beyazdır</b> — ışıksız değil, <b>ışıklı</b>.
+        ///
+        /// Işıksız (unlit) bir malzemede renk bir yansıma oranı değil,
+        /// doğrudan bir <b>parlaklık değeridir</b>. Martılara 0,93
+        /// yazılmıştı ve gündüz gökyüzünün parlaklığı bunun binlerce
+        /// katı; sonuç karede görüldü: 24 martı, gökten <b>koyu</b>
+        /// ince dilimler olarak çıkıyor. İlk bakışta bir çizim
+        /// bozukluğu sandım — bir kuşun mercekteki toz gibi okunması,
+        /// rengin yanlış olduğunun en iyi kanıtı.
+        ///
+        /// Bu, bu depoda üçüncü kez aynı sınıf: bacanın dumanı
+        /// malzemesiz olduğu için macentaydı, prefabların yuvaları boş
+        /// olduğu için macentaydı, martı ışıksız olduğu için siyah.
+        /// Ortak nokta: <b>hiçbiri hata vermez, hepsi çizer</b>.
+        ///
+        /// Doğru çözüm sabit bir parlaklık uydurmak değil, kuşu
+        /// güneşin aydınlatmasına bırakmak: beyaz bir kuş, gökyüzünün
+        /// pozu ne olursa olsun beyaz okunur. Bedeli iki üçgen ve
+        /// yirmi dört örnek.
+        ///
+        /// <b>Çift yüzlü</b>, çünkü martı çoğu zaman <b>alttan</b>
+        /// görünür: iki üçgenlik bir kanat tek yüzlüyse yukarıdan
+        /// bakan oyuncu kuşu görür, aşağıdan bakan göremez.
+        /// </summary>
+        public static Material MartiMalzeme()
         {
             if (_martiMalzeme != null) return _martiMalzeme;
-            var s = Shader.Find("HDRP/Unlit") ?? Shader.Find("Unlit/Color");
+            var s = Shader.Find("HDRP/Lit") ?? Shader.Find("Standard");
             _martiMalzeme = new Material(s) { name = "M_Marti" };
-            var beyaz = new Color(0.93f, 0.93f, 0.95f);
-            if (_martiMalzeme.HasProperty("_UnlitColor"))
-                _martiMalzeme.SetColor("_UnlitColor", beyaz);
-            else if (_martiMalzeme.HasProperty("_Color"))
+            var beyaz = new Color(0.94f, 0.94f, 0.92f);
+            if (_martiMalzeme.HasProperty("_BaseColor"))
+                _martiMalzeme.SetColor("_BaseColor", beyaz);
+            if (_martiMalzeme.HasProperty("_Color"))
                 _martiMalzeme.SetColor("_Color", beyaz);
+            // Tuy mat: parlak bir kus plastik gorunur.
+            if (_martiMalzeme.HasProperty("_Smoothness"))
+                _martiMalzeme.SetFloat("_Smoothness", 0.12f);
+            if (_martiMalzeme.HasProperty("_Metallic"))
+                _martiMalzeme.SetFloat("_Metallic", 0f);
+            if (_martiMalzeme.HasProperty("_DoubleSidedEnable"))
+            {
+                _martiMalzeme.SetFloat("_DoubleSidedEnable", 1f);
+                _martiMalzeme.SetFloat("_CullMode", 0f);   // Off
+                _martiMalzeme.SetFloat("_CullModeForward", 0f);
+                _martiMalzeme.EnableKeyword("_DOUBLESIDED_ON");
+            }
             return _martiMalzeme;
         }
 

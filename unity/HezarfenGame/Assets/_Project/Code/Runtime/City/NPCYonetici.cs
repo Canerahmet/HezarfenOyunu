@@ -241,8 +241,9 @@ namespace Hezarfen.Sehir
                 {
                     meslek = s.meslek,
                     evDugum = s.evDugum,
+                    evKonum = s.evKonum,
                     tohum = s.tohum,
-                    konum = graf.dugumler[s.evDugum].konum,
+                    konum = s.evKonum ?? graf.dugumler[s.evDugum].konum,
                     // HIZIN TEK SAHIBI VAR: InsanDNA.
                     //
                     // Burada ayri bir formul duruyordu
@@ -382,7 +383,13 @@ namespace Hezarfen.Sehir
                 // Kayik KULLANILMAZ: rutin gundelik hayattir ve kimse
                 // her ogle namazi icin Bogaz'i gecmez. Kayik yolculugu
                 // bir GOREVDIR, rutin degil.
-                a.YolaKoy(graf.Yol(cikis, hedef, kayikVar: false), hedef);
+                // EVE DONEN KENDI EVINE DONER.
+                //
+                // Yol arama avlu kapisina kadar kosuyor; kapidan eve son
+                // adim bir noktadir. Bu olmadan bir mahallenin butun
+                // sakinleri kapinin ustunde duruyordu.
+                a.YolaKoy(graf.Yol(cikis, hedef, kayikVar: false), hedef,
+                          hedef == a.evDugum ? a.evKonum : null);
             }
         }
 

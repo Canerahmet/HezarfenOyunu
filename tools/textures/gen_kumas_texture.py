@@ -220,6 +220,45 @@ def _kece(res, rng):
     return h, deger, puru, None
 
 
+def _kilim(res, rng):
+    """Kilim: **atkı yüzlü** düz dokuma — çözgü tamamen gizli.
+
+    Kilim halı değildir: düğüm yoktur, atkı çözgüyü tamamen örter ve
+    yüzey enine **kaburgalı** okunur. Bu bir desen değil bir dokuma
+    özelliğidir; motifi ayrı bir sorudur ve kaynak istediği için
+    burada YOK — desen uydurmak, kilimi kilim yapan şeyi uydurmak
+    olurdu (CLAUDE.md: kaynak niteliksel olduğunda metrik geometri
+    uydurma).
+
+    Atkı yün ve kalın: santimetreye 4-6 atkı. Çözgü daha sık ama
+    görünmez; varlığı yalnızca atkının onun üstünden geçerken yaptığı
+    hafif dalgada okunur.
+    """
+    # Atki yuzlu dokumayi `_dokuma` ile kurmak yanlis olurdu: o islev
+    # iki ipligi de gosteren bir orgu uretir. Burada gorunen tek sey
+    # atki, yani yatay kaburga.
+    y = np.arange(res, dtype=np.float32)[:, None] / res
+    atki = 5.0 * 0.18 * res / res    # goruntuleme icin: 5 atki/cm x 18 cm
+    kaburga = 0.5 + 0.5 * np.cos(2.0 * np.pi * y * (5.0 * 18.0))
+    kaburga = np.repeat(kaburga, res, axis=1)
+
+    # Cozgunun izi: atki her cozgunun ustunden gecerken hafifce
+    # yukselir — dusey, cok sig bir dalga.
+    x = np.arange(res, dtype=np.float32)[None, :] / res
+    cozgu = 0.5 + 0.5 * np.cos(2.0 * np.pi * x * (9.0 * 18.0))
+    cozgu = np.repeat(cozgu, res, axis=0)
+
+    tuy = _periyodik_gurultu(res, 60, rng, oktav=3)
+    egri = _periyodik_gurultu(res, 9, rng, oktav=2)   # dokumanin egriligi
+
+    h = (kaburga - 0.5) * 1.0 + (cozgu - 0.5) * 0.18 + (tuy - 0.5) * 0.25
+    deger = (0.70 + (kaburga - 0.5) * 0.14 + (tuy - 0.5) * 0.08
+             + (egri - 0.5) * 0.05)
+    # Yun mat: kilim parlamaz. Kaburganin sirti biraz daha duzgun.
+    puru = 0.90 - 0.10 * kaburga
+    return h, deger, puru, None
+
+
 SPECS = [
     dict(id="kumas_keten", kabartma=0.0004, size=0.12, fn=_keten, tohum=16321,
          use="Keten gomlek, sarik ve yasmak (M_Cloth_Gomlek/Sarik/Yasmak)",
@@ -233,6 +272,10 @@ SPECS = [
     dict(id="kumas_kece", kabartma=0.0011, size=0.18, fn=_kece, tohum=16324,
          use="Takke ve kavuk (M_Cloth_Takke/Kavuk)",
          dokuma="dokuma yok — dovulmus lif"),
+    dict(id="kumas_kilim", kabartma=0.0016, size=0.18, fn=_kilim, tohum=16325,
+         use="Kilim (M_Cloth_Kilim) — ic mekan dosemesi",
+         dokuma="atki yuzlu duz dokuma, 5 atki/cm; MOTIF YOK "
+                "(motif kaynak ister, uydurulmaz)"),
 ]
 
 

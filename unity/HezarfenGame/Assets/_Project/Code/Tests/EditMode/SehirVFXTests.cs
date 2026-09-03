@@ -1,5 +1,6 @@
 using Hezarfen.Sehir;
 using NUnit.Framework;
+using UnityEngine;
 
 namespace Hezarfen.Tests
 {
@@ -49,6 +50,53 @@ namespace Hezarfen.Tests
                     $"Saat {s:0.00} icin yogunluk {y:0.00} — havuz "
                     + "boyutuyla carpilan bir sayi 0-1 disina cikamaz.");
             }
+        }
+
+        /// <summary>
+        /// <b>Martı beyaz görünsün, duman gri.</b>
+        ///
+        /// Işıksız (unlit) bir malzemede renk yansıma oranı değil,
+        /// doğrudan <b>parlaklık</b>tır. Martılara 0,93 yazılmıştı ve
+        /// gündüz gökyüzü bunun binlerce katı parlak; karede 24 martı
+        /// gökten <b>koyu ince dilimler</b> olarak çıkıyordu. Bir kuşun
+        /// mercekteki toz gibi okunması, rengin yanlış olduğunun en iyi
+        /// kanıtı — nitekim önce çizim bozukluğu sandım.
+        ///
+        /// Bu, depoda üçüncü kez aynı sınıf kusur: duman malzemesiz
+        /// olduğu için macentaydı, prefab yuvaları boş olduğu için
+        /// macentaydı, martı ışıksız olduğu için siyahtı. Hiçbiri hata
+        /// vermez; hepsi çizer.
+        /// </summary>
+        [Test]
+        public void TheGullIsLitNotUnlitAndVisibleFromBelow()
+        {
+            var m = SehirVFX.MartiMalzeme();
+            Assert.IsNotNull(m, "Marti malzemesi kurulamadi.");
+
+            Assert.IsFalse(m.HasProperty("_UnlitColor"),
+                "Marti ISIKSIZ bir malzeme kullaniyor. Isiksiz renk bir "
+                + "parlaklik degeridir; gunduz gokyuzunun yaninda 0,93 "
+                + "siyahtir. Kus gunes alsin.");
+            Assert.IsTrue(m.HasProperty("_BaseColor"),
+                "Marti malzemesinde _BaseColor yok — isikli bir "
+                + "golgelendirici bekleniyordu.");
+
+            // Marti cogu zaman ALTTAN gorunur; iki ucgenlik bir kanat
+            // tek yuzluyse asagidan bakan oyuncu onu goremez.
+            Assert.AreEqual(0f, m.GetFloat("_CullMode"), 0.01f,
+                "Marti tek yuzlu — alttan bakinca kaybolur.");
+        }
+
+        /// <summary>
+        /// Duman malzemesi <b>var</b> — malzemesiz bir parçacık
+        /// sistemi HDRP'de sessizce macenta çizer.
+        /// </summary>
+        [Test]
+        public void TheSmokeHasAMaterialAtAll()
+        {
+            Assert.IsNotNull(SehirVFX.DumanMalzeme(),
+                "Duman malzemesi yok — HDRP bunu MACENTA cizer ve "
+                + "hicbir uyari vermez.");
         }
 
         [Test]

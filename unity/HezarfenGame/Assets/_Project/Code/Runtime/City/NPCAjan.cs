@@ -110,8 +110,29 @@ namespace Hezarfen.Sehir
         /// </summary>
         public int vakitDamgasi = -1;
 
+        /// <summary>
+        /// <b>Yolun ucundaki son adim</b> — dugum degil, nokta.
+        ///
+        /// Graf "ev" olarak avlu kapisini biliyor ve bir kapinin
+        /// arkasinda ortalama 77 ev var (10.900 ev / 142 kapi). Yol
+        /// arama kapiya kadar kosar; kapidan kendi evine son adimi
+        /// sakin kendi atar. Bu olmadan bir mahallenin butun sakinleri
+        /// tek noktada durur — turda olculen tam buydu: bir durakta
+        /// 40 m icinde 272 kisi, dort durakta sifir.
+        ///
+        /// Bos ise davranis eskisi gibi: yolun son dugumunde durulur.
+        /// </summary>
+        public Vector3? sonNokta;
+
+        /// <summary>
+        /// Bu sakinin kendi evinin konumu (yoksa boş).
+        /// <see cref="SehirGunu.Sakin.evKonum"/> ile aynı şey.
+        /// </summary>
+        public Vector3? evKonum;
+
         /// <summary>Yolun sonuna geldi mi.</summary>
-        public bool Vardi => yol.Count == 0 || adim >= yol.Count;
+        public bool Vardi => (yol.Count == 0 || adim >= yol.Count)
+                             && sonNokta == null;
 
         /// <summary>
         /// Yolu bir adım ilerletir.
@@ -128,15 +149,18 @@ namespace Hezarfen.Sehir
             float kalan = yurumeHizi * dt;
             var oncekiKonum = konum;
 
-            while (kalan > 0f && adim < yol.Count)
+            while (kalan > 0f && (adim < yol.Count || sonNokta != null))
             {
-                Vector3 hedef = graf.dugumler[yol[adim]].konum;
+                Vector3 hedef = adim < yol.Count
+                    ? graf.dugumler[yol[adim]].konum
+                    : sonNokta.Value;
                 float d = Vector3.Distance(konum, hedef);
                 if (d <= kalan)
                 {
                     konum = hedef;
                     kalan -= d;
-                    adim++;
+                    if (adim < yol.Count) adim++;
+                    else sonNokta = null;
                 }
                 else
                 {
@@ -151,12 +175,19 @@ namespace Hezarfen.Sehir
                 : 0f;
         }
 
-        /// <summary>Yeni bir yol ver ve baştan başlat.</summary>
-        public void YolaKoy(List<int> yeniYol, int hedef)
+        /// <summary>
+        /// Yeni bir yol ver ve baştan başlat.
+        ///
+        /// <paramref name="son"/> verilirse yolun son düğümünden sonra
+        /// o noktaya yürünür — evin kapısından evin kendisine.
+        /// </summary>
+        public void YolaKoy(List<int> yeniYol, int hedef,
+                            Vector3? son = null)
         {
             yol = yeniYol ?? new List<int>();
             adim = 0;
             hedefDugum = hedef;
+            sonNokta = son;
         }
     }
 }

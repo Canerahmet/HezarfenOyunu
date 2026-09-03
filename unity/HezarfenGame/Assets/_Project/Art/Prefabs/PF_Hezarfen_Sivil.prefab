@@ -48,6 +48,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7838469473058755621, guid: 64b47f7848bb753468c5185f63f0dd7d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7838469473058755621, guid: 64b47f7848bb753468c5185f63f0dd7d, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.000000030908616
+      objectReference: {fileID: 0}
+    - target: {fileID: -7838469473058755621, guid: 64b47f7848bb753468c5185f63f0dd7d, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.00000003090862
+      objectReference: {fileID: 0}
+    - target: {fileID: -7838469473058755621, guid: 64b47f7848bb753468c5185f63f0dd7d, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.7071067
+      objectReference: {fileID: 0}
+    - target: {fileID: -7838469473058755621, guid: 64b47f7848bb753468c5185f63f0dd7d, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.7071068
+      objectReference: {fileID: 0}
     - target: {fileID: -7408962516040910045, guid: 64b47f7848bb753468c5185f63f0dd7d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -113,36 +133,16 @@ PrefabInstance:
       value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 4742473837712756890, guid: 64b47f7848bb753468c5185f63f0dd7d, type: 3}
-      propertyPath: m_Size
-      value: 1.9722555
-      objectReference: {fileID: 0}
-    - target: {fileID: 4742473837712756890, guid: 64b47f7848bb753468c5185f63f0dd7d, type: 3}
-      propertyPath: m_FadeMode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4742473837712756890, guid: 64b47f7848bb753468c5185f63f0dd7d, type: 3}
-      propertyPath: m_LocalReferencePoint.y
-      value: 0.88061094
-      objectReference: {fileID: 0}
-    - target: {fileID: 4742473837712756890, guid: 64b47f7848bb753468c5185f63f0dd7d, type: 3}
-      propertyPath: m_LocalReferencePoint.z
-      value: 0.055585206
-      objectReference: {fileID: 0}
-    - target: {fileID: 4742473837712756890, guid: 64b47f7848bb753468c5185f63f0dd7d, type: 3}
-      propertyPath: m_LODs.Array.data[0].fadeTransitionWidth
-      value: 0.25
+      propertyPath: m_LODs.Array.size
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4742473837712756890, guid: 64b47f7848bb753468c5185f63f0dd7d, type: 3}
       propertyPath: m_LODs.Array.data[0].screenRelativeHeight
       value: 0.22
       objectReference: {fileID: 0}
-    - target: {fileID: 5866666021909216657, guid: 64b47f7848bb753468c5185f63f0dd7d, type: 3}
-      propertyPath: m_Controller
-      value: 
-      objectReference: {fileID: 9100000, guid: 03e4a326de9ab51429ad0ca6e94aada2, type: 2}
-    - target: {fileID: 5866666021909216657, guid: 64b47f7848bb753468c5185f63f0dd7d, type: 3}
-      propertyPath: m_ApplyRootMotion
-      value: 0
+    - target: {fileID: 4742473837712756890, guid: 64b47f7848bb753468c5185f63f0dd7d, type: 3}
+      propertyPath: m_LODs.Array.data[1].screenRelativeHeight
+      value: 0.01
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

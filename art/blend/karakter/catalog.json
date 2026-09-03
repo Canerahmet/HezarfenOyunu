@@ -65,10 +65,9 @@
    "cinsiyet": "erkek",
    "yas_bandi": "yetiskin",
    "dizlik": false,
-   "giysi_parca": 26,
+   "giysi_parca": 14,
    "giysi_adlari": [
-    "Biyik_-1",
-    "Biyik_1",
+    "Biyik",
     "Entari_Etek",
     "Entari_Kol_Sag",
     "Entari_Kol_Sol",
@@ -78,27 +77,20 @@
     "Kusak",
     "Mest_-1",
     "Mest_1",
-    "Sac_-1_0",
-    "Sac_-1_1",
-    "Sac_-1_2",
-    "Sac_1_0",
-    "Sac_1_1",
-    "Sac_1_2",
+    "Sac",
     "Sakal",
-    "SakalUc_-1_0",
-    "SakalUc_-1_1",
-    "SakalUc_-1_2",
-    "SakalUc_-1_3",
-    "SakalUc_1_2",
-    "SakalUc_1_3",
     "Salvar",
     "Sarik"
    ],
-   "tris_lod0": 57864,
-   "tris_lod1": 17356,
+   "tris_lod0": 62276,
+   "tris_lod1": 18682,
+   "tris_lod2": 4982,
    "agirliksiz_kose": 0,
-   "kose_lod0": 28978,
-   "kemik": 38,
+   "kose_lod0": 31172,
+   "kol_donusu": 33.0,
+   "agirlik_farki_once": 1.2413,
+   "agirlik_farki": 0.0122,
+   "kemik": 30,
    "kemikler": [
     {
      "ad": "Hips",
@@ -323,7 +315,7 @@
     {
      "ad": "Etek_0_0",
      "bas": [
-      0.3506,
+      0.3509,
       0.0,
       1.02
      ],
@@ -333,7 +325,7 @@
     {
      "ad": "Etek_0_1",
      "bas": [
-      0.3506,
+      0.3509,
       0.0,
       0.5567
      ],
@@ -344,7 +336,7 @@
      "ad": "Etek_1_0",
      "bas": [
       0.0,
-      0.3506,
+      0.3509,
       1.02
      ],
      "uzunluk": 0.4632,
@@ -354,7 +346,7 @@
      "ad": "Etek_1_1",
      "bas": [
       0.0,
-      0.3506,
+      0.3509,
       0.5567
      ],
      "uzunluk": 0.4632,
@@ -363,7 +355,7 @@
     {
      "ad": "Etek_2_0",
      "bas": [
-      -0.3506,
+      -0.3509,
       0.0,
       1.02
      ],
@@ -373,7 +365,7 @@
     {
      "ad": "Etek_2_1",
      "bas": [
-      -0.3506,
+      -0.3509,
       0.0,
       0.5567
      ],
@@ -384,97 +376,17 @@
      "ad": "Etek_3_0",
      "bas": [
       -0.0,
-      -0.3506,
+      -0.3509,
       1.02
      ],
-     "uzunluk": 0.4632,
+     "uzunluk": 0.4633,
      "kot_orani": 0.6
     },
     {
      "ad": "Etek_3_1",
      "bas": [
       -0.0,
-      -0.3506,
-      0.5567
-     ],
-     "uzunluk": 0.4632,
-     "kot_orani": 0.3275
-    },
-    {
-     "ad": "Etek_0_0.001",
-     "bas": [
-      0.3507,
-      0.0,
-      1.02
-     ],
-     "uzunluk": 0.4632,
-     "kot_orani": 0.6
-    },
-    {
-     "ad": "Etek_0_1.001",
-     "bas": [
-      0.3507,
-      0.0,
-      0.5567
-     ],
-     "uzunluk": 0.4632,
-     "kot_orani": 0.3275
-    },
-    {
-     "ad": "Etek_1_0.001",
-     "bas": [
-      0.0,
-      0.3507,
-      1.02
-     ],
-     "uzunluk": 0.4632,
-     "kot_orani": 0.6
-    },
-    {
-     "ad": "Etek_1_1.001",
-     "bas": [
-      0.0,
-      0.3507,
-      0.5567
-     ],
-     "uzunluk": 0.4632,
-     "kot_orani": 0.3275
-    },
-    {
-     "ad": "Etek_2_0.001",
-     "bas": [
-      -0.3507,
-      0.0,
-      1.02
-     ],
-     "uzunluk": 0.4632,
-     "kot_orani": 0.6
-    },
-    {
-     "ad": "Etek_2_1.001",
-     "bas": [
-      -0.3507,
-      0.0,
-      0.5567
-     ],
-     "uzunluk": 0.4632,
-     "kot_orani": 0.3275
-    },
-    {
-     "ad": "Etek_3_0.001",
-     "bas": [
-      -0.0,
-      -0.3507,
-      1.02
-     ],
-     "uzunluk": 0.4632,
-     "kot_orani": 0.6
-    },
-    {
-     "ad": "Etek_3_1.001",
-     "bas": [
-      -0.0,
-      -0.3507,
+      -0.3509,
       0.5567
      ],
      "uzunluk": 0.4632,
@@ -503,10 +415,9 @@
    "cinsiyet": "erkek",
    "yas_bandi": "yetiskin",
    "dizlik": true,
-   "giysi_parca": 28,
+   "giysi_parca": 16,
    "giysi_adlari": [
-    "Biyik_-1",
-    "Biyik_1",
+    "Biyik",
     "Dizlik_-1",
     "Dizlik_1",
     "Entari_Etek",
@@ -518,27 +429,20 @@
     "Kusak",
     "Mest_-1",
     "Mest_1",
-    "Sac_-1_0",
-    "Sac_-1_1",
-    "Sac_-1_2",
-    "Sac_1_0",
-    "Sac_1_1",
-    "Sac_1_2",
+    "Sac",
     "Sakal",
-    "SakalUc_-1_0",
-    "SakalUc_-1_1",
-    "SakalUc_-1_2",
-    "SakalUc_-1_3",
-    "SakalUc_1_2",
-    "SakalUc_1_3",
     "Salvar",
     "Sarik"
    ],
-   "tris_lod0": 58344,
-   "tris_lod1": 17500,
+   "tris_lod0": 62756,
+   "tris_lod1": 18826,
+   "tris_lod2": 5020,
    "agirliksiz_kose": 0,
-   "kose_lod0": 29218,
-   "kemik": 38,
+   "kose_lod0": 31412,
+   "kol_donusu": 33.0,
+   "agirlik_farki_once": 1.2437,
+   "agirlik_farki": 0.0156,
+   "kemik": 30,
    "kemikler": [
     {
      "ad": "Hips",
@@ -763,7 +667,7 @@
     {
      "ad": "Etek_0_0",
      "bas": [
-      0.3506,
+      0.3509,
       0.0,
       1.02
      ],
@@ -773,7 +677,7 @@
     {
      "ad": "Etek_0_1",
      "bas": [
-      0.3506,
+      0.3509,
       0.0,
       0.7778
      ],
@@ -784,7 +688,7 @@
      "ad": "Etek_1_0",
      "bas": [
       0.0,
-      0.3506,
+      0.3509,
       1.02
      ],
      "uzunluk": 0.2422,
@@ -794,7 +698,7 @@
      "ad": "Etek_1_1",
      "bas": [
       0.0,
-      0.3506,
+      0.3509,
       0.7778
      ],
      "uzunluk": 0.2423,
@@ -803,7 +707,7 @@
     {
      "ad": "Etek_2_0",
      "bas": [
-      -0.3506,
+      -0.3509,
       0.0,
       1.02
      ],
@@ -813,7 +717,7 @@
     {
      "ad": "Etek_2_1",
      "bas": [
-      -0.3506,
+      -0.3509,
       0.0,
       0.7778
      ],
@@ -824,7 +728,7 @@
      "ad": "Etek_3_0",
      "bas": [
       -0.0,
-      -0.3506,
+      -0.3509,
       1.02
      ],
      "uzunluk": 0.2422,
@@ -834,87 +738,7 @@
      "ad": "Etek_3_1",
      "bas": [
       -0.0,
-      -0.3506,
-      0.7778
-     ],
-     "uzunluk": 0.2423,
-     "kot_orani": 0.4575
-    },
-    {
-     "ad": "Etek_0_0.001",
-     "bas": [
-      0.3507,
-      0.0,
-      1.02
-     ],
-     "uzunluk": 0.2422,
-     "kot_orani": 0.6
-    },
-    {
-     "ad": "Etek_0_1.001",
-     "bas": [
-      0.3507,
-      0.0,
-      0.7778
-     ],
-     "uzunluk": 0.2423,
-     "kot_orani": 0.4575
-    },
-    {
-     "ad": "Etek_1_0.001",
-     "bas": [
-      0.0,
-      0.3507,
-      1.02
-     ],
-     "uzunluk": 0.2422,
-     "kot_orani": 0.6
-    },
-    {
-     "ad": "Etek_1_1.001",
-     "bas": [
-      0.0,
-      0.3507,
-      0.7778
-     ],
-     "uzunluk": 0.2423,
-     "kot_orani": 0.4575
-    },
-    {
-     "ad": "Etek_2_0.001",
-     "bas": [
-      -0.3507,
-      0.0,
-      1.02
-     ],
-     "uzunluk": 0.2422,
-     "kot_orani": 0.6
-    },
-    {
-     "ad": "Etek_2_1.001",
-     "bas": [
-      -0.3507,
-      0.0,
-      0.7778
-     ],
-     "uzunluk": 0.2423,
-     "kot_orani": 0.4575
-    },
-    {
-     "ad": "Etek_3_0.001",
-     "bas": [
-      -0.0,
-      -0.3507,
-      1.02
-     ],
-     "uzunluk": 0.2422,
-     "kot_orani": 0.6
-    },
-    {
-     "ad": "Etek_3_1.001",
-     "bas": [
-      -0.0,
-      -0.3507,
+      -0.3509,
       0.7778
      ],
      "uzunluk": 0.2423,
@@ -943,10 +767,9 @@
    "cinsiyet": "erkek",
    "yas_bandi": "yetiskin",
    "dizlik": false,
-   "giysi_parca": 26,
+   "giysi_parca": 14,
    "giysi_adlari": [
-    "Biyik_-1",
-    "Biyik_1",
+    "Biyik",
     "Entari_Etek",
     "Entari_Kol_Sag",
     "Entari_Kol_Sol",
@@ -956,27 +779,20 @@
     "Kusak",
     "Mest_-1",
     "Mest_1",
-    "Sac_-1_0",
-    "Sac_-1_1",
-    "Sac_-1_2",
-    "Sac_1_0",
-    "Sac_1_1",
-    "Sac_1_2",
+    "Sac",
     "Sakal",
-    "SakalUc_-1_0",
-    "SakalUc_-1_1",
-    "SakalUc_-1_2",
-    "SakalUc_-1_3",
-    "SakalUc_1_2",
-    "SakalUc_1_3",
     "Salvar",
     "Sarik"
    ],
-   "tris_lod0": 57964,
-   "tris_lod1": 17384,
+   "tris_lod0": 62416,
+   "tris_lod1": 18724,
+   "tris_lod2": 4992,
    "agirliksiz_kose": 0,
-   "kose_lod0": 29024,
-   "kemik": 38,
+   "kose_lod0": 31252,
+   "kol_donusu": 24.9,
+   "agirlik_farki_once": 1.2567,
+   "agirlik_farki": 0.0116,
+   "kemik": 30,
    "kemikler": [
     {
      "ad": "Hips",
@@ -1201,7 +1017,7 @@
     {
      "ad": "Etek_0_0",
      "bas": [
-      0.3533,
+      0.3536,
       0.0,
       1.02
      ],
@@ -1211,7 +1027,7 @@
     {
      "ad": "Etek_0_1",
      "bas": [
-      0.3533,
+      0.3536,
       0.0,
       0.5567
      ],
@@ -1222,7 +1038,7 @@
      "ad": "Etek_1_0",
      "bas": [
       0.0,
-      0.3533,
+      0.3536,
       1.02
      ],
      "uzunluk": 0.4632,
@@ -1232,7 +1048,7 @@
      "ad": "Etek_1_1",
      "bas": [
       0.0,
-      0.3533,
+      0.3536,
       0.5567
      ],
      "uzunluk": 0.4632,
@@ -1241,7 +1057,7 @@
     {
      "ad": "Etek_2_0",
      "bas": [
-      -0.3533,
+      -0.3536,
       0.0,
       1.02
      ],
@@ -1251,7 +1067,7 @@
     {
      "ad": "Etek_2_1",
      "bas": [
-      -0.3533,
+      -0.3536,
       0.0,
       0.5567
      ],
@@ -1262,7 +1078,7 @@
      "ad": "Etek_3_0",
      "bas": [
       -0.0,
-      -0.3533,
+      -0.3536,
       1.02
      ],
      "uzunluk": 0.4632,
@@ -1272,87 +1088,7 @@
      "ad": "Etek_3_1",
      "bas": [
       -0.0,
-      -0.3533,
-      0.5567
-     ],
-     "uzunluk": 0.4632,
-     "kot_orani": 0.3275
-    },
-    {
-     "ad": "Etek_0_0.001",
-     "bas": [
-      0.3534,
-      0.0,
-      1.02
-     ],
-     "uzunluk": 0.4632,
-     "kot_orani": 0.6
-    },
-    {
-     "ad": "Etek_0_1.001",
-     "bas": [
-      0.3534,
-      0.0,
-      0.5567
-     ],
-     "uzunluk": 0.4632,
-     "kot_orani": 0.3275
-    },
-    {
-     "ad": "Etek_1_0.001",
-     "bas": [
-      0.0,
-      0.3534,
-      1.02
-     ],
-     "uzunluk": 0.4632,
-     "kot_orani": 0.6
-    },
-    {
-     "ad": "Etek_1_1.001",
-     "bas": [
-      0.0,
-      0.3534,
-      0.5567
-     ],
-     "uzunluk": 0.4632,
-     "kot_orani": 0.3275
-    },
-    {
-     "ad": "Etek_2_0.001",
-     "bas": [
-      -0.3534,
-      0.0,
-      1.02
-     ],
-     "uzunluk": 0.4632,
-     "kot_orani": 0.6
-    },
-    {
-     "ad": "Etek_2_1.001",
-     "bas": [
-      -0.3534,
-      0.0,
-      0.5567
-     ],
-     "uzunluk": 0.4632,
-     "kot_orani": 0.3275
-    },
-    {
-     "ad": "Etek_3_0.001",
-     "bas": [
-      -0.0,
-      -0.3534,
-      1.02
-     ],
-     "uzunluk": 0.4632,
-     "kot_orani": 0.6
-    },
-    {
-     "ad": "Etek_3_1.001",
-     "bas": [
-      -0.0,
-      -0.3534,
+      -0.3536,
       0.5567
      ],
      "uzunluk": 0.4632,
@@ -1381,7 +1117,7 @@
    "cinsiyet": "erkek",
    "yas_bandi": "genc",
    "dizlik": false,
-   "giysi_parca": 16,
+   "giysi_parca": 11,
    "giysi_adlari": [
     "Entari_Etek",
     "Entari_Kol_Sag",
@@ -1391,20 +1127,19 @@
     "Kusak",
     "Mest_-1",
     "Mest_1",
-    "Sac_-1_0",
-    "Sac_-1_1",
-    "Sac_-1_2",
-    "Sac_1_0",
-    "Sac_1_1",
-    "Sac_1_2",
+    "Sac",
     "Salvar",
     "Takke"
    ],
-   "tris_lod0": 48316,
-   "tris_lod1": 14494,
+   "tris_lod0": 49672,
+   "tris_lod1": 14900,
+   "tris_lod2": 3972,
    "agirliksiz_kose": 0,
-   "kose_lod0": 24170,
-   "kemik": 38,
+   "kose_lod0": 24844,
+   "kol_donusu": 18.6,
+   "agirlik_farki_once": 1.4137,
+   "agirlik_farki": 0.0171,
+   "kemik": 30,
    "kemikler": [
     {
      "ad": "Hips",
@@ -1629,7 +1364,7 @@
     {
      "ad": "Etek_0_0",
      "bas": [
-      0.3394,
+      0.3397,
       0.0,
       1.008
      ],
@@ -1639,7 +1374,7 @@
     {
      "ad": "Etek_0_1",
      "bas": [
-      0.3394,
+      0.3397,
       0.0,
       0.7686
      ],
@@ -1650,7 +1385,7 @@
      "ad": "Etek_1_0",
      "bas": [
       0.0,
-      0.3394,
+      0.3397,
       1.008
      ],
      "uzunluk": 0.2394,
@@ -1660,7 +1395,7 @@
      "ad": "Etek_1_1",
      "bas": [
       0.0,
-      0.3394,
+      0.3397,
       0.7686
      ],
      "uzunluk": 0.2394,
@@ -1669,7 +1404,7 @@
     {
      "ad": "Etek_2_0",
      "bas": [
-      -0.3394,
+      -0.3397,
       0.0,
       1.008
      ],
@@ -1679,7 +1414,7 @@
     {
      "ad": "Etek_2_1",
      "bas": [
-      -0.3394,
+      -0.3397,
       0.0,
       0.7686
      ],
@@ -1690,7 +1425,7 @@
      "ad": "Etek_3_0",
      "bas": [
       -0.0,
-      -0.3394,
+      -0.3397,
       1.008
      ],
      "uzunluk": 0.2394,
@@ -1700,87 +1435,7 @@
      "ad": "Etek_3_1",
      "bas": [
       -0.0,
-      -0.3394,
-      0.7686
-     ],
-     "uzunluk": 0.2394,
-     "kot_orani": 0.4521
-    },
-    {
-     "ad": "Etek_0_0.001",
-     "bas": [
-      0.3395,
-      0.0,
-      1.008
-     ],
-     "uzunluk": 0.2394,
-     "kot_orani": 0.5929
-    },
-    {
-     "ad": "Etek_0_1.001",
-     "bas": [
-      0.3395,
-      0.0,
-      0.7686
-     ],
-     "uzunluk": 0.2394,
-     "kot_orani": 0.4521
-    },
-    {
-     "ad": "Etek_1_0.001",
-     "bas": [
-      0.0,
-      0.3395,
-      1.008
-     ],
-     "uzunluk": 0.2394,
-     "kot_orani": 0.5929
-    },
-    {
-     "ad": "Etek_1_1.001",
-     "bas": [
-      0.0,
-      0.3395,
-      0.7686
-     ],
-     "uzunluk": 0.2394,
-     "kot_orani": 0.4521
-    },
-    {
-     "ad": "Etek_2_0.001",
-     "bas": [
-      -0.3395,
-      0.0,
-      1.008
-     ],
-     "uzunluk": 0.2394,
-     "kot_orani": 0.5929
-    },
-    {
-     "ad": "Etek_2_1.001",
-     "bas": [
-      -0.3395,
-      0.0,
-      0.7686
-     ],
-     "uzunluk": 0.2394,
-     "kot_orani": 0.4521
-    },
-    {
-     "ad": "Etek_3_0.001",
-     "bas": [
-      -0.0,
-      -0.3395,
-      1.008
-     ],
-     "uzunluk": 0.2394,
-     "kot_orani": 0.5929
-    },
-    {
-     "ad": "Etek_3_1.001",
-     "bas": [
-      -0.0,
-      -0.3395,
+      -0.3397,
       0.7686
      ],
      "uzunluk": 0.2394,
@@ -1801,18 +1456,17 @@
    "source": "KIYAFET: Ralamb kiyafet albumunden (1657-58, kamu mali, refs/ralamb/) OKUNAN dilbilgisi. Minyatur kopyalanmadi; okunan sey oranlardir — entarinin boyu isi soyler (oturan ayak bilegine, calisan baldira), kusak dogal belde ve dar, salvar entarinin altindan GORUNUR, kol agzi astari ters cevrilir, dizlik gercek bir ogedir (plaka 50), baslik rutbe gostergesidir ve Hezarfen ne pasa ne asker. UYARI: album 1657-58, oyun 1632 — YIRMI BES YIL fark. Ana hatlar (salvar-gomlek-entari-kusak-sarik) bu aralikta degismedi ama ayrinti degisebilir. Peter Mundy (1618) obur yandan yaklasiyor; 1632'nin TAM ORTASINDA BIR KAYNAK YOK ve bu bosluk kapatilamaz, ancak soylenebilir.",
    "why": "yasli erkek — uzun entari, buyuk sarik, ak sakal",
    "boy": 1.7083,
-   "en_genis": 1.0778,
-   "derinlik": 0.5682,
+   "en_genis": 1.007,
+   "derinlik": 0.5609,
    "etek_kotu": 0.09,
    "tip": "yasli",
    "taban_boy": 1.63,
    "cinsiyet": "erkek",
    "yas_bandi": "yasli",
    "dizlik": false,
-   "giysi_parca": 26,
+   "giysi_parca": 14,
    "giysi_adlari": [
-    "Biyik_-1",
-    "Biyik_1",
+    "Biyik",
     "Entari_Etek",
     "Entari_Kol_Sag",
     "Entari_Kol_Sol",
@@ -1822,27 +1476,20 @@
     "Kusak",
     "Mest_-1",
     "Mest_1",
-    "Sac_-1_0",
-    "Sac_-1_1",
-    "Sac_-1_2",
-    "Sac_1_0",
-    "Sac_1_1",
-    "Sac_1_2",
+    "Sac",
     "Sakal",
-    "SakalUc_-1_0",
-    "SakalUc_-1_1",
-    "SakalUc_-1_2",
-    "SakalUc_-1_3",
-    "SakalUc_1_2",
-    "SakalUc_1_3",
     "Salvar",
     "Sarik"
    ],
-   "tris_lod0": 57012,
-   "tris_lod1": 17100,
+   "tris_lod0": 62104,
+   "tris_lod1": 18630,
+   "tris_lod2": 4968,
    "agirliksiz_kose": 0,
-   "kose_lod0": 28540,
-   "kemik": 38,
+   "kose_lod0": 31092,
+   "kol_donusu": 43.6,
+   "agirlik_farki_once": 1.3486,
+   "agirlik_farki": 0.0144,
+   "kemik": 30,
    "kemikler": [
     {
      "ad": "Hips",
@@ -2067,7 +1714,7 @@
     {
      "ad": "Etek_0_0",
      "bas": [
-      0.3449,
+      0.3225,
       0.0,
       0.978
      ],
@@ -2077,7 +1724,7 @@
     {
      "ad": "Etek_0_1",
      "bas": [
-      0.3449,
+      0.3225,
       0.0,
       0.5338
      ],
@@ -2088,7 +1735,7 @@
      "ad": "Etek_1_0",
      "bas": [
       0.0,
-      0.3449,
+      0.3225,
       0.978
      ],
      "uzunluk": 0.4442,
@@ -2098,7 +1745,7 @@
      "ad": "Etek_1_1",
      "bas": [
       0.0,
-      0.3449,
+      0.3225,
       0.5338
      ],
      "uzunluk": 0.4442,
@@ -2107,7 +1754,7 @@
     {
      "ad": "Etek_2_0",
      "bas": [
-      -0.3449,
+      -0.3225,
       0.0,
       0.978
      ],
@@ -2117,7 +1764,7 @@
     {
      "ad": "Etek_2_1",
      "bas": [
-      -0.3449,
+      -0.3225,
       0.0,
       0.5338
      ],
@@ -2128,7 +1775,7 @@
      "ad": "Etek_3_0",
      "bas": [
       -0.0,
-      -0.3449,
+      -0.3225,
       0.978
      ],
      "uzunluk": 0.4442,
@@ -2138,87 +1785,7 @@
      "ad": "Etek_3_1",
      "bas": [
       -0.0,
-      -0.3449,
-      0.5338
-     ],
-     "uzunluk": 0.4442,
-     "kot_orani": 0.314
-    },
-    {
-     "ad": "Etek_0_0.001",
-     "bas": [
-      0.3449,
-      0.0,
-      0.978
-     ],
-     "uzunluk": 0.4442,
-     "kot_orani": 0.5753
-    },
-    {
-     "ad": "Etek_0_1.001",
-     "bas": [
-      0.3449,
-      0.0,
-      0.5338
-     ],
-     "uzunluk": 0.4442,
-     "kot_orani": 0.314
-    },
-    {
-     "ad": "Etek_1_0.001",
-     "bas": [
-      0.0,
-      0.3449,
-      0.978
-     ],
-     "uzunluk": 0.4442,
-     "kot_orani": 0.5753
-    },
-    {
-     "ad": "Etek_1_1.001",
-     "bas": [
-      0.0,
-      0.3449,
-      0.5338
-     ],
-     "uzunluk": 0.4442,
-     "kot_orani": 0.314
-    },
-    {
-     "ad": "Etek_2_0.001",
-     "bas": [
-      -0.3449,
-      0.0,
-      0.978
-     ],
-     "uzunluk": 0.4442,
-     "kot_orani": 0.5753
-    },
-    {
-     "ad": "Etek_2_1.001",
-     "bas": [
-      -0.3449,
-      0.0,
-      0.5338
-     ],
-     "uzunluk": 0.4442,
-     "kot_orani": 0.314
-    },
-    {
-     "ad": "Etek_3_0.001",
-     "bas": [
-      -0.0,
-      -0.3449,
-      0.978
-     ],
-     "uzunluk": 0.4442,
-     "kot_orani": 0.5753
-    },
-    {
-     "ad": "Etek_3_1.001",
-     "bas": [
-      -0.0,
-      -0.3449,
+      -0.3225,
       0.5338
      ],
      "uzunluk": 0.4442,
@@ -2238,7 +1805,7 @@
    "kiyafet_tier": "T2",
    "source": "KIYAFET: Ralamb kiyafet albumunden (1657-58, kamu mali, refs/ralamb/) OKUNAN dilbilgisi. Minyatur kopyalanmadi; okunan sey oranlardir — entarinin boyu isi soyler (oturan ayak bilegine, calisan baldira), kusak dogal belde ve dar, salvar entarinin altindan GORUNUR, kol agzi astari ters cevrilir, dizlik gercek bir ogedir (plaka 50), baslik rutbe gostergesidir ve Hezarfen ne pasa ne asker. UYARI: album 1657-58, oyun 1632 — YIRMI BES YIL fark. Ana hatlar (salvar-gomlek-entari-kusak-sarik) bu aralikta degismedi ama ayrinti degisebilir. Peter Mundy (1618) obur yandan yaklasiyor; 1632'nin TAM ORTASINDA BIR KAYNAK YOK ve bu bosluk kapatilamaz, ancak soylenebilir.",
    "why": "yetiskin kadin — ferace ve yasmak (sokak kiyafeti)",
-   "boy": 1.6001,
+   "boy": 1.6009,
    "en_genis": 0.9643,
    "derinlik": 0.5223,
    "etek_kotu": 0.087,
@@ -2260,11 +1827,15 @@
     "Salvar",
     "Yasmak"
    ],
-   "tris_lod0": 49016,
-   "tris_lod1": 14704,
+   "tris_lod0": 49508,
+   "tris_lod1": 14852,
+   "tris_lod2": 3960,
    "agirliksiz_kose": 0,
-   "kose_lod0": 24522,
-   "kemik": 38,
+   "kose_lod0": 24768,
+   "kol_donusu": 51.8,
+   "agirlik_farki_once": 1.3653,
+   "agirlik_farki": 0.0298,
+   "kemik": 30,
    "kemikler": [
     {
      "ad": "Hips",
@@ -2343,28 +1914,28 @@
       0.0,
       1.2798
      ],
-     "uzunluk": 0.2585,
+     "uzunluk": 0.2596,
      "kot_orani": 0.7528
     },
     {
      "ad": "LeftLowerArm",
      "bas": [
-      -0.3077,
-      0.0709,
-      1.0693
+      -0.3086,
+      0.0702,
+      1.0684
      ],
-     "uzunluk": 0.2469,
-     "kot_orani": 0.629
+     "uzunluk": 0.2481,
+     "kot_orani": 0.6285
     },
     {
      "ad": "LeftHand",
      "bas": [
-      -0.4173,
-      -0.107,
-      0.9376
+      -0.4176,
+      -0.1092,
+      0.9362
      ],
      "uzunluk": 0.06,
-     "kot_orani": 0.5515
+     "kot_orani": 0.5507
     },
     {
      "ad": "RightShoulder",
@@ -2383,28 +1954,28 @@
       0.0,
       1.2798
      ],
-     "uzunluk": 0.2585,
+     "uzunluk": 0.2596,
      "kot_orani": 0.7528
     },
     {
      "ad": "RightLowerArm",
      "bas": [
-      0.3077,
-      0.0709,
-      1.0693
+      0.3086,
+      0.0702,
+      1.0684
      ],
-     "uzunluk": 0.2469,
-     "kot_orani": 0.629
+     "uzunluk": 0.2481,
+     "kot_orani": 0.6285
     },
     {
      "ad": "RightHand",
      "bas": [
-      0.4173,
-      -0.107,
-      0.9376
+      0.4176,
+      -0.1092,
+      0.9362
      ],
      "uzunluk": 0.06,
-     "kot_orani": 0.5515
+     "kot_orani": 0.5507
     },
     {
      "ad": "LeftUpperLeg",
@@ -2489,7 +2060,7 @@
     {
      "ad": "Etek_0_0",
      "bas": [
-      0.3086,
+      0.3089,
       0.0,
       0.948
      ],
@@ -2499,7 +2070,7 @@
     {
      "ad": "Etek_0_1",
      "bas": [
-      0.3086,
+      0.3089,
       0.0,
       0.5175
      ],
@@ -2510,7 +2081,7 @@
      "ad": "Etek_1_0",
      "bas": [
       0.0,
-      0.3086,
+      0.3089,
       0.948
      ],
      "uzunluk": 0.4306,
@@ -2520,7 +2091,7 @@
      "ad": "Etek_1_1",
      "bas": [
       0.0,
-      0.3086,
+      0.3089,
       0.5175
      ],
      "uzunluk": 0.4306,
@@ -2529,7 +2100,7 @@
     {
      "ad": "Etek_2_0",
      "bas": [
-      -0.3086,
+      -0.3089,
       0.0,
       0.948
      ],
@@ -2539,7 +2110,7 @@
     {
      "ad": "Etek_2_1",
      "bas": [
-      -0.3086,
+      -0.3089,
       0.0,
       0.5175
      ],
@@ -2550,7 +2121,7 @@
      "ad": "Etek_3_0",
      "bas": [
       -0.0,
-      -0.3086,
+      -0.3089,
       0.948
      ],
      "uzunluk": 0.4306,
@@ -2560,87 +2131,7 @@
      "ad": "Etek_3_1",
      "bas": [
       -0.0,
-      -0.3086,
-      0.5175
-     ],
-     "uzunluk": 0.4306,
-     "kot_orani": 0.3044
-    },
-    {
-     "ad": "Etek_0_0.001",
-     "bas": [
-      0.3087,
-      0.0,
-      0.948
-     ],
-     "uzunluk": 0.4306,
-     "kot_orani": 0.5576
-    },
-    {
-     "ad": "Etek_0_1.001",
-     "bas": [
-      0.3087,
-      0.0,
-      0.5175
-     ],
-     "uzunluk": 0.4306,
-     "kot_orani": 0.3044
-    },
-    {
-     "ad": "Etek_1_0.001",
-     "bas": [
-      0.0,
-      0.3087,
-      0.948
-     ],
-     "uzunluk": 0.4306,
-     "kot_orani": 0.5576
-    },
-    {
-     "ad": "Etek_1_1.001",
-     "bas": [
-      0.0,
-      0.3087,
-      0.5175
-     ],
-     "uzunluk": 0.4306,
-     "kot_orani": 0.3044
-    },
-    {
-     "ad": "Etek_2_0.001",
-     "bas": [
-      -0.3087,
-      0.0,
-      0.948
-     ],
-     "uzunluk": 0.4306,
-     "kot_orani": 0.5576
-    },
-    {
-     "ad": "Etek_2_1.001",
-     "bas": [
-      -0.3087,
-      0.0,
-      0.5175
-     ],
-     "uzunluk": 0.4306,
-     "kot_orani": 0.3044
-    },
-    {
-     "ad": "Etek_3_0.001",
-     "bas": [
-      -0.0,
-      -0.3087,
-      0.948
-     ],
-     "uzunluk": 0.4306,
-     "kot_orani": 0.5576
-    },
-    {
-     "ad": "Etek_3_1.001",
-     "bas": [
-      -0.0,
-      -0.3087,
+      -0.3089,
       0.5175
      ],
      "uzunluk": 0.4306,
@@ -2660,7 +2151,7 @@
    "kiyafet_tier": "T2",
    "source": "KIYAFET: Ralamb kiyafet albumunden (1657-58, kamu mali, refs/ralamb/) OKUNAN dilbilgisi. Minyatur kopyalanmadi; okunan sey oranlardir — entarinin boyu isi soyler (oturan ayak bilegine, calisan baldira), kusak dogal belde ve dar, salvar entarinin altindan GORUNUR, kol agzi astari ters cevrilir, dizlik gercek bir ogedir (plaka 50), baslik rutbe gostergesidir ve Hezarfen ne pasa ne asker. UYARI: album 1657-58, oyun 1632 — YIRMI BES YIL fark. Ana hatlar (salvar-gomlek-entari-kusak-sarik) bu aralikta degismedi ama ayrinti degisebilir. Peter Mundy (1618) obur yandan yaklasiyor; 1632'nin TAM ORTASINDA BIR KAYNAK YOK ve bu bosluk kapatilamaz, ancak soylenebilir.",
    "why": "yasli kadin — ferace ve yasmak",
-   "boy": 1.5595,
+   "boy": 1.5602,
    "en_genis": 0.9504,
    "derinlik": 0.5618,
    "etek_kotu": 0.085,
@@ -2682,11 +2173,15 @@
     "Salvar",
     "Yasmak"
    ],
-   "tris_lod0": 49304,
-   "tris_lod1": 14790,
+   "tris_lod0": 49544,
+   "tris_lod1": 14862,
+   "tris_lod2": 3962,
    "agirliksiz_kose": 0,
-   "kose_lod0": 24670,
-   "kemik": 38,
+   "kose_lod0": 24790,
+   "kol_donusu": 30.1,
+   "agirlik_farki_once": 1.1543,
+   "agirlik_farki": 0.0224,
+   "kemik": 30,
    "kemikler": [
     {
      "ad": "Hips",
@@ -2911,7 +2406,7 @@
     {
      "ad": "Etek_0_0",
      "bas": [
-      0.3041,
+      0.3042,
       0.0,
       0.924
      ],
@@ -2921,7 +2416,7 @@
     {
      "ad": "Etek_0_1",
      "bas": [
-      0.3041,
+      0.3042,
       0.0,
       0.5044
      ],
@@ -2932,7 +2427,7 @@
      "ad": "Etek_1_0",
      "bas": [
       0.0,
-      0.3041,
+      0.3042,
       0.924
      ],
      "uzunluk": 0.4197,
@@ -2942,7 +2437,7 @@
      "ad": "Etek_1_1",
      "bas": [
       0.0,
-      0.3041,
+      0.3042,
       0.5044
      ],
      "uzunluk": 0.4197,
@@ -2951,7 +2446,7 @@
     {
      "ad": "Etek_2_0",
      "bas": [
-      -0.3041,
+      -0.3042,
       0.0,
       0.924
      ],
@@ -2961,7 +2456,7 @@
     {
      "ad": "Etek_2_1",
      "bas": [
-      -0.3041,
+      -0.3042,
       0.0,
       0.5044
      ],
@@ -2972,7 +2467,7 @@
      "ad": "Etek_3_0",
      "bas": [
       -0.0,
-      -0.3041,
+      -0.3042,
       0.924
      ],
      "uzunluk": 0.4197,
@@ -2982,87 +2477,7 @@
      "ad": "Etek_3_1",
      "bas": [
       -0.0,
-      -0.3041,
-      0.5044
-     ],
-     "uzunluk": 0.4197,
-     "kot_orani": 0.2967
-    },
-    {
-     "ad": "Etek_0_0.001",
-     "bas": [
-      0.3043,
-      0.0,
-      0.924
-     ],
-     "uzunluk": 0.4197,
-     "kot_orani": 0.5435
-    },
-    {
-     "ad": "Etek_0_1.001",
-     "bas": [
-      0.3043,
-      0.0,
-      0.5044
-     ],
-     "uzunluk": 0.4197,
-     "kot_orani": 0.2967
-    },
-    {
-     "ad": "Etek_1_0.001",
-     "bas": [
-      0.0,
-      0.3043,
-      0.924
-     ],
-     "uzunluk": 0.4197,
-     "kot_orani": 0.5435
-    },
-    {
-     "ad": "Etek_1_1.001",
-     "bas": [
-      0.0,
-      0.3043,
-      0.5044
-     ],
-     "uzunluk": 0.4197,
-     "kot_orani": 0.2967
-    },
-    {
-     "ad": "Etek_2_0.001",
-     "bas": [
-      -0.3043,
-      0.0,
-      0.924
-     ],
-     "uzunluk": 0.4197,
-     "kot_orani": 0.5435
-    },
-    {
-     "ad": "Etek_2_1.001",
-     "bas": [
-      -0.3043,
-      0.0,
-      0.5044
-     ],
-     "uzunluk": 0.4197,
-     "kot_orani": 0.2967
-    },
-    {
-     "ad": "Etek_3_0.001",
-     "bas": [
-      -0.0,
-      -0.3043,
-      0.924
-     ],
-     "uzunluk": 0.4197,
-     "kot_orani": 0.5435
-    },
-    {
-     "ad": "Etek_3_1.001",
-     "bas": [
-      -0.0,
-      -0.3043,
+      -0.3042,
       0.5044
      ],
      "uzunluk": 0.4197,
@@ -3082,7 +2497,7 @@
    "kiyafet_tier": "T2",
    "source": "KIYAFET: Ralamb kiyafet albumunden (1657-58, kamu mali, refs/ralamb/) OKUNAN dilbilgisi. Minyatur kopyalanmadi; okunan sey oranlardir — entarinin boyu isi soyler (oturan ayak bilegine, calisan baldira), kusak dogal belde ve dar, salvar entarinin altindan GORUNUR, kol agzi astari ters cevrilir, dizlik gercek bir ogedir (plaka 50), baslik rutbe gostergesidir ve Hezarfen ne pasa ne asker. UYARI: album 1657-58, oyun 1632 — YIRMI BES YIL fark. Ana hatlar (salvar-gomlek-entari-kusak-sarik) bu aralikta degismedi ama ayrinti degisebilir. Peter Mundy (1618) obur yandan yaklasiyor; 1632'nin TAM ORTASINDA BIR KAYNAK YOK ve bu bosluk kapatilamaz, ancak soylenebilir.",
    "why": "kiz cocuk — kisa entari, basortu",
-   "boy": 1.2272,
+   "boy": 1.228,
    "en_genis": 0.7489,
    "derinlik": 0.4008,
    "etek_kotu": 0.515,
@@ -3106,9 +2521,13 @@
    ],
    "tris_lod0": 51460,
    "tris_lod1": 15438,
+   "tris_lod2": 4116,
    "agirliksiz_kose": 0,
-   "kose_lod0": 25868,
-   "kemik": 38,
+   "kose_lod0": 25820,
+   "kol_donusu": 51.0,
+   "agirlik_farki_once": 1.3094,
+   "agirlik_farki": 0.0173,
+   "kemik": 30,
    "kemikler": [
     {
      "ad": "Hips",
@@ -3333,7 +2752,7 @@
     {
      "ad": "Etek_0_0",
      "bas": [
-      0.2396,
+      0.2397,
       0.0,
       0.726
      ],
@@ -3343,7 +2762,7 @@
     {
      "ad": "Etek_0_1",
      "bas": [
-      0.2396,
+      0.2397,
       0.0,
       0.6203
      ],
@@ -3354,7 +2773,7 @@
      "ad": "Etek_1_0",
      "bas": [
       0.0,
-      0.2396,
+      0.2397,
       0.726
      ],
      "uzunluk": 0.1057,
@@ -3364,7 +2783,7 @@
      "ad": "Etek_1_1",
      "bas": [
       0.0,
-      0.2396,
+      0.2397,
       0.6203
      ],
      "uzunluk": 0.1057,
@@ -3373,7 +2792,7 @@
     {
      "ad": "Etek_2_0",
      "bas": [
-      -0.2396,
+      -0.2397,
       0.0,
       0.726
      ],
@@ -3383,7 +2802,7 @@
     {
      "ad": "Etek_2_1",
      "bas": [
-      -0.2396,
+      -0.2397,
       0.0,
       0.6203
      ],
@@ -3394,7 +2813,7 @@
      "ad": "Etek_3_0",
      "bas": [
       -0.0,
-      -0.2396,
+      -0.2397,
       0.726
      ],
      "uzunluk": 0.1057,
@@ -3402,86 +2821,6 @@
     },
     {
      "ad": "Etek_3_1",
-     "bas": [
-      -0.0,
-      -0.2396,
-      0.6203
-     ],
-     "uzunluk": 0.1057,
-     "kot_orani": 0.3649
-    },
-    {
-     "ad": "Etek_0_0.001",
-     "bas": [
-      0.2397,
-      0.0,
-      0.726
-     ],
-     "uzunluk": 0.1057,
-     "kot_orani": 0.4271
-    },
-    {
-     "ad": "Etek_0_1.001",
-     "bas": [
-      0.2397,
-      0.0,
-      0.6203
-     ],
-     "uzunluk": 0.1057,
-     "kot_orani": 0.3649
-    },
-    {
-     "ad": "Etek_1_0.001",
-     "bas": [
-      0.0,
-      0.2397,
-      0.726
-     ],
-     "uzunluk": 0.1057,
-     "kot_orani": 0.4271
-    },
-    {
-     "ad": "Etek_1_1.001",
-     "bas": [
-      0.0,
-      0.2397,
-      0.6203
-     ],
-     "uzunluk": 0.1057,
-     "kot_orani": 0.3649
-    },
-    {
-     "ad": "Etek_2_0.001",
-     "bas": [
-      -0.2397,
-      0.0,
-      0.726
-     ],
-     "uzunluk": 0.1057,
-     "kot_orani": 0.4271
-    },
-    {
-     "ad": "Etek_2_1.001",
-     "bas": [
-      -0.2397,
-      0.0,
-      0.6203
-     ],
-     "uzunluk": 0.1057,
-     "kot_orani": 0.3649
-    },
-    {
-     "ad": "Etek_3_0.001",
-     "bas": [
-      -0.0,
-      -0.2397,
-      0.726
-     ],
-     "uzunluk": 0.1057,
-     "kot_orani": 0.4271
-    },
-    {
-     "ad": "Etek_3_1.001",
      "bas": [
       -0.0,
       -0.2397,
@@ -3513,7 +2852,7 @@
    "cinsiyet": "erkek",
    "yas_bandi": "cocuk",
    "dizlik": false,
-   "giysi_parca": 16,
+   "giysi_parca": 11,
    "giysi_adlari": [
     "Entari_Etek",
     "Entari_Kol_Sag",
@@ -3523,20 +2862,19 @@
     "Kusak",
     "Mest_-1",
     "Mest_1",
-    "Sac_-1_0",
-    "Sac_-1_1",
-    "Sac_-1_2",
-    "Sac_1_0",
-    "Sac_1_1",
-    "Sac_1_2",
+    "Sac",
     "Salvar",
     "Takke"
    ],
-   "tris_lod0": 50684,
-   "tris_lod1": 15204,
+   "tris_lod0": 53000,
+   "tris_lod1": 15900,
+   "tris_lod2": 4240,
    "agirliksiz_kose": 0,
-   "kose_lod0": 25374,
-   "kemik": 38,
+   "kose_lod0": 26566,
+   "kol_donusu": 30.1,
+   "agirlik_farki_once": 1.4412,
+   "agirlik_farki": 0.0177,
+   "kemik": 30,
    "kemikler": [
     {
      "ad": "Hips",
@@ -3761,7 +3099,7 @@
     {
      "ad": "Etek_0_0",
      "bas": [
-      0.2482,
+      0.2485,
       0.0,
       0.744
      ],
@@ -3771,7 +3109,7 @@
     {
      "ad": "Etek_0_1",
      "bas": [
-      0.2482,
+      0.2485,
       0.0,
       0.5673
      ],
@@ -3782,7 +3120,7 @@
      "ad": "Etek_1_0",
      "bas": [
       0.0,
-      0.2482,
+      0.2485,
       0.744
      ],
      "uzunluk": 0.1767,
@@ -3792,7 +3130,7 @@
      "ad": "Etek_1_1",
      "bas": [
       0.0,
-      0.2482,
+      0.2485,
       0.5673
      ],
      "uzunluk": 0.1767,
@@ -3801,7 +3139,7 @@
     {
      "ad": "Etek_2_0",
      "bas": [
-      -0.2482,
+      -0.2485,
       0.0,
       0.744
      ],
@@ -3811,7 +3149,7 @@
     {
      "ad": "Etek_2_1",
      "bas": [
-      -0.2482,
+      -0.2485,
       0.0,
       0.5673
      ],
@@ -3822,7 +3160,7 @@
      "ad": "Etek_3_0",
      "bas": [
       -0.0,
-      -0.2482,
+      -0.2485,
       0.744
      ],
      "uzunluk": 0.1767,
@@ -3832,87 +3170,7 @@
      "ad": "Etek_3_1",
      "bas": [
       -0.0,
-      -0.2482,
-      0.5673
-     ],
-     "uzunluk": 0.1767,
-     "kot_orani": 0.3337
-    },
-    {
-     "ad": "Etek_0_0.001",
-     "bas": [
-      0.2482,
-      0.0,
-      0.744
-     ],
-     "uzunluk": 0.1767,
-     "kot_orani": 0.4376
-    },
-    {
-     "ad": "Etek_0_1.001",
-     "bas": [
-      0.2482,
-      0.0,
-      0.5673
-     ],
-     "uzunluk": 0.1767,
-     "kot_orani": 0.3337
-    },
-    {
-     "ad": "Etek_1_0.001",
-     "bas": [
-      0.0,
-      0.2482,
-      0.744
-     ],
-     "uzunluk": 0.1767,
-     "kot_orani": 0.4376
-    },
-    {
-     "ad": "Etek_1_1.001",
-     "bas": [
-      0.0,
-      0.2482,
-      0.5673
-     ],
-     "uzunluk": 0.1767,
-     "kot_orani": 0.3337
-    },
-    {
-     "ad": "Etek_2_0.001",
-     "bas": [
-      -0.2482,
-      0.0,
-      0.744
-     ],
-     "uzunluk": 0.1767,
-     "kot_orani": 0.4376
-    },
-    {
-     "ad": "Etek_2_1.001",
-     "bas": [
-      -0.2482,
-      0.0,
-      0.5673
-     ],
-     "uzunluk": 0.1767,
-     "kot_orani": 0.3337
-    },
-    {
-     "ad": "Etek_3_0.001",
-     "bas": [
-      -0.0,
-      -0.2482,
-      0.744
-     ],
-     "uzunluk": 0.1767,
-     "kot_orani": 0.4376
-    },
-    {
-     "ad": "Etek_3_1.001",
-     "bas": [
-      -0.0,
-      -0.2482,
+      -0.2485,
       0.5673
      ],
      "uzunluk": 0.1767,

@@ -240,6 +240,13 @@ namespace Hezarfen.Editor.Gis
                 Topla(SceneManager.GetSceneAt(i), "TERRAIN", graf);
             sb.AppendLine($"  arazi sahnesi: {graf.dugumler.Count - oncekiSayi} dugum");
 
+            int evUzak = EvleriBagla(graf);
+            sb.AppendLine($"  {graf.evKonumlari.Count} ev konumu, "
+                          + $"{graf.Say(SokakGrafi.Tur.Ev)} avlu kapisi"
+                          + (evUzak > 0
+                              ? $" ({evUzak} ev kapisindan 300 m'den uzak)"
+                              : ""));
+
             var (red, uzun) = Bagla(graf, terrain);
             int kayik = KayikBagla(graf);
             sb.AppendLine($"  {kayik} kayik kenari (iskeleler arasi)");
@@ -409,12 +416,32 @@ namespace Hezarfen.Editor.Gis
             return n;
         }
 
+        /// <summary>
+        /// Ev önekleri — <b>düğüm değil, konum</b> olarak toplanır.
+        ///
+        /// Ölçüldü: sahnelerde 10.900 ev var (<c>PF_House_Aile_*</c>)
+        /// ama grafta "ev" demek avlu kapısı demekti ve kapı sayısı
+        /// 142. Kapı başına 282 sakin düşüyor, hepsi tek noktada
+        /// duruyordu.
+        ///
+        /// Evleri düğüm yapmak denenmedi çünkü ölçüsü belli: kenar
+        /// kurucu iki kez O(n²) ve 1.544 → 12.400 düğüm, 2,4 milyon
+        /// çiftten 154 milyona çıkar. Ev bir <b>varış noktası</b>,
+        /// kavşak değil.
+        /// </summary>
+        private static readonly string[] EvOnekleri = { "PF_House" };
+
         private static void Topla(Scene sahne, string semt, SokakGrafi graf)
         {
             if (!sahne.IsValid() || !sahne.isLoaded) return;
             foreach (var kok in sahne.GetRootGameObjects())
                 foreach (var t in kok.GetComponentsInChildren<Transform>(true))
                 {
+                    if (EvMi(t.name))
+                    {
+                        graf.evKonumlari.Add(t.position);
+                        continue;
+                    }
                     var tur = TuruBul(t.name);
                     if (tur == SokakGrafi.Tur.Bilinmeyen) continue;
                     graf.dugumler.Add(new SokakGrafi.Dugum
@@ -424,6 +451,60 @@ namespace Hezarfen.Editor.Gis
                         semt = semt,
                     });
                 }
+        }
+
+        /// <summary>Bu ad bir ev mi (graf düğümü değil, varış noktası).</summary>
+        public static bool EvMi(string ad)
+        {
+            foreach (string onek in EvOnekleri)
+                if (ad.StartsWith(onek, System.StringComparison.Ordinal))
+                    return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Her evi <b>en yakın avlu kapısına</b> bağlar.
+        ///
+        /// Bağ üretim anında hesaplanır ve varlığa yazılır; çalışma
+        /// zamanında 40.000 sakin için arama yapılmaz. Kapı yoksa (bir
+        /// semtte hiç <c>PF_AvluKapi</c> olmayabilir) en yakın <b>her
+        /// türden</b> düğüme bağlanır — evsiz kalan bir ev, yolu olmayan
+        /// bir sakin demektir.
+        /// </summary>
+        private static int EvleriBagla(SokakGrafi graf)
+        {
+            graf.evKapisi.Clear();
+            if (graf.evKonumlari.Count == 0) return 0;
+
+            var kapilar = new List<int>();
+            for (int i = 0; i < graf.dugumler.Count; i++)
+                if (graf.dugumler[i].tur == SokakGrafi.Tur.Ev)
+                    kapilar.Add(i);
+
+            int uzakUyari = 0;
+            foreach (var ev in graf.evKonumlari)
+            {
+                int en = -1;
+                float d2 = float.MaxValue;
+                if (kapilar.Count > 0)
+                {
+                    foreach (int i in kapilar)
+                    {
+                        float d = (graf.dugumler[i].konum - ev).sqrMagnitude;
+                        if (d < d2) { d2 = d; en = i; }
+                    }
+                }
+                else
+                {
+                    en = graf.EnYakin(ev);
+                    if (en >= 0)
+                        d2 = (graf.dugumler[en].konum - ev).sqrMagnitude;
+                }
+                if (en < 0) en = 0;
+                if (d2 > 300f * 300f) uzakUyari++;
+                graf.evKapisi.Add(en);
+            }
+            return uzakUyari;
         }
 
         /// <summary>

@@ -18,6 +18,7 @@ Kullanım:
 """
 
 import argparse
+import math
 import json
 import os
 import sys
@@ -125,6 +126,12 @@ for _ad, _makro, _boy, _tip, _why in skn.ARKETIPLER:
                          tip=_tip, makro=_makro, boy=_boy, why=_why))
 
 
+#: Son olculen kol donusu — `giydir` icinden kataloga tasinir.
+#: Modul duzeyinde tek hucre: giydir bir sozluk dondurmuyor ve
+#: imzasini degistirmek bes cagiran yeri de degistirirdi.
+_KOL_DONUS = [0.0]
+
+
 def _kendi_uvsi_var(obj, esik=1e-6):
     """Parçanın UV katmanında **veri** var mı (boş katman sayılmaz)."""
     me = obj.data
@@ -187,7 +194,19 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
         govde, "Gomlek", col,
         # Belin altinda kalan gomlek eteğin ICINDE kalir; gorunmeyen
         # geometri uretmiyoruz.
-        tut=lambda c: (z_bel - boy * 0.035) <= c.z <= z_boyun and not kol(c),
+        # GOMLEGIN YAKASI ENTARININ ICINDE KALIR.
+        #
+        # Ikisi de `z_boyun`da bitiyordu ve kabuk kesimi govdenin
+        # ucgen kenarlarini izledigi icin agiz TIRTIKLI cikiyor.
+        # Oglanin yakin planinda sonucu goruldu: entarinin yakasinin
+        # icinde soluk, firfirli bir halka — gomlek yakasi degil, bir
+        # kesim izi.
+        #
+        # Pay 2 cm: entarinin agzi (ayni kotta, ama disarida ve
+        # yumusatilmis) gomlegin agzini tamamen orter. Gorunen tek
+        # kenar entarininki olur ve o zaten yaka gibi okunuyor.
+        tut=lambda c: ((z_bel - boy * 0.035) <= c.z
+                       <= z_boyun - boy * 0.020 and not kol(c)),
         sisme=0.008, kalinlik=kiy.GOMLEK_KAL)
     if gomlek:
         parts.append(hz.assign(kiy.yumusat(gomlek, 9), mats["gomlek"]))
@@ -241,9 +260,21 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
     # 1657-58). Silueti bir ofset degil bir profil; o yuzden kol artik
     # kendi cizgisi boyunca lofting ile uretiliyor ve kabuk yalniz
     # govdeyi tasiyor.
+    # KABUK KOLUN ALTINA GIRER — DIKIS ORADA GIZLENIR.
+    #
+    # Kabugun kol bolgesini disarida birakmasi, koltuk altinda ACIK BIR
+    # AGIZ birakiyor: inceleme karesinde iki omuzda da kumasin kenari
+    # gorunuyor ve arasindan tenle birlikte kabugun ICI okunuyor.
+    # Katilastirma ona kalinlik verir ama kapak koymaz; kenar kenardir.
+    #
+    # Pay 2 cm (1,78 m'de): kolun olculen yaricapinin (~4,2 cm) yarisi.
+    # Yani kabugun agzi her zaman kol tupunun ICINDE kalir ve disaridan
+    # hicbir aciden gorunmez.
+    KOL_PAYI = boy * 0.022
     entari_ust = kiy.kopya_kabuk(
         govde, "Entari_Ust", col,
-        tut=lambda c: z_ust_alt <= c.z <= z_boyun and not kol(c),
+        tut=lambda c: z_ust_alt <= c.z <= z_boyun and not (
+            abs(c.x) >= kol_esik + KOL_PAYI and c.z >= z_kol_alt),
         sisme=ENTARI_SIS, kalinlik=kiy.ENTARI_KAL)
     if entari_ust:
         parts.append(hz.assign(kiy.yumusat(entari_ust, 13), ust_mat))
@@ -251,12 +282,24 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
     # --- ENTARI KOLLARI -----------------------------------------------------
     kol_sayisi = 0
     olculen_log = "yok"
+    kol_donus = 0.0
     for isaret in (+1.0, -1.0):
         def _kol_filtre(c, s=isaret):
             return kol(c) and (c.x * s) > 0.0
 
-        cizgi = rk.uzuv_cizgisi(govde, z_boyun, z_parmak, _kol_filtre,
-                                 adim=24)
+        # KOL X EKSENINDE DILIMLENIR — GEREKCESI `uzuv_cizgisi`de.
+        #
+        # Omuzdan (kol esigi) parmak ucuna (govdenin en genis noktasi)
+        # dogru yurunur. Ucu ISARETLIDIR: sag kol +x, sol kol -x.
+        _mn, _mx = hz.bounds(govde)
+        _x_ic = kol_esik * isaret
+        _x_dis = (_mx[0] if isaret > 0 else _mn[0])
+        # TOHUM: kol OMUZDAN baslar, kalcadan degil. Govde iki
+        # bacakli oldugu icin `abs(x) >= kol_esik` sartini uyluk da
+        # gecer; capasiz bir tarayici oradan baslayabiliyor.
+        _tohum = Vector((_x_ic, 0.0, z_boyun - boy * 0.045))
+        cizgi = rk.uzuv_cizgisi(govde, _x_ic, _x_dis, _kol_filtre,
+                                adim=24, eksen=0, tohum=_tohum)
         if not cizgi or len(cizgi) < 3:
             continue
 
@@ -308,11 +351,26 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
         #
         # Istenen sey kumasi govdenin ICINE sokmak, yukari degil:
         # dikey bilesen sifirlanir.
+        # UZATMA GOVDEYE DOGRU OLDUGUNU GARANTI ETMELI.
+        #
+        # Yon olculen kol ekseninden turuyordu ve inceleme karesinde
+        # sonucu ASIMETRIK cikti: sol omuzda dikis kapandi, SAG omuzda
+        # kumasin agzi acik kaldi ve icerisi goruldu. Iki kol ayni kodla
+        # uretiliyor; farki yaratan sey olculen cizginin ilk iki
+        # noktasi — omuz ucunda birbirine cok yakin olduklarinda yon
+        # gurultuye kaliyor ve disari bakabiliyor.
+        #
+        # Govdeye dogru olmak bir tercih degil sart: yon ne olursa
+        # olsun x bileseni orta duzleme bakmali. Bakmiyorsa dogrudan
+        # orta duzleme cevrilir.
         if len(cizgi) >= 2:
             ic = (cizgi[0] - cizgi[1])
             ic.z = 0.0
-            if ic.length > 1e-6:
-                cizgi = [cizgi[0] + ic.normalized() * (boy * 0.045)] + cizgi
+            if ic.length < 1e-6 or (ic.x * isaret) >= 0.0:
+                ic = Vector((-isaret, 0.0, 0.0))
+            cizgi = [cizgi[0] + ic.normalized() * (boy * 0.045)] + cizgi
+            hz.log(f"kol uzatmasi {'sag' if isaret > 0 else 'sol'}: "
+                   f"yon ({ic.x:+.3f}, {ic.y:+.3f})")
 
         # Profil BOY'a gore: omuzda kolu sarar, bilekte iki katina cikar.
         # YARICAP = OLCULEN KOL + KUMAS PAYI.
@@ -335,9 +393,33 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
         # ikisinde de omuzda bir TOP olustu — kabuk ile kolun ust uste
         # bindigi yerde iki kat kumas. 1,0 cm ile kol kabugun hemen
         # ustune oturuyor.
-        r_om = (olculen[0] or boy * 0.032) + boy * 0.006
+        # OMUZDA KOL, ENTARININ KENDI PAYI KADAR GENIS OLMALI.
+        #
+        # Kusur yandan bakinca goruldu: omuzdan koltuk altina kadar
+        # uzanan bir YARIK, arasindan ten ve kabugun ici. Sebep iki
+        # sayinin birbirini bilmemesiydi — entari kabugu govdeden
+        # 3,4 cm sisiriliyor, kol tupu ise olculen kolun 0,6 cm
+        # disindan geciyordu. Dikis yerinde 2,8 cm'lik bir basamak var
+        # ve kabugun agzi acikta kaliyor.
+        #
+        # Gercek bir entaride omuz, govdenin kumasi kadar genistir ve
+        # kol dirsege dogru DARALIR. Yani omuz yaricapinin payi bir
+        # zevk sayisi degil: entarinin kendi sismesi. Ikisi ayni
+        # sayidan turdugu icin bir daha ayrisamazlar.
+        r_om = (olculen[0] or boy * 0.032) + ENTARI_SIS
         r_dir = (olculen[1] or boy * 0.026) + boy * 0.013
         r_bil = (r_bilek_olcu or boy * 0.020) + boy * 0.022
+        # Cizginin toplam donusu: ardisik uc nokta arasindaki en
+        # buyuk aci. Duz bir kolda birkac derece; katlanan bir cizgide
+        # doksani asar.
+        for _i in range(1, len(cizgi) - 1):
+            _a = (cizgi[_i] - cizgi[_i - 1])
+            _b = (cizgi[_i + 1] - cizgi[_i])
+            if _a.length < 1e-6 or _b.length < 1e-6:
+                continue
+            _ac = math.degrees(_a.normalized().angle(_b.normalized()))
+            kol_donus = max(kol_donus, _ac)
+
         kolu = kiy.giysi_kolu(
             f"Entari_Kol_{'Sag' if isaret > 0 else 'Sol'}", col, cizgi,
             r_omuz=r_om, r_dirsek=r_dir,
@@ -345,8 +427,21 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
         if kolu is not None:
             parts.append(hz.assign(kolu, ust_mat))
             kol_sayisi += 1
+    # KOL CIZGISI DUZ OLMALI — DONUS ACISI OLCULUR.
+    #
+    # Yaslinin inceleme karesinde kollar dirsekten GERIYE kirilmis
+    # duruyordu ve sayilar da bunu soyluyordu: bilek t=0,67 (yetiskinde
+    # 0,95) ve bilek yaricapi 2,3 cm (yetiskinde 4,5). Yani cizgi kolu
+    # izlemiyor, bir yerde katlaniyor.
+    #
+    # `uzuv_cizgisi` dilimleri Z ekseninde aliyor; kol yataya yakin
+    # oldugunda ayni dilim hem ust kolu hem on kolu yakalar ve merkez
+    # ikisinin ortasina, yani govdeye dogru ziplar. Bir uzvun merkez
+    # cizgisi neredeyse duzdur; donus acisi bunu SAYIYLA soyler ve
+    # katalog kaydeder.
     hz.log(f"entari kolu: {kol_sayisi} parca (lofted, kabuk degil) — "
-           f"olculen kol {olculen_log}")
+           f"olculen kol {olculen_log}, kol donusu {kol_donus:.0f} derece")
+    _KOL_DONUS[0] = kol_donus
 
     # --- ENTARI ETEGI -------------------------------------------------------
     #
@@ -411,6 +506,20 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
     # Kusak entarinin YUZEYINE oturur; disari cikmasini fici bicimi
     # (kiy.band) saglar. Once buraya 12 mm daha ekliyordum ve kusak
     # giysiden ayri, ortasi bos bir cember gibi duruyordu.
+    # PAY DEGISTIRILMEDI — VE SEBEBI OLCULDU.
+    #
+    # Inceleme karesinde kadinin belinde iki yanda koyu birer oyuk var
+    # ve bunu "bandin ic duvari goruniyor" diye tesis ettim; payi 4 mm
+    # ICERI cektim. Sonra kesitleri olctum ve hipotez coktu:
+    #
+    #   z 0,96-1,10'da  Ferace ic yaricap 0,092
+    #                   Gomlek dis yaricap 0,128-0,146
+    #
+    # Yani band zaten govde kabugunun ICINDE; gorunen sey bir yarik
+    # degil, iki kumas arasindaki dar aralikta biriken ORTAM ORTMESI.
+    # Olcum hipotezi curutunce degisiklik geri alindi: yanlis bir
+    # gerekceyle konulan dogru gorunumlu bir sayi, sonraki turda
+    # yanlis yerde aranan bir kusur olur.
     kusak_pay = ENTARI_SIS + kiy.ENTARI_KAL + 0.002
     if kusak_var:
         parts.append(hz.assign(kiy.band(
@@ -500,7 +609,22 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
     # gorunmeyecek 40 kartin bedelini odemek olurdu.
     ak = (tip == "yasli")
     sac_mat = mats["beard_ak"] if ak else sk.hair_material()
-    sakal_mat = mats["beard_ak"] if ak else sk.sakal_material()
+    # Sac KABUGU ayri bir malzeme: kart malzemesi alfa keser (biyik ve
+    # sakal ucu hala kart), kabuk ise opak olmali.
+    sac_kabuk_mat = mats["beard_ak"] if ak else mats["sac"]
+    # SAKAL MALZEMESI PALETTEN GELIR — IKINCI SAHIP KALDIRILDI.
+    #
+    # Ak sakal paletten (`beard_ak`), kestane sakal ise
+    # `sac_kit.sakal_material()`ten geliyordu. Ikisi ayni rengi ve ayni
+    # puruzlulugu yaziyordu, yani bir sayinin iki sahibi vardi — ve
+    # olculunce ayrildiklari yer bulundu: palete sakal DOKUSU eklendi,
+    # `sakal_material` dokusuz kaldi. Sonuc yakin plan karesinde
+    # goruldu: yaslinin sakali dokulu, yetiskininki hala ceneye
+    # gecirilmis duz bir maske.
+    #
+    # Tek sahip: palet. `beard` ve `beard_ak` ayni dokuyu, farkli rengi
+    # tasiyor.
+    sakal_mat = mats["beard_ak"] if ak else mats["beard"]
     # Sakalsizda cene hatti bos donerse hem kabuk hem tutam dongusu
     # kendiliginden bosa doner — ayri bir bayrak tutmaya gerek yok.
     hat = sk.cene_hatti(govde, boy) if skn.sakalli(tip) else []
@@ -557,11 +681,31 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
                 1.0, max(0.0, (z_agiz - c.z) / (z_agiz - z_dip))),
             kalinlik=0.004)
         if sakal:
-            parts.append(hz.assign(kiy.yumusat(sakal, 2), sakal_mat))
+            # SAKALIN UV'SI GOVDEDEN GELIR VE ONA GORE YANLIS.
+            #
+            # Kabuk govdeden kopyalandigi icin MakeHuman'in BUTUN VUCUT
+            # yerlesimini de kopyaliyor. O yerlesim ten dokusu icindir
+            # ve 1:1 acilmistir; ustune 6 cm'lik dosenebilir bir sakal
+            # dokusu koyunca doku yuze YAYILIYOR — renderda teller
+            # birkac santimlik siyah yarik oldu.
+            #
+            # Sakal kendi dokusunu istiyorsa kendi yansitmasini da
+            # istemeli. UV katmani silinince `_kendi_uvsi_var` False
+            # doner ve parca kumaslarla ayni dunya yansitmasindan
+            # gecer.
+            while sakal.data.uv_layers:
+                sakal.data.uv_layers.remove(sakal.data.uv_layers[0])
+            parts.append(hz.assign(kiy.yumusat(sakal, 6), sakal_mat))
 
     # Cene ucundan sarkan tutam: kabuk yuzeye oturur, sakalin UCU
     # yuzeyden ayrilir. Birkac kart bu silueti verir.
-    for i, (p, yon) in enumerate(hat[:4]):
+    # SAKAL UCU KARTLARI DA KALDIRILDI.
+    #
+    # Sakal kabuga cevrilirken bu dort kart "silueti versin" diye
+    # birakilmisti. Ayni kusuru tasiyorlar: kenardan bakildiginda
+    # cizgi, ve kabuk zaten cenenin bicimini veriyor. Bir kararin
+    # yarisini uygulamak, kusurun yarisini birakmaktir.
+    for i, (p, yon) in enumerate(()):
         for sx in (-1, 1):
             if sx > 0 and abs(p.x) < boy * 0.004:
                 continue
@@ -574,8 +718,42 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
                         serit=i % 4, egim=0.22)
             parts.append(hz.assign(k, sac_mat))
 
-    # BIYIK: ust dudak. Plaka 20 ve 35'te sakalla birlikte var.
-    for sx in ((-1, 1) if skn.sakalli(tip) else ()):
+    # --- BIYIK: KART DEGIL KABUK ----------------------------------------
+    #
+    # Biyik iki kartti ve karelerde ne oldugu goruldu: yandan bakinca
+    # yuzun ONUNDE asili duran kahverengi bir CUBUK. Bir kart kenardan
+    # bakildiginda bir cizgidir — sakalda ve sacta ayni sebeple kabuga
+    # gecildi; bu ucuncusu ve ayni kusurun ALTINCI ornegi.
+    if skn.sakalli(tip):
+        _mk = kiy.kesit_merkezli(govde, boy * 0.905)
+        _mrx, _mry, _mcy = _mk if _mk else (boy * 0.05, boy * 0.06, 0.0)
+
+        def _biyik_bolge(c):
+            # Ust dudak seridi: agzin hemen ustu, yalniz yuzun ONU.
+            # DAR VE KISA: biyik dudagi orter, burnu degil. Ilk
+            # denemede 0,897-0,921 ve %62 genislikti; renderda sakalla
+            # birlesip agzi tamamen kapatan koyu bir DIKDORTGEN oldu.
+            if not (boy * 0.899 <= c.z <= boy * 0.915):
+                return False
+            if abs(c.x) > _mrx * 0.50:
+                return False
+            return c.y < _mcy - _mry * 0.45
+
+        _biyik = kiy.kopya_kabuk(
+            govde, "Biyik", col, tut=_biyik_bolge,
+            sisme=lambda c: 0.004 + 0.008 * min(
+                1.0, max(0.0, (c.z - boy * 0.897) / (boy * 0.024))),
+            kalinlik=0.003)
+        if _biyik:
+            while _biyik.data.uv_layers:
+                _biyik.data.uv_layers.remove(_biyik.data.uv_layers[0])
+            # Yumusatma 2 -> 6: kabuk govdenin ucgenlerini birebir
+            # kopyaladigi icin kenarlari basamakli cikiyor ve karede
+            # "blok" okunuyordu. Sakalda da ayni sayi kullanildi.
+            parts.append(hz.assign(kiy.yumusat(_biyik, 6), sakal_mat))
+
+    # Eski biyik kartlari KALDIRILDI; gerekcesi yukarida.
+    for sx in ():
         # BIYIK DUDAGIN ONUNE KONUR, MUTLAK BIR Y'YE DEGIL.
         #
         # Once `-boy * 0,052` yaziliyordu, yani y = -8,8 cm. Olculdu:
@@ -594,9 +772,63 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
                     boy * 0.026, boy * 0.020, col, serit=2, egim=0.10)
         parts.append(hz.assign(b, sac_mat))
 
-    # Sakak ve ense: sarigin altindan cikan tutamlar. Yasmagin altinda
-    # gorunmezler ve ortunun icinden batarlar — orada hic uretilmezler.
-    for sx in ((-1, 1) if tip not in ("kadin", "kiz") else ()):
+    # --- SAC: KART DEGIL KABUK ------------------------------------------
+    #
+    # Sarigin/takkenin altindan cikan sac uc karta diziliyordu. Oglanin
+    # yakin plani ne oldugunu gosterdi: kulaklarin iki yaninda ince
+    # TELLER, boynun cevresinde bir FIRFIR. Bir kart kenardan
+    # bakildiginda bir cizgidir ve kafanin bicimini izlemez.
+    #
+    # Ayni kusur bu depoda BESINCI kez ve cozumu sakalda zaten
+    # bulunmustu ("SAKAL: KART DEGIL KABUK"): kafanin kendi yuzleri
+    # kopyalanip disari itilince sac kafanin bicimini kendiliginden
+    # alir. Kart dizmek gerekmez; kafa degisirse sac da degisir.
+    #
+    # Yasmagin/ferace ortusunun altinda gorunmez, orada hic uretilmez.
+    if tip not in ("kadin", "kiz"):
+        _bk = kiy.kesit_merkezli(govde, boy * 0.900)
+        _bas_rx, _bas_ry, _bas_cy = _bk if _bk else (boy * 0.05,
+                                                     boy * 0.06, 0.0)
+        # Baslik tabani: sarik boy*0,946'dan, takke daha asagidan
+        # baslar. Sacin ustu bunun ALTINDA kalir; ustu zaten ortulu.
+        # Baslik tabani turden turer: sarik boy*0,946'dan, takke
+        # boy*0,965'ten baslar ama kenari daha yukari oturur. Sacin
+        # ustu her ikisinin de ALTINDA kalir — orasi zaten ortulu.
+        _sac_ust = boy * (0.912 if tip in ("cocuk", "genc") else 0.925)
+        # SAKALSIZDA SAC KULAKTAN ASAGI INMEZ.
+        #
+        # Sinir 0,858 sakalliya gore secilmisti: orada sacin alt ucu
+        # zaten sakala karisiyor. Sakalsiz gencte ayni sinir, yuzun iki
+        # yanindan ceneye inen uzun ZULUFLER birakti — karede ince,
+        # koyu iki serit olarak okundu. Sakalsizda sac kulak hizasinda
+        # biter.
+        _sac_alt = boy * (0.858 if skn.sakalli(tip) else 0.878)
+
+        def _sac_bolge(c):
+            if not (_sac_alt <= c.z <= _sac_ust):
+                return False
+            # SAC YUZE INMEZ. Yuz -y'de (kafanin on yuzu olculdu);
+            # sac kafanin arka ve yan yuzudur. Sinir kafanin KENDI
+            # merkezinden turer, sabit bir sayidan degil.
+            # Sakalsizda sac yanaga da inmez: on sinir geri cekilir.
+            return c.y > _bas_cy - _bas_ry * (
+                0.30 if skn.sakalli(tip) else 0.02)
+
+        _sac = kiy.kopya_kabuk(
+            govde, "Sac", col, tut=_sac_bolge,
+            # Kokte ince, ensede kalin: sac asagi dogru toplanir.
+            sisme=lambda c: 0.004 + 0.010 * min(
+                1.0, max(0.0, (_sac_ust - c.z) / (_sac_ust - _sac_alt))),
+            kalinlik=0.004)
+        if _sac:
+            # UV govdeden gelir ve dosenebilir dokuya gore yanlistir —
+            # sakaldaki ayni gerekce.
+            while _sac.data.uv_layers:
+                _sac.data.uv_layers.remove(_sac.data.uv_layers[0])
+            parts.append(hz.assign(kiy.yumusat(_sac, 6), sac_kabuk_mat))
+
+    # Eski kart dongusu KALDIRILDI; gerekcesi yukarida.
+    for sx in ():
         for i, (dy, dz, ser) in enumerate((
                 (0.30, 0.905, 0), (0.10, 0.895, 3), (-0.34, 0.900, 1))):
             # KESIT DEGIL KESIT_MERKEZLI.
@@ -914,6 +1146,21 @@ def main():
         # kafa donerken yerinde kalirdi.
         _parcalar = [govde] + giysi + ([goz] if goz is not None else [])
         lod0 = kit.join_parts(_parcalar, f"{asset}_LOD0", col)
+        # UCUNCU KADEME — MERDIVEN ZATEN VARDI, BASAMAK YOKTU.
+        #
+        # `ImportLanding.KarakterUc` uc kademelik bir esik merdiveni
+        # tasiyor (0,22 / 0,04 / 0,010) ama karakterler iki kademeyle
+        # geliyordu, yani ucuncu basamak olu koddu — bu depoda tekrar
+        # eden "yazildi, baglanmadi" kusurunun bir baskasi.
+        #
+        # Bedeli olculebilir: kalabalikta ayni anda 60 govde ciziliyor
+        # ve her biri LOD1'de ~17.500 ucgen — yalniz insanlar icin
+        # 1,05 milyon ucgen.
+        #
+        # Oran 0,08 comert, agresif degil: LOD2 esigi 0,04 ekran
+        # yuksekligi, yani 1080p'de ~43 piksellik bir insan. 4.700
+        # ucgen o boyda hala piksel basina birden fazla ucgen demek.
+        lod2 = kar.desimasyon(lod0, 0.08, f"{asset}_LOD2")
         lod1 = kar.desimasyon(lod0, 0.30, f"{asset}_LOD1")
         # BIRLESMIS AGDA DA TEK KATMAN.
         #
@@ -923,12 +1170,37 @@ def main():
         # ikinci katman FBX'e de gider ve Unity'de hangisinin
         # kullanildigi ice aktarma ayarina kalir — yani kusur geri
         # gelebilecegi bir kapi acik kalir.
-        for _m in (lod0, lod1):
+        for _m in (lod0, lod1, lod2):
             kit.uv_adini_duzelt(_m)
         hz.link(lod1, col)
-        for m in (lod0, lod1):
+        hz.link(lod2, col)
+        for m in (lod0, lod1, lod2):
             rk.deri_bagla(m, arm)
             rk.agirliklari_tamamla(m, arm)
+
+        # GIYSI, ALTINDAKI TENIN KEMIGINI TAKIP ETSIN.
+        #
+        # Oyun karesinde Hezarfen'in SIRTI CIPLAK cikiyordu: kollar
+        # giyinik, kusak yerinde, ama omuzlarla kusak arasinda ten
+        # goruluyor — omuz kemigi ve omurga cizgisiyle. Blender'in
+        # bind-poz karesi tertemiz giyinik; aradaki tek fark HAREKET.
+        #
+        # Olculdu: birlesik agda giysi koselerinin %67'si, hemen
+        # altindaki ten kosesinden 0,30'dan fazla farkli agirlik
+        # tasiyor (ortalama fark 1,20, en buyugu 2,20 — tamamen baska
+        # kemikler). Iki kabuk ayri hareket edince gomlegin 8 mm'lik
+        # payi govdeyi iceride tutmuyor.
+        #
+        # `agirliklari_tamamla`nin kendi aciklamasi bu cozumu adiyla
+        # aniyordu: "daha zarif bir cozum ... olurdu ama olculebilir
+        # farki belirsiz". Belirsizligi olcum kapatti.
+        agirlik_once = 0.0
+        for m in (lod0, lod1, lod2):
+            _degisen, _once = rk.agirliklari_govdeden_al(m)
+            if m is lod0:
+                agirlik_once = _once
+                hz.log(f"giysi agirligi tenden alindi: {_degisen} kose "
+                       f"(onceki ortalama fark {_once:.2f})")
 
         # ETEK SALINIM KEMIKLERI.
         #
@@ -938,7 +1210,7 @@ def main():
         # en yakin kemige tam agirlikla baglar ve once kosarsa etek
         # kemikleri hicbir sey almaz.
         salinim = 0
-        for m in (lod0, lod1):
+        for m in (lod0, lod1, lod2):
             salinim += rk.etek_kemikleri(arm, m, z_bel_k, z_etek_k)
         hz.log(f"etek salinimi: {salinim} kose 4 zincire baglandi")
 
@@ -988,6 +1260,7 @@ def main():
             dizlik=dizlik_var, giysi_parca=giysi_sayisi,
             giysi_adlari=giysi_adlari,
             tris_lod0=kar.hz_tri(lod0), tris_lod1=kar.hz_tri(lod1),
+            tris_lod2=kar.hz_tri(lod2),
             # AGIRLIK KAYDA GIRER — CUNKU KATALOG GORMEDIGINI KORUYAMAZ.
             #
             # CLAUDE.md: "git status ikili bir dosyayi degismis
@@ -1004,6 +1277,20 @@ def main():
             # onemli olan her seyi gorunur kilmaktir.
             agirliksiz_kose=agirliksiz,
             kose_lod0=toplam,
+            # GIYSI-TEN AGIRLIK FARKI: kusurun sayisi.
+            #
+            # 0 = giysi altindaki tenle birebir ayni kemigi takip
+            # eder. Buyudukce iki kabuk hareket ederken ayrisir ve
+            # govde giysinin icinden cikar.
+            # KOL CIZGISININ EN BUYUK DONUSU (derece).
+            #
+            # Bir uzvun merkez cizgisi neredeyse duzdur. Yaslinin
+            # cizgisi 171 derece donuyordu — cunku BACAKLA basliyor,
+            # sonra omza atliyordu. Karede kollar dirsekten geriye
+            # kirilmis duruyordu ve hicbir sayi bunu soylemiyordu.
+            kol_donusu=round(_KOL_DONUS[0], 1),
+            agirlik_farki_once=round(agirlik_once, 4),
+            agirlik_farki=round(rk.agirlik_farki(lod0)[1], 4),
             kemik=len(arm.data.bones),
             kemikler=rk.kemik_raporu(arm, kar.HEDEF_BOY))
 
@@ -1067,7 +1354,8 @@ def main():
         catalog.append(bilgi)
         hz.log(f"{ad:16s} boy {bilgi['boy']:.3f} m, etek {bilgi['etek_kotu']:.2f} m, "
                f"{bilgi['giysi_parca']} parca, {bilgi['kemik']} kemik, "
-               f"{bilgi['tris_lod0']:6d} / {bilgi['tris_lod1']:5d} ucgen")
+               f"{bilgi['tris_lod0']:6d} / {bilgi['tris_lod1']:5d} / "
+               f"{bilgi.get('tris_lod2', 0):5d} ucgen")
 
         hz.save_blend(os.path.join(args.blend_dir, f"{asset}.blend"))
         if args.export:

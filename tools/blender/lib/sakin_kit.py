@@ -118,11 +118,36 @@ def yasmak(ad, col, bas_r, kotlar, cy=0.0, yuz_acik=False,
     `kotlar`: `(z_omuz, z_cene, z_goz, z_alin, z_tepe)` — hepsi mutlak.
     """
     z_omuz, z_cene, z_goz, z_alin, z_tepe = kotlar
+    # TEPE ILE ALIN ARASINA BIR NOKTA: KAFA DOMEDIR, KONI DEGIL.
+    #
+    # Iki denetim noktasi arasi DOGRUSAL orneklenir; tepede 0,34,
+    # alinda 1,06 olunca aradaki yuzey duz bir KONI oluyor. Kizin
+    # yakin planinda sonucu goruldu — bir cadi sapkasi, ve tepe on
+    # tarafta kafanin derisinin icinden geciyordu.
+    #
+    # Ara nokta yuksekligin %45'inde ve 0,88 carpanda: kafanin kendi
+    # kubbesi. Sayi kafa yaricapina goredir, boya gore degil.
+    _kubbe = z_alin + (z_tepe - z_alin) * 0.45
     # (kot, bas_r carpani) — tepeden omuza. Carpanlar basin kendi
     # yaricapina goredir, boya gore degil: cocukta da yetiskinde de
     # ortu basa AYNI sikilikta oturur.
-    profil = [(z_tepe, 0.34), (z_alin, 1.06), (z_goz, 1.09),
-              (z_cene, 1.16), (z_omuz, 1.52)]
+    if yuz_acik:
+        # ÇOCUĞUN ÖRTÜSÜ OMZA AÇILMAZ.
+        #
+        # Yetişkin profili omuzda 1,52 katına açılıyor ve bu, **ön
+        # kapalıyken** doğru: örtü yüzün önünde birleşir, iki yan
+        # birbirini taşır. Yüz açılınca o taşıma kalkıyor ve geriye
+        # iki serbest panel kalıyor — inceleme karesinde kızın
+        # yüzünün iki yanında aşağı sarkan beyaz **kulaklar** olarak
+        # okundu.
+        #
+        # Çocuğun başındaki şey bir başörtüsüdür: saçı ve kulağı
+        # örter, çenede biter, omza yayılmaz. Profil de onu söyler.
+        profil = [(z_tepe, 0.56), (_kubbe, 0.90), (z_alin, 1.06),
+                  (z_goz, 1.10), (z_cene, 1.12)]
+    else:
+        profil = [(z_tepe, 0.56), (_kubbe, 0.90), (z_alin, 1.06),
+                  (z_goz, 1.09), (z_cene, 1.16), (z_omuz, 1.52)]
 
     bm = bmesh.new()
     halkalar = []
@@ -139,9 +164,19 @@ def yasmak(ad, col, bas_r, kotlar, cy=0.0, yuz_acik=False,
             halka = []
             for m in range(segment):
                 a = math.tau * m / segment
+                # ORTU KAFADAN SIG OLAMAZ.
+                #
+                # y yari-ekseni `r * 0,90` yaziliydi, yani ortu onden
+                # arkaya kafadan DAR. Insan kafasi ise onden arkaya
+                # yanlardan UZUNDUR ve burun onde daha da cikar.
+                # Sonuc yakin planda goruldu: kadinin BURNU ve
+                # dudaklari ortunun icinden disari cikiyor.
+                #
+                # 1,06: kafanin kendi on-arka oranindan biraz genis —
+                # bez yuze yapismaz, uzerinden gecer.
                 halka.append(bm.verts.new(
                     Vector((math.cos(a) * r,
-                            cy + math.sin(a) * r * 0.90, z))))
+                            cy + math.sin(a) * r * 1.06, z))))
             halkalar.append(halka)
             kotlar_z.append(z)
 
@@ -173,7 +208,12 @@ def yasmak(ad, col, bas_r, kotlar, cy=0.0, yuz_acik=False,
 
     # TEPE KAPAGI — acik kalirsa ortunun ici tepeden gorunur (ilk
     # yazimda gorunuyordu).
-    tepe = bm.verts.new(Vector((0.0, cy, z_tepe + bas_r * 0.06)))
+    # TEPE KAFANIN USTUNDE OLMALI.
+    #
+    # 0,06 idi ve kizda da kadinda da tepede pembe bir leke goruldu:
+    # kafanin derisi ortunun ustunden cikiyor. Kapak bir suslemedir,
+    # ama once bir KAPAK olmali.
+    tepe = bm.verts.new(Vector((0.0, cy, z_tepe + bas_r * 0.07)))
     ust = halkalar[0]
     for m in range(segment):
         bm.faces.new((ust[m], ust[(m + 1) % segment], tepe))

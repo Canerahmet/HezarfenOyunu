@@ -58,6 +58,9 @@ namespace Hezarfen.Tests
             public int tris_lod0;
             public int tris_lod1;
             public int kemik;
+            public float kol_donusu;
+            public float agirlik_farki;
+            public float agirlik_farki_once;
             public List<Kemik_> kemikler;
         }
 
@@ -68,6 +71,80 @@ namespace Hezarfen.Tests
             public List<float> bas;
             public float uzunluk;
             public float kot_orani;
+        }
+
+        /// <summary>
+        /// <b>Giysi, altındaki tenin kemiğini takip etsin.</b>
+        ///
+        /// Oyun karesinde Hezarfen'in <b>sırtı çıplaktı</b>: kollar
+        /// giyinik, kuşak yerinde, ama omuzlarla kuşak arasında ten
+        /// görünüyordu — omuz kemiği ve omurga çizgisiyle birlikte.
+        /// Blender'ın bind-poz karesi ise tertemiz giyinik. Aradaki tek
+        /// fark <b>hareket</b>tir; kusur modelde değil deformasyonda.
+        ///
+        /// Ölçüldü: birleşik ağda giysi köşelerinin <b>%67'si</b>, hemen
+        /// altındaki ten köşesinden 0,30'dan fazla farklı ağırlık
+        /// taşıyordu (ortalama fark <b>1,20</b>, en büyüğü 2,20 — yani
+        /// tamamen başka kemikler). <c>ARMATURE_AUTO</c> ısı yayılımını
+        /// her köşe için ayrı çözüyor ve iç içe iki kabukta komşu iki
+        /// nokta farklı sonuç alabiliyor. İki kabuk ayrı hareket edince
+        /// gömleğin <b>8 mm</b>'lik payı gövdeyi içeride tutmuyor.
+        ///
+        /// Onarımdan sonra ortalama fark <b>0,0055</b>; sapan köşe
+        /// 10.181'den 56'ya indi ve o 56 eteğin salınım kemikleridir —
+        /// kasıtlı.
+        ///
+        /// Eşik 0,05: onarılmış hâlin on katı, kusurlu hâlin yirmide
+        /// biri. Bir ayar değeri değil, iki dünya arasındaki boşluk.
+        /// </summary>
+        [Test]
+        public void ClothFollowsTheSameBonesAsTheSkinUnderIt()
+        {
+            foreach (var v in Katalog())
+            {
+                if (v.kemik <= 0) continue;   // rig'siz ara urun
+                Assert.LessOrEqual(v.agirlik_farki, 0.05f,
+                    $"{v.name}: giysi ile ten arasindaki agirlik farki "
+                    + $"{v.agirlik_farki:0.000} (onarim oncesi "
+                    + $"{v.agirlik_farki_once:0.000}). Bu kadar farkla "
+                    + "iki kabuk ayri hareket eder ve govde giysinin "
+                    + "icinden cikar — oyunda CIPLAK SIRT olarak "
+                    + "gorunur. Uret: gen_hezarfen.py --export.");
+            }
+        }
+
+        /// <summary>
+        /// <b>Kolun merkez çizgisi katlanmasın.</b>
+        ///
+        /// İnceleme paketinde yaşlı sakinin kolları <b>dirsekten
+        /// geriye kırılmış</b> duruyordu — eller kalçada, kumaş kendi
+        /// üstüne katlanmış. Hiçbir sayı bunu söylemiyordu ve kusur
+        /// üç sürüm boyunca kimsenin bakmadığı bir karede durdu.
+        ///
+        /// Ölçüldüğünde sebep tek satırda çıktı: uzuv tarayıcısı
+        /// dilimleri <b>kot</b> ekseninde alıyor ve gövde iki
+        /// bacaklı olduğu için <c>abs(x) ≥ kol_eşiği</c> şartını
+        /// <b>uyluk da geçiyor</b>. Yaşlının kol çizgisi bacakla
+        /// başlıyor (ilk beş nokta z 0,75 → 0,40), bacak bitince
+        /// omza atlıyordu.
+        ///
+        /// Bir uzvun merkez çizgisi neredeyse düzdür. Ölçülen en
+        /// büyük dönüş: sağlıklı arketiplerde 25–52°, kusurlu
+        /// yaşlıda <b>171°</b>. Eşik 70: sağlığın biraz üstü,
+        /// kusurun üçte biri.
+        /// </summary>
+        [Test]
+        public void TheArmCentrelineDoesNotFoldBackOnItself()
+        {
+            foreach (var v in Katalog())
+            {
+                if (v.kemik <= 0 || v.kol_donusu <= 0f) continue;
+                Assert.LessOrEqual(v.kol_donusu, 70f,
+                    $"{v.name}: kol cizgisinin en buyuk donusu "
+                    + $"{v.kol_donusu:0}°. Bu kadar donen bir cizgi kolu "
+                    + "izlemiyor, katlaniyor — giysi kolu dirsekten "
+                    + "geriye kirilir. Uret: gen_hezarfen.py --export.");
+            }
         }
 
         /// <summary>Unity Humanoid'in zorunlu saydığı kemikler.</summary>

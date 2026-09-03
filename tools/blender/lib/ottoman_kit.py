@@ -135,6 +135,93 @@ FEATHER = (0.238, 0.183, 0.128)
 #   0,50   -> R/G 1,81  doygunluk 0,66  parlaklik 92,4   ✓
 ROOF_CLAY = (0.305, 0.084, 0.026)
 
+#: <b>Karakter rolleri her iki cemaat icin AYNI.</b>
+#:
+#: Once yalnizca `default` paletinde yaziliydi ve `selftest.py` bunu
+#: yakaladi: `M_Skin` iki farkli tanim gosteriyor — `default.skin`
+#: dokulu, `nonmuslim.skin` dokusuz. Ayni malzeme adinin iki tanimi
+#: olmasi Blender tarafinda sessizce `.001` uretir; hata ancak Unity
+#: malzemesi yazilirken cikar.
+#:
+#: Kural zaten dogruydu: bir Rum'un sakali da sakaldir, teni de
+#: tendir. Cemaate gore degisen sey EVDIR — badana, ahsap boyasi,
+#: kiremit.
+KARAKTER_ROLLERI = {
+    # --- TEN ---------------------------------------------------------
+    #
+    # `M_Skin` de dokusuzdu ve dokusuz ten HDRP'de MUM gibi okur.
+    # Doku MPFB2'nin kendi bolge maskelerinden bestelendi
+    # (`gen_deri_texture.py`): dudak, goz kapagi, kulak ve gozenek.
+    # `tinted` burada iki kat onemli — ten rengi kisiden kisiye
+    # degismek ZORUNDA, yoksa sehirdeki herkes ayni tende olur.
+    #
+    # UV: govde MakeHuman taban mesh'inden geliyor ve onun kendi
+    # yerlesimini tasiyor; bu yuzden `apply_uvs` govdeye UYGULANMAZ
+    # (dunya yansitmasi bu yerlesimi ezer ve dudak alna duserdi).
+    "skin":   dict(asset="deri_insan", tinted=True,
+                   root=os.path.join("art", "textures", "generated")),
+
+    "gomlek": dict(asset="kumas_keten", tinted=True,
+                   root=os.path.join("art", "textures", "generated")),
+    "sarik":  dict(asset="kumas_keten", tinted=True,
+                   root=os.path.join("art", "textures", "generated")),
+    "yasmak": dict(asset="kumas_keten", tinted=True,
+                   root=os.path.join("art", "textures", "generated")),
+    "entari": dict(asset="kumas_cuha", tinted=True,
+                   root=os.path.join("art", "textures", "generated")),
+    "ferace": dict(asset="kumas_cuha", tinted=True,
+                   root=os.path.join("art", "textures", "generated")),
+    "salvar": dict(asset="kumas_cuha", tinted=True,
+                   root=os.path.join("art", "textures", "generated")),
+    "kusak":  dict(asset="kumas_ipek", tinted=True,
+                   root=os.path.join("art", "textures", "generated")),
+    "kavuk":  dict(asset="kumas_kece", tinted=True,
+                   root=os.path.join("art", "textures", "generated")),
+    "takke":  dict(asset="kumas_kece", tinted=True,
+                   root=os.path.join("art", "textures", "generated")),
+
+    # SAKAL: DOKUSUZ ALBEDO PLASTIK OKUR — KUMASTA OGRENILDI.
+    #
+    # `M_Beard`in taban rengi haritasi YOKTU (`_BaseColorMap`
+    # fileID 0) ve yakin plan karesinde sakal ceneye gecirilmis
+    # kahverengi bir MASKE gibi duruyordu: tek parca, tek renk,
+    # hic kirilma yok. Kart atlasi (`gen_hair_texture.py`) bu isi
+    # goremez — o bir ALFA atlasi ve dosenmez; sakal ise kart
+    # degil KABUK (bkz. gen_hezarfen.py "SAKAL: KART DEGIL
+    # KABUK") ve kabuk dosenebilir bir YUZEY ister.
+    #
+    # `tinted`: renk paletten gelir. Ayni doku hem kestane sakali
+    # (beard) hem ak sakali (beard_ak) tasiyor; albedo notr
+    # oldugu icin ayni yuzey iki yasi da anlatabiliyor.
+    "beard":    dict(asset="sakal", tinted=True,
+                     root=os.path.join("art", "textures", "generated")),
+    "beard_ak": dict(asset="sakal", tinted=True,
+                     root=os.path.join("art", "textures", "generated")),
+    "sac":      dict(asset="sac_yuzey", tinted=True,
+                     root=os.path.join("art", "textures", "generated")),
+
+    # MEST: HER SAKININ AYAGINDA VE DOKUSUZDU.
+    #
+    # `M_Leather_Mest`in taban rengi haritasi yoktu. Sari mest
+    # sehirde en cok tekrar eden kucuk yuzeylerden biri — altmis
+    # govdede yuz yirmi tane — ve dokusuz oldugu icin plastik
+    # okuyordu. Kosele ile ayni doku, farkli renk.
+    "mest":     dict(asset="kosele", tinted=True,
+                     root=os.path.join("art", "textures", "generated")),
+
+    # KILIM: IC MEKANIN DOSEMESI VE SON DOKUSUZ KUMAS.
+    #
+    # Doku ATKI YUZLU duz dokuma — kilimi kilim yapan yuzey budur:
+    # dugum yok, atki cozguyu tamamen orter, yuzey enine kaburgali
+    # okunur. MOTIF YOK ve bu bilincli: bir kilimin motifi kaynak
+    # ister; uydurmak, kilimi kilim yapan seyi uydurmak olurdu
+    # (CLAUDE.md: kaynak niteliksel oldugunda metrik geometri
+    # uydurma). Motif belgeyle birlikte gelir.
+    "cloth":    dict(asset="kumas_kilim", tinted=True,
+                     root=os.path.join("art", "textures", "generated")),
+
+}
+
 TEXTURE_ROLES = {
     "default": {
         "stone":   dict(asset="old_stone_wall"),
@@ -168,9 +255,15 @@ TEXTURE_ROLES = {
         # cemaate gore degismez — deri deridir. Doku olarak asinmis
         # kereste kullanilir cunku elde CC0 deri/tuy dokusu yok; rengi
         # tint tasir, yuzey dokusunu lif yonu verir.
-        "leather": dict(asset="weathered_planks", tint=LEATHER,
-                        tint_factor=0.82, tint_blend="COLOR",
-                        value_gamma=0.78),
+        # DERI ARTIK DERIDIR.
+        #
+        # Bu satir kereste dokusu kullaniyordu ve gerekcesi de
+        # yazilmisti: "elde CC0 deri/tuy dokusu yok". Dogruydu — ta
+        # ki uretilene kadar. `gen_kosele_texture.py` kosele tanesini
+        # ve kirik agini uretiyor; artik bir kayisa tahta damari
+        # giydirmek icin sebep yok.
+        "leather": dict(asset="kosele", tinted=True,
+                        root=os.path.join("art", "textures", "generated")),
         "feather": dict(asset="weathered_planks", tint=FEATHER,
                         tint_factor=0.86, tint_blend="COLOR",
                         value_gamma=0.88),
@@ -224,39 +317,7 @@ TEXTURE_ROLES = {
         #   ipek : kusak — tek parlak parca, ve o parlaklik rutbe degil
         #          dokuma (atlas atlamalari isigi tek yonde toplar)
         #   kece : dovulmus baslik cekirdegi (kavuk, takke)
-        # --- TEN ---------------------------------------------------------
-        #
-        # `M_Skin` de dokusuzdu ve dokusuz ten HDRP'de MUM gibi okur.
-        # Doku MPFB2'nin kendi bolge maskelerinden bestelendi
-        # (`gen_deri_texture.py`): dudak, goz kapagi, kulak ve gozenek.
-        # `tinted` burada iki kat onemli — ten rengi kisiden kisiye
-        # degismek ZORUNDA, yoksa sehirdeki herkes ayni tende olur.
-        #
-        # UV: govde MakeHuman taban mesh'inden geliyor ve onun kendi
-        # yerlesimini tasiyor; bu yuzden `apply_uvs` govdeye UYGULANMAZ
-        # (dunya yansitmasi bu yerlesimi ezer ve dudak alna duserdi).
-        "skin":   dict(asset="deri_insan", tinted=True,
-                       root=os.path.join("art", "textures", "generated")),
-
-        "gomlek": dict(asset="kumas_keten", tinted=True,
-                       root=os.path.join("art", "textures", "generated")),
-        "sarik":  dict(asset="kumas_keten", tinted=True,
-                       root=os.path.join("art", "textures", "generated")),
-        "yasmak": dict(asset="kumas_keten", tinted=True,
-                       root=os.path.join("art", "textures", "generated")),
-        "entari": dict(asset="kumas_cuha", tinted=True,
-                       root=os.path.join("art", "textures", "generated")),
-        "ferace": dict(asset="kumas_cuha", tinted=True,
-                       root=os.path.join("art", "textures", "generated")),
-        "salvar": dict(asset="kumas_cuha", tinted=True,
-                       root=os.path.join("art", "textures", "generated")),
-        "kusak":  dict(asset="kumas_ipek", tinted=True,
-                       root=os.path.join("art", "textures", "generated")),
-        "kavuk":  dict(asset="kumas_kece", tinted=True,
-                       root=os.path.join("art", "textures", "generated")),
-        "takke":  dict(asset="kumas_kece", tinted=True,
-                       root=os.path.join("art", "textures", "generated")),
-
+        **KARAKTER_ROLLERI,
         # Kitabe'nin BURADA doku rolu YOK ve bu bilincli. Once mermerle ayni
         # dokuyu veriyordu; sonuc Unity'de iki AYNI malzemeydi, cunku dokulu
         # bir malzemede taban rengi dokudan gelir — paletteki albedo tasinmaz.
@@ -291,9 +352,15 @@ TEXTURE_ROLES = {
         # cemaate gore degismez — deri deridir. Doku olarak asinmis
         # kereste kullanilir cunku elde CC0 deri/tuy dokusu yok; rengi
         # tint tasir, yuzey dokusunu lif yonu verir.
-        "leather": dict(asset="weathered_planks", tint=LEATHER,
-                        tint_factor=0.82, tint_blend="COLOR",
-                        value_gamma=0.78),
+        # DERI ARTIK DERIDIR.
+        #
+        # Bu satir kereste dokusu kullaniyordu ve gerekcesi de
+        # yazilmisti: "elde CC0 deri/tuy dokusu yok". Dogruydu — ta
+        # ki uretilene kadar. `gen_kosele_texture.py` kosele tanesini
+        # ve kirik agini uretiyor; artik bir kayisa tahta damari
+        # giydirmek icin sebep yok.
+        "leather": dict(asset="kosele", tinted=True,
+                        root=os.path.join("art", "textures", "generated")),
         "feather": dict(asset="weathered_planks", tint=FEATHER,
                         tint_factor=0.86, tint_blend="COLOR",
                         value_gamma=0.88),
@@ -327,6 +394,7 @@ TEXTURE_ROLES = {
         # bir malzemede taban rengi dokudan gelir — paletteki albedo tasinmaz.
         # Kitabe sahnede hic gorunmuyordu. Duz renk, oyulmus harflerin
         # golgesini tasiyan bir alan olarak dogru okunur.
+        **KARAKTER_ROLLERI,
     },
 }
 
@@ -392,6 +460,13 @@ PALETTES = {
         # yaslinin sakalini beyazlatmak genc adamin sakalini da
         # beyazlatirdi. Ayri ad = ayri malzeme.
         "beard_ak": ((0.760, 0.745, 0.720), 0.70, "M_Beard_Ak"),
+        # SAC KABUGU: KART DEGIL, SAKALLA AYNI KARAR.
+        #
+        # Sarigin/takkenin altindan cikan sac kart diziliyordu ve
+        # oglanin yakin planinda ne oldugu goruldu: kulaklarin iki
+        # yaninda TEL, boynun cevresinde FIRFIR. Ayni kusur bu depoda
+        # besinci kez; sakalda cozumu zaten bulunmustu.
+        "sac":     ((0.106, 0.070, 0.048), 0.55, "M_Hair_Kabuk"),
         "entari":  (CLOTH_ENTARI, 0.80, "M_Cloth_Entari"),
         "salvar":  (CLOTH_SALVAR, 0.82, "M_Cloth_Salvar"),
         "gomlek":  (CLOTH_GOMLEK, 0.86, "M_Cloth_Gomlek"),
@@ -478,6 +553,13 @@ PALETTES = {
         # yaslinin sakalini beyazlatmak genc adamin sakalini da
         # beyazlatirdi. Ayri ad = ayri malzeme.
         "beard_ak": ((0.760, 0.745, 0.720), 0.70, "M_Beard_Ak"),
+        # SAC KABUGU: KART DEGIL, SAKALLA AYNI KARAR.
+        #
+        # Sarigin/takkenin altindan cikan sac kart diziliyordu ve
+        # oglanin yakin planinda ne oldugu goruldu: kulaklarin iki
+        # yaninda TEL, boynun cevresinde FIRFIR. Ayni kusur bu depoda
+        # besinci kez; sakalda cozumu zaten bulunmustu.
+        "sac":     ((0.106, 0.070, 0.048), 0.55, "M_Hair_Kabuk"),
         "entari":  (CLOTH_ENTARI, 0.80, "M_Cloth_Entari"),
         "salvar":  (CLOTH_SALVAR, 0.82, "M_Cloth_Salvar"),
         "gomlek":  (CLOTH_GOMLEK, 0.86, "M_Cloth_Gomlek"),

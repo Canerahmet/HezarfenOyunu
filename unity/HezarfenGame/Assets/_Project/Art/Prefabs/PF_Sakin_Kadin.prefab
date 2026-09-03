@@ -53,28 +53,28 @@ PrefabInstance:
       value: PF_Sakin_Kadin
       objectReference: {fileID: 0}
     - target: {fileID: 4742473837712756890, guid: f1917038e1ef084409f0b9a25a523f14, type: 3}
-      propertyPath: m_FadeMode
-      value: 1
+      propertyPath: m_Size
+      value: 1.995497
+      objectReference: {fileID: 0}
+    - target: {fileID: 4742473837712756890, guid: f1917038e1ef084409f0b9a25a523f14, type: 3}
+      propertyPath: m_LODs.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4742473837712756890, guid: f1917038e1ef084409f0b9a25a523f14, type: 3}
+      propertyPath: m_LocalReferencePoint.y
+      value: 0.7255943
       objectReference: {fileID: 0}
     - target: {fileID: 4742473837712756890, guid: f1917038e1ef084409f0b9a25a523f14, type: 3}
       propertyPath: m_LocalReferencePoint.z
-      value: -0.04287511
-      objectReference: {fileID: 0}
-    - target: {fileID: 4742473837712756890, guid: f1917038e1ef084409f0b9a25a523f14, type: 3}
-      propertyPath: m_LODs.Array.data[0].fadeTransitionWidth
-      value: 0.25
+      value: -0.05586016
       objectReference: {fileID: 0}
     - target: {fileID: 4742473837712756890, guid: f1917038e1ef084409f0b9a25a523f14, type: 3}
       propertyPath: m_LODs.Array.data[0].screenRelativeHeight
       value: 0.22
       objectReference: {fileID: 0}
-    - target: {fileID: 5866666021909216657, guid: f1917038e1ef084409f0b9a25a523f14, type: 3}
-      propertyPath: m_Controller
-      value: 
-      objectReference: {fileID: 9100000, guid: 03e4a326de9ab51429ad0ca6e94aada2, type: 2}
-    - target: {fileID: 5866666021909216657, guid: f1917038e1ef084409f0b9a25a523f14, type: 3}
-      propertyPath: m_ApplyRootMotion
-      value: 0
+    - target: {fileID: 4742473837712756890, guid: f1917038e1ef084409f0b9a25a523f14, type: 3}
+      propertyPath: m_LODs.Array.data[1].screenRelativeHeight
+      value: 0.01
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

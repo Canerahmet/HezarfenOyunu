@@ -68,18 +68,40 @@ DIRSEK_T = 0.45
 BILEK_T = 0.82
 
 
-def _dilim_merkezi(vs, z, kal, filtre=None):
-    """Bu kottaki noktaların merkezi (yoksa None)."""
-    s = [v for v in vs if abs(v.z - z) < kal and (filtre is None or filtre(v))]
+def _dilim_merkezi(vs, z, kal, filtre=None, eksen=2,
+                   yakin=None, yaricap=0.0):
+    """Bu dilimdeki noktaların merkezi (yoksa None).
+
+    `eksen`: dilimin alındığı eksen — 2 = z (kot), 0 = x (yanal).
+    Kol için x doğrudur; gerekçesi `uzuv_cizgisi`de.
+    """
+    s = [v for v in vs
+         if abs(v[eksen] - z) < kal and (filtre is None or filtre(v))]
     if len(s) < 3:
         return None
+    # IZLEME: dilimde iki kume varsa oncekine YAKIN olani alinir.
+    #
+    # Bir dilim uzvun tek kesitini icerir SANILIYORDU. Yatay bir kolda
+    # bu yanlis: ayni dilime hem ust kol hem on kol duser ve ortalama
+    # ikisinin ORTASINA, yani govdeye dogru ziplar. Olculdu — cizginin
+    # en buyuk donusu yaslida 99, eksen degistirilince 138 dereceye
+    # cikti. Eksen secmek yetmiyor cunku sorun eksende degil, iki
+    # kumeyi tek sey saymakta.
+    #
+    # Onceki nokta biliniyorsa dilim ona gore SUZULUR: uzuv surekli
+    # bir sey oldugu icin bir sonraki kesit oncekinin yakinindadir.
+    if yakin is not None and yaricap:
+        y = [v for v in s if (v - yakin).length < yaricap]
+        if len(y) >= 3:
+            s = y
     n = float(len(s))
     return Vector((sum(v.x for v in s) / n,
                    sum(v.y for v in s) / n,
                    sum(v.z for v in s) / n))
 
 
-def uzuv_cizgisi(obj, z_ust, z_alt, filtre, adim=40, kesintide_dur=True):
+def uzuv_cizgisi(obj, z_ust, z_alt, filtre, adim=40, kesintide_dur=True,
+                 eksen=2, tohum=None):
     """Bir uzvun merkez çizgisi: yukarıdan aşağı dilimlerin merkezleri.
 
     `kesintide_dur` **uzuv bittiğinde durur** — ama boşluk boşluk değildir.
@@ -104,11 +126,30 @@ def uzuv_cizgisi(obj, z_ust, z_alt, filtre, adim=40, kesintide_dur=True):
     Eşik ortadadır: boyun %8'i (≈13,6 cm). Örnekleme boşluğunun üç katı,
     yapısal boşluğun dörtte biri.
     """
+    # DILIM EKSENI: KOLDA Z YANLIS EKSEN.
+    #
+    # Dilimler kot ekseninde aliniyordu ve bu bacakta dogru: bacak
+    # dikeydir. KOL degil — taban govde A duruşundadir ve kol yataya
+    # yakindir. Yatay bir uzuvda tek bir Z dilimi hem ust kolu hem on
+    # kolu yakalar ve "merkez" ikisinin ORTASINA, yani govdeye dogru
+    # ziplar.
+    #
+    # Olculdu: cizginin en buyuk donus acisi yetiskinde 51 derece,
+    # YASLIDA 99 derece — bir uzvun merkez cizgisi 99 derece donmez,
+    # katlanir. Inceleme karesinde sonucu goruldu: yaslinin kollari
+    # dirsekten geriye kirilmis, eller kalcada.
+    #
+    # `eksen=0` ile dilimler x'te alinir: omuzdan parmak ucuna dogru
+    # yurunur ve her dilim kolun TEK bir kesitidir.
     mn, mx = hz.bounds(obj)
     boy = mx[2] - mn[2]
     kal = boy * 0.012
     #: Uzvun bittigine karar vermek icin gereken KESINTISIZ bos yukseklik.
     bosluk_tol = boy * 0.08
+    #: Izleme yaricapi: bir sonraki kesit oncekinin bu kadar yakininda
+    #: olmali. Boyun %11'i (1,70 m'de 19 cm) — dirsek bukulmesi buna
+    #: sigar, karsi uzuv sigmaz.
+    izleme = boy * 0.11
     mw = obj.matrix_world
     vs = [mw @ v.co for v in obj.data.vertices]
     nokta = []
@@ -116,7 +157,22 @@ def uzuv_cizgisi(obj, z_ust, z_alt, filtre, adim=40, kesintide_dur=True):
     bos = 0.0
     for i in range(adim + 1):
         z = z_ust + (z_alt - z_ust) * (i / float(adim))
-        m = _dilim_merkezi(vs, z, kal, filtre)
+        # ILK DILIM ICIN CAPA: TOHUM.
+        #
+        # Izleme bir onceki noktaya gore suzuyor; ilk dilimde onceki
+        # nokta yok ve orada iki kume olabilir. Yaslinin kolunda tam
+        # bunu olctum: cizgi BACAKLA basliyor (ilk bes nokta z
+        # 0,75 -> 0,40), sonra bacak bitince omza atliyor ve donus
+        # acisi 171 dereceye cikiyor.
+        #
+        # `tohum` uzvun NEREDEN basladigini soyler. Bir uzuv
+        # tarayicisinin bilmesi gereken ilk sey budur; tahmin
+        # etmesini beklemek, iki bacakli bir gövdede kolu bacaktan
+        # ayirt etmesini beklemektir.
+        _capa = nokta[-1] if nokta else tohum
+        m = _dilim_merkezi(vs, z, kal, filtre, eksen,
+                           yakin=_capa,
+                           yaricap=izleme * (1.0 if nokta else 2.0))
         if m is None:
             bos += dilim_yuk
             if kesintide_dur and nokta and bos > bosluk_tol:
@@ -524,8 +580,21 @@ def etek_kemikleri(arm_obj, mesh_obj, z_bel, z_etek, zincir=4, eklem=2,
             t1 = (j + 1) / float(eklem)
             z0 = z_bel + (z_etek - z_bel) * t0
             z1 = z_bel + (z_etek - z_bel) * t1
+            # KEMIK VARSA YENIDEN YARATILMAZ.
+            #
+            # `edit_bones.new` ayni adi ikinci kez alinca Blender onu
+            # sessizce `Etek_0_0.001` yapar. Bu islev her LOD icin bir
+            # kez cagriliyor, yani iskelet LOD basina SEKIZ fazla kemik
+            # topluyordu: iki kademede 38, ucuncusu eklenince 46 —
+            # oysa etek zinciri sekiz kemiktir ve LOD sayisiyla ilgisi
+            # yoktur.
+            #
+            # Kusur ucuncu kademeyi eklerken sayiyla ortaya cikti; iki
+            # kademede de vardi ve gorunmuyordu. Ustelik her LOD kendi
+            # kopyasina baglaniyordu, yani ayni etek uc ayri kemik
+            # takimini takip ediyordu.
             ad = f"Etek_{i}_{j}"
-            eb = arm.edit_bones.new(ad)
+            eb = arm.edit_bones.get(ad) or arm.edit_bones.new(ad)
             eb.head = Vector((yon.x * yaricap, yon.y * yaricap, z0))
             eb.tail = Vector((yon.x * yaricap, yon.y * yaricap, z1))
             eb.parent = ebeveyn
@@ -570,3 +639,147 @@ def etek_kemikleri(arm_obj, mesh_obj, z_bel, z_etek, zincir=4, eklem=2,
         bagli += 1
 
     return bagli
+
+
+def _deri_yuvalari(mesh_obj, anahtar="skin"):
+    """Ten malzemesi taşıyan malzeme yuvalarının indeksleri."""
+    return {i for i, ms in enumerate(mesh_obj.material_slots)
+            if ms.material and anahtar in ms.material.name.lower()}
+
+
+def agirlik_farki(mesh_obj, anahtar="skin", en_cok=0.35):
+    """Giysi köşeleri, altındaki tenle **aynı kemiği** mi takip ediyor.
+
+    Dönüş: ``(eslenen, ortalama_fark, buyuk_fark_orani)``.
+
+    Fark, iki köşenin ağırlık sözlükleri arasındaki mutlak fark
+    toplamıdır: 0 = birebir aynı, 2 = tamamen ayrı kemikler.
+    """
+    from mathutils import kdtree
+
+    deri_idx = _deri_yuvalari(mesh_obj, anahtar)
+    if not deri_idx:
+        return (0, 0.0, 0.0)
+
+    me = mesh_obj.data
+    deri_v, giysi_v = set(), set()
+    for p in me.polygons:
+        hedef = deri_v if p.material_index in deri_idx else giysi_v
+        hedef.update(p.vertices)
+    giysi_v -= deri_v
+    if not deri_v or not giysi_v:
+        return (0, 0.0, 0.0)
+
+    deri_list = sorted(deri_v)
+    kd = kdtree.KDTree(len(deri_list))
+    for i, vi in enumerate(deri_list):
+        kd.insert(me.vertices[vi].co, i)
+    kd.balance()
+
+    def w(vi):
+        return {g.group: g.weight for g in me.vertices[vi].groups
+                if g.weight > 1e-4}
+
+    toplam, sayilan, buyuk = 0.0, 0, 0
+    for vi in sorted(giysi_v):
+        _, idx, mes = kd.find(me.vertices[vi].co)
+        if mes > en_cok:
+            continue
+        a, b = w(vi), w(deri_list[idx])
+        fark = sum(abs(a.get(k, 0.0) - b.get(k, 0.0))
+                   for k in set(a) | set(b))
+        toplam += fark
+        sayilan += 1
+        if fark > 0.30:
+            buyuk += 1
+    if sayilan == 0:
+        return (0, 0.0, 0.0)
+    return (sayilan, toplam / sayilan, buyuk / sayilan)
+
+
+def agirliklari_govdeden_al(mesh_obj, anahtar="skin", en_cok=0.35):
+    """Giysinin ağırlıklarını **altındaki tenden** kopyalar.
+
+    ## Neden gerekti — ve neden bu kadar geç
+
+    `agirliklari_tamamla`nın kendi açıklaması bu çözümü zaten adıyla
+    anıyordu: *"Daha zarif bir çözüm (tenin ağırlıklarını en yakın
+    komşudan aktarmak) daha doğru olurdu ama ölçülebilir farkı
+    belirsiz."* Ölçülmemiş bir gerekçeyle atlanmıştı; şimdi ölçüldü.
+
+    Oyun karesinde Hezarfen'in **sırtı çıplak** çıkıyor: mavi kollar
+    var, kuşak var, entari var, ama omuzlarla kuşak arasında ten
+    görünüyor — omuz kemiği ve omurga çizgisiyle birlikte. Blender'ın
+    bind-poz karesi ise tertemiz giyinik. Aradaki tek fark
+    **hareket**tir.
+
+    Sebep sayıyla: birleşik ağda giysi köşelerinin **%67'si**,
+    hemen altındaki ten köşesinden 0,30'dan fazla farklı ağırlık
+    taşıyor (ortalama fark 1,20, en büyüğü 2,20 — yani tamamen başka
+    kemikler). `ARMATURE_AUTO` ısı yayılımını her köşe için ayrı
+    çözüyor ve iç içe iki kabukta komşu iki nokta farklı sonuç
+    alabiliyor. İki kabuk ayrı hareket edince gömleğin **8 mm**'lik payı
+    gövdeyi içeride tutmaya yetmiyor.
+
+    ## Neden en yakın ten köşesi doğru cevap
+
+    Giysi kabuğu gövdeden **kopyalanarak** üretiliyor
+    (`kiyafet_kit.kopya_kabuk`): her giysi köşesi, bir ten köşesinin
+    normal boyunca birkaç milimetre dışına itilmiş hâlidir. Yani
+    eşleşme bir tahmin değil, üretimin kendi yapısı. Kavuk, sarık,
+    sakal ve mest de aynı kuralla doğru kemiği bulur — başın yanındaki
+    en yakın ten baştır.
+
+    Payı aşan köşeler (eteğin savrulan eteği gibi) dokunulmadan
+    bırakılır; onlar için otomatik ağırlık zaten makuldür ve zorlamak
+    eteği bacağa yapıştırırdı.
+
+    Dönüş: ``(degisen_kose, once_ortalama_fark)``.
+    """
+    from mathutils import kdtree
+
+    deri_idx = _deri_yuvalari(mesh_obj, anahtar)
+    if not deri_idx:
+        return (0, 0.0)
+
+    me = mesh_obj.data
+    deri_v, giysi_v = set(), set()
+    for p in me.polygons:
+        hedef = deri_v if p.material_index in deri_idx else giysi_v
+        hedef.update(p.vertices)
+    giysi_v -= deri_v
+    if not deri_v or not giysi_v:
+        return (0, 0.0)
+
+    _, once, _ = agirlik_farki(mesh_obj, anahtar, en_cok)
+
+    deri_list = sorted(deri_v)
+    kd = kdtree.KDTree(len(deri_list))
+    for i, vi in enumerate(deri_list):
+        kd.insert(me.vertices[vi].co, i)
+    kd.balance()
+
+    gruplar = list(mesh_obj.vertex_groups)
+    silinecek = {g.index: [] for g in gruplar}
+    yazilacak = []          # (grup_index, vertex_index, agirlik)
+
+    for vi in sorted(giysi_v):
+        _, idx, mes = kd.find(me.vertices[vi].co)
+        if mes > en_cok:
+            continue
+        kaynak = {g.group: g.weight
+                  for g in me.vertices[deri_list[idx]].groups
+                  if g.weight > 1e-4}
+        simdiki = {g.group for g in me.vertices[vi].groups}
+        for gi in simdiki - set(kaynak):
+            silinecek[gi].append(vi)
+        for gi, w in kaynak.items():
+            yazilacak.append((gi, vi, w))
+
+    for g in gruplar:
+        if silinecek[g.index]:
+            g.remove(silinecek[g.index])
+    for gi, vi, w in yazilacak:
+        gruplar[gi].add([vi], w, "REPLACE")
+
+    return (len({vi for _, vi, _ in yazilacak}), once)

@@ -1,0 +1,28 @@
+{
+ "polyhaven_id": null,
+ "name": "kosele",
+ "resolution": "1024px",
+ "size_meters": [
+  0.2,
+  0.2
+ ],
+ "authors": {
+  "Hezarfen projesi (prosedürel üretim)": "All"
+ },
+ "license": "Kendi eserimiz — üçüncü taraf hakkı yok",
+ "source": "prosedürel; girdi yok",
+ "maps": {
+  "BC": "T_kosele_BC.png",
+  "N": "T_kosele_N.png",
+  "ARM": "T_kosele_ARM.png",
+  "R": "T_kosele_R.png",
+  "AO": "T_kosele_AO.png"
+ },
+ "normal_convention": "OpenGL (Y+) — Poly Haven nor_gl ile ayni",
+ "generated_by": "tools/textures/gen_kosele_texture.py",
+ "role": "deri",
+ "use": "mest, kayis ve kemer",
+ "why": "M_Leather_Mest dokusuzdu (_BaseColorMap fileID 0) ve M_Leather dokuluydu ama dokusu KERESTEYDI (weathered_planks, boyanmis). Bir kayisa tahta damari giydirmek dokusuz birakmaktan daha az gorunur ama daha yanlis: yuzey yalan soyler.",
+ "base_color_note": "BC bilerek notr. Renk paletten gelir (leather koyu kahve, mest sari) ve malzeme onu _BaseColor ile carpar.",
+ "grain_mm": 0.9
+}

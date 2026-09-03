@@ -26,6 +26,20 @@ namespace Hezarfen.Sehir
             public NPCMeslek meslek;
             public int evDugum;
             public int tohum;
+
+            /// <summary>
+            /// Sakinin kendi evinin konumu — <b>avlu kapısı değil</b>.
+            ///
+            /// Graf "ev" olarak avlu kapısını biliyor ve şehirde 10.900
+            /// eve karşılık 142 kapı var. Ev seçimi kapıdan yapılınca
+            /// kapı başına 282 kişi düşüyor ve hepsi tek noktada
+            /// duruyor; turda ölçüldü — bir durakta 40 m içinde 272
+            /// kişi, dört durakta sıfır.
+            ///
+            /// Graf ev konumu taşımıyorsa (eski varlık) bu alan boştur
+            /// ve davranış eskisi gibi kalır.
+            /// </summary>
+            public Vector3? evKonum;
         }
 
         /// <summary>Bir vaktin ölçümü.</summary>
@@ -59,10 +73,25 @@ namespace Hezarfen.Sehir
             if (graf == null || meslekler == null || meslekler.Count == 0)
                 return liste;
 
+            // EV SECIMI: once GERCEK EVLER, yoksa avlu kapilari.
+            //
+            // `graf.evKonumlari` uretim aninda doldurulur ve her evin
+            // hangi kapiya bagli oldugu `evKapisi`nde yazilidir. Eski
+            // bir graf varligi bu listeleri tasimiyorsa davranis
+            // degismez — kapilar kullanilir.
+            bool gercekEv = graf.evKonumlari != null
+                            && graf.evKonumlari.Count > 0
+                            && graf.evKapisi != null
+                            && graf.evKapisi.Count == graf.evKonumlari.Count;
+
             var evler = new List<int>();
-            for (int i = 0; i < graf.dugumler.Count; i++)
-                if (graf.dugumler[i].tur == SokakGrafi.Tur.Ev) evler.Add(i);
-            if (evler.Count == 0) return liste;
+            if (!gercekEv)
+            {
+                for (int i = 0; i < graf.dugumler.Count; i++)
+                    if (graf.dugumler[i].tur == SokakGrafi.Tur.Ev)
+                        evler.Add(i);
+                if (evler.Count == 0) return liste;
+            }
 
             float toplamPay = 0f;
             foreach (var m in meslekler) toplamPay += Mathf.Max(0f, m.pay);
@@ -78,10 +107,24 @@ namespace Hezarfen.Sehir
                     if (r <= m.pay) { secilen = m; break; }
                     r -= m.pay;
                 }
+                int evDugum;
+                Vector3? evKonum = null;
+                if (gercekEv)
+                {
+                    int h = rng.Next(graf.evKonumlari.Count);
+                    evDugum = graf.evKapisi[h];
+                    evKonum = graf.evKonumlari[h];
+                }
+                else
+                {
+                    evDugum = evler[rng.Next(evler.Count)];
+                }
+
                 liste.Add(new Sakin
                 {
                     meslek = secilen,
-                    evDugum = evler[rng.Next(evler.Count)],
+                    evDugum = evDugum,
+                    evKonum = evKonum,
                     tohum = rng.Next(int.MaxValue),
                 });
             }

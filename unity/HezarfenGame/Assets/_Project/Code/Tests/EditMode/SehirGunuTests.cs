@@ -60,6 +60,54 @@ namespace Hezarfen.Tests
             return SehirGunu.Gun(g, s, yil, gun);
         }
 
+        /// <summary>
+        /// <b>Sakinler şehre dağılsın, bir avuç noktaya yığılmasın.</b>
+        ///
+        /// Ölçüm turdan geldi: dört durakta 40 m içinde <b>sıfır</b>
+        /// kişi, bir durakta <b>272</b>. Sebep sahne dosyalarında
+        /// sayıldı — şehirde 10.900 ev (<c>PF_House_Aile_*</c>) ama
+        /// grafta "ev" demek avlu kapısı demek ve kapı sayısı
+        /// <b>142</b>. Kapı başına 282 sakin düşüyor ve evdekilerin
+        /// hepsi tek noktada duruyor: şehir sayıya göre kalabalık,
+        /// ekrana göre boş.
+        ///
+        /// Eşik <b>nüfusa</b> göre, ev sayısına göre değil: bu test
+        /// {Sakin} sakin üretiyor ve 10.900 evden çekilen o kadar
+        /// bağımsız seçim ~%95 ayrı çıkar. Kusurlu hâlde tavan
+        /// <b>160</b>'tı (avlu kapısı sayısı), yani ne seçilirse
+        /// seçilsin iki dünya arasında bir kat fark var. İlk yazdığım
+        /// eşik 2.000'di ve <i>ölçtüğüm şeyi değil beklediğim şeyi</i>
+        /// yazmışım: nüfus 1.200 iken 2.000 ayrı ev matematiksel olarak
+        /// imkânsız.
+        /// </summary>
+        [Test]
+        public void ResidentsLiveInHousesNotOnTheCourtyardGate()
+        {
+            var g = Graf();
+            var s = SehirGunu.Sakinler(g, Meslekler(), Sakin);
+
+            var ayri = new HashSet<Vector3>();
+            int konumsuz = 0;
+            foreach (var k in s)
+            {
+                if (k.evKonum == null) { konumsuz++; continue; }
+                ayri.Add(k.evKonum.Value);
+            }
+
+            Assert.AreEqual(0, konumsuz,
+                $"{konumsuz} sakinin ev konumu yok — graf ev konumu "
+                + "tasimiyor. Kur: Hezarfen > GIS > Sokak grafini kur.");
+            // %75: bagimsiz secimde beklenen ~%95, kusurlu halde
+            // tavan 160 (kapi sayisi). Arada genis bir bosluk var ve
+            // esik oraya konuyor.
+            int enAz = Sakin * 3 / 4;
+            Assert.Greater(ayri.Count, enAz,
+                $"{Sakin} sakin yalnizca {ayri.Count} ayri noktada "
+                + $"oturuyor (en az {enAz} bekleniyor). Kapi basina "
+                + "yuzlerce kisi tek noktada durur ve sehir hem yigin "
+                + "hem bos gorunur.");
+        }
+
         /// <summary>Her mesleğin her vakitte bir işi var.</summary>
         [Test]
         public void NoProfessionStandsIdleAtAnyPrayer()

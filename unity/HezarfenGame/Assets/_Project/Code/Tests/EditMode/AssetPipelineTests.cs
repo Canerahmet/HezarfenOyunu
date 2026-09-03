@@ -363,12 +363,22 @@ namespace Hezarfen.Tests
                 var lods = grup.GetLODs();
                 if (lods.Length == 0) continue;
 
+                // DERI BAGLI AG DA SAYILIR.
+                //
+                // Sayim yalniz `MeshFilter`a bakiyordu ve karakterler
+                // `SkinnedMeshRenderer` tasiyor: 58.000 ucgenlik bir
+                // gövde bu kurala gore SIFIR ucgendi ve iki kademeyle
+                // gecip gidiyordu. Kural yazilmisti, kapsami eksikti —
+                // bu depoda tekrar eden bicimiyle: bir olcu, olcmesi
+                // gereken seyi hic gormuyor.
                 int tris = 0;
                 foreach (var r in lods[0].renderers)
                 {
-                    var mf = r != null ? r.GetComponent<MeshFilter>() : null;
-                    if (mf != null && mf.sharedMesh != null)
-                        tris += mf.sharedMesh.triangles.Length / 3;
+                    if (r == null) continue;
+                    Mesh ag = r is SkinnedMeshRenderer smr
+                        ? smr.sharedMesh
+                        : r.GetComponent<MeshFilter>()?.sharedMesh;
+                    if (ag != null) tris += ag.triangles.Length / 3;
                 }
 
                 if (tris > 20000 && lods.Length < 3)

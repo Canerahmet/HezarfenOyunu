@@ -193,6 +193,18 @@ namespace Hezarfen.Editor.Diagnostics
                 return n;
             }
 
+            /// <summary>
+            /// Durak noktasindan en cok bu kadar uzaga kayilabilir (m).
+            ///
+            /// Onceki halde sinir YOKTU: yerlestirici butun sehri
+            /// tariyor ve yakindaki her aday elenirse duragi
+            /// kilometrelerce oteye tasiyordu. 05_ayasofya ve
+            /// 09_marmara kareleri bombos araziyi gosteriyordu ve
+            /// sayilar "acik dugum: E, kayma 0,0, tepe acik: E" diye
+            /// KUSURSUZ okunuyordu — cunku olculmeyen sey buydu.
+            /// </summary>
+            private const float EnCokDurakSapmasi = 150f;
+
             internal IEnumerator Kos(Durak[] duraklar)
             {
                 Directory.CreateDirectory(Cikti);
@@ -202,9 +214,15 @@ namespace Hezarfen.Editor.Diagnostics
                 satirlar.Add("Her durakta kamera karesi kaydedildi ve yanina");
                 satirlar.Add("sayilar yazildi. Kare bir GOZLEM, sayi bir KANIT.");
                 satirlar.Add("");
-                satirlar.Add("| durak | ayak altinda | arazi farki | kamera kolu "
-                             + "| 40 m'de NPC | cizilen govde | replik | kare (ms) | neden |");
-                satirlar.Add("|---|---|---:|---:|---:|---:|---:|---:|---|");
+                satirlar.Add("| durak | konum (x, z) | ayak altinda "
+                             + "| arazi farki | kamera kolu "
+                             + "| 40 m'de NPC | cizilen govde | replik "
+                             + "| kadrajda | acik dugum | durak sapmasi (m) "
+                             + "| kayma (m) | tepe acik "
+                             + "| aci kaymasi "
+                             + "| kare (ms) | neden |");
+                satirlar.Add("|---|---|---|---:|---:|---:|---:|---:|---|"
+                             + ":-:|---:|---:|:-:|---:|---:|---|");
 
                 var oyuncu = Object.FindAnyObjectByType<WalkController>();
                 var kip = Object.FindAnyObjectByType<KameraKipi>();
@@ -273,6 +291,17 @@ namespace Hezarfen.Editor.Diagnostics
                 foreach (var d in duraklar)
                 {
                     // --- ISINLA ---
+                    // ISINLANAN YER ILE DURULAN YER AYNI SEY DEGIL.
+                    //
+                    // Uc durakta kare bir duvar, birinde de TAVAN
+                    // gosterdi: 07_kirsal karesinde oyuncu bir evin
+                    // icinde, ahsap tavanin altinda duruyor. Oysa
+                    // yerlestirici "tepesi acik dugum" ariyor. Ikisi
+                    // ayni anda dogru olamaz; hangisinin yalan
+                    // soyledigini bilmek icin ucu birden yaziliyor:
+                    // acik dugum bulundu mu, oyuncu konduktan sonra ne
+                    // kadar KAYDI, ve son yerinde tepesi hala acik mi.
+                    bool acikBulundu = false;
                     var hedef = d.nokta == Vector3.zero ? dogum : d.nokta;
                     if (d.nokta != Vector3.zero)
                     {
@@ -312,6 +341,20 @@ namespace Hezarfen.Editor.Diagnostics
                             bool bulundu = false;
                             foreach (var aday in sirali)
                             {
+                                // DURAK BIR YERDIR; 2 km oteden cekilen
+                                // kare baska bir yerin karesidir.
+                                //
+                                // Liste mesafeye gore SIRALI, yani ilk
+                                // asan noktada durmak yeterli. Sinir
+                                // 150 m: bir mahalle capinin yarisi —
+                                // durak hala "orasi" sayilir, ama
+                                // sehrin obur ucuna kacamaz.
+                                if ((new Vector2(aday.x, aday.z)
+                                     - new Vector2(hedef.x, hedef.z))
+                                    .sqrMagnitude > EnCokDurakSapmasi
+                                                    * EnCokDurakSapmasi)
+                                    break;
+
                                 float ak2 = arazi != null
                                     ? arazi.SampleHeight(aday)
                                       + arazi.transform.position.y
@@ -360,6 +403,7 @@ namespace Hezarfen.Editor.Diagnostics
                                     continue;
                                 hedef = new Vector3(aday.x, hedef.y, aday.z);
                                 bulundu = true;
+                                acikBulundu = acikAra;
                                 break;
                             }
                             if (bulundu) break;
@@ -390,6 +434,7 @@ namespace Hezarfen.Editor.Diagnostics
                         hedef = new Vector3(hedef.x, yuzey + 0.3f, hedef.z);
                     }
 
+                    var konulan = hedef;
                     cc.enabled = false;
                     oyuncu.transform.position = hedef;
                     oyuncu.transform.rotation = Quaternion.Euler(0f, d.bakisYaw, 0f);
@@ -408,6 +453,7 @@ namespace Hezarfen.Editor.Diagnostics
                     //
                     // Esik 12: birkac yoldan gecen kalabalik degildir.
                     Vector3? kalabalikMerkez = null;
+                    bool kalabaligaDonuldu = false;
                     if (npc != null && npc.Sakinler != null)
                     {
                         var toplam = Vector3.zero;
@@ -426,6 +472,7 @@ namespace Hezarfen.Editor.Diagnostics
                         }
                         if (adet >= 12)
                         {
+                            kalabaligaDonuldu = true;
                             var yon = toplam / adet - oyuncu.transform.position;
                             yon.y = 0f;
                             if (yon.sqrMagnitude > 1e-4f)
@@ -436,6 +483,64 @@ namespace Hezarfen.Editor.Diagnostics
                                 cc.enabled = true;
                                 Physics.SyncTransforms();
                             }
+                        }
+                    }
+
+                    // DUVARA BAKAN BIR OLCU ALETI SUS URETIR.
+                    //
+                    // Duraklarin bakis acisi elle secilmisti ve karelere
+                    // BAKINCA goruldu: 10_uskudar'da on metredeki bir tas
+                    // blok karenin %60'ini kapliyor, 07_kirsal'da kare bir
+                    // ahsap tavan ve bos siva duvari gosteriyor. Oysa
+                    // yerlestirme dogruydu — ayni turda "acik dugum: E,
+                    // kayma 0,0 m, tepe acik: E" yaziyor. Yani kusur
+                    // oyuncunun DURDUGU yerde degil, BAKTIGI yondeydi.
+                    //
+                    // Elle secilen aci atilmiyor: durak "Ayasofya" diyorsa
+                    // oraya bakmasinin bir sebebi var. Aci korunur ve
+                    // yalnizca onu goren en yakin ACIK yone kaydirilir.
+                    // Hicbiri acik degilse en uzagi gorene gidilir —
+                    // kapali bir avluda bile en iyi kare o.
+                    //
+                    // Kalabaliga donulduyse dokunulmaz: o karar bundan
+                    // daha iyi bir sebebe dayaniyor.
+                    float aciKaymasi = 0f;
+                    if (!kalabaligaDonuldu)
+                    {
+                        var goz = oyuncu.transform.position
+                                  + Vector3.up * 1.6f;
+                        float enIyiAci = 0f, enIyiUzak = -1f;
+                        bool yeter = false;
+                        // Sirayla 0, +15, -15, +30, -30 ... : ilk YETERLI
+                        // yon kazanir, yani en az kaydiran.
+                        for (int adim = 0; adim <= 6 && !yeter; adim++)
+                        {
+                            for (int isaret = 1; isaret >= -1; isaret -= 2)
+                            {
+                                float sap = adim * 15f * isaret;
+                                var yon = Quaternion.Euler(0f, d.bakisYaw + sap, 0f)
+                                          * Vector3.forward;
+                                float uzak = Physics.Raycast(
+                                    goz, yon, out var carp, 80f, ~0,
+                                    QueryTriggerInteraction.Ignore)
+                                    ? carp.distance : 80f;
+                                if (uzak > enIyiUzak)
+                                { enIyiUzak = uzak; enIyiAci = sap; }
+                                // 12 m: dar sokak bile bu kadar derindir
+                                // (sokak eni 7,2 m, ADR 0075). Bundan
+                                // yakini duvardir.
+                                if (uzak >= 12f) { yeter = true; enIyiAci = sap; break; }
+                                if (adim == 0) break;   // 0 derecenin esi yok
+                            }
+                        }
+                        aciKaymasi = enIyiAci;
+                        if (Mathf.Abs(aciKaymasi) > 0.01f)
+                        {
+                            cc.enabled = false;
+                            oyuncu.transform.rotation = Quaternion.Euler(
+                                0f, d.bakisYaw + aciKaymasi, 0f);
+                            cc.enabled = true;
+                            Physics.SyncTransforms();
                         }
                     }
 
@@ -466,6 +571,44 @@ namespace Hezarfen.Editor.Diagnostics
                         ? arazi.SampleHeight(p) + arazi.transform.position.y
                         : 0f;
 
+                    // KAYMA: kondugu yer ile durdugu yer arasindaki
+                    // yatay mesafe. Fizik oyuncuyu cakisan bir
+                    // carpistiricidan disari itiyorsa yerlestiricinin
+                    // secimi bir sey ifade etmez ve kusur secimde
+                    // aranmaz.
+                    // DURAK SAPMASI: ISTENEN YER ILE DURULAN YER.
+                    //
+                    // 05_ayasofya ve 09_marmara karelerine BAKINCA
+                    // goruldu: oyuncu bombos, kumsal rengi bir arazide
+                    // duruyor ve ufukta kucucuk bir kubbe var. Sayilar
+                    // ise "acik dugum: E, kayma 0,0 m, tepe acik: E"
+                    // diyordu — yani yerlestirme kendi olcusune gore
+                    // KUSURSUZ calismisti.
+                    //
+                    // Eksik olan olcu buydu: yerlestirici en yakin ACIK
+                    // sokak dugumunu ariyor ve arama butun sehri
+                    // tariyor, MESAFE SINIRI YOK. Yakindaki dugumlerin
+                    // hepsi elenirse durak kilometrelerce oteye kayar ve
+                    // hicbir sayi bunu soylemez.
+                    //
+                    // Bir olcu aleti nerede durdugunu bilmiyorsa
+                    // olctugu sey de belirsizdir.
+                    var sapmaV = p - (d.nokta == Vector3.zero ? dogum : d.nokta);
+                    sapmaV.y = 0f;
+                    float durakSapmasi = sapmaV.magnitude;
+
+                    var kaymaV = p - konulan;
+                    kaymaV.y = 0f;
+                    float kayma = kaymaV.magnitude;
+
+                    // TEPE: SON yerinde gok gorunuyor mu. Yerlestirici
+                    // ayni soruyu ADAY icin soruyor; burada SONUC icin
+                    // soruluyor. Ikisi ayrilirsa arada gecen sey
+                    // (fizik, akis, semt yuklemesi) suclu demektir.
+                    bool tepeAcik = !Physics.Raycast(
+                        p + Vector3.up * 1.8f, Vector3.up, 3.2f, ~0,
+                        QueryTriggerInteraction.Ignore);
+
                     // KARE SURESI: OTURDUKTAN SONRA, ORTANCA.
                     //
                     // Once isinlanmadan hemen sonra on karenin ORTALAMASI
@@ -479,6 +622,46 @@ namespace Hezarfen.Editor.Diagnostics
                     { yield return null; ornekler.Add(Time.unscaledDeltaTime); }
                     ornekler.Sort();
                     float ms = ornekler[ornekler.Count / 2] * 1000f;
+
+                    // REPLIK SAYISI BURADA OKUNUR — SONRA DEGIL.
+                    //
+                    // Satir en sonda `bark.GorunurReplik` okuyordu ve
+                    // arada KALABALIK KARESI var: o blok kamerayi 13 m
+                    // yukari tasiyip dort kare bekliyor, `BarkGosterici`
+                    // de her LateUpdate'te sayiyi o kameraya gore
+                    // yeniden hesapliyor. Yani rapor, oyuncunun
+                    // gordugu repligi degil denetim kamerasinin
+                    // gordugunu yaziyordu — ve on duragin onunda da 0
+                    // cikiyordu.
+                    //
+                    // Kusur bark sisteminde degil OLCUMUN YERINDEYDI.
+                    // Bu depoda tekrar eden ders: bozuk olan cogu zaman
+                    // olctugun sey degil, olcme bicimin.
+                    int replikSayisi = bark != null ? bark.GorunurReplik : 0;
+
+                    // KADRAJDA NE VAR — TURUN SORMADIGI SORU.
+                    //
+                    // Tablo "ayak altinda", "acik dugum", "tepe acik"
+                    // yaziyor; hepsi oyuncunun DURDUGU yerle ilgili.
+                    // Oysa bir tur karesi bir GORUNTUdur ve karelere
+                    // bakinca kusur hep orada cikti: 07_kirsal bir
+                    // tavan, 10_uskudar on metredeki bir tas blok,
+                    // 05_ayasofya bombos arazi gosteriyor. Hicbiri
+                    // sayida yoktu.
+                    //
+                    // Kameranin merkezinden bir isin: ne var, ne kadar
+                    // uzakta. Bir gozlem aracinin en az soylemesi
+                    // gereken sey, neye baktigidir.
+                    string kadrajda = "gok";
+                    float kadrajUzak = 0f;
+                    if (Physics.Raycast(kam.transform.position,
+                                        kam.transform.forward,
+                                        out var kadrajCarp, 400f, ~0,
+                                        QueryTriggerInteraction.Ignore))
+                    {
+                        kadrajda = kadrajCarp.collider.name;
+                        kadrajUzak = kadrajCarp.distance;
+                    }
 
                     // --- YAKALA ---
                     var rt = new RenderTexture(1280, 720, 24,
@@ -540,12 +723,27 @@ namespace Hezarfen.Editor.Diagnostics
                         kam.transform.rotation = Quaternion.LookRotation(
                             (mrk + Vector3.up * 1.0f)
                             - kam.transform.position);
-                        for (int i = 0; i < 4; i++) yield return null;
+                        // ZAMANSAL ETKILER YAKINSASIN — DORT KARE AZ.
+                        //
+                        // Denetim karesinde catilarin ve pencerelerin
+                        // uzerinde yuzlerce beyaz BENEK vardi; kar gibi.
+                        // Ayni yerin goz hizasi karesi (210 kare
+                        // oturma) tertemiz. Yani benek oyunun degil
+                        // TURUN kusuru: hacimsel bulut 0,90 zamansal
+                        // birikim kullaniyor, SSGI ve hacimsel sis de
+                        // kare kare temizleniyor; dort karede hicbiri
+                        // oturmuyor.
+                        //
+                        // Ayni sinif kusur bu araçta zaten yazili
+                        // (otomatik poz penceresiz kipte yakinsamiyor).
+                        // Bir gozlem araci, gozledigi seyin oturmasini
+                        // BEKLEMEK zorunda.
+                        for (int i = 0; i < 90; i++) yield return null;
 
                         var rt2 = new RenderTexture(1280, 720, 24,
                                                     RenderTextureFormat.ARGB32);
                         kam.targetTexture = rt2;
-                        for (int i = 0; i < 6; i++) kam.Render();
+                        for (int i = 0; i < 24; i++) kam.Render();
                         RenderTexture.active = rt2;
                         var tex2 = new Texture2D(1280, 720,
                                                  TextureFormat.RGB24, false);
@@ -563,12 +761,26 @@ namespace Hezarfen.Editor.Diagnostics
                         if (kip2 != null) kip2.enabled = true;
                     }
 
-                    satirlar.Add($"| {d.ad} | {altinda} | "
+                    // OYUNCU NEREDE — RAPORDA EN BASIT VE EN EKSIK OLCU.
+                    //
+                    // 01_dogum karesi ufka kadar bos toprak gosteriyor
+                    // ve 03_galata_sokak da oyle; ikisi de sehirde
+                    // olmali. Tabloda bunu soyleyecek tek sey yoktu:
+                    // "ayak altinda TR_Istanbul" bir yer adi degil,
+                    // yalnizca carpistiricinin adi. Bir tur raporu,
+                    // turun NEREDE yapildigini yazmalidir.
+                    satirlar.Add($"| {d.ad} | {p.x:0}, {p.z:0} | {altinda} | "
                                  + $"{p.y - araziKot:+0.0;-0.0} | "
                                  + $"{(kip != null ? kip.SonMesafe.ToString("0.00") : "?")} | "
                                  + $"{YakindakiNpc(npc, oyuncu.transform.position)} | "
                                  + $"{CizilenGovde(npc)} | "
-                                 + $"{(bark != null ? bark.GorunurReplik : 0)} | "
+                                 + $"{replikSayisi} | "
+                                 + $"{kadrajda} @ {kadrajUzak:0} m | "
+                                 + $"{(acikBulundu ? "E" : "H")} | "
+                                 + $"{durakSapmasi:0} | "
+                                 + $"{kayma:0.0} | "
+                                 + $"{(tepeAcik ? "E" : "H")} | "
+                                 + $"{aciKaymasi:+0;-0;0}° | "
                                  + $"{ms:0.0} | {d.neden} |");
                     Debug.Log($"[Hezarfen] tur {d.ad}: {altinda}, "
                               + $"kol {(kip != null ? kip.SonMesafe : 0f):0.0}, "

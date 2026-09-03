@@ -227,6 +227,10 @@ namespace Hezarfen.Editor.Lighting
             pv.size = sinir.size;
             n++;
 
+            // 3) FIRININ GOKYUZU — problar gogu buradan ogrenir.
+            string gokRapor = GokAyari();
+            n++;
+
             rapor = (geciciVardi
                         ? "Gecici takim SILINDI (ustune degil yerine).\n"
                         : "Gecici takim zaten yoktu.\n")
@@ -234,6 +238,7 @@ namespace Hezarfen.Editor.Lighting
                     + $"{AlacakaranlikEV}).\n"
                     + $"Sis: {SisMesafesi} m (Halic sabahi).\n"
                     + $"Prob hacmi: {_probYazi}\n"
+                    + gokRapor + "\n"
                     + "Sicrama: APV (pisirilmeli) + SSGI (kademeli).\n"
                     + "SONRAKI ADIM: Hezarfen -> Aydinlatma -> Problari pisir";
             return n;
@@ -635,6 +640,7 @@ namespace Hezarfen.Editor.Lighting
                                + "'Kalici isik pasini kur'.");
                 return;
             }
+            Debug.Log("[Hezarfen] " + GokAyari());
             Debug.Log("[Hezarfen] Problar pisiriliyor (yalniz APV)...");
             AdaptiveProbeVolumes.BakeAsync();
         }
@@ -662,6 +668,34 @@ namespace Hezarfen.Editor.Lighting
         public static void TopluPisir()
         {
             EditorSceneManager.OpenScene(ProbeSahnesi);
+
+            // SEHIR TABAN SAHNEDE DEGIL, SEMTLERDE.
+            //
+            // Firin yalniz taban sahneyi aciyordu ve pisirme kumesi tek
+            // sahne iceriyordu (`singleSceneMode: 1`). Sonuc olculdu:
+            // 2.829.507 prob pisti ve hepsi bos bir 729 x 648 m yamanin
+            // ustundeydi; binalarin oldugu 35-41 MB'lik sekiz semt
+            // sahnesine hic prob dusmedi. Sehrin dolayli isigi bu yuzden
+            // yalnizca SSGI'dan geliyordu ve ustten bakan denetim
+            // karesinde sokak simsiyah cikiyordu.
+            //
+            // Semtler ek olarak acilir; `SemtProblari.Kur` her birine
+            // kendi `Mode.Global` hacmini koyar ve kumeye baglar.
+            foreach (string semt in SemtProblari.Semtler())
+                EditorSceneManager.OpenScene(semt, OpenSceneMode.Additive);
+            Debug.Log("[Hezarfen] " + (SemtProblari.Kur(out string semtRapor) > 0
+                          ? semtRapor : "Semt bulunamadi."));
+
+            // PROB, ISIGA KATILAN GEOMETRININ CEVRESINE KONUR.
+            //
+            // Sehrin tamami "Contribute GI" isaretsizdi: D_Surici_Dogu
+            // 498 nesne, hepsi 0; D_Galata 401 nesne, hepsi 0. Yani
+            // firin her seferinde katilan hicbir sey bulamadi ve
+            // 2.829.507 probu bos yamaca pisirdi — ve "basarili" dedi.
+            Debug.Log("[Hezarfen] GI katilimi: "
+                      + GIKatilimi.Kat(out string giRapor) + " cizici\n"
+                      + giRapor);
+
             var pv = Object.FindAnyObjectByType<ProbeVolume>();
             if (pv == null)
             {
@@ -681,6 +715,9 @@ namespace Hezarfen.Editor.Lighting
             // Ayar bir varliga yazilir ve sahneye baglanir; boylece bir
             // dahaki sefere "acik miydi" diye sorulmaz.
             AydinlatmaAyari();
+
+            Debug.Log("[Hezarfen] " + GokAyari());
+            EditorSceneManager.SaveOpenScenes();
 
             Debug.Log("[Hezarfen] APV pisirme basladi (toplu kip).");
             _pisirmeBasi = System.DateTime.UtcNow;
@@ -717,16 +754,286 @@ namespace Hezarfen.Editor.Lighting
             }
             ls.bakedGI = true;
             ls.realtimeGI = false;
-            ls.lightmapper = LightingSettings.Lightmapper.ProgressiveGPU;
+            // GPU DEGIL CPU — VE SEBEBI OLCULDU.
+            //
+            // Toplu pisirme iki kez COKTU: sureç hicbir sey yazmadan
+            // yok oldu, gunlukte hata yok. Sayilar sebebi soyluyor —
+            // gunlukteki tek satir "Transformed OOTS snapshot into
+            // LightBaker scene input ... Size: 7251.37MB" ve bu
+            // makinenin karti 8 GB. Yani sahne girdisi tek basina
+            // VRAM'in tamamina yakin; ilerlemeli GPU firinini
+            // calistiracak yer kalmiyor.
+            //
+            // Sistem bellegi 32 GB (olculdu), yani CPU firininin yeri
+            // var. Yavas ama BITIYOR; bitmeyen bir firindan yavas bir
+            // firin iyidir. Sehir kucultulmedi, prob araligi
+            // seyreltilmedi: kusur kalite ayarinda degil, isin yanlis
+            // yere verilmesindeydi.
+            ls.lightmapper = LightingSettings.Lightmapper.ProgressiveCPU;
+            // ORNEK SAYISI ISIN BOYUNA GORE SECILIR.
+            //
+            // 128 dolayli ornek + 2 sicrama, bir oda icin makul
+            // sayilardir; 10 km'lik bir sehir icin degil. Olculdu:
+            // GPU firini VRAM'e sigmayip coktu, CPU firini ise UC
+            // SAATTE bitmedi. Ikisi de ayni seyi soyluyor — is,
+            // makineye gore fazla.
+            //
+            // Neyi kesecegimi secerken prob IZGARASINI korudum:
+            // araligi 3 m'den 6 m'ye cikarmak 7,2 m'lik bir sokaga
+            // enine tek prob birakirdi ve sokak tam da isigin
+            // olculmesi gereken yer. Kesilen sey ORNEKLEME: prob bir
+            // kuresel harmonik, yani zaten agir ortalamasi alinmis bir
+            // sey. 32 ornek onda gurultu birakmaz; ayni sayi bir isik
+            // haritasinda leke yapardi.
+            //
+            // Sicrama 2 -> 1: acik hava sehrinde ikinci sicrama, ilkin
+            // yaninda olcum gurultusu kadar kalir. Kapali ic mekan
+            // gelince bu sayi yeniden sorulur.
             ls.directSampleCount = 32;
-            ls.indirectSampleCount = 128;
-            ls.maxBounces = 2;
+            ls.indirectSampleCount = 32;
+            ls.maxBounces = 1;
             ls.ao = false;                 // AO ekranda zaten var (SSAO)
             EditorUtility.SetDirty(ls);
             Lightmapping.lightingSettings = ls;
             AssetDatabase.SaveAssets();
             Debug.Log("[Hezarfen] Aydinlatma ayari: Baked GI ACIK "
                       + $"({ls.indirectSampleCount} dolayli ornek).");
+        }
+
+        /// <summary>
+        /// <b>Fırının gökyüzü</b> — problara gök ışığını veren şey.
+        ///
+        /// ## Ölçüm
+        ///
+        /// APV pişirildikten sonra turun kareleri ölçüldü ve gölgedeki
+        /// zemin <c>(36, 15, 0)</c> çıktı: <b>mavi kanal sıfır</b>.
+        /// Açık gök altındaki bir gölge güneşten daha mavidir, daha az
+        /// değil; mavinin hiç olmaması "karanlık" demek değil, <b>gök
+        /// hiç katkı vermiyor</b> demektir. Aynı turda Galata sokağının
+        /// gölgesi 0,76 mavi/kırmızı oranı taşıyordu — yani kusur pozda
+        /// ya da tonlamada değil, yerdeydi.
+        ///
+        /// Sebep sahnede yazılıydı: <c>StaticLightingSky</c> nesnesi
+        /// vardı, <c>m_Profile</c> alanı <c>{fileID: 0}</c>. Fırın
+        /// 2.829.507 probu <b>gökyüzüsüz</b> pişirdi; şehrin dolaylı
+        /// ışığı olarak yalnız güneşin kiremitten ve sıvadan sıçrayan
+        /// sıcak payı kaldı. Bu depoda dördüncü kez aynı sınıf kusur:
+        /// nesne var, sayı büyük, taşıması gereken şey bağlanmamış.
+        ///
+        /// Bir önceki turda bu karanlığı ölçüp <i>"kusur değil, üstü
+        /// kapalı sokak"</i> demiştim. Ölçtüğüm şey parlaklıktı ve
+        /// parlaklık bu iki durumu ayırmıyor; ayıran ölçü <b>rengin
+        /// mavisi</b>.
+        ///
+        /// ## Neden bulut fırına girmiyor
+        ///
+        /// Bulut gölgesi gezer; pişirilirse şehrin üstüne kalıcı bir
+        /// leke olarak çakılır. Gök statik, bulut gerçek zamanlı.
+        /// </summary>
+        public static string GokAyari()
+        {
+            var sls = Object.FindAnyObjectByType<StaticLightingSky>();
+            if (sls == null)
+                sls = new GameObject("StaticLightingSky")
+                      .AddComponent<StaticLightingSky>();
+
+            var gokProfili = AssetDatabase.LoadAssetAtPath<VolumeProfile>(
+                Gis.SkyProfileBuilder.ProfilePath);
+            if (gokProfili == null)
+                return "Gok profili YOK ("
+                       + Gis.SkyProfileBuilder.ProfilePath
+                       + ") — once 'Hezarfen > GIS > Faz1 gokyuzu "
+                       + "profilini uret'.";
+
+            // SIRA ONEMLI: `profile` atamasi HDRP icinde benzersiz
+            // kimligi SIFIRLIYOR (paket kaynaginda yazili: "Changing the
+            // volume is considered a destructive operation"). Kimlik
+            // once yazilirsa profil onu siler ve firin yine goksuz
+            // kosar.
+            sls.profile = gokProfili;
+            sls.staticLightingSkyUniqueID =
+                SkySettings.GetUniqueID(typeof(PhysicallyBasedSky));
+            sls.staticLightingCloudsUniqueID = 0;
+
+            EditorUtility.SetDirty(sls);
+            EditorSceneManager.MarkSceneDirty(
+                EditorSceneManager.GetActiveScene());
+            return $"Firin gokyuzu: {gokProfili.name} "
+                   + $"(kimlik {sls.staticLightingSkyUniqueID}).";
+        }
+
+        /// <summary>
+        /// Fırının gökyüzü <b>bağlı mı</b> — testin okuduğu ölçü.
+        ///
+        /// İki koşul birden: profil atanmış olacak <b>ve</b> kimlik o
+        /// profilde gerçekten bulunan, etkin bir gökyüzünü gösterecek.
+        /// Kimliği sıfır olan bir profil, profilsiz bir kimlik kadar
+        /// karanlık pişirir.
+        /// </summary>
+        public static bool GokBagli(out string neden)
+        {
+            var sls = Object.FindAnyObjectByType<StaticLightingSky>();
+            if (sls == null)
+            {
+                neden = "Sahnede StaticLightingSky yok.";
+                return false;
+            }
+            if (sls.profile == null)
+            {
+                neden = "StaticLightingSky profilsiz — firin goksuz kosar.";
+                return false;
+            }
+            if (sls.staticLightingSkyUniqueID == 0)
+            {
+                neden = "StaticLightingSky kimligi 0 — profil bagli ama "
+                        + "gok secilmemis.";
+                return false;
+            }
+            if (!sls.profile.TryGet<PhysicallyBasedSky>(out var gok)
+                || !gok.active)
+            {
+                neden = $"Profil ({sls.profile.name}) etkin bir "
+                        + "PhysicallyBasedSky tasimiyor.";
+                return false;
+            }
+            neden = $"{sls.profile.name} / kimlik "
+                    + $"{sls.staticLightingSkyUniqueID}";
+            return true;
+        }
+
+        /// <summary>
+        /// <b>Tek semtin problarini pisirir</b> — bütün şehri bir
+        /// oturuşta pişiremeyen makine için.
+        ///
+        /// ## Neden gerekti
+        ///
+        /// Şehrin tamamı iki kez pişmedi: GPU fırını 8 GB'lık karta
+        /// sığmayıp çöktü, CPU fırını üç saatte bitmedi. İş bölünebilir
+        /// ve bölünmesi gereken yer belli — <b>semt</b>: oyun zaten
+        /// semt semt akıtıyor, APV verisi de sahne sahne saklanıyor.
+        ///
+        /// ## Nasıl
+        ///
+        /// APV, yüklü sahnelerden hangilerinin pişeceğini
+        /// <c>partialBakeSceneList</c> ile öğrenir ve listede olmayan
+        /// sahnelerin hücrelerini <b>korur</b>
+        /// (<c>ProbeGIBaking.Serialization</c>). Alan <c>internal</c>;
+        /// yansımayla yazılıyor ve bu bilerek kaydediliyor: paket
+        /// sürümü değişip alan kaybolursa kısmi pişirme sessizce
+        /// TAM pişirmeye döner ve yine sığmaz. O yüzden bulunamazsa
+        /// koşum durur, devam etmez.
+        ///
+        /// Semt adı komut satırından gelir:
+        /// <c>-hezarfenSemt D_Galata</c>.
+        /// </summary>
+        public static void TopluPisirSemt()
+        {
+            string semt = KomutSatiri("-hezarfenSemt");
+            if (string.IsNullOrEmpty(semt))
+            {
+                Debug.LogError("[Hezarfen] -hezarfenSemt <ad> verilmedi.");
+                EditorApplication.Exit(1);
+                return;
+            }
+            string yol = $"{SemtProblari.SemtDizini}/{semt}.unity";
+            if (!System.IO.File.Exists(yol))
+            {
+                Debug.LogError($"[Hezarfen] Semt yok: {yol}");
+                EditorApplication.Exit(1);
+                return;
+            }
+
+            EditorSceneManager.OpenScene(ProbeSahnesi);
+            EditorSceneManager.OpenScene(yol, OpenSceneMode.Additive);
+            // SEMT KURULUMU VE GI BAYRAKLARI BURADA KOSMAZ.
+            //
+            // Ikisi de butun semtleri ACAR (`SemtProblari.Kur`,
+            // `GIKatilimi.Kat`) ve bu isin amaci tam olarak onu
+            // yapmamak. Ikisi de daha once kostu ve sonuclari
+            // sahnelere KAYDEDILDI; bosta kostuklarinda zaten "0"
+            // diyorlar. Burada yalniz dogrulanir.
+            var _pv = Object.FindAnyObjectByType<ProbeVolume>();
+            if (_pv == null)
+            {
+                Debug.LogError($"[Hezarfen] {semt} icinde prob hacmi yok"
+                               + " — once 'Semt problarini kur'.");
+                EditorApplication.Exit(1);
+                return;
+            }
+            AydinlatmaAyari();
+            Debug.Log("[Hezarfen] " + GokAyari());
+            EditorSceneManager.SaveOpenScenes();
+
+            if (!KismiPisirmeyiAyarla(new[] { ProbeSahnesi, yol }))
+            {
+                Debug.LogError("[Hezarfen] Kismi pisirme alani bulunamadi "
+                               + "(AdaptiveProbeVolumes.partialBakeSceneList). "
+                               + "Paket surumu degismis olabilir; tam "
+                               + "pisirme bu makinede sigmiyor, o yuzden "
+                               + "devam edilmiyor.");
+                EditorApplication.Exit(4);
+                return;
+            }
+
+            Debug.Log($"[Hezarfen] APV pisirme basladi — YALNIZ {semt}.");
+            _pisirmeBasi = System.DateTime.UtcNow;
+            _pisirmeGoruldu = false;
+            // YEDEK YOL BURADA KAPALI.
+            //
+            // `PisirmeyiBekle` 20 saniyede baslamayan bir APV cagrisi
+            // gorunce klasik `Lightmapping.BakeAsync`e dusuyor — ve o
+            // cagri KISMI listeyi tanimaz, butun sehri pisirmeye
+            // kalkar. Yani yedek yol, bu islevin varlik sebebini
+            // ortadan kaldirirdi.
+            _yedekDenendi = true;
+            _sonBildirim = 0.0;
+            // KLASIK CAGRI — VE BU KISMI PISIRMEYI BOZMAZ.
+            //
+            // Ilk yazimda `AdaptiveProbeVolumes.BakeAsync()` vardi ve
+            // olculdu: 120 saniye boyunca `Lightmapping.isRunning`
+            // false kaldi, pisirme HIC baslamadi. Bu depoda zaten
+            // yazili bir gercek — o cagri toplu kipte baslamiyor;
+            // sehrin tamamini pisiren yol da ancak klasik cagriya
+            // duserek calisiyordu.
+            //
+            // `Lightmapping.BakeAsync()` AYNI APV yolundan geciyor
+            // (yigin izi: Lightmapping.BakeAsync -> OnBakeStarted ->
+            // PrepareBaking) ve `partialBakeSceneList` orada okunuyor.
+            // Yani klasik cagri kismi listeyi tanir; tam pisirmeye
+            // donmez.
+            Lightmapping.BakeAsync();
+            EditorApplication.update += PisirmeyiBekle;
+        }
+
+        private static string KomutSatiri(string anahtar)
+        {
+            var a = System.Environment.GetCommandLineArgs();
+            for (int i = 0; i < a.Length - 1; i++)
+                if (a[i] == anahtar) return a[i + 1];
+            return null;
+        }
+
+        /// <summary>
+        /// <c>partialBakeSceneList</c>'i verilen sahnelerle doldurur.
+        /// Alan <c>internal</c> olduğu için yansıma; bulunamazsa
+        /// <c>false</c> döner ve çağıran durur.
+        /// </summary>
+        private static bool KismiPisirmeyiAyarla(string[] sahneler)
+        {
+            var t = typeof(AdaptiveProbeVolumes);
+            var f = t.GetField("partialBakeSceneList",
+                System.Reflection.BindingFlags.NonPublic
+                | System.Reflection.BindingFlags.Static);
+            if (f == null) return false;
+
+            var kume = new System.Collections.Generic.HashSet<string>();
+            foreach (string y in sahneler)
+            {
+                string g = AssetDatabase.AssetPathToGUID(y);
+                if (!string.IsNullOrEmpty(g)) kume.Add(g);
+            }
+            f.SetValue(null, kume);
+            return true;
         }
 
         private const string ProbeSahnesi =
@@ -747,6 +1054,18 @@ namespace Hezarfen.Editor.Lighting
         /// Bir beklemenin, beklediği şeyin başladığını görmeden bittiğine
         /// karar vermesi bekleme değildir.
         /// </summary>
+        /// <summary>
+        /// Pişirmenin bekleneceği en uzun süre (sn).
+        ///
+        /// 60 dakikaydı ve o sayı, şehrin GI'ya <b>katılmadığı</b>
+        /// zamandan kalmaydı: fırın hiçbir şey bulamadığı için 1,7
+        /// dakikada bitiyordu. 105.192 çizici katılınca ölçüldü —
+        /// pişirme 35 dakikayı geçti ve sürüyordu. Bir sınır, ölçülen
+        /// işten kısa olduğunda koruma değil kayıp üretir: iptal eder ve
+        /// bir saatlik işi çöpe atar.
+        /// </summary>
+        private const double EnCokPisirme = 3.0 * 3600.0;
+
         private static bool _pisirmeGoruldu;
         private static bool _yedekDenendi;
 
@@ -778,7 +1097,8 @@ namespace Hezarfen.Editor.Lighting
 
             // Baslamasi icin makul sure taniyoruz: is kuyruga giriyor.
             if (!_pisirmeGoruldu && gecen < 120.0) return;
-            if (_pisirmeGoruldu && Lightmapping.isRunning && gecen < 3600.0)
+            if (_pisirmeGoruldu && Lightmapping.isRunning
+                && gecen < EnCokPisirme)
                 return;
 
             EditorApplication.update -= PisirmeyiBekle;
@@ -790,9 +1110,10 @@ namespace Hezarfen.Editor.Lighting
                 EditorApplication.Exit(3);
                 return;
             }
-            if (gecen >= 3600.0)
+            if (gecen >= EnCokPisirme)
             {
-                Debug.LogError("[Hezarfen] APV pisirme 60 dk'da bitmedi.");
+                Debug.LogError("[Hezarfen] APV pisirme "
+                               + $"{EnCokPisirme / 60.0:0} dk'da bitmedi.");
                 Lightmapping.Cancel();
                 EditorApplication.Exit(2);
                 return;

@@ -1,0 +1,27 @@
+{
+ "polyhaven_id": null,
+ "name": "sac_yuzey",
+ "resolution": "1024px",
+ "size_meters": [
+  0.09,
+  0.09
+ ],
+ "authors": {
+  "Hezarfen projesi (prosedürel üretim)": "All"
+ },
+ "license": "Kendi eserimiz — üçüncü taraf hakkı yok",
+ "source": "prosedürel; girdi yok",
+ "maps": {
+  "BC": "T_sac_yuzey_BC.png",
+  "N": "T_sac_yuzey_N.png",
+  "ARM": "T_sac_yuzey_ARM.png",
+  "R": "T_sac_yuzey_R.png",
+  "AO": "T_sac_yuzey_AO.png"
+ },
+ "normal_convention": "OpenGL (Y+) — Poly Haven nor_gl ile ayni",
+ "generated_by": "tools/textures/gen_sakal_texture.py",
+ "role": "sakal",
+ "use": "sarik/takke altindan gorunen sac ve ense kabugu",
+ "why": "M_Beard'in taban rengi haritasi YOKTU (olculdu: _BaseColorMap fileID 0) ve dokusuz albedo HDRP'de plastik okur — yakin planda sakal ceneye gecirilmis kahverengi bir maske gibi duruyordu. Kart atlasi bu isi goremez: sakal kart degil KABUK, ve kabuk dosenebilir bir yuzey ister.",
+ "base_color_note": "BC bilerek notr. Renk paletten gelir (beard kestane, beard_ak ak) ve malzeme onu _BaseColor ile carpar; renkli bir albedo yaslinin ak sakalini kestaneye cevirirdi."
+}

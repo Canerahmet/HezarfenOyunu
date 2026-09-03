@@ -254,10 +254,18 @@ varlığı bağlıyor ve indirilen bir dalga sesinin lisansını takip etmek,
 
 ### Kumaş ve ten dokuları — prosedürel, kendi eserimiz (2026-09-02)
 
-`art/textures/generated/kumas_{keten,cuha,ipek,kece}` ve
-`art/textures/generated/deri_insan` **bizim ürettiğimiz** dokulardır;
-üçüncü taraf hakkı yoktur. Üreteçler: `tools/textures/gen_kumas_texture.py`
-ve `tools/textures/gen_deri_texture.py`.
+`art/textures/generated/kumas_{keten,cuha,ipek,kece,kilim}`,
+`art/textures/generated/deri_insan`, `art/textures/generated/sakal`
+ve `art/textures/generated/kosele`
+**bizim ürettiğimiz** dokulardır; üçüncü taraf hakkı yoktur.
+Üreteçler: `tools/textures/gen_kumas_texture.py`,
+`tools/textures/gen_deri_texture.py`,
+`tools/textures/gen_sakal_texture.py` ve
+`tools/textures/gen_kosele_texture.py`.
+
+Sakal dokusunun **girdisi yoktur**: teller doğrudan sayıdan çiziliyor
+(yön, kümelenme, uzunluk). Kart atlası (`gen_hair_texture.py`) da
+aynı ailedendir ve aynı şekilde kendi eserimizdir.
 
 Ten dokusunun **girdisi** MPFB2'nin kendi bölge maskeleridir
 (`data/textures/mpfb_{face,lips,eyelids,ears}.jpg`) — yukarıdaki
@@ -265,5 +273,10 @@ MPFB 2.0.17 satırının kapsadığı **CC0 çekirdek varlık** kümesi. Maskele
 "nerede ne var" bilgisini taşır (yüz, dudak, göz kapağı, kulak);
 tenin rengi, oranları, gözeneği ve gözün çizimi bize aittir. Maske
 dosyaları depoya **girmez**; çıktı girer.
+
+Kilim dokusu **motif taşımaz** ve bu bilinçlidir: bir kilimin
+motifi kaynak ister; uydurulmuş bir motif, kilimi kilim yapan şeyi
+uydurmak olurdu. Doku yalnızca **atkı yüzlü düz dokumanın** yüzeyini
+taşır. Motif belgeyle birlikte gelir.
 
 Ticari kullanım: sorun yok. Kaynak CC0, çıktı bizim.
