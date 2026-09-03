@@ -982,6 +982,44 @@ kadar indirip eteği onun altından başlatmak, (b) eteği göğsün altından
 başlatıp bel dikişini hiç kurmamak. Ölçüyle seçilecek bir şey değil;
 Caner'e soruluyor.
 
+### Turun altı durağı boş çıktı — çünkü şehir henüz yüklenmemişti
+
+Turun kendi raporu on durağın **altısında** ayak altında `TR_Istanbul`
+(çıplak arazi), 40 m'de 0 NPC ve 0 çizilen gövde yazıyordu. Kareler de
+öyle: `03_galata_sokak` boş bir kum düzlüğü, şehir ufukta ince bir
+şerit. Bu, turlar boyunca *"orada şehir yok"* diye okundu.
+
+Ölçüm başka bir şey söylüyor. Durak (120, 60); `D_Galata`'nın kendi
+sınırı x −1944…1296, z −972…1944 — **durak semtin tam içinde.** Şehir
+yok değil, **henüz yüklenmemiş**: akış Addressables ile asenkron
+yüklüyor ve tur onu **doksan kare** bekliyordu. Doksan kare bir sayıdır,
+bir koşul değil.
+
+Bu deponun tekrar eden dersinin bir örneği daha: *bir bekleme,
+beklediği şeyin bittiğini görmeden bitiyorsa bekleme değildir.* Aynı
+kusur APV fırınında da vardı.
+
+Tur artık `DistrictStreamer.LoadsInFlight` sıfıra inene kadar bekliyor
+(akışın bir kez değerlendirmesi için yarım saniye önden, otuz saniye
+üst sınır) ve her satırda **kaç semt yüklü, ne kadar beklendi** yazıyor.
+Bundan sonra boş çıkan bir durak gerçekten boştur.
+
+### Gölgenin rengi: turun tek sayısı, artık bir aletle
+
+`tools/olcum/golge_orani.py` karenin en karanlık %25'inin
+mavi/kırmızı oranını veriyor (gökyüzü pikselleri dışarıda). Fırın öncesi
+taban ölçüm tek cümleye iniyor: **binanın olduğu her karede gölge
+siyah.**
+
+| kare | gölge mavi/kırmızı | saçılım |
+|---|---:|---:|
+| çıplak araziye bakanlar (01, 02, 03, 05, 08, 10) | 0,26 – 0,30 | 0,10 – 0,17 |
+| şehre bakanlar (04, 06, 07, 09) | 0,000 – 0,016 | 0,006 – 0,10 |
+
+Saçılım da anlatıyor: `04_surici_kalabalik`'te 0,006 — karanlık her
+pikselde **aynı** renk. Değişmeyen bir karanlık gölge değil, ışık
+almayan yüzeydir.
+
 ### Yüzün ölçüleri: dört sabit, dört ölçüm
 
 Yakın plan kareleri dört ayrı kusur gösterdi ve dördü de aynı cinsti —
