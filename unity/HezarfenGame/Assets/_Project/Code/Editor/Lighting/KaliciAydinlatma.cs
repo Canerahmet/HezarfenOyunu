@@ -1187,6 +1187,27 @@ namespace Hezarfen.Editor.Lighting
             return true;
         }
 
+        // FIRINDA ISIK YOK — VE BU BILINCLI.
+        //
+        // Pisirme kaydi bunu tek satirda soyluyor:
+        //
+        //   Extracted OOTS snapshot with 11260 instances, 404 geometries,
+        //   28 materials, **0 lights**
+        //
+        // Sahnedeki iki yonlu isik da `m_Lightmapping: 4` — Realtime
+        // Only — ve oyle KALMALI: gunesi `ZamanSistemi.GunesiYerlestir`
+        // saate gore donduruyor. Sabit bir gunesi pisirmek, gunun her
+        // saatinde yanlis yonden gelen bir sicrama demek olurdu.
+        //
+        // Yani APV burada GOKYUZU sicramasini tasir, gunesinkini degil;
+        // gunesin sicramasi ekran uzayindan (SSGI) gelir. Golgenin
+        // rengi olcusu de tam bunu olcuyor: gok mavidir, gokten
+        // sicrayan isik alan bir golge mavi/kirmizi oraninda yukselir.
+        //
+        // Bu not, ileride birinin "firinda isik yok" diye gunesi
+        // Baked/Mixed yapmasini engellemek icin burada: o degisiklik
+        // gun dongusunu bozar.
+
         private const string ProbeSahnesi =
             "Assets/_Project/Scenes/Faz1_Terrain.unity";
 
