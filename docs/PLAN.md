@@ -153,8 +153,15 @@ ses kaynakları 3B ve mesafeyle sönümlü · kare ≤ 16,7 ms.
 
 ADR 0072'nin **hiç çalışmamış** temel katmanı burada kapanır.
 
-- **APV pişirme** (19 ProbeVolume var, diskte veri yok — iç mekânlar
-  geldiğinde bu artık isteğe bağlı değil)
+- **APV pişirme** — *durum 2026-09-04:* mimari kuruldu ve **D_Galata
+  pişti** (ADR 0087). Yol açık: prob hacimleri semt boyunda, açık suya
+  hacim konmuyor, aralık 6 m, örnek 16, arka uç CPU, karma kip
+  `IndirectOnly`. Ve asıl kusur bulundu — **fırında ışık yoksa prob da
+  yok**: gökyüzünü beş kat parlatmak `CellData`yı iki desende bıraktı,
+  güneşi `Mixed` yapmak 12.106 desene çıkardı.
+  **Kalan:** öteki beş semt (her biri ~1-2 saat) ve gölge ölçümünün
+  kapalı karelerde 0,26-0,30 ailesine katılması
+  (`tools/olcum/golge_orani.py`).
 - Ortam örtme (AO), temas gölgesi
 - Bloom, renk derecelendirme (LUT), vinyet
 - VFX: ocak dumanı, toz, kuş sürüsü, deniz serpintisi
