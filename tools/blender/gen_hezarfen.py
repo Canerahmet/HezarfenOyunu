@@ -785,7 +785,15 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
     # gorunen sey sakal, sakak, ense. Kafanin tamamini kaplamak hic
     # gorunmeyecek 40 kartin bedelini odemek olurdu.
     ak = (tip == "yasli")
-    sac_mat = mats["beard_ak"] if ak else sk.hair_material()
+    # KART MALZEMESI ARTIK URETILMIYOR.
+    #
+    # `sac_mat` uc yerde kullaniliyordu ve ucu de bos donguydu
+    # (`for sx in ()`): sakal ucu, biyik ve sac kartlari kabuga
+    # cevrilirken donguler bosaltilmis ama govdeleri birakilmisti.
+    # Bir kararin yarisini uygulamak, kusurun yarisini birakmaktir —
+    # bu dosyanin kendi cumlesi. Gerekceler yerinde duruyor, kod
+    # gitti; `sac_kit.kart` ve `sac_kit.hair_material` kutuphanede
+    # kaliyor ama bugun onlari cagiran hicbir uretici yok.
     # Sac KABUGU ayri bir malzeme: kart malzemesi alfa keser (biyik ve
     # sakal ucu hala kart), kabuk ise opak olmali.
     sac_kabuk_mat = mats["beard_ak"] if ak else mats["sac"]
@@ -937,19 +945,6 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
     # birakilmisti. Ayni kusuru tasiyorlar: kenardan bakildiginda
     # cizgi, ve kabuk zaten cenenin bicimini veriyor. Bir kararin
     # yarisini uygulamak, kusurun yarisini birakmaktir.
-    for i, (p, yon) in enumerate(()):
-        for sx in (-1, 1):
-            if sx > 0 and abs(p.x) < boy * 0.004:
-                continue
-            k = sk.kart(f"SakalUc_{sx}_{i}",
-                        (p.x * sx + yon.x * sx * 0.020,
-                         p.y + yon.y * 0.020, p.z - boy * 0.030),
-                        (yon.x * sx * 0.30, yon.y * 0.30, -1.0),
-                        (yon.x * sx, yon.y, 0.30),
-                        boy * 0.030, boy * 0.028, col,
-                        serit=i % 4, egim=0.22)
-            parts.append(hz.assign(k, sac_mat))
-
     # --- BIYIK: KART DEGIL KABUK ----------------------------------------
     #
     # Biyik iki kartti ve karelerde ne oldugu goruldu: yandan bakinca
@@ -998,26 +993,6 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
             # kopyaladigi icin kenarlari basamakli cikiyor ve karede
             # "blok" okunuyordu. Sakalda da ayni sayi kullanildi.
             parts.append(hz.assign(kiy.yumusat(_biyik, 6), sakal_mat))
-
-    # Eski biyik kartlari KALDIRILDI; gerekcesi yukarida.
-    for sx in ():
-        # BIYIK DUDAGIN ONUNE KONUR, MUTLAK BIR Y'YE DEGIL.
-        #
-        # Once `-boy * 0,052` yaziliyordu, yani y = -8,8 cm. Olculdu:
-        # kafanin ON yuzu y = -0,031. Biyik yuzun bes santim ONUNDE
-        # duruyordu ve UV kusuru duzelip alfa calisinca cenenin
-        # yaninda ince bir tel olarak gorundu.
-        #
-        # Dogru yer agiz kotundaki kesitin kendi onudur — govdenin y
-        # ekseni ortasindan gecmedigi icin `kesit_merkezli` sart.
-        _bk = kiy.kesit_merkezli(govde, boy * 0.905)
-        _brx, _bry, _bcy = _bk if _bk else (boy * 0.05, boy * 0.06, 0.0)
-        b = sk.kart(f"Biyik_{sx}", (sx * boy * 0.010,
-                                    _bcy - _bry * 0.92,
-                                    boy * 0.905),
-                    (sx * 0.85, -0.30, -0.42), (0.0, -1.0, 0.25),
-                    boy * 0.026, boy * 0.020, col, serit=2, egim=0.10)
-        parts.append(hz.assign(b, sac_mat))
 
     # --- SAC: KART DEGIL KABUK ------------------------------------------
     #
@@ -1108,40 +1083,6 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
             while _sac.data.uv_layers:
                 _sac.data.uv_layers.remove(_sac.data.uv_layers[0])
             parts.append(hz.assign(kiy.yumusat(_sac, 6), sac_kabuk_mat))
-
-    # Eski kart dongusu KALDIRILDI; gerekcesi yukarida.
-    for sx in ():
-        for i, (dy, dz, ser) in enumerate((
-                (0.30, 0.905, 0), (0.10, 0.895, 3), (-0.34, 0.900, 1))):
-            # KESIT DEGIL KESIT_MERKEZLI.
-            #
-            # `kesit` yari-derinligi `max(|y|)` diye verir ve bu ancak
-            # govde y=0'da ortaliysa dogrudur — degil. Ayni kusur bu
-            # depoda etekte, kusakta ve sarikta ucer kez odendi; burada
-            # dorduncusuydu ve olculdu: sac malzemesinin y sinirlari
-            # -0,105..+0,075, oysa yuzun onu y = -0,035. Yani kartlar
-            # yuzun YEDI SANTIM ONUNDE, cenenin iki yanindan omza inen
-            # ince teller olarak asili duruyordu — UV kusuru duzelip
-            # alfa calismaya baslayinca gorunur oldular.
-            _km = kiy.kesit_merkezli(govde, boy * dz)
-            if _km is None:
-                _km = (boy * 0.05, boy * 0.06, 0.0)
-            _rx, _ry, _cy = _km
-            # TUTAM KAFAYA YAPISIK VE GENIS OLMALI.
-            #
-            # Kok kafanin %94'unde ve kart uzun+dar+cok egimliydi;
-            # sonuc yuzun iki yaninda asili duran iki ince TEL oldu.
-            # Bir kart, kenardan bakildiginda bir cizgidir — sac gibi
-            # okunmasi icin genis ve yuzeye yapisik olmali.
-            #
-            # Kok %80'e cekildi (tutamin dibi kafanin ICINDE kalir),
-            # boy kisaldi, en iki katina cikti, egim ucte bire indi.
-            k = sk.kart(f"Sac_{sx}_{i}",
-                        (sx * _rx * 0.80, _cy + dy * _ry, boy * dz),
-                        (sx * 0.35, dy * 0.3, -1.0), (sx, dy * 0.4, 0.25),
-                        boy * 0.026, boy * 0.058, col, serit=ser,
-                        egim=0.10)
-            parts.append(hz.assign(k, sac_mat))
 
     # --- MEST ------------------------------------------------------------------
     # Mest kabuk DEGIL kaliptir; gerekcesi kiy.mest'te (kabuk yontemi
