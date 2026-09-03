@@ -504,64 +504,6 @@ namespace Hezarfen.Editor.Diagnostics
                         }
                     }
 
-                    // DUVARA BAKAN BIR OLCU ALETI SUS URETIR.
-                    //
-                    // Duraklarin bakis acisi elle secilmisti ve karelere
-                    // BAKINCA goruldu: 10_uskudar'da on metredeki bir tas
-                    // blok karenin %60'ini kapliyor, 07_kirsal'da kare bir
-                    // ahsap tavan ve bos siva duvari gosteriyor. Oysa
-                    // yerlestirme dogruydu — ayni turda "acik dugum: E,
-                    // kayma 0,0 m, tepe acik: E" yaziyor. Yani kusur
-                    // oyuncunun DURDUGU yerde degil, BAKTIGI yondeydi.
-                    //
-                    // Elle secilen aci atilmiyor: durak "Ayasofya" diyorsa
-                    // oraya bakmasinin bir sebebi var. Aci korunur ve
-                    // yalnizca onu goren en yakin ACIK yone kaydirilir.
-                    // Hicbiri acik degilse en uzagi gorene gidilir —
-                    // kapali bir avluda bile en iyi kare o.
-                    //
-                    // Kalabaliga donulduyse dokunulmaz: o karar bundan
-                    // daha iyi bir sebebe dayaniyor.
-                    float aciKaymasi = 0f;
-                    if (!kalabaligaDonuldu)
-                    {
-                        var goz = oyuncu.transform.position
-                                  + Vector3.up * 1.6f;
-                        float enIyiAci = 0f, enIyiUzak = -1f;
-                        bool yeter = false;
-                        // Sirayla 0, +15, -15, +30, -30 ... : ilk YETERLI
-                        // yon kazanir, yani en az kaydiran.
-                        for (int adim = 0; adim <= 6 && !yeter; adim++)
-                        {
-                            for (int isaret = 1; isaret >= -1; isaret -= 2)
-                            {
-                                float sap = adim * 15f * isaret;
-                                var yon = Quaternion.Euler(0f, d.bakisYaw + sap, 0f)
-                                          * Vector3.forward;
-                                float uzak = Physics.Raycast(
-                                    goz, yon, out var carp, 80f, ~0,
-                                    QueryTriggerInteraction.Ignore)
-                                    ? carp.distance : 80f;
-                                if (uzak > enIyiUzak)
-                                { enIyiUzak = uzak; enIyiAci = sap; }
-                                // 12 m: dar sokak bile bu kadar derindir
-                                // (sokak eni 7,2 m, ADR 0075). Bundan
-                                // yakini duvardir.
-                                if (uzak >= 12f) { yeter = true; enIyiAci = sap; break; }
-                                if (adim == 0) break;   // 0 derecenin esi yok
-                            }
-                        }
-                        aciKaymasi = enIyiAci;
-                        if (Mathf.Abs(aciKaymasi) > 0.01f)
-                        {
-                            cc.enabled = false;
-                            oyuncu.transform.rotation = Quaternion.Euler(
-                                0f, d.bakisYaw + aciKaymasi, 0f);
-                            cc.enabled = true;
-                            Physics.SyncTransforms();
-                        }
-                    }
-
                     // SEMT AKISI SAYIYLA DEGIL, DURUMLA BEKLENIR.
                     //
                     // Burada 90 kare bekleniyordu ve turun kendi
@@ -613,6 +555,94 @@ namespace Hezarfen.Editor.Diagnostics
                     // Yuklenen sahnenin ciziciler ve fizik olarak
                     // oturmasi.
                     for (int i = 0; i < 60; i++) yield return null;
+
+                    // ACI ARAMASI **SEMT YUKLENDIKTEN SONRA**.
+                    //
+                    // Bu blok akis beklemesinden ONCE kosuyordu ve
+                    // olculdu: sehir henuz gelmemisken her yon "80 m,
+                    // hicbir sey" okuyor, ilk aday (0 derece) 12 m
+                    // esigini gecmis sayiliyor ve arama daha ilk
+                    // adimda bitiyor. Rapor bunu yaziyordu: dort
+                    // durakta `kadrajda gok @ 0 m` — kamera hicbir seye
+                    // bakmiyor.
+                    //
+                    // Yani aciyi secen olcu BOS BIR DUNYAYI olcuyordu.
+                    // Bu turdaki ucuncu ornegi: bir olcum, olctugu sey
+                    // daha ortada yokken calisiyor.
+                    // DUVARA BAKAN BIR OLCU ALETI SUS URETIR.
+                    //
+                    // Duraklarin bakis acisi elle secilmisti ve karelere
+                    // BAKINCA goruldu: 10_uskudar'da on metredeki bir tas
+                    // blok karenin %60'ini kapliyor, 07_kirsal'da kare bir
+                    // ahsap tavan ve bos siva duvari gosteriyor. Oysa
+                    // yerlestirme dogruydu — ayni turda "acik dugum: E,
+                    // kayma 0,0 m, tepe acik: E" yaziyor. Yani kusur
+                    // oyuncunun DURDUGU yerde degil, BAKTIGI yondeydi.
+                    //
+                    // Elle secilen aci atilmiyor: durak "Ayasofya" diyorsa
+                    // oraya bakmasinin bir sebebi var. Aci korunur ve
+                    // yalnizca onu goren en yakin ACIK yone kaydirilir.
+                    // Hicbiri acik degilse en uzagi gorene gidilir —
+                    // kapali bir avluda bile en iyi kare o.
+                    //
+                    // Kalabaliga donulduyse dokunulmaz: o karar bundan
+                    // daha iyi bir sebebe dayaniyor.
+                    float aciKaymasi = 0f;
+                    if (!kalabaligaDonuldu)
+                    {
+                        var goz = oyuncu.transform.position
+                                  + Vector3.up * 1.6f;
+                        // ARAMA ARTIK ERKEN KESILMIYOR.
+                        //
+                        // Eski dongü ilk ACIK yonde duruyordu ve acik
+                        // olmak yetmiyor: hicbir seye carpmayan bir yon
+                        // de 80 m okur ve ilk adimda kazanir. Raporun
+                        // karsiligi `kadrajda gok @ 0 m` — kamera hicbir
+                        // seye bakmiyor, yani o kare bir inceleme karesi
+                        // degil.
+                        //
+                        // Butun adaylar taranir ve sirasiyla:
+                        //   1. hem ACIK (>=12 m) hem KONULU (bir seye
+                        //      carpan) yonlerden ORIJINALE EN YAKINI,
+                        //   2. yoksa en cok acikligi olan.
+                        // Ikincisi kirda ve denizde dogru cevap: orada
+                        // gok gercekten konudur.
+                        float enIyiAci = 0f, enIyiUzak = -1f;
+                        float konuAci = 0f;
+                        bool konuVar = false;
+                        for (int adim = 0; adim <= 6; adim++)
+                        {
+                            for (int isaret = 1; isaret >= -1; isaret -= 2)
+                            {
+                                float sap = adim * 15f * isaret;
+                                var yon = Quaternion.Euler(
+                                    0f, d.bakisYaw + sap, 0f) * Vector3.forward;
+                                bool vurdu = Physics.Raycast(
+                                    goz, yon, out var carp, 80f, ~0,
+                                    QueryTriggerInteraction.Ignore);
+                                float uzak = vurdu ? carp.distance : 80f;
+                                if (uzak > enIyiUzak)
+                                { enIyiUzak = uzak; enIyiAci = sap; }
+                                // 12 m: dar sokak bile bu kadar derindir
+                                // (sokak eni 7,2 m, ADR 0075). Bundan
+                                // yakini duvardir.
+                                if (vurdu && uzak >= 12f && !konuVar)
+                                { konuVar = true; konuAci = sap; }
+                                if (adim == 0) break;   // 0 derecenin esi yok
+                            }
+                        }
+                        if (konuVar) enIyiAci = konuAci;
+                        aciKaymasi = enIyiAci;
+                        if (Mathf.Abs(aciKaymasi) > 0.01f)
+                        {
+                            cc.enabled = false;
+                            oyuncu.transform.rotation = Quaternion.Euler(
+                                0f, d.bakisYaw + aciKaymasi, 0f);
+                            cc.enabled = true;
+                            Physics.SyncTransforms();
+                        }
+                    }
+
 
                     // --- KOS ---
                     if (d.kos)
