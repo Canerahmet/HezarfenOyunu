@@ -63,6 +63,22 @@ namespace Hezarfen.Sehir
         /// <summary>Sırayla gidilecek düğümler.</summary>
         public List<int> duraklar = new();
 
+        /// <summary>
+        /// Ödül bayrakları.
+        ///
+        /// <b>YAZILIYOR, OKUNMUYOR — ölçüldü.</b> Alan her görevde
+        /// kuruluyor (<c>Odulu(arketip)</c>) ve testler hangi arketipin
+        /// hangi bayrağı taşıdığını kilitliyor
+        /// (<c>OlayTests</c>, <c>EkonomiTests</c>). Ama depoda
+        /// <c>odul</c>'ü <b>okuyan</b> tek satır yok: ne akçe veriliyor,
+        /// ne lonca ya da mahalle itibarı sayılıyor.
+        ///
+        /// Yani bu alan bugün bir <b>niyet kaydı</b>, bir mekanik
+        /// değil — ve testlerin yeşil olması onun çalıştığı anlamına
+        /// gelmiyor; yalnızca doğru bayrağın <i>yazıldığı</i> anlamına
+        /// geliyor. Not burada duruyor ki yeşil sayılar "bitti" diye
+        /// okunmasın.
+        /// </summary>
         public Odul odul;
         public int akce;
 
