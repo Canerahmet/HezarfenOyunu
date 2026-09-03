@@ -45,8 +45,25 @@ içine bakan kareler 0,00-0,02. Yani kusur "sahne karanlık" değil,
 0,26 da hedef değil, yalnızca **aynı sahnede ölçülen sağlıklı komşu**.
 Fırın işini yaptıysa kapalı kareler o aileye katılır.
 
+## Sabit bölge: fırın öncesi/sonrası aynı yeri okumak
+
+`04_surici_kalabalik` karesinde sokağın kendisi (`--bolge
+430,180,700,660`):
+
+```
+golge  parlaklik 0,0070  rgb 0,0176/0,0045/0,0000  mavi/kirmizi 0,000  sacilim 0,001
+```
+
+Saçılım **0,001**. O dikdörtgendeki her karanlık piksel aynı renk ve
+mavisi tam sıfır. Kusurun en keskin hâli bu satır.
+
+Fırından sonra aynı komut aynı dikdörtgeni okur; "en karanlık %25"
+kendi kendini seçtiği için gölge aydınlanınca başka pikselleri
+ölçerdi, sabit bölge ölçmez.
+
 Kullanım:
   python tools/olcum/golge_orani.py --gok-yok renders/tur/*.png
+  python tools/olcum/golge_orani.py --gok-yok --bolge 430,180,700,660       renders/tur/04_surici_kalabalik.png
 """
 
 import argparse
@@ -61,8 +78,18 @@ def _srgb_to_linear(x):
     return np.where(x <= 0.04045, x / 12.92, ((x + 0.055) / 1.055) ** 2.4)
 
 
-def olc(yol, dilim=0.25, gok_yok=False):
+def olc(yol, dilim=0.25, gok_yok=False, bolge=None):
     im = np.asarray(Image.open(yol).convert("RGB"))
+    # SABIT BOLGE: FIRIN ONCESI/SONRASI AYNI YERI OLCMEK ICIN.
+    #
+    # En karanlik %25 kendi kendini secer ve bu, tek bir kare icin
+    # dogru olcudur. Ama fırın sonrasi kare yeniden cekilecek: golge
+    # aydinlanirsa "en karanlik %25" ARTIK BASKA PIKSELLER olur ve iki
+    # sayi ayni seyi olcmez. Sabit bir dikdortgen verildiginde olcu
+    # ayni yeri okur.
+    if bolge:
+        x0, y0, x1, y1 = bolge
+        im = im[y0:y1, x0:x1]
     lin = _srgb_to_linear(im)
     # Parlaklik: Rec.709.
     y = (lin[..., 0] * 0.2126 + lin[..., 1] * 0.7152
@@ -110,10 +137,18 @@ def main():
                     help="Golge/gunes kumesinin buyuklugu (oran)")
     ap.add_argument("--gok-yok", action="store_true",
                     help="Gokyuzu piksellerini disarida birak")
+    ap.add_argument("--bolge", default=None,
+                    help="Sabit dikdortgen: x0,y0,x1,y1 (piksel)")
     a = ap.parse_args()
 
+    bolge = None
+    if a.bolge:
+        bolge = tuple(int(v) for v in a.bolge.split(","))
+        if len(bolge) != 4:
+            raise SystemExit("[HZ] --bolge x0,y0,x1,y1 bekler")
+
     for yol in a.kare:
-        s = olc(yol, a.dilim, a.gok_yok)
+        s = olc(yol, a.dilim, a.gok_yok, bolge)
         print(yol)
         for ad in ("golge", "gunes"):
             d = s[ad]
