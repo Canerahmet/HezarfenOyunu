@@ -718,6 +718,23 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
         # Yasmak sac ve boyun cizgisini yutar; altina sac karti koymak
         # hem gorunmez hem de ortunun icinden batardi.
         # Kotlar basin kendi olculerinden: omuz, cene, goz, alin, tepe.
+        # KOTLAR OLCULMEYE CALISILDI VE OLCUM REDDETTI.
+        #
+        # `0,885` (cene) ve `0,928` (goz) birer boy kesri ve bu turda
+        # ayni bicimdeki dort sabit olcumle degistirildi (sakalin ustu
+        # ve alti, biyik bandi, sacin ustu). Bu ikisi de MPFB2 bolge
+        # maskelerinden okundu: kizda cene 0,8375, goz 0,9116.
+        #
+        # Sonuc DAHA KOTU: ortu cenenin altina, omza kadar sarkti ve
+        # tepe dar bir koniye dondu. Sebep sayida degil, sayinin NE
+        # OLDUGUNDA: bunlar anatomik yer isaretleri degil, bir donel
+        # profilin DENETIM KOTLARI. Yaninda yazan carpanlar (1,06 /
+        # 1,09 / 1,16) bu kotlara gore secilmis; kotu kaydirmak
+        # carpanlari da yanlis yere tasiyor.
+        #
+        # Yani "sabit bir sayi bir olcumun yerinde duruyor" kurali her
+        # sabit icin dogru degil. Bir sayi ancak DUNYADA bir sey
+        # gosteriyorsa olculur; bir bicimi ayarliyorsa olculmez, ayarlanir.
         kotlar = (boy * (0.800 if tip == "kadin" else 0.788),
                   boy * 0.885, boy * 0.928, boy * 0.958, boy * 1.008)
         y = skn.yasmak("Yasmak", col, bas_r, kotlar, cy=bas_cy,

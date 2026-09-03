@@ -349,3 +349,4 @@ def cene_kotu(govde, esik=0.5):
     """
     yuz = bolge_kotu(govde, "mpfb_face.jpg", esik)
     return None if yuz is None else yuz[0]
+
