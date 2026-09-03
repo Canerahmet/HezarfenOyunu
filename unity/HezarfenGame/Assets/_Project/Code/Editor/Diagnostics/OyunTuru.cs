@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Hezarfen.Player;
 using Hezarfen.Sehir;
+using Hezarfen.Streaming;
 using UnityEditor;
 using UnityEngine;
 
@@ -217,12 +218,13 @@ namespace Hezarfen.Editor.Diagnostics
                 satirlar.Add("| durak | konum (x, z) | ayak altinda "
                              + "| arazi farki | kamera kolu "
                              + "| 40 m'de NPC | cizilen govde | replik "
-                             + "| kadrajda | acik dugum | durak sapmasi (m) "
+                             + "| kadrajda | semt (bekleme) | acik dugum "
+                             + "| durak sapmasi (m) "
                              + "| kayma (m) | tepe acik "
                              + "| aci kaymasi "
                              + "| kare (ms) | neden |");
                 satirlar.Add("|---|---|---|---:|---:|---:|---:|---:|---|"
-                             + ":-:|---:|---:|:-:|---:|---:|---|");
+                             + "---|:-:|---:|---:|:-:|---:|---:|---|");
 
                 var oyuncu = Object.FindAnyObjectByType<WalkController>();
                 var kip = Object.FindAnyObjectByType<KameraKipi>();
@@ -544,8 +546,41 @@ namespace Hezarfen.Editor.Diagnostics
                         }
                     }
 
-                    // Semt akisi ve zemin otursun.
-                    for (int i = 0; i < 90; i++) yield return null;
+                    // SEMT AKISI SAYIYLA DEGIL, DURUMLA BEKLENIR.
+                    //
+                    // Burada 90 kare bekleniyordu ve turun kendi
+                    // raporu bedelini yaziyordu: on duragin ALTISINDA
+                    // ayak altinda `TR_Istanbul` (cıplak arazi), 40
+                    // m'de 0 NPC, 0 cizilen govde. Kareler de oyle
+                    // — `03_galata_sokak` bos bir kum duzlugu, sehir
+                    // ufukta ince bir serit. Oysa durak (120, 60) ve
+                    // D_Galata'nin siniri x -1944..1296, z -972..1944:
+                    // durak semtin TAM ICINDE.
+                    //
+                    // Yani sehir yok degil, HENUZ YUKLENMEMIS. Akis
+                    // Addressables ile asenkron yukluyor ve 90 kare
+                    // bunun bittigini GORMUYOR — bu deponun tekrar eden
+                    // dersi: bir bekleme, bekledigi seyin bittigini
+                    // gormeden bitiyorsa bekleme degildir. Ayni kusur
+                    // APV firininda da vardi ve orada `_pisirmeGoruldu`
+                    // ile kapandi.
+                    float akisBekleme;
+                    int akisSemt;
+                    var akis = Object.FindAnyObjectByType<DistrictStreamer>();
+                    // Akisin en az bir kez degerlendirmesi icin
+                    // (`evaluateInterval` 0,25 sn) yarim saniye.
+                    for (int i = 0; i < 40; i++) yield return null;
+                    float _bekleT0 = Time.realtimeSinceStartup;
+                    while (akis != null && akis.LoadsInFlight > 0
+                           && Time.realtimeSinceStartup - _bekleT0 < 30f)
+                        yield return null;
+                    akisBekleme = Time.realtimeSinceStartup - _bekleT0;
+                    akisSemt = 0;
+                    if (akis != null)
+                        foreach (var _ in akis.ResidentDistricts) akisSemt++;
+                    // Yuklenen sahnenin ciziciler ve fizik olarak
+                    // oturmasi.
+                    for (int i = 0; i < 60; i++) yield return null;
 
                     // --- KOS ---
                     if (d.kos)
@@ -776,6 +811,7 @@ namespace Hezarfen.Editor.Diagnostics
                                  + $"{CizilenGovde(npc)} | "
                                  + $"{replikSayisi} | "
                                  + $"{kadrajda} @ {kadrajUzak:0} m | "
+                                 + $"{akisSemt} ({akisBekleme:0.0} sn) | "
                                  + $"{(acikBulundu ? "E" : "H")} | "
                                  + $"{durakSapmasi:0} | "
                                  + $"{kayma:0.0} | "
@@ -786,6 +822,7 @@ namespace Hezarfen.Editor.Diagnostics
                               + $"kol {(kip != null ? kip.SonMesafe : 0f):0.0}, "
                               + $"npc {YakindakiNpc(npc, oyuncu.transform.position)}, "
                               + $"govde {CizilenGovde(npc)}, "
+                              + $"semt {akisSemt} ({akisBekleme:0.0} sn), "
                               + $"{ms:0.0} ms");
                 }
 
