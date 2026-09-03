@@ -1215,7 +1215,18 @@ namespace Hezarfen.Editor.Lighting
         /// işten kısa olduğunda koruma değil kayıp üretir: iptal eder ve
         /// bir saatlik işi çöpe atar.
         /// </summary>
-        private const double EnCokPisirme = 3.0 * 3600.0;
+        /// <summary>
+        /// 3 saatti ve o sayı da ölçümün gerisinde kaldı: <c>D_Galata</c>
+        /// on iki dakikada %19,8'de ve ilerleme dakikada %0,1. Bir üst
+        /// sınır, ölçülen işten kısa olduğunda koruma değil <b>kayıp</b>
+        /// üretir — üç saatlik bir fırını iptal edip hiçbir şey
+        /// yazmadan çıkar.
+        ///
+        /// Asıl koruma artık süre değil <see cref="TakilmaSiniri"/>:
+        /// ilerleme durursa dakikalar içinde biliniyor. Süre sınırı
+        /// yalnız son çare.
+        /// </summary>
+        private const double EnCokPisirme = 6.0 * 3600.0;
 
         /// <summary>
         /// İlerleme bu kadar süre kıpırdamazsa pişirme <b>takılmış</b>
