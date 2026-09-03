@@ -1004,6 +1004,30 @@ Tur artık `DistrictStreamer.LoadsInFlight` sıfıra inene kadar bekliyor
 üst sınır) ve her satırda **kaç semt yüklü, ne kadar beklendi** yazıyor.
 Bundan sonra boş çıkan bir durak gerçekten boştur.
 
+### Kanadın yüzeyi kerestedeydi — ve doku denetimi artık kapandı
+
+`M_Feather`, 9,71 m'lik kanadın **bütün** yüzeyi, doku olarak
+`weathered_planks` kullanıyordu. Köselede bir kez ölçülüp kapatılan
+kusurun aynısı: *bir yüzeye ait olmadığı bir doku giydirmek, dokusuz
+bırakmaktan daha az görünür ama daha yanlıştır.* Varlığın kendi kaynak
+notu yüzeyi zaten yazıyordu — *"ahşap çıta iskelet + kartal tüyü yüzey
++ deri kayış"*.
+
+`tools/textures/gen_tuy_texture.py` üretildi: bindirmeli tüy sıraları,
+omurga, 35°'lik teller. Ölçüler kuştan — birincil tüy 5-8 cm en, tel
+aralığı 0,5-1 mm.
+
+Ardından **bütün palet tarandı** ve sonuç temiz:
+
+* Kalan `weathered_planks` kullanıcıları `timber`, `timber_bare`,
+  `trim` — üçü de gerçekten ahşap.
+* Paletteki on altı rolden dokusuz olan yalnız üç tanesi:
+  `goz_ak`, `goz_bebek`, `goz_iris`. Bunlar bilerek düz — göz ten
+  dokusunun üstüne prosedürel olarak boyanıyor.
+
+Yani "dokusuz albedo plastik okur" cephesi kapandı; bir sonraki tur
+burayı yeniden taramasın.
+
 ### `06_kara_surlari`: oyuncunun başının üstünde bir taş tavan
 
 Turun `tepe acik` sütunu on durakta bir kez **H** diyor ve o durak bu.
