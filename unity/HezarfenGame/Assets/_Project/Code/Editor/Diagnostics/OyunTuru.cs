@@ -220,7 +220,7 @@ namespace Hezarfen.Editor.Diagnostics
                              + "| 40 m'de NPC | cizilen govde | replik "
                              + "| kadrajda | semt (bekleme) | acik dugum "
                              + "| durak sapmasi (m) "
-                             + "| kayma (m) | tepe acik "
+                             + "| kayma (m) | tepe acik / neyin altinda "
                              + "| aci kaymasi "
                              + "| kare (ms) | neden |");
                 satirlar.Add("|---|---|---|---:|---:|---:|---:|---:|---|"
@@ -640,9 +640,24 @@ namespace Hezarfen.Editor.Diagnostics
                     // ayni soruyu ADAY icin soruyor; burada SONUC icin
                     // soruluyor. Ikisi ayrilirsa arada gecen sey
                     // (fizik, akis, semt yuklemesi) suclu demektir.
+                    // KAPALIYSA NEYIN KAPATTIGI DA YAZILIR.
+                    //
+                    // Sutun on durakta bir kez "H" diyor
+                    // (`06_kara_surlari`) ve kareye bakilinca oyuncunun
+                    // uc metre ustunde karenin tamamini kaplayan duz bir
+                    // TAS KUTLE goruluyor. "Kapali" bilgisi kusuru
+                    // gosteriyor ama pesine dusulecek bir ip vermiyor;
+                    // carpan seyin ADI veriyor. Ayni sey `kadrajda`
+                    // sutununda zaten yapiliyor — bu, onun yukari
+                    // bakani.
                     bool tepeAcik = !Physics.Raycast(
-                        p + Vector3.up * 1.8f, Vector3.up, 3.2f, ~0,
+                        p + Vector3.up * 1.8f, Vector3.up,
+                        out var tepeVurus, 3.2f, ~0,
                         QueryTriggerInteraction.Ignore);
+                    string tepeAd = tepeAcik
+                        ? "-"
+                        : $"{tepeVurus.collider.name} @ "
+                          + $"{tepeVurus.distance:0.0} m";
 
                     // KARE SURESI: OTURDUKTAN SONRA, ORTANCA.
                     //
@@ -815,7 +830,7 @@ namespace Hezarfen.Editor.Diagnostics
                                  + $"{(acikBulundu ? "E" : "H")} | "
                                  + $"{durakSapmasi:0} | "
                                  + $"{kayma:0.0} | "
-                                 + $"{(tepeAcik ? "E" : "H")} | "
+                                 + $"{(tepeAcik ? "E" : tepeAd)} | "
                                  + $"{aciKaymasi:+0;-0;0}° | "
                                  + $"{ms:0.0} | {d.neden} |");
                     Debug.Log($"[Hezarfen] tur {d.ad}: {altinda}, "
