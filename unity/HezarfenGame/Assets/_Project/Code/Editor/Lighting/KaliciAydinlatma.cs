@@ -791,8 +791,20 @@ namespace Hezarfen.Editor.Lighting
             // Sicrama 2 -> 1: acik hava sehrinde ikinci sicrama, ilkin
             // yaninda olcum gurultusu kadar kalir. Kapali ic mekan
             // gelince bu sayi yeniden sorulur.
-            ls.directSampleCount = 32;
-            ls.indirectSampleCount = 32;
+            // ORNEK 32 -> 16, VE BU DA OLCULDU.
+            //
+            // D_Galata 4 m aralikla altmis dakikada **%21,9**'a geldi
+            // ve dakikada %0,02 kazaniyordu — uc saatlik sinirin
+            // altinda bitmesi mumkun degildi. Ayni ayarlarla D_Eyup 26
+            // dakikada bitmisti; Galata'da 2.325 ev var, Eyup'ta bir
+            // avuc. Yani maliyet PROB sayisindan degil GEOMETRIDEN
+            // geliyor ve orneklemeyi yarilamak dogrudan yarilar.
+            //
+            // Fırında ISIK YOK (bkz. dosyanın basindaki not): hesap
+            // gokyuzu gorunurlugu ve gok sicramasi. Bu, isik haritasi
+            // degil bir kuresel harmonik — 16 ornek onda leke birakmaz.
+            ls.directSampleCount = 16;
+            ls.indirectSampleCount = 16;
             ls.maxBounces = 1;
             ls.ao = false;                 // AO ekranda zaten var (SSAO)
             EditorUtility.SetDirty(ls);

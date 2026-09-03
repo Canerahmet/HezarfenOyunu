@@ -76,15 +76,23 @@ namespace Hezarfen.Editor.Lighting
         /// yüklüyken — kısmi pişirmenin şartı bu, hücre ızgarası küme
         /// çapında — yerleştirme 67.180.350 prob sınırını aşıyor.
         /// Denemeler <c>-hezarfenYerlesimDene</c> ile dakikalar içinde
-        /// koştu: <b>3 m geçmedi, 4 m geçti, 6 m geçti.</b> 4 seçildi;
-        /// prob sayısı 3'e göre 2,4 kat azalıyor ve sınırın altında
-        /// kalan en ince aralık o.
+        /// koştu: <b>3 m geçmedi, 4 m geçti, 6 m geçti.</b> Önce 4
+        /// seçildi — sınırın altında kalan en ince aralık o — ve
+        /// <b>ikinci bir ölçüm onu da eledi:</b> D_Galata 4 m'de altmış
+        /// dakikada %21,9'a geldi, dakikada %0,02 kazanarak. Sınır prob
+        /// sayısıydı, ama duvar SÜREYDİ.
+        ///
+        /// 6 m prob sayısını 4'e göre 3,4 kat azaltır. Bedeli
+        /// ölçülebilir ve kabul edildi: 7 m'lik bir sokağa enine tek
+        /// prob düşer, yani sokak boyunca sıçrama yumuşar. Sıçrama
+        /// zaten alçak frekanslıdır; bitmeyen bir fırının çözünürlüğü
+        /// ise sıfırdır.
         ///
         /// Sıçrama ışığı alçak frekanslıdır — bir duvarın yansıttığı
         /// ışık metrelerce yumuşak değişir — yani 3 ile 4 arasındaki
         /// fark gözde değil, bellekte.
         /// </summary>
-        public const float ProbAraligi = 4f;
+        public const float ProbAraligi = 6f;
 
         // YURUNEN BANTLA SINIRLAMA DENENDI VE ELENDI.
         //
