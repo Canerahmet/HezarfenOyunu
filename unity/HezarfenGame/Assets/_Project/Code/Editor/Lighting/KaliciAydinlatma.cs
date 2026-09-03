@@ -803,6 +803,14 @@ namespace Hezarfen.Editor.Lighting
             // Fırında ISIK YOK (bkz. dosyanın basindaki not): hesap
             // gokyuzu gorunurlugu ve gok sicramasi. Bu, isik haritasi
             // degil bir kuresel harmonik — 16 ornek onda leke birakmaz.
+            // KARMA KIP: YALNIZ DOLAYLI.
+            //
+            // Gunes `Mixed` oldu; hangi yarisinin pisecegini bu belirler.
+            // `IndirectOnly` (Baked Indirect) yalniz sicramayi pisirir,
+            // golge haritasi uretmez — yani gunes saate gore donmeye
+            // devam eder ve golgeler onu izler. `Shadowmask` secseydik
+            // golgeler pisirildigi saate CAKILIRDI.
+            ls.mixedBakeMode = MixedLightingMode.IndirectOnly;
             ls.directSampleCount = 16;
             ls.indirectSampleCount = 16;
             ls.maxBounces = 1;
@@ -851,13 +859,24 @@ namespace Hezarfen.Editor.Lighting
                 sls = new GameObject("StaticLightingSky")
                       .AddComponent<StaticLightingSky>();
 
+            // FIRININ GOKYUZU OYUNUN GOKYUZU DEGIL.
+            //
+            // Burada `VP_Faz1_Sky` baglaniyordu ve o profil sahnedeki
+            // Volume tarafindan da kullaniliyor — yani parlakligini
+            // degistirmek oyunun goruntusunu de degistirirdi. Ama fırının
+            // istedigi tam olarak farkli bir parlaklik: olculdu, oyunun
+            // gogunden gelen ortam probu 0,0370/0,0421/0,0546 ve bu bir
+            // gunduk gogu icin cok karanlik (gerekcesi `FirinGokyuzu`da).
+            //
+            // Ayri profil: `VP_Firin_Sky`, parlakligi Lux kipinde ve
+            // acikca verilmis. Yoksa uretilir — bir turun iki saatini
+            // "profil yokmus" diye kaybetmek istemiyoruz.
             var gokProfili = AssetDatabase.LoadAssetAtPath<VolumeProfile>(
-                Gis.SkyProfileBuilder.ProfilePath);
+                FirinGokyuzu.ProfilYolu);
+            if (gokProfili == null) gokProfili = FirinGokyuzu.Uret();
             if (gokProfili == null)
-                return "Gok profili YOK ("
-                       + Gis.SkyProfileBuilder.ProfilePath
-                       + ") — once 'Hezarfen > GIS > Faz1 gokyuzu "
-                       + "profilini uret'.";
+                return "Firin gok profili uretilemedi ("
+                       + FirinGokyuzu.ProfilYolu + ").";
 
             // SIRA ONEMLI: `profile` atamasi HDRP icinde benzersiz
             // kimligi SIFIRLIYOR (paket kaynaginda yazili: "Changing the
@@ -1079,6 +1098,64 @@ namespace Hezarfen.Editor.Lighting
             // CIZDIGINDE dolduruyor; toplu kipte kamera hic render
             // etmiyor. Sayi burada okunuyor: DC terimi sifira yakinsa
             // firina giden gok BOS demektir.
+            // FIRINA BIR SKYBOX VER — hipotez `FirinGokyuzu.SkyboxUret`te.
+            var _sky = FirinGokyuzu.SkyboxUret();
+            if (_sky != null && RenderSettings.skybox != _sky)
+            {
+                RenderSettings.skybox = _sky;
+                DynamicGI.UpdateEnvironment();
+                EditorSceneManager.MarkSceneDirty(
+                    EditorSceneManager.GetActiveScene());
+                Debug.Log("[Hezarfen] Firin skybox'i baglandi: " + _sky.name);
+            }
+
+            // GUNES FIRINA GIRER — VE BU BIR OLCUMLE KAZANILDI.
+            //
+            // Uc deney, her biri D_Okmeydani uzerinde on dakika:
+            //
+            //   1. Gok profili Lux kipinde 20.000'e sabitlendi.
+            //      `CellData` iki desenin tekrari — L0 TAM SIFIR.
+            //   2. Fırına gercek bir skybox malzemesi verildi; ortam
+            //      probu 0,037'den 0,18/0,23/0,30'a cikti. `CellData`
+            //      yine iki desen — L0 TAM SIFIR.
+            //   3. Yonlu gunes `Mixed` yapildi. `CellData` **12.106
+            //      farkli desen** — problar ilk kez isik tasiyor.
+            //
+            // Yani fırın, icinde hic ISIK yoksa prob aydinlatmasini
+            // uretmiyor; gokyuzu tek basina yetmiyor. "Gunes gercek
+            // zamanli kalsin, APV gok sicramasini tasisin" kurgusu bu
+            // yuzden kendi icinde tutarsizdi.
+            //
+            // BEDELI ACIK: sicrama, pisirildigi SAATIN gunesine gore
+            // donuyor. `ZamanSistemi` gunesi saate gore cevirmeye devam
+            // ediyor ve DOGRUDAN isikla golgeler onu izliyor; donmeyen
+            // tek sey dolayli terim. Bir saat sapmis bir sicrama, kapkara
+            // bir sokagin yaninda kucuk kalir.
+            //
+            // Karma kipi `IndirectOnly` (Baked Indirect): golge haritasi
+            // pisirilmez, yalniz dolayli isik. Gunesin donmesi bu yuzden
+            // golgeleri bozmaz.
+            {
+                int _kn = 0;
+                foreach (var l in Object.FindObjectsByType<Light>(
+                             FindObjectsSortMode.None))
+                {
+                    if (l.type != LightType.Directional) continue;
+                    if (l.intensity <= 0f) continue;
+                    if (l.lightmapBakeType == LightmapBakeType.Mixed) continue;
+                    l.lightmapBakeType = LightmapBakeType.Mixed;
+                    EditorUtility.SetDirty(l);
+                    _kn++;
+                }
+                if (_kn > 0)
+                {
+                    EditorSceneManager.MarkSceneDirty(
+                        EditorSceneManager.GetActiveScene());
+                    Debug.Log($"[Hezarfen] {_kn} yonlu isik KARMA yapildi "
+                              + "(dolayli isik pisirilsin diye).");
+                }
+            }
+
             var _op = RenderSettings.ambientProbe;
             Debug.Log($"[Hezarfen] Ortam probu (gokten gelen sicrama): "
                       + $"{_op[0, 0]:0.0000} / {_op[1, 0]:0.0000} / "
