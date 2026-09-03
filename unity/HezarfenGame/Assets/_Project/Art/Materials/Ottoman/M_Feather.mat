@@ -54,7 +54,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseColorMap:
-        m_Texture: {fileID: 2800000, guid: 2638fbced36b5924ea5910dd65fa5e6a, type: 3}
+        m_Texture: {fileID: 2800000, guid: 63d04106c691b154790850c428821686, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BentNormalMap:
@@ -90,15 +90,15 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 2638fbced36b5924ea5910dd65fa5e6a, type: 3}
+        m_Texture: {fileID: 2800000, guid: 63d04106c691b154790850c428821686, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MaskMap:
-        m_Texture: {fileID: 2800000, guid: 4391dd9f05cd5234aa8974a29e57c77a, type: 3}
+        m_Texture: {fileID: 2800000, guid: 8ef1ba3aebdfbc349b2abac64f54fbe0, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMap:
-        m_Texture: {fileID: 2800000, guid: bcbbc89379254cc4abff72574e827ac3, type: 3}
+        m_Texture: {fileID: 2800000, guid: ddb24c3aa5373b24f9a69dd54d3ae672, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMapOS:
@@ -262,8 +262,8 @@ Material:
     - _ZTestTransparent: 4
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _BaseColor: {r: 0.238, g: 0.183, b: 0.128, a: 1}
+    - _Color: {r: 0.23799995, g: 0.18299997, b: 0.12799996, a: 1}
     - _DiffusionProfileAsset: {r: 0, g: 0, b: 0, a: 0}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}

@@ -4,6 +4,7 @@ using System.IO;
 using Hezarfen.Player;
 using Hezarfen.Sehir;
 using Hezarfen.Streaming;
+using UnityEngine.Rendering;
 using UnityEditor;
 using UnityEngine;
 
@@ -62,8 +63,23 @@ namespace Hezarfen.Editor.Diagnostics
             new Durak { ad = "02_dogum_kosu", nokta = Vector3.zero,
                         bakisYaw = 0f, kos = true,
                         neden = "Kosarken karakter ve kamera." },
-            new Durak { ad = "03_galata_sokak", nokta = new Vector3(120f, 0f, 60f),
-                        bakisYaw = 200f,
+            // GALATA DURAGI OLCUMLE TASINDI.
+            //
+            // Durak (120, 60) idi ve semt akisi duzeltilince ne oldugu
+            // goruldu: iki semt YUKLU, ama ayak altinda `TR_Istanbul`
+            // (ciplak arazi), kadrajda `gok @ 0 m`, 40 m'de sifir NPC.
+            // Yani sehir gelmemis degil — durak sehrin OLMADIGI yerde.
+            //
+            // D_Galata'nin 10.843 yerlesim ornegi sahne dosyasindan
+            // okundu: x -1811..1046, z -791..1612 ve en yogun 200 m'lik
+            // hucre **x 200-400, z 0-200** (271 ornek). Durak o hucrenin
+            // ortasina tasindi; bakis +z, cunku yogun hucrelerin cogu
+            // orada (z 600-1200).
+            //
+            // Bu, ADR 0078'in referans semti — katman once burada
+            // olculuyor, yani duragin sehirde durmasi sart.
+            new Durak { ad = "03_galata_sokak", nokta = new Vector3(300f, 0f, 100f),
+                        bakisYaw = 0f,
                         neden = "Dar sokakta kamera kolu ve kalabalik." },
             new Durak { ad = "04_surici", nokta = new Vector3(-700f, 0f, -1500f),
                         bakisYaw = 90f,
@@ -218,13 +234,13 @@ namespace Hezarfen.Editor.Diagnostics
                 satirlar.Add("| durak | konum (x, z) | ayak altinda "
                              + "| arazi farki | kamera kolu "
                              + "| 40 m'de NPC | cizilen govde | replik "
-                             + "| kadrajda | semt (bekleme) | acik dugum "
+                             + "| kadrajda | semt (bekleme) | apv | acik dugum "
                              + "| durak sapmasi (m) "
                              + "| kayma (m) | tepe acik / neyin altinda "
                              + "| aci kaymasi "
                              + "| kare (ms) | neden |");
                 satirlar.Add("|---|---|---|---:|---:|---:|---:|---:|---|"
-                             + "---|:-:|---:|---:|:-:|---:|---:|---|");
+                             + "---|---|:-:|---:|---:|:-:|---:|---:|---|");
 
                 var oyuncu = Object.FindAnyObjectByType<WalkController>();
                 var kip = Object.FindAnyObjectByType<KameraKipi>();
@@ -566,6 +582,17 @@ namespace Hezarfen.Editor.Diagnostics
                     // ile kapandi.
                     float akisBekleme;
                     int akisSemt;
+                    // APV CALISIYOR MU — PISEN VERI KAREYE ULASTI MI.
+                    //
+                    // Bu turda fırın bitti ve diske 157 MB prob verisi
+                    // yazdi (62 hucre), ama Galata sokaginin golgesi
+                    // hala mavi/kirmizi 0,000. Yani soru artik "pisti
+                    // mi" degil: "pisen sey KAREYE ULASIYOR mu".
+                    //
+                    // Bu deponun ikinci tekrar eden dersi tam olarak
+                    // bu: yazildi, diske gecti, baglanmadi. Rapor
+                    // artik calisma zamaninin kendi cevabini tasiyor.
+                    string apv;
                     var akis = Object.FindAnyObjectByType<DistrictStreamer>();
                     // Akisin en az bir kez degerlendirmesi icin
                     // (`evaluateInterval` 0,25 sn) yarim saniye.
@@ -578,6 +605,11 @@ namespace Hezarfen.Editor.Diagnostics
                     akisSemt = 0;
                     if (akis != null)
                         foreach (var _ in akis.ResidentDistricts) akisSemt++;
+                    var _prv = ProbeReferenceVolume.instance;
+                    apv = _prv == null
+                        ? "yok"
+                        : $"{(_prv.isInitialized ? "kurulu" : "KURULMADI")}"
+                          + $"/kume {(_prv.currentBakingSet != null ? "var" : "YOK")}";
                     // Yuklenen sahnenin ciziciler ve fizik olarak
                     // oturmasi.
                     for (int i = 0; i < 60; i++) yield return null;
@@ -827,6 +859,7 @@ namespace Hezarfen.Editor.Diagnostics
                                  + $"{replikSayisi} | "
                                  + $"{kadrajda} @ {kadrajUzak:0} m | "
                                  + $"{akisSemt} ({akisBekleme:0.0} sn) | "
+                                 + $"{apv} | "
                                  + $"{(acikBulundu ? "E" : "H")} | "
                                  + $"{durakSapmasi:0} | "
                                  + $"{kayma:0.0} | "

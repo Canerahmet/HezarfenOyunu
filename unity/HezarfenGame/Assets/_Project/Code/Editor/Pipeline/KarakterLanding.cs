@@ -311,11 +311,24 @@ namespace Hezarfen.Editor.Pipeline
                 // kullan, yoksa kur.
                 var grup = go.GetComponent<LODGroup>();
                 if (grup == null) grup = go.AddComponent<LODGroup>();
-                grup.SetLODs(new[]
-                {
-                    new LOD(1f, new Renderer[] { smr[0] }),
-                    new LOD(0f, new Renderer[] { smr[1] }),
-                });
+                // MERDIVEN KAC BASAMAKSA O KADAR — IKI DEGIL.
+                //
+                // Burada tam iki kademe yaziliydi (`smr[0]`, `smr[1]`)
+                // ve FBX UC ag tasiyor: karakterlerin `_LOD2`si
+                // uretiliyor, ihrac ediliyor ve prefabta ATILIYORDU.
+                // `AssetPipelineTests` bunu soyluyor: 20 binden agir
+                // her varlik uc kademeli olmali, dokuz karakter
+                // 52-64 bin ucgenle iki kademede.
+                //
+                // Sayiyi elle yazmak yerine gelen ag sayisi kadar
+                // basamak kuruluyor; esikleri yine `ImportLanding`
+                // veriyor (merdivenin tek sahibi orasi).
+                var basamak = new LOD[smr.Length];
+                for (int i = 0; i < smr.Length; i++)
+                    basamak[i] = new LOD(
+                        i == smr.Length - 1 ? 0f : 1f,
+                        new Renderer[] { smr[i] });
+                grup.SetLODs(basamak);
                 grup.RecalculateBounds();
                 // Esikleri BURADA yazmiyoruz: merdivenin tek sahibi
                 // `ImportLanding`. Elle sayi yazmak, o merdiven degisince
