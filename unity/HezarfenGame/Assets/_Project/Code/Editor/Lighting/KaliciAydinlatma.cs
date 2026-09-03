@@ -1348,7 +1348,21 @@ namespace Hezarfen.Editor.Lighting
             // firinin oldugunu ancak SAATLER sonra ogreniyorduk.
             // Esik %0,1: gercek bir ilerleme bundan buyuk adimlar atar,
             // olcum gurultusu atmaz.
-            if (ilerlemeGecerli && ilerleme > _sonIlerleme + 0.001f)
+            // ILERLEME **DEGISTI** MI — ARTTI MI DEGIL.
+            //
+            // Once `> _sonIlerleme + 0,001` yaziyordu, yani en yuksek
+            // degeri tutuyordu. Olculdu: `buildProgress` EVRE BASINA
+            // sifirlaniyor — D_Galata 95. dakikada %45,1 idi, 100.
+            // dakikada %0,1. Ikinci evre boyunca hicbir okuma 0,451'i
+            // gecemez, yani zamanlayici son ARTIS aninda donmus kalir
+            // ve saglikli bir firin yirmi bes dakika sonra "takildi"
+            // diye kesilir.
+            //
+            // Takilmis bir firin hic kimildamaz; calisan bir firin
+            // ister ilerler ister yeni bir evreye doner. Olcut bu
+            // yuzden DEGISIM.
+            if (ilerlemeGecerli
+                && System.Math.Abs(ilerleme - _sonIlerleme) > 0.001f)
             {
                 _sonIlerleme = ilerleme;
                 _ilerlemeAni = gecen;
