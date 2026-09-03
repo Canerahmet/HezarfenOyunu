@@ -19,6 +19,56 @@ Sûriçi sokağının kendisinde (sabit dikdörtgen) mavi/kırmızı **0,000**,
 saçılım **0,001** — o alandaki her karanlık piksel aynı renk. Değişmeyen
 karanlık gölge değil, **ışık almayan yüzey**tir.
 
+## Fırın bitti ve problar SİYAH pişti — kapanmamış halka
+
+`D_Galata` 106 dakikada pişti: 62 hücre, 157 MB. Çalışma zamanı sağlam
+(tur raporu `apv: kurulu/kume var`). Gölge yine **0,000**.
+
+Diskteki verinin kendisi okundu ve hangi yarının boş olduğunu söylüyor:
+
+| dosya | içerik | okunan |
+|---|---|---|
+| `CellData` | L0 (ışınım) | `(0, 0, 0, 0.5)` half dörtlüleri — **sıfır** |
+| `CellOptionalData` | L1 (yön) | `0x7f` dolusu — orta nokta, yani **yönsüz** |
+| `CellSharedData` | geçerlilik | `0xff` — problar geçerli |
+| `CellSupportData` | konum | gerçek koordinatlar (162, −414, 42…) |
+
+Yani problar **yerinde ve geçerli, ama ışıksız**.
+
+### Sebep zinciri
+
+* Fırında ışık yok — bilinçli: güneş `Realtime Only`, `ZamanSistemi`
+  onu saate göre döndürüyor.
+* Geriye gökyüzü kalıyor ve fırın gökyüzünü
+  `RenderSettings.ambientProbe` üzerinden görüyor. Ölçüldü:
+  **0,0370 / 0,0421 / 0,0546** — mavimsi, yani gerçekten gökten geliyor,
+  ama bir gün ışığı göğü için çok karanlık.
+* Sahnedeki güneş +43,4° yükseklikte ve 100.000 lux. Ama
+  **PhysicallyBasedSky'ın parlaklığı güneş ışığının atmosferde
+  saçılmasından gelir** — güneş fırının dışındaysa saçılacak bir şey de
+  yok. Gök, kendi saçılma terimi kadar kalıyor.
+* 0,037'lik bir ortamdan tek sıçrama, L0'ın kodlama çözünürlüğünün
+  altına düşüyor ve sıfır olarak yazılıyor.
+
+Yani **"güneş gerçek zamanlı kalsın, APV gök sıçramasını taşısın"
+kurgusu PhysicallyBasedSky ile kendi içinde tutarsız.** Gök, güneşsiz
+parlamıyor.
+
+### Caner'e soru (iki seçenek + öneri)
+
+1. **Güneşi `Mixed` yap ve turun saatinde pişir.** Sıçrama o saat için
+   doğru olur, günün öteki saatlerinde yanlış yönden gelir. Gün
+   döngüsü görsel olarak bozulmaz ama sıçrama onu izlemez.
+2. **Pişirme için ayrı bir gök**: sabit, açıkça parlaklığı verilmiş bir
+   statik aydınlatma göğü (HDRI ya da gradyan), çalışma zamanındaki PBR
+   göğünden bağımsız. Sıçrama saatten bağımsız ve tutarlı olur;
+   bedeli, gece ile gündüzün aynı dolaylı ışığı almasıdır.
+
+**Önerim (2).** Sıçrama ışığı bu oyunda sokağın okunabilmesi için var;
+saatle dönen bir sıçramanın kazandırdığı doğruluk, gece sokağın yine
+simsiyah olmasının yanında küçük kalır. Ayrıca (2) tek bir pişirmeyle
+bütün günü kapatır — bu makinede pişirme süresi başlı başına bir kısıt.
+
 ## Ölçülen dört sebep
 
 1. **Prob hacimleri dünya boyuydu.** Her semtin hacmi `Mode.Global`'dı ve
