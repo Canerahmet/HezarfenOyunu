@@ -1201,6 +1201,23 @@ namespace Hezarfen.Editor.Lighting
         /// </summary>
         private const double TakilmaSiniri = 25.0 * 60.0;
 
+        /// <summary>
+        /// <b>İlk</b> ilerleme adımı için tanınan süre (sn).
+        ///
+        /// Takılma sınırı 25 dakikaydı ve o sayı, pişirmenin hemen
+        /// ilerlemeye başladığı bir kuruluma göre seçilmişti. Kısmi
+        /// pişirme <b>sekiz semt yüklüyken</b> koşuyor ve prob
+        /// yerleştirme bütün şehir için yapılıyor: o aşama boyunca
+        /// <c>buildProgress</c> sıfırda durur ve hiçbir şey bozuk
+        /// değildir. 25 dakikalık sınır burada sağlıklı bir fırını
+        /// keserdi.
+        ///
+        /// Yani sayı değil, <b>ne zaman saydığı</b> yanlıştı: ilk
+        /// adıma kadar bekleme uzun, ondan sonra kısa. Üst sınır yine
+        /// <see cref="EnCokPisirme"/>.
+        /// </summary>
+        private const double IlkIlerlemeSiniri = 75.0 * 60.0;
+
         private static float _sonIlerleme;
         private static double _ilerlemeAni;
 
@@ -1248,7 +1265,9 @@ namespace Hezarfen.Editor.Lighting
                 _sonIlerleme = ilerleme;
                 _ilerlemeAni = gecen;
             }
-            else if (_pisirmeGoruldu && gecen - _ilerlemeAni > TakilmaSiniri)
+            else if (_pisirmeGoruldu
+                     && gecen - _ilerlemeAni > (_sonIlerleme > 0f
+                         ? TakilmaSiniri : IlkIlerlemeSiniri))
             {
                 Debug.LogError("[Hezarfen] APV pisirme TAKILDI: "
                                + $"%{ilerleme * 100.0:0.0} oraninda "
