@@ -29,7 +29,7 @@ MonoBehaviour:
       bounds:
         m_Center: {x: 1377, y: 121.5, z: -567}
         m_Extent: {x: 7695, y: 202.5, z: 7695}
-    - hasProbeVolume: 1
+    - hasProbeVolume: 0
       bakeScene: 1
       bounds:
         m_Center: {x: 4698, y: 0, z: -648}
@@ -44,7 +44,7 @@ MonoBehaviour:
       bounds:
         m_Center: {x: -324, y: 0, z: 486}
         m_Extent: {x: 1620, y: 324, z: 1458}
-    - hasProbeVolume: 1
+    - hasProbeVolume: 0
       bakeScene: 1
       bounds:
         m_Center: {x: -2592, y: 0, z: -1620}
@@ -106,40 +106,126 @@ MonoBehaviour:
     m_Values: []
   m_SerializedPerSceneCellList: []
   cellSharedDataAsset:
-    m_AssetGUID: 
-    m_StreamableAssetPath: 
-    m_ElementSize: 0
+    m_AssetGUID: dee3341ca87baab43970b388f61753e0
+    m_StreamableAssetPath: APVStreamingAssets\d56f5ca68aaaf8c418598197d6bb9ba8\dee3341ca87baab43970b388f61753e0.bytes
+    m_ElementSize: 8192
     m_StreamableCellDescs:
-      m_Keys: 
-      m_Values: []
-    m_Asset: {fileID: 0}
+      m_Keys: 4b1400006b1500007b1400000b1500009b150000
+      m_Values:
+      - offset: 0
+        elementCount: 1
+      - offset: 8192
+        elementCount: 1
+      - offset: 16384
+        elementCount: 4
+      - offset: 49152
+        elementCount: 1
+      - offset: 57344
+        elementCount: 3
+    m_Asset: {fileID: 4900000, guid: dee3341ca87baab43970b388f61753e0, type: 3}
   scenarios:
-    m_Keys: []
-    m_Values: []
+    m_Keys:
+    - Default
+    m_Values:
+    - sceneHash: 1751686919
+      cellDataAsset:
+        m_AssetGUID: 7a7ddac9c453ebe4cb5b9ae2e8f9559e
+        m_StreamableAssetPath: APVStreamingAssets\d56f5ca68aaaf8c418598197d6bb9ba8\7a7ddac9c453ebe4cb5b9ae2e8f9559e.bytes
+        m_ElementSize: 131072
+        m_StreamableCellDescs:
+          m_Keys: 4b1400006b1500007b1400000b1500009b150000
+          m_Values:
+          - offset: 0
+            elementCount: 1
+          - offset: 131072
+            elementCount: 1
+          - offset: 262144
+            elementCount: 4
+          - offset: 786432
+            elementCount: 1
+          - offset: 917504
+            elementCount: 3
+        m_Asset: {fileID: 4900000, guid: 7a7ddac9c453ebe4cb5b9ae2e8f9559e, type: 3}
+      cellOptionalDataAsset:
+        m_AssetGUID: 7ce419f944cdc6841ab0c9db2636d975
+        m_StreamableAssetPath: APVStreamingAssets\d56f5ca68aaaf8c418598197d6bb9ba8\7ce419f944cdc6841ab0c9db2636d975.bytes
+        m_ElementSize: 131072
+        m_StreamableCellDescs:
+          m_Keys: 4b1400006b1500007b1400000b1500009b150000
+          m_Values:
+          - offset: 0
+            elementCount: 1
+          - offset: 131072
+            elementCount: 1
+          - offset: 262144
+            elementCount: 4
+          - offset: 786432
+            elementCount: 1
+          - offset: 917504
+            elementCount: 3
+        m_Asset: {fileID: 4900000, guid: 7ce419f944cdc6841ab0c9db2636d975, type: 3}
+      cellProbeOcclusionDataAsset:
+        m_AssetGUID: 
+        m_StreamableAssetPath: APVStreamingAssets\d56f5ca68aaaf8c418598197d6bb9ba8\.bytes
+        m_ElementSize: 0
+        m_StreamableCellDescs:
+          m_Keys: 4b1400006b1500007b1400000b1500009b150000
+          m_Values:
+          - offset: 0
+            elementCount: 1
+          - offset: 0
+            elementCount: 1
+          - offset: 0
+            elementCount: 4
+          - offset: 0
+            elementCount: 1
+          - offset: 0
+            elementCount: 3
+        m_Asset: {fileID: 0}
   cellBricksDataAsset:
-    m_AssetGUID: 
-    m_StreamableAssetPath: 
-    m_ElementSize: 0
+    m_AssetGUID: 6c039a368aafa534db10e7ce2f564e37
+    m_StreamableAssetPath: APVStreamingAssets\d56f5ca68aaaf8c418598197d6bb9ba8\6c039a368aafa534db10e7ce2f564e37.bytes
+    m_ElementSize: 16
     m_StreamableCellDescs:
-      m_Keys: 
-      m_Values: []
-    m_Asset: {fileID: 0}
+      m_Keys: 4b1400006b1500007b1400000b1500009b150000
+      m_Values:
+      - offset: 0
+        elementCount: 1
+      - offset: 16
+        elementCount: 1
+      - offset: 32
+        elementCount: 468
+      - offset: 7520
+        elementCount: 128
+      - offset: 9568
+        elementCount: 342
+    m_Asset: {fileID: 4900000, guid: 6c039a368aafa534db10e7ce2f564e37, type: 3}
   cellSupportDataAsset:
-    m_AssetGUID: 
-    m_StreamableAssetPath: 
-    m_ElementSize: 0
+    m_AssetGUID: 3e4ddeea5f6115a4bb71fe699c9f54e3
+    m_StreamableAssetPath: APVStreamingAssets\d56f5ca68aaaf8c418598197d6bb9ba8\3e4ddeea5f6115a4bb71fe699c9f54e3.bytes
+    m_ElementSize: 163840
     m_StreamableCellDescs:
-      m_Keys: 
-      m_Values: []
-    m_Asset: {fileID: 0}
+      m_Keys: 4b1400006b1500007b1400000b1500009b150000
+      m_Values:
+      - offset: 0
+        elementCount: 1
+      - offset: 163840
+        elementCount: 1
+      - offset: 327680
+        elementCount: 4
+      - offset: 983040
+        elementCount: 1
+      - offset: 1146880
+        elementCount: 3
+    m_Asset: {fileID: 4900000, guid: 3e4ddeea5f6115a4bb71fe699c9f54e3, type: 3}
   chunkSizeInBricks: 128
-  maxCellPosition: {x: 38, y: 2, z: 30}
-  minCellPosition: {x: -26, y: -1, z: -35}
+  maxCellPosition: {x: 27, y: 1, z: 22}
+  minCellPosition: {x: -20, y: -1, z: -26}
   globalBounds:
-    m_Center: {x: 1458, y: 121.5, z: -607.5}
-    m_Extent: {x: 7776, y: 364.5, z: 7897.5}
+    m_Center: {x: 1134, y: 0, z: -648}
+    m_Extent: {x: 7614, y: 324, z: 7776}
   bakedSimplificationLevels: 3
-  bakedMinDistanceBetweenProbes: 3
+  bakedMinDistanceBetweenProbes: 4
   bakedProbeOcclusion: 0
   bakedSkyOcclusionValue: 0
   bakedSkyShadingDirectionValue: 0
@@ -150,7 +236,7 @@ MonoBehaviour:
     y: 0
     z: 0
     w: 0
-  maxSHChunkCount: 5
+  maxSHChunkCount: 4
   L0ChunkSize: 65536
   L1ChunkSize: 32768
   L2TextureChunkSize: 32768
@@ -163,8 +249,8 @@ MonoBehaviour:
   supportValidityChunkSize: 32768
   supportTouchupChunkSize: 32768
   supportLayerMaskChunkSize: 0
-  supportOffsetsChunkSize: 98304
-  supportDataChunkSize: 262144
+  supportOffsetsChunkSize: 0
+  supportDataChunkSize: 163840
   lightingScenario: Default
   version: 2
   freezePlacement: 1

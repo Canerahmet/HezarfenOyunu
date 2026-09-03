@@ -108,6 +108,26 @@ namespace Hezarfen.Editor.Lighting
         /// </summary>
         public const float EnBuyukYapi = 1000f;
 
+        /// <summary>
+        /// Bir semtin prob hacmi alabileceği en büyük yayılım (m).
+        ///
+        /// <b>Ölçüldü, seçilmedi.</b> Semtlerin kendi sınırları iki
+        /// ayrı topluluk oluşturuyor: gerçek mahalleler 2045–3184 m
+        /// (Eyüp, Galata, Üsküdar, Sûriçi), ve iki tane 7494–7929 m.
+        /// İkincilerin içinde ne var diye bakıldı — <c>D_Bogaz</c>'ın
+        /// tek kök nesnesi <c>TEKNELER_1632</c>: Boğaz boyunca serpilmiş
+        /// <b>tekneler</b>. <c>D_Halic</c> aynı.
+        ///
+        /// Bunlar mahalle değil, açık su üstünde bir serpme. Prob hacmi
+        /// gökyüzünün kapandığı yerler için vardır; açık denizde
+        /// kapanan bir şey yok. Bedeli ölçüldü: 15 km'ye yayılan bir
+        /// kutu, dondurulmuş ızgarada <c>D_Bogaz</c>'ı yirmi dakikada
+        /// <b>%1</b>'e getirdi — tek semt için on bir saat.
+        ///
+        /// 5000 m iki topluluğun arasında duruyor.
+        /// </summary>
+        public const float EnBuyukSemt = 5000f;
+
         /// <summary>Taban sahne — prob hacmi burada YAŞAMAZ.</summary>
         public const string TabanSahne =
             "Assets/_Project/Scenes/Faz1_Terrain.unity";
@@ -474,6 +494,16 @@ namespace Hezarfen.Editor.Lighting
             satirlar.Add($"Prob araligi {ProbAraligi:0.#} m, cok sahne kipi acik.");
             satirlar.Add("Sanal kaydirma: "
                          + (SanalKaydirmayiKapat() ? "KAPALI" : "BULUNAMADI"));
+            // KURULUM IZGARANIN GIRDISINI DEGISTIRIR — DONDURMA COZULUR.
+            //
+            // `freezePlacement` hucre izgarasini kumede saklı olana
+            // sabitler ve kismi pisirmeyi mumkun kilar. Ama prob
+            // hacimleri degistiginde o izgara ARTIK YANLIS: donuk
+            // kalirsa yeni hacimler eski izgaraya zorlanir. Kurulum
+            // cozer; yeni izgara, butun semtler yukluyken kosan
+            // yerlestirme denemesinde kurulup yeniden dondurulur.
+            satirlar.Add("Yerlesim dondurmasi: "
+                         + (YerlesimiDondur(false) ? "COZULDU" : "BULUNAMADI"));
 
             // TABAN SAHNEDEKI DUNYA BOYU HACIM KALDIRILIR.
             //
@@ -559,6 +589,16 @@ namespace Hezarfen.Editor.Lighting
                 if (b.size == Vector3.zero)
                 {
                     satirlar.Add($"{ad}: cizici yok, hacim atlandi.");
+                    continue;
+                }
+                // ACIK SUYA PROB KOYULMAZ — gerekcesi `EnBuyukSemt`te.
+                if (b.size.x > EnBuyukSemt || b.size.z > EnBuyukSemt)
+                {
+                    Object.DestroyImmediate(pv.gameObject);
+                    EditorSceneManager.MarkSceneDirty(sahne);
+                    satirlar.Add($"{ad}: yayilim "
+                                 + $"{b.size.x:0}x{b.size.z:0} m — mahalle "
+                                 + "degil serpme; prob hacmi YOK.");
                     continue;
                 }
                 // PAY: prob duvarin DISINDA da olmali, yoksa cephenin
