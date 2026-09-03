@@ -104,25 +104,7 @@ MonoBehaviour:
   cellDescs:
     m_Keys: 
     m_Values: []
-  m_SerializedPerSceneCellList:
-  - sceneGUID: 5dd4b6fedd5b0234290b7c6bd49f8734
-    cellList: 
-  - sceneGUID: 37fce4938672dcc4eba3d9f1acf1b758
-    cellList: 
-  - sceneGUID: 6c1b15ed85f7e654693f50dc6d5bc8c3
-    cellList: 
-  - sceneGUID: 8b54264db8e6834449fdddc0b81eedc6
-    cellList: 
-  - sceneGUID: 44e44d71267113943a187985519ac82d
-    cellList: 
-  - sceneGUID: 26ed6d7c29f431949ad98db357d31ca6
-    cellList: 
-  - sceneGUID: c58f016d90452fb4aa5ac315a145eebc
-    cellList: 
-  - sceneGUID: 12788ae11ceaa9f4683ee5f1dd956ffb
-    cellList: 
-  - sceneGUID: 91434be0a2fec6543a7741e240036370
-    cellList: 
+  m_SerializedPerSceneCellList: []
   cellSharedDataAsset:
     m_AssetGUID: 
     m_StreamableAssetPath: 
@@ -185,7 +167,7 @@ MonoBehaviour:
   supportDataChunkSize: 262144
   lightingScenario: Default
   version: 2
-  freezePlacement: 0
+  freezePlacement: 1
   probeOffset: {x: 0, y: 0, z: 0}
   simplificationLevels: 3
   minDistanceBetweenProbes: 4

@@ -334,6 +334,47 @@ namespace Hezarfen.Editor.Lighting
         }
 
         /// <summary>
+        /// <b>Hücre yerleşimini dondurur</b> — kısmi pişirmenin
+        /// gerçek anahtarı.
+        ///
+        /// APV'nin hücre ızgarası küme çapındadır ve her pişirmede
+        /// o an <b>yüklü</b> prob hacimlerinden yeniden hesaplanır.
+        /// Tek bir semt yüklüyken ızgara başka çıkıyor ve Unity kısmi
+        /// pişirmeyi <i>"incompatible cell layout"</i> diyerek sessizce
+        /// atıyor.
+        ///
+        /// Bunun bir çaresi bütün semtleri yüklemekti ve ölçüm bedelini
+        /// gösterdi: en küçük semt %6,2'ye dokuz dakikada geldi ve
+        /// ilerleme hızı düşüyordu — tek semt için otuz saatin üstünde.
+        /// Sebep açık: ışık hesabı bütün şehrin geometrisine karşı
+        /// koşuyor.
+        ///
+        /// <c>freezePlacement</c> ızgarayı kümede saklı olana sabitler.
+        /// Bir kez bütün semtlerle yerleştirme yapılıp dondurulduktan
+        /// sonra her semt tek başına pişirilebilir ve sonuç aynı
+        /// ızgaraya oturur.
+        ///
+        /// Bedeli: bir semt pişerken komşu semtin geometrisi sahnede
+        /// olmaz, yani semt <b>sınırındaki</b> sıçrama komşudan gelen
+        /// ışığı görmez. Semtler coğrafi olarak ayrı bölgeler ve taban
+        /// (arazi) her koşumda yüklü; hata sınırda kalır. Alternatifi
+        /// hiç pişmemesiydi.
+        /// </summary>
+        public static bool YerlesimiDondur(bool donuk)
+        {
+            var kume = Kume();
+            if (kume == null) return false;
+            var so = new SerializedObject(kume);
+            var p = so.FindProperty("freezePlacement");
+            if (p == null) return false;
+            p.boolValue = donuk;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(kume);
+            AssetDatabase.SaveAssets();
+            return true;
+        }
+
+        /// <summary>
         /// <b>Pişmiş verinin imzası</b> — hücre sayısı, veri
         /// dosyalarının toplam boyu ve en son yazılma anı.
         ///

@@ -964,10 +964,30 @@ namespace Hezarfen.Editor.Lighting
             // degil, "yalniz sunu PISIR" demek. Sahnelerin hepsi acik
             // olmali ki izgara her kosumda ayni cikssin; kazanc,
             // isik hesabinin bir semte inmesinden gelir.
+            // `-hezarfenDonuk`: IZGARA DONMUS, YALNIZ HEDEF SEMT
+            // YUKLENIR.
+            //
+            // Butun semtleri yuklemek izgarayi her kosumda ayni yapar
+            // ama isik hesabini butun sehrin geometrisine karsi
+            // kosturur; olculdu: en kucuk semt dokuz dakikada %6,2 ve
+            // hiz dusuyordu — tek semt icin otuz saatin ustu.
+            // `freezePlacement` izgarayi sabitleyince o yuke gerek
+            // kalmiyor (bkz. `SemtProblari.YerlesimiDondur`).
+            bool donuk = System.Array.IndexOf(
+                System.Environment.GetCommandLineArgs(),
+                "-hezarfenDonuk") >= 0;
             EditorSceneManager.OpenScene(ProbeSahnesi);
-            foreach (string s2 in SemtProblari.Semtler())
-                if (!EditorSceneManager.GetSceneByPath(s2).isLoaded)
-                    EditorSceneManager.OpenScene(s2, OpenSceneMode.Additive);
+            if (donuk)
+            {
+                EditorSceneManager.OpenScene(yol, OpenSceneMode.Additive);
+            }
+            else
+            {
+                foreach (string s2 in SemtProblari.Semtler())
+                    if (!EditorSceneManager.GetSceneByPath(s2).isLoaded)
+                        EditorSceneManager.OpenScene(
+                            s2, OpenSceneMode.Additive);
+            }
             // SEMT KURULUMU VE GI BAYRAKLARI BURADA KOSMAZ.
             //
             // Ikisi de butun semtleri ACAR (`SemtProblari.Kur`,
@@ -1094,10 +1114,18 @@ namespace Hezarfen.Editor.Lighting
             if (_yerlesimDenemesi)
             {
                 Application.logMessageReceived -= ApvKaydiniDinle;
-                Debug.Log($"[Hezarfen] YERLESIM GECTI ({semt}) — deneme "
-                          + "kipinde pisirme iptal ediliyor.");
                 Lightmapping.Cancel();
-                EditorApplication.Exit(0);
+                // YERLESIM GECTIYSE IZGARA DONDURULUR.
+                //
+                // Deneme kipi zaten butun semtler yukluyken kosuyor,
+                // yani bu, izgaranin sehrin TAMAMINI kapsadigi tek an.
+                // Burada dondurulmazsa sonraki her kismi pisirme kendi
+                // izgarasini uretir ve sonucu atilir.
+                bool d = SemtProblari.YerlesimiDondur(true);
+                Debug.Log($"[Hezarfen] YERLESIM GECTI ({semt}). Izgara "
+                          + (d ? "DONDURULDU" : "DONDURULAMADI")
+                          + " — deneme kipinde pisirme iptal edildi.");
+                EditorApplication.Exit(d ? 0 : 8);
                 return;
             }
             EditorApplication.update += PisirmeyiBekle;

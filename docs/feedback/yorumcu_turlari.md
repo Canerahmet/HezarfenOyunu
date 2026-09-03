@@ -982,6 +982,52 @@ kadar indirip eteği onun altından başlatmak, (b) eteği göğsün altından
 başlatıp bel dikişini hiç kurmamak. Ölçüyle seçilecek bir şey değil;
 Caner'e soruluyor.
 
+### Yüzün ölçüleri: dört sabit, dört ölçüm
+
+Yakın plan kareleri dört ayrı kusur gösterdi ve dördü de aynı cinsti —
+**boyun bir kesri, bir ölçümün yerinde duruyordu.**
+
+| ne | yazılıydı | ölçüldü | karede ne görünüyordu |
+|---|---|---|---|
+| sakalın üstü | `boy * 0.897` | dudak altı `0.885` | ağzın üstünden geçen bir **sargı** |
+| sakalın altı | `boy * 0.806` | çene `0.869` | boynu saran bir **boyunluk** |
+| bıyık bandı | `0.899–0.915` | dudak `0.885–0.895` | burun köküne yapışık bir **tahta** |
+| saçın üstü | `0.912 / 0.925` | başlık tabanı `0.948 / 0.946` | başlıkla saç arasında **çıplak kafa derisi** |
+
+Ölçünün kaynağı yeni değil: MPFB2'nin kendi bölge maskeleri
+(`mpfb_face`, `mpfb_lips`) gövdenin UV atlasında duruyor ve ten dokusu
+zaten onlardan besteleniyor. `sac_kit.bolge_kotu` maskeyi gövdenin
+UV'leri üzerinden okuyup bölgenin kot aralığını döndürüyor — yani
+kaynak ikinci kez okundu.
+
+Başlık taban kotları da tek sahibe indi (`BASLIK_TABANI`); saçın üstü
+artık ondan türüyor.
+
+### Takke: kubbe üç kez ölçüldü, üçünde de yanlış yerdeydi
+
+Takke bir **kubbe** olarak kuruluyordu ve üç ayrı ölçüm üç ayrı kusur
+gösterdi: taban yarıçapı kafanın en geniş diliminden alınınca takke
+kafanın çevresinde **havada** durdu; kendi kotunda ölçülünce **külah**
+gibi sivrildi (yükseklik hâlâ boydan türüyordu ve kafanın tepesini
+4,5 cm aşıyordu); yükseklik de kafadan ölçülünce kubbe önde derinin
+**altına** girdi ve takke tepede küçük bir yamaya döndü.
+
+Üçünün sebebi aynı: **bir kubbe kafayla yalnız bir halkada buluşur.**
+Bu depo dersi sakalda, bıyıkta ve saçta zaten ödemişti. Takke artık
+`kopya_kabuk` — kafaya geçirilen bir bez, kafanın biçiminde.
+
+### Ölçülüp reddedilen iki değişiklik
+
+* **Saç çizgisini öne taşımak.** Saç kabuğunun ön kenarı y +0,0117'de,
+  yüzün önü -0,0553'te: kafanın tam ortası. Eşik 0,62'ye taşındı ve
+  sonuç **daha kötü** oldu — saç yanağa taştı. Sebep sayıda değil
+  biçimde: saç çizgisi bir **düzlem** değil bir eğridir. (`SemtProblari`
+  aynı dersi bir kutu ile bir yamaç için yazmıştı.)
+* **Yaşmağın açıklık kenarını yaya oturtmak.** Yüzler `m + 0,5`
+  açısına göre siliniyor, köşeler `m` açısında duruyor; "ilk duran
+  köşe" kenarın kendisi değil. Karede ölçülebilir fark çıkmadı, geri
+  alındı.
+
 ### Feracenin üç silindiri — sorulan soru ölçümle kapandı
 
 Yukarıdaki soru ("kabuğu kalçanın altına indir" mi, "eteği göğsün
