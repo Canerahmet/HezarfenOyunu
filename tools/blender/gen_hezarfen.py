@@ -663,13 +663,31 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
             if bk is None:
                 continue
             cx, rx, ry = bk
-            pay = diz_sis + kiy.GOMLEK_KAL + 0.010
+            # DIZLIK SALVARI SIKAR — USTUNDE DURMAZ.
+            #
+            # Pay `+0,010` idi ve sayinin ne demek oldugu hesapla
+            # cikiyor: salvarin o kottaki DIS yaricapi
+            # `bacak + diz_sis + GOMLEK_KAL`, yani dizligin IC duvari
+            # kumasin tam 10 mm disinda kaliyordu. Render bunu
+            # gosteriyor — bacagin cevresinde asili duran iki kahve
+            # halka, arasindan bosluk.
+            #
+            # Bir dizlik baglanir: kumasi ICERI toplar. 4 mm eksi pay
+            # bandi salvarin icine gomer ve kumas bandin altinda
+            # kaybolur — kolda (`KOL_PAYI`) ve feracede kullanilan ayni
+            # ilke, burada sikma yonunde.
+            pay = diz_sis + kiy.GOMLEK_KAL - 0.004
             b = kiy.band(f"Dizlik_{sx}", col, z_diz,
                          (rx + pay, ry + pay), boy * 0.030, 0.007)
             for v in b.data.vertices:
                 v.co.x += cx
             b.data.update()
             parts.append(hz.assign(b, mats["leather"]))
+            if sx > 0:
+                hz.log(f"dizlik: bacak r {rx:.3f}/{ry:.3f}, salvar dis "
+                       f"{rx + diz_sis + kiy.GOMLEK_KAL:.3f}, dizlik ic "
+                       f"{rx + pay:.3f} (fark "
+                       f"{pay - diz_sis - kiy.GOMLEK_KAL:+.3f} m)")
 
     # --- SARIK ----------------------------------------------------------------
     # Sarik ALINDAN baslar ve basin tepesini ASAR — baslik odur. Yarıcap
