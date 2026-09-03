@@ -966,6 +966,16 @@ namespace Hezarfen.Editor.Lighting
             Debug.Log("[Hezarfen] " + GokAyari());
             EditorSceneManager.SaveOpenScenes();
 
+            // SANAL KAYDIRMA HER KOSUMDA KAPATILIR.
+            //
+            // Gerekcesi `SemtProblari.SanalKaydirmayiKapat`ta: o GPU
+            // gecisi D_Bogaz kosumunu d3d12 aygit hatasiyla oldurdu.
+            // Kurulum isini burada tekrar etmek bedava ve kurulum
+            // kosulmadan pisirmeye girilirse kosum yine olmez.
+            Debug.Log("[Hezarfen] Sanal kaydirma: "
+                      + (SemtProblari.SanalKaydirmayiKapat()
+                         ? "kapali" : "BULUNAMADI"));
+
             // OLCUM ANAHTARLARI.
             //
             // `-hezarfenAralik <m>`: prob araligini kumeye yazar. Sayinin

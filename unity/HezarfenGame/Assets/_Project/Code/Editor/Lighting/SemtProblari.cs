@@ -231,6 +231,49 @@ namespace Hezarfen.Editor.Lighting
         }
 
         /// <summary>
+        /// <b>Sanal kaydırmayı kapatır</b> — GPU'yu pişirmenin dışında
+        /// tutar.
+        ///
+        /// Sanal kaydırma (virtual offset), geometrinin içinde kalan
+        /// probları dışarı iten bir <b>GPU</b> geçişidir. Fırın CPU'ya
+        /// alınmıştı (7,25 GB'lik sahne girdisi 8 GB'lik karta
+        /// sığmıyordu), ama bu geçiş yine karta gidiyordu ve ölçüm
+        /// bunun bedelini gösterdi — <c>D_Bogaz</c> koşumu tek satırla
+        /// öldü:
+        ///
+        /// <code>
+        /// d3d12: Unrecoverable GPU device error!
+        ///   UnityEditor.Lightmapping/VirtualOffsetBake:Update
+        /// d3d12: upload buffer was too small … Requested: 100761624
+        /// </code>
+        ///
+        /// Yani 100 MB'lık bir istek 20 MB'lık bir tampona
+        /// yazılmaya çalışıldı. İşi CPU'ya vermek, işin
+        /// <b>tamamını</b> vermek demekmiş.
+        ///
+        /// Bedeli ne: duvarın içinde kalan birkaç prob dışarı
+        /// itilmeyecek ve orada geçersiz kalacak. APV'nin kendi
+        /// geçerlilik karışımı (<c>validityThreshold</c>) bu probları
+        /// zaten dışarıda bırakıyor; kaybedilen şey biraz doğruluk,
+        /// kazanılan şey pişirmenin <b>bitmesi</b>.
+        /// </summary>
+        public static bool SanalKaydirmayiKapat()
+        {
+            var kume = Kume();
+            if (kume == null) return false;
+            var so = new SerializedObject(kume);
+            var p = so.FindProperty(
+                "settings.virtualOffsetSettings.useVirtualOffset");
+            if (p == null) return false;
+            if (!p.boolValue) return true;
+            p.boolValue = false;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(kume);
+            AssetDatabase.SaveAssets();
+            return true;
+        }
+
+        /// <summary>
         /// Prob aralığını kümeye yazar — <b>yalnız ölçüm koşumları
         /// için</b>.
         ///
@@ -297,6 +340,8 @@ namespace Hezarfen.Editor.Lighting
             so.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(kume);
             satirlar.Add($"Prob araligi {ProbAraligi:0.#} m, cok sahne kipi acik.");
+            satirlar.Add("Sanal kaydirma: "
+                         + (SanalKaydirmayiKapat() ? "KAPALI" : "BULUNAMADI"));
 
             // TABAN SAHNEDEKI DUNYA BOYU HACIM KALDIRILIR.
             //
