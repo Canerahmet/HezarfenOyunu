@@ -162,7 +162,7 @@
   },
   {
    "footprint_x": 5.261,
-   "footprint_y": 5.404,
+   "footprint_y": 5.301,
    "height": 1.091,
    "pivot_min_z": -0.2232,
    "tris_lod0": 442,
@@ -218,7 +218,7 @@
   },
   {
    "footprint_x": 8.671,
-   "footprint_y": 5.829,
+   "footprint_y": 5.726,
    "height": 1.251,
    "pivot_min_z": -0.2808,
    "tris_lod0": 502,

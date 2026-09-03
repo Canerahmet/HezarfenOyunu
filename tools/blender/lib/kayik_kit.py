@@ -200,18 +200,36 @@ def build_kayik(p, col, asset_name, textured=False):
         t = 0.38 + 0.22 * k
         x = (t - 0.5) * L
         b = B * 0.5 * math.sin(math.pi * t) ** 0.62
+        # PALA SAPIN UCUNDA DURUR — VE YERI ELLE YAZILMAZ.
+        #
+        # Sap `-16 derece` egik ve yari boyu 1,25 m; ucu bu yuzden
+        # merkezinden `1,25 * sin 16 = 0,34 m` asagida. Pala ise elle
+        # `-0,48 m` yaziliyordu, yani sapin gercek ucundan **14 cm
+        # daha asagida**. Renderda kurek, ucundan kopmus bir cubuk ve
+        # ondan ayri duran kucuk bir tahta olarak okunuyordu.
+        #
+        # Ayni sayi iki yerden turemis olamaz: pala artik sapin kendi
+        # acisindan hesaplaniyor. Disari yonu, `x` ekseni etrafinda
+        # `aci * sy` donmus (0, sy, 0)'dir — iki tarafta da ASAGI
+        # bakar, cunku hem konum hem donus `sy` ile aynaliyor.
+        _aci = math.radians(16.0)
+        _uzak = 1.33                       # sap merkezinden pala merkezine
+        _dy = _uzak * math.cos(_aci)
+        _dz = -_uzak * math.sin(_aci)
+        _z0 = D * (1.0 - DRAFT_RATIO) + 0.10
         for sy in (-1, 1):
             sap = hz.make_box(f"Kurek_{k}{sy}", (0.055, 2.5, 0.055),
                               (0.0, 0.0, 0.0), col)
-            sap.rotation_euler = (math.radians(-16.0) * sy, 0.0, 0.0)
-            sap.location = (x, sy * (b + 0.45),
-                            D * (1.0 - DRAFT_RATIO) + 0.10)
+            sap.rotation_euler = (-_aci * sy, 0.0, 0.0)
+            sap.location = (x, sy * (b + 0.45), _z0)
             parts.append(hz.assign(sap, mats["timber_bare"]))
-            pala = hz.make_box(f"KurekPala_{k}{sy}", (0.085, 0.62, 0.02),
+            # PALA GENISLIGI 8,5 -> 15 cm. Bir kurek palasi 15-18 cm
+            # genistir; 8,5 cm'lik bir tahta uzaktan sapin kendisinden
+            # ayirt edilmez ve kurek "iki cubuk" okur.
+            pala = hz.make_box(f"KurekPala_{k}{sy}", (0.150, 0.62, 0.02),
                                (0.0, 0.0, 0.0), col)
-            pala.rotation_euler = (math.radians(-16.0) * sy, 0.0, 0.0)
-            pala.location = (x, sy * (b + 1.78),
-                             D * (1.0 - DRAFT_RATIO) + 0.10 - 0.48)
+            pala.rotation_euler = (-_aci * sy, 0.0, 0.0)
+            pala.location = (x, sy * (b + 0.45 + _dy), _z0 + _dz)
             parts.append(hz.assign(pala, mats["timber_bare"]))
 
     # --- LOD1: kutle. Uzaktan bir tekne bir lekedir. --------------------
