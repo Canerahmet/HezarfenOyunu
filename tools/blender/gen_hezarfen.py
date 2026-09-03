@@ -336,6 +336,20 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
         olculen = kiy.cizgi_yaricapi(govde, cizgi, _kol_filtre,
                                      oranlar=(0.10, 0.55),
                                      pencere=0.055, en_cok=boy * 0.09)
+        # OMUZ AYRI OLCULUR — %10'DAKI KOL DELTOIDI BILMIYOR.
+        #
+        # Koltuk alti kapandi ama omzun USTU acik kaldi: inceleme
+        # karesinde deltoidin uzerinde koyu bir yarik ve arasindan ten.
+        # Sebep sayidaydi: `olculen[0]` cizginin %10'undaki yaricap,
+        # yani kolun INCE yeri. Omuzun kendisi deltoidle birlikte
+        # bundan belirgin kalin ve tup oraya yetismiyordu.
+        #
+        # Omuz kendi orani (%2) ile olculur; pencere de dar tutulur ki
+        # gogse tasmasin.
+        _omuz_olcu = kiy.cizgi_yaricapi(govde, cizgi, _kol_filtre,
+                                        oranlar=(0.02,),
+                                        pencere=0.045,
+                                        en_cok=boy * 0.11)
         olculen_log = ("/".join("-" if o is None else f"{o*100:.1f}"
                                 for o in list(olculen) + [r_bilek_olcu])
                        + f" cm, bilek t={t_bilek:.2f}")
@@ -368,7 +382,20 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
             ic.z = 0.0
             if ic.length < 1e-6 or (ic.x * isaret) >= 0.0:
                 ic = Vector((-isaret, 0.0, 0.0))
-            cizgi = [cizgi[0] + ic.normalized() * (boy * 0.045)] + cizgi
+            # UZATMA 4,5 -> 7,5 cm: DIKIS OMZUN USTUNDE ACIK KALIYORDU.
+            #
+            # Koltuk alti kapandi ama omzun USTU kapanmadi: inceleme
+            # karesinde deltoidin uzerinde koyu bir yarik ve arasindan
+            # ten. Sebep olculebilir — kol tupunun yaricapi omuzda
+            # olculen kol + entarinin sismesi (~7 cm), oysa deltoidin
+            # tepesi kol EKSENINDEN daha yukarida. Tup oraya
+            # YETISMIYOR.
+            #
+            # Yaricabi buyutmek omuzda bir TOP yapardi (bir kez oldu,
+            # yorumu asagida). Dogru olan tupu govdenin daha ICINE
+            # sokmak: ilk halka gogsun icinde kalir, loft deltoidin
+            # uzerinden geceR ve dikis kabugun altinda kaybolur.
+            cizgi = [cizgi[0] + ic.normalized() * (boy * 0.075)] + cizgi
             hz.log(f"kol uzatmasi {'sag' if isaret > 0 else 'sol'}: "
                    f"yon ({ic.x:+.3f}, {ic.y:+.3f})")
 
@@ -406,7 +433,8 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
         # kol dirsege dogru DARALIR. Yani omuz yaricapinin payi bir
         # zevk sayisi degil: entarinin kendi sismesi. Ikisi ayni
         # sayidan turdugu icin bir daha ayrisamazlar.
-        r_om = (olculen[0] or boy * 0.032) + ENTARI_SIS
+        r_om = max(olculen[0] or boy * 0.032,
+                   (_omuz_olcu[0] or 0.0)) + ENTARI_SIS
         r_dir = (olculen[1] or boy * 0.026) + boy * 0.013
         r_bil = (r_bilek_olcu or boy * 0.020) + boy * 0.022
         # Cizginin toplam donusu: ardisik uc nokta arasindaki en
