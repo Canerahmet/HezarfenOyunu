@@ -52,5 +52,72 @@ namespace Hezarfen.Tests.EditMode
                 + "Kur: Hezarfen > Aydinlatma > Kalici isik pasini kur, "
                 + "sonra problari yeniden pisir.");
         }
+
+        /// <summary>
+        /// <b>Fırında en az bir ışık olsun.</b>
+        ///
+        /// ## Ölçüm
+        ///
+        /// Problar L0 = <b>tam sıfır</b> pişti ve sebebi üç deneyle
+        /// bulundu (ADR 0087). Gök profilini Lux kipinde 20.000'e
+        /// sabitlemek de, fırına gerçek bir skybox malzemesi vermek de
+        /// (ortam probu 0,037 → 0,18/0,23/0,30) `CellData`yı iki desende
+        /// bıraktı. Güneş <c>Mixed</c> yapılınca desen sayısı
+        /// <b>12.106</b> oldu.
+        ///
+        /// Yani <b>fırın, içinde hiç ışık yoksa prob aydınlatması
+        /// üretmiyor.</b>
+        ///
+        /// ## Neden test
+        ///
+        /// Bu ayar bir alan: birinin güneşi <c>Realtime Only</c>'ye
+        /// çevirmesi yetiyor ve fırın yine "başarılı" diyor, yalnızca
+        /// şehir kararıyor. İki saatlik bir pişirmenin sessizce boşa
+        /// gitmesi bu turda dört kez oldu.
+        ///
+        /// Ölçü sahne dosyasından okunur: yönlü, şiddeti sıfırdan büyük
+        /// ve <c>m_Lightmapping</c> değeri <b>4 (Realtime)</b>
+        /// olmayan en az bir ışık.
+        /// </summary>
+        [Test]
+        public void AtLeastOneSunReachesTheBake()
+        {
+            const string yol = "Assets/_Project/Scenes/Faz1_Terrain.unity";
+            Assert.IsTrue(System.IO.File.Exists(yol), $"{yol} yok.");
+
+            var satir = System.IO.File.ReadAllLines(yol);
+            int yonlu = 0, firinda = 0;
+            for (int i = 0; i < satir.Length; i++)
+            {
+                if (satir[i] != "Light:") continue;
+                int tur = -1, lm = -1;
+                float siddet = 0f;
+                for (int j = i; j < System.Math.Min(i + 60, satir.Length); j++)
+                {
+                    if (satir[j].StartsWith("  m_Type: "))
+                        int.TryParse(satir[j].Substring(10).Trim(), out tur);
+                    else if (satir[j].StartsWith("  m_Intensity: "))
+                        float.TryParse(satir[j].Substring(15).Trim(),
+                            System.Globalization.NumberStyles.Float,
+                            System.Globalization.CultureInfo.InvariantCulture,
+                            out siddet);
+                    else if (satir[j].StartsWith("  m_Lightmapping: "))
+                        int.TryParse(satir[j].Substring(18).Trim(), out lm);
+                }
+                if (tur != 1 || siddet <= 0f) continue;
+                yonlu++;
+                if (lm != 4) firinda++;   // 4 = Realtime Only
+            }
+
+            Assert.Greater(yonlu, 0,
+                "Taban sahnede siddeti sifirdan buyuk yonlu isik yok — "
+                + "olcu bos donuyor.");
+            Assert.Greater(firinda, 0,
+                "Butun yonlu isiklar Realtime Only. Firin ISIKSIZ kosar "
+                + "ve problar L0 = sifir piser: sehirde dolayli isik "
+                + "olmaz, ama pisirme yine 'basarili' der. Gunes Mixed "
+                + "olmali (karma kip IndirectOnly, yani golgeler yine "
+                + "saati izler). Gerekce: ADR 0087.");
+        }
     }
 }
