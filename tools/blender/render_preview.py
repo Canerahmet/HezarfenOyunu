@@ -16,7 +16,7 @@ görüntüler üretir. Caner'in yazılı notu da bu paketlere dayanır.
 Tasarım kararları:
   * **1,70 m insan figürü** her karede durur. Mimari bir oyunda tek başına en yararlı
     inceleme öğesi budur: "cumba çok derin" yargısı ancak bir insana göre verilebilir.
-  * **LOD1+ ve UCX_ gizlenir.** Aynı konumda üst üste duran LOD'lar z-fighting üretir;
+  * **LOD1+ ve çarpıştırıcılar (`UCX_`, `UCXB_`) gizlenir.** Aynı konumda üst üste duran LOD'lar z-fighting üretir;
     kalibre edilmemiş bir görüntü üzerinde alınan her karar yanlıştır.
   * **Işık nihai ışık değildir.** Amaç güzellik değil BİÇİMİ OKUTMAK; bu yüzden sabit,
     nötr bir stüdyo düzeni kullanılır ve sürümler arası kıyaslanabilir kalır.
@@ -129,7 +129,22 @@ def collect_targets(lod=0):
         name = obj.name
         m = lod_re.search(name)
 
-        if name.startswith("UCX_"):
+        # CARPISTIRICININ HER TURU GIZLENIR — YALNIZ `UCX_` DEGIL.
+        #
+        # Burada yalniz `UCX_` eleniyordu ve olculdu: Galata Kulesi'nin
+        # inceleme karesinde kursun kulahin yerinde DUZ TEPELI BEYAZ
+        # BIR SILINDIR vardi. Kulah yerindeydi (koni, 8,5 m, tepesi
+        # 46,00 m'de); goruleni ureten sey `UCXB_GalataKulesi` —
+        # carpistiricinin kendisi, modelin ustune cizilmis.
+        #
+        # `UCXB_` sonradan geldi (ici bos, disbukey DEGIL; ev ve kule
+        # kademelerinde gerekti) ve bu alet guncellenmedi. Yani
+        # "render bir gozlemdir" derken gozlemin kendisi yanlisti ve
+        # her `UCXB_` tasiyan varlik bu kusurla incelendi.
+        #
+        # Desen Unity tarafindaki iniş sozlesmesiyle ayni: `UCX` ile
+        # baslayan ve `_` ile devam eden her onek carpistiricidir.
+        if re.match(r"^UCX[A-Z]*_", name):
             hidden.append(name)
         elif m is not None and int(m.group(1)) != lod:
             hidden.append(name)
