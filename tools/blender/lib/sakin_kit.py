@@ -279,48 +279,22 @@ def yasmak(ad, col, bas_r, kotlar, cy=0.0, yuz_acik=False,
     return obj
 
 
-def takke(ad, col, z_taban, r, yukseklik, kalinlik=0.006, segment=18,
-          cy=0.0):
-    """
-    **Takke** — çocuğun ve gencin başlığı.
-
-    Sarık rütbe gösterir (`SOURCE_KIYAFET`); bir çocuğun sarığı olmaz.
-    Takke başa oturan yarım kubbedir: kavuktan alçak, sarıktan sade.
-    """
-    bm = bmesh.new()
-    kat = 5
-    halkalar = []
-    for i in range(kat):
-        t = i / float(kat - 1)
-        z = z_taban + yukseklik * t
-        rr = r * math.cos(t * math.pi * 0.5) ** 0.55
-        if rr < 1e-4:
-            rr = 1e-4
-        halka = []
-        for k in range(segment):
-            a = math.tau * k / segment
-            halka.append(bm.verts.new(
-                Vector((math.cos(a) * rr, cy + math.sin(a) * rr, z))))
-        halkalar.append(halka)
-
-    bm.verts.ensure_lookup_table()
-    for i in range(kat - 1):
-        ust, alt = halkalar[i], halkalar[i + 1]
-        for k in range(segment):
-            k2 = (k + 1) % segment
-            bm.faces.new((ust[k], ust[k2], alt[k2], alt[k]))
-    bm.faces.new(tuple(halkalar[-1]))
-
-    obj = hz.mesh_from_bmesh(ad, bm, col=col)
-    if obj is None:
-        return None
-    m = obj.modifiers.new("Kalinlik", "SOLIDIFY")
-    m.thickness = kalinlik
-    m.offset = 0.0
-    kiy._uygula(obj)
-    for poly in obj.data.polygons:
-        poly.use_smooth = True
-    return obj
+# TAKKE KUBBESI KALDIRILDI — YERINE KABUK GECTI.
+#
+# Burada bir `takke()` vardi: taban halkasi kafanin bir kotundaki
+# kesitten, ustu `cos(t*pi/2)^0,55` profilinden turetilen bir kubbe. Uc
+# ayri olcum ayni seyi soyledi. Taban yaricapi kafanin EN GENIS
+# diliminden alininca takke kafanin cevresinde HAVADA durdu; kendi
+# kotunda olculunce KULAH gibi sivrildi (yukseklik hala boydan
+# turuyordu ve kafanin tepesini 4,5 cm asiyordu); yukseklik de kafadan
+# olculunce kubbe onde derinin ALTINA girdi ve takke tepede kucuk bir
+# yamaya dondu.
+#
+# Ucunun sebebi ayni: bir kubbe kafayla YALNIZ BIR halkada bulusur,
+# gerisinde ya disarida ya iceridedir. Bu depo dersi sakalda, biyikta
+# ve sacta zaten odemisti — altindaki bicime oturan sey KABUK olmali.
+# Takke artik `gen_hezarfen`de `kiy.kopya_kabuk` ile kuruluyor ve kafayi
+# birebir izliyor.
 
 
 def yas_bandi(makro):

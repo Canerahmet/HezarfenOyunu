@@ -111,7 +111,11 @@ HEZARFEN_MAKRO = {
 #: 5 cm altında bitiyordu ve arada çıplak kafa derisi kalıyordu.
 BASLIK_TABANI = {
     "sarik": 0.946,
-    "takke": 0.965,
+    # Takke 0,965'teydi ve olculdu: o kot kafanin tepesine 6 cm kalan
+    # yer, yani takke yalniz TEPEYE oturan bir kefiye gibi duruyor ve
+    # kenariyla sacin arasinda genis bir ciplak bant kaliyordu. Takke
+    # kafayi orter — tabani sarikla ayni yerde, kasin biraz ustunde.
+    "takke": 0.948,
     "kavuk": 0.982,
 }
 
@@ -706,12 +710,30 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
         #
         # Dogru olcu takkenin KENDI kotundaki kesit. 1,06: kumas kafaya
         # yapismaz, altinda sac var.
-        _tk = kiy.kesit_merkezli(govde, boy * BASLIK_TABANI["takke"])
-        _tr = (_tk[0] if _tk else bas_r * 0.86) * 1.06
-        t = skn.takke("Takke", col, boy * BASLIK_TABANI["takke"],
-                      _tr, boy * 0.062, cy=(_tk[2] if _tk else bas_cy))
+        # TAKKE DE KART DEGIL KABUK — ve ayni sebeple.
+        #
+        # Takke bir kubbe olarak kuruluyordu: taban halkasi kafanin bir
+        # kotundaki kesitten, ustu `cos(t*pi/2)^0,55` profilinden. Iki
+        # olcum bunun ne demek oldugunu gosterdi. Once taban yaricapi
+        # kafanin EN GENIS diliminden (kulak hizasi) aliniyordu ve takke
+        # kafanin cevresinde havada duruyordu; yaricapi kendi kotunda
+        # olcunce bu kez KULAH gibi sivrildi, cunku yukseklik hala
+        # `boy * 0,062` yaziliydi ve kafanin tepesini 4,5 cm asiyordu.
+        # Yukseklik de kafanin tepesinden olculunce sivrilik gitti ama
+        # bu sefer kubbe kafanin ONUNDE derinin ALTINA girdi: takke
+        # tepede kucuk bir yamaya dondu.
+        #
+        # Ucunun de sebebi ayni: bir kubbe kafayla YALNIZ BIR halkada
+        # bulusur, gerisinde ya disarida ya iceridedir. Bu depo bu dersi
+        # sakalda, biyikta ve sacta zaten odedi — altindaki bicime
+        # oturan sey kabuk olmali. Takke bunun en acik ornegi: kafaya
+        # gecirilen bir bez.
+        _tz = boy * BASLIK_TABANI["takke"]
+        t = kiy.kopya_kabuk(govde, "Takke", col,
+                            tut=lambda c: c.z >= _tz,
+                            sisme=0.006, kalinlik=0.006)
         if t:
-            parts.append(hz.assign(t, mats["takke"]))
+            parts.append(hz.assign(kiy.yumusat(t, 6), mats["takke"]))
     else:
         buyuk = 1.16 if tip == "yasli" else 1.0
         # KOTLAR BASIN USTUNDE DEGIL, BASIN UZERINDE.
