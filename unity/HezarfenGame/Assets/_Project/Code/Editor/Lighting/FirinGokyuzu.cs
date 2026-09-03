@@ -144,10 +144,23 @@ namespace Hezarfen.Editor.Lighting
         /// yanlışsa L0 yine sıfır kalır ve hipotez elenir — iki
         /// durumda da on dakikada cevap.
         ///
-        /// Güneş diski <b>kapalı</b>: güneşin kendisi fırının dışında
-        /// (gerçek zamanlı) ve skybox'a bir güneş koymak onu ikinci kez
-        /// eklemek olurdu. Kalan şey gökyüzünün difüz kubbesi — zaten
-        /// APV'nin taşıması gereken şey.
+        /// Güneş diski <b>kapalı</b>: güneş artık fırının İÇİNDE
+        /// (<c>Mixed</c>) ve skybox'a bir güneş koymak onu ikinci kez
+        /// eklemek olurdu. Kalan şey gökyüzünün difüz kubbesi.
+        ///
+        /// ## Sonuç: hipotez tek başına yanlış çıktı, malzeme kaldı
+        ///
+        /// Skybox <b>tek başına</b> problara ışık koymadı — L0 yine tam
+        /// sıfır pişti. Işığı getiren şey güneşin <c>Mixed</c> olmasıydı
+        /// (ADR 0087). Ama malzeme kaldı, çünkü ortam probunu ölçülebilir
+        /// biçimde yükseltiyor (0,037 → 0,18/0,23/0,30) ve gökyüzü
+        /// sıçraması gerçek bir terim.
+        ///
+        /// <b>Sınanmamış:</b> güneş fırına girdikten sonra skybox hâlâ
+        /// gerekli mi. Deneyi on dakika: `D_Okmeydani`'yi bir kez
+        /// skybox'sız pişir ve `tools/olcum/prob_isigi.py` ile desen
+        /// sayısına bak. Gerekmiyorsa malzeme kaldırılır — HDRP onu
+        /// çizimde kullanmıyor, yani sahnede duran ölü bir bağ olur.
         /// </summary>
         public static Material SkyboxUret()
         {
