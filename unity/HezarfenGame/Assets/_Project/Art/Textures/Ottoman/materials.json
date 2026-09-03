@@ -32,23 +32,43 @@
   },
   {
    "name": "M_Beard",
-   "kind": "untextured",
+   "kind": "pbr",
+   "asset": "sakal",
+   "sizeMeters": [
+    0.06,
+    0.06
+   ],
+   "roughness": 0.72,
+   "metallic": 0.0,
    "baseColor": [
     0.105,
     0.072,
     0.052
    ],
-   "roughness": 0.72
+   "baked": false,
+   "maskFile": "T_Sakal_MASK.png",
+   "normalFile": "T_Sakal_N.png",
+   "baseColorFile": "T_Sakal_BC.png"
   },
   {
    "name": "M_Beard_Ak",
-   "kind": "untextured",
+   "kind": "pbr",
+   "asset": "sakal",
+   "sizeMeters": [
+    0.06,
+    0.06
+   ],
+   "roughness": 0.7,
+   "metallic": 0.0,
    "baseColor": [
     0.76,
     0.745,
     0.72
    ],
-   "roughness": 0.7
+   "baked": false,
+   "maskFile": "T_Sakal_MASK.png",
+   "normalFile": "T_Sakal_N.png",
+   "baseColorFile": "T_Sakal_BC.png"
   },
   {
    "name": "M_Brick_Band",
@@ -147,13 +167,23 @@
   },
   {
    "name": "M_Cloth_Kilim",
-   "kind": "untextured",
+   "kind": "pbr",
+   "asset": "kumas_kilim",
+   "sizeMeters": [
+    0.18,
+    0.18
+   ],
+   "roughness": 0.88,
+   "metallic": 0.0,
    "baseColor": [
     0.42,
     0.15,
     0.13
    ],
-   "roughness": 0.88
+   "baked": false,
+   "maskFile": "T_KumasKilim_MASK.png",
+   "normalFile": "T_KumasKilim_N.png",
+   "baseColorFile": "T_KumasKilim_BC.png"
   },
   {
    "name": "M_Cloth_Kusak",
@@ -256,19 +286,54 @@
    "baseColorFile": "T_KumasKeten_BC.png"
   },
   {
+   "name": "M_Eye_Iris",
+   "kind": "untextured",
+   "baseColor": [
+    0.118,
+    0.072,
+    0.042
+   ],
+   "roughness": 0.18
+  },
+  {
+   "name": "M_Eye_Pupil",
+   "kind": "untextured",
+   "baseColor": [
+    0.02,
+    0.018,
+    0.017
+   ],
+   "roughness": 0.18
+  },
+  {
+   "name": "M_Eye_Sclera",
+   "kind": "untextured",
+   "baseColor": [
+    0.64,
+    0.612,
+    0.585
+   ],
+   "roughness": 0.22
+  },
+  {
    "name": "M_Feather",
    "kind": "pbr",
-   "asset": "weathered_planks",
+   "asset": "tuy",
    "sizeMeters": [
-    2.0,
-    2.0
+    0.4,
+    0.4
    ],
    "roughness": 0.62,
    "metallic": 0.0,
-   "baked": true,
-   "maskFile": "T_WeatheredPlanks_MASK.png",
-   "normalFile": "T_WeatheredPlanks_N.png",
-   "baseColorFile": "T_Feather_BC.png"
+   "baseColor": [
+    0.238,
+    0.183,
+    0.128
+   ],
+   "baked": false,
+   "maskFile": "T_Tuy_MASK.png",
+   "normalFile": "T_Tuy_N.png",
+   "baseColorFile": "T_Tuy_BC.png"
   },
   {
    "name": "M_Foliage_Cinar",
@@ -333,6 +398,26 @@
    "normalFile": "T_HairCard_N.png"
   },
   {
+   "name": "M_Hair_Kabuk",
+   "kind": "pbr",
+   "asset": "sac_yuzey",
+   "sizeMeters": [
+    0.09,
+    0.09
+   ],
+   "roughness": 0.55,
+   "metallic": 0.0,
+   "baseColor": [
+    0.106,
+    0.07,
+    0.048
+   ],
+   "baked": false,
+   "maskFile": "T_SacYuzey_MASK.png",
+   "normalFile": "T_SacYuzey_N.png",
+   "baseColorFile": "T_SacYuzey_BC.png"
+  },
+  {
    "name": "M_Lead_Sheet",
    "kind": "pbr",
    "asset": "lead_sheet",
@@ -350,27 +435,42 @@
   {
    "name": "M_Leather",
    "kind": "pbr",
-   "asset": "weathered_planks",
+   "asset": "kosele",
    "sizeMeters": [
-    2.0,
-    2.0
+    0.2,
+    0.2
    ],
    "roughness": 0.74,
    "metallic": 0.0,
-   "baked": true,
-   "maskFile": "T_WeatheredPlanks_MASK.png",
-   "normalFile": "T_WeatheredPlanks_N.png",
-   "baseColorFile": "T_Leather_BC.png"
+   "baseColor": [
+    0.226,
+    0.132,
+    0.074
+   ],
+   "baked": false,
+   "maskFile": "T_Kosele_MASK.png",
+   "normalFile": "T_Kosele_N.png",
+   "baseColorFile": "T_Kosele_BC.png"
   },
   {
    "name": "M_Leather_Mest",
-   "kind": "untextured",
+   "kind": "pbr",
+   "asset": "kosele",
+   "sizeMeters": [
+    0.2,
+    0.2
+   ],
+   "roughness": 0.66,
+   "metallic": 0.0,
    "baseColor": [
     0.56,
     0.395,
     0.115
    ],
-   "roughness": 0.66
+   "baked": false,
+   "maskFile": "T_Kosele_MASK.png",
+   "normalFile": "T_Kosele_N.png",
+   "baseColorFile": "T_Kosele_BC.png"
   },
   {
    "name": "M_Marble_Kitabe",
