@@ -192,6 +192,35 @@ namespace Hezarfen.Editor.Diagnostics
             }
 
             /// <summary>
+            /// <b>Duyma menzilindeki sakin sayısı</b> — "replik 0"ın ne
+            /// demek olduğunu söyleyen sayı.
+            ///
+            /// `replik` sütunu on durağın <b>onunda da</b> 0 yazıyor ve
+            /// bu tek başına iki ayrı şey demek olabilir: bark sistemi
+            /// çalışmıyor, ya da o mesafede zaten kimse yok. Replik
+            /// yalnızca <see cref="BarkGosterici.duyulmaMesafesi"/>
+            /// içinde görünür (12 m); tur ise 40 m'deki kalabalığı
+            /// sayıyordu.
+            ///
+            /// Sıfırın yanına bu sayı yazılınca ayrım kendiliğinden
+            /// çıkıyor: "0 replik / 0 sakin" beklenen, "0 replik /
+            /// 6 sakin" kusur. Menzil <b>bark'ın kendi alanından</b>
+            /// okunuyor — bir sayının iki sahibi olmasın.
+            /// </summary>
+            private static int DuymaMenzilinde(Sehir.NPCYonetici npc,
+                                               Sehir.BarkGosterici bark,
+                                               Vector3 p)
+            {
+                if (npc == null || npc.Sakinler == null) return 0;
+                float r = bark != null ? bark.duyulmaMesafesi : 12f;
+                float r2 = r * r;
+                int n = 0;
+                foreach (var a in npc.Sakinler)
+                    if ((a.konum - p).sqrMagnitude <= r2) n++;
+                return n;
+            }
+
+            /// <summary>
             /// O anda ekrana <b>çizilen</b> sakin gövdesi sayısı.
             ///
             /// Turda "40 m'de 93 NPC" yazıyordu ve karede sokak
@@ -233,7 +262,7 @@ namespace Hezarfen.Editor.Diagnostics
                 satirlar.Add("");
                 satirlar.Add("| durak | konum (x, z) | ayak altinda "
                              + "| arazi farki | kamera kolu "
-                             + "| 40 m'de NPC | cizilen govde | replik "
+                             + "| 40 m'de NPC | cizilen govde | replik / menzilde "
                              + "| kadrajda | semt (bekleme) | apv | acik dugum "
                              + "| durak sapmasi (m) "
                              + "| kayma (m) | tepe acik / neyin altinda "
@@ -886,7 +915,8 @@ namespace Hezarfen.Editor.Diagnostics
                                  + $"{(kip != null ? kip.SonMesafe.ToString("0.00") : "?")} | "
                                  + $"{YakindakiNpc(npc, oyuncu.transform.position)} | "
                                  + $"{CizilenGovde(npc)} | "
-                                 + $"{replikSayisi} | "
+                                 + $"{replikSayisi} / "
+                                 + $"{DuymaMenzilinde(npc, bark, p)} | "
                                  + $"{kadrajda} @ {kadrajUzak:0} m | "
                                  + $"{akisSemt} ({akisBekleme:0.0} sn) | "
                                  + $"{apv} | "
