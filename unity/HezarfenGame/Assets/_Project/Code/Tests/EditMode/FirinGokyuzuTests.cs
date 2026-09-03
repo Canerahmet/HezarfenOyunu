@@ -119,5 +119,52 @@ namespace Hezarfen.Tests.EditMode
                 + "olmali (karma kip IndirectOnly, yani golgeler yine "
                 + "saati izler). Gerekce: ADR 0087.");
         }
+
+        /// <summary>
+        /// <b>Fırın ayarları: CPU ve yalnız dolaylı.</b>
+        ///
+        /// İki alan, ikisi de bu turda ölçümle kazanıldı ve ikisi de tek
+        /// tıkla geri alınabilir.
+        ///
+        /// <b>Arka uç CPU olmalı.</b> GPU fırını iki kez süreç hiçbir şey
+        /// yazmadan yok olarak bitti ve sebebi kayıtta tek satırdı:
+        /// <i>"Transformed OOTS snapshot into LightBaker scene input …
+        /// Size: 7251,37 MB"</i> — bu makinenin kartı <b>8 GB</b>.
+        /// Sistem belleği 32 GB.
+        ///
+        /// <b>Karma kip `IndirectOnly` olmalı.</b> Güneş artık fırına
+        /// giriyor (yoksa problar L0 = sıfır pişiyor, ADR 0087) ve
+        /// hangi yarısının pişeceğini bu alan söylüyor. `Shadowmask`
+        /// seçilirse <b>gölgeler pişirildiği saate çakılır</b> ve
+        /// <c>ZamanSistemi</c> güneşi döndürdükçe gölgeler yerinde
+        /// kalır — günün her saati yanlış. `IndirectOnly` yalnız
+        /// sıçramayı dondurur.
+        /// </summary>
+        [Test]
+        public void TheBakeStaysOnTheCpuAndBakesOnlyTheIndirectTerm()
+        {
+            const string yol =
+                "Assets/_Project/Settings/LS_Hezarfen.lighting";
+            Assert.IsTrue(System.IO.File.Exists(yol), $"{yol} yok.");
+
+            int karma = -1, arkaUc = -1;
+            foreach (string satir in System.IO.File.ReadLines(yol))
+            {
+                if (satir.StartsWith("  m_MixedBakeMode: "))
+                    int.TryParse(satir.Substring(19).Trim(), out karma);
+                else if (satir.StartsWith("  m_BakeBackend: "))
+                    int.TryParse(satir.Substring(17).Trim(), out arkaUc);
+            }
+
+            Assert.AreEqual(1, arkaUc,
+                "Fırın arka ucu Progressive CPU olmali (m_BakeBackend 1). "
+                + "GPU firini bu makinede iki kez sessizce oldu: sahne "
+                + "girdisi 7,25 GB, kart 8 GB.");
+            Assert.AreEqual(0, karma,
+                "Karma kip IndirectOnly olmali (m_MixedBakeMode 0). "
+                + "Shadowmask secilirse golgeler pisirildigi saate "
+                + "cakilir ve ZamanSistemi gunesi dondurdukce yanlis "
+                + "yerde kalirlar. Gerekce: ADR 0087.");
+        }
     }
 }
