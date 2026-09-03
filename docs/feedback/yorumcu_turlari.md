@@ -1004,6 +1004,36 @@ Tur artık `DistrictStreamer.LoadsInFlight` sıfıra inene kadar bekliyor
 üst sınır) ve her satırda **kaç semt yüklü, ne kadar beklendi** yazıyor.
 Bundan sonra boş çıkan bir durak gerçekten boştur.
 
+### Fırın bitti — ve problar SİYAH pişti
+
+`D_Galata` 106 dakikada pişti: **62 hücre, 157 MB** prob verisi, imza
+denetimi geçti. Tur raporunun yeni `apv` sütunu çalışma zamanının da
+sağlam olduğunu söylüyor: `kurulu/kume var`. Yol açık.
+
+Taşıdığı şey değil. `03_galata_sokak` — artık şehrin **içinde**, 40
+m'de 57 NPC — gölge mavi/kırmızı **0,000**, saçılım 0,005.
+
+Verinin kendisi okundu: `CellData.bytes` içinde tekrar eden
+`00 00 00 00 00 00 00 38` deseni ve baytların **%43,8'i tam sıfır**.
+Problar siyah pişmiş.
+
+**Sınanan ve çürütülen hipotez.** "Toplu kipte kimse çizmiyor, o yüzden
+ortam probu boş" diye düşünüldü ve geçici bir kamerayla bir kare
+çizdirildi. Ölçüm tersini söyledi:
+
+```
+Ortam probu (render ONCESI):  0,0370 / 0,0421 / 0,0546
+Ortam probu (render SONRASI): 0,0000 / 0,0000 / 0,0000
+```
+
+Yani prob **doluydu** (üstelik mavimsi — gökten geliyor) ve çizim onu
+**sıfırladı**. Çizim kaldırıldı.
+
+Geriye asıl sayı kaldı: **0,037**. Bir gün ışığı göğü için bu çok
+karanlık ve sıçrama ışığı ortam probunun büyüklüğü kadar olur. Bir
+sonraki turun sorusu tek cümle: *20.000 lux'lük bir PBR göğünün ortam
+probu ne olmalı, ve neden 0,037?*
+
 ### Fırın: dört ölçüm, dört yanlış varsayım, ve sonunda projenin kendi kuralı
 
 Bu turda pişirme dört kez "başarılı" dönüp diske hiçbir şey yazmadı.

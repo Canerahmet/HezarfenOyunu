@@ -1070,6 +1070,35 @@ namespace Hezarfen.Editor.Lighting
                 return;
             }
 
+            // ORTAM PROBU BOS MU — HIPOTEZIN OLCUSU.
+            //
+            // Problar siyah pisti ve firinda isik yok (bilincli: gunes
+            // saate gore donuyor). Geriye gokyuzu kaliyor ve
+            // lightmapper gokyuzunu `RenderSettings.ambientProbe`
+            // uzerinden goruyor. HDRP o probu boru hatti bir kare
+            // CIZDIGINDE dolduruyor; toplu kipte kamera hic render
+            // etmiyor. Sayi burada okunuyor: DC terimi sifira yakinsa
+            // firina giden gok BOS demektir.
+            var _op = RenderSettings.ambientProbe;
+            Debug.Log($"[Hezarfen] Ortam probu (gokten gelen sicrama): "
+                      + $"{_op[0, 0]:0.0000} / {_op[1, 0]:0.0000} / "
+                      + $"{_op[2, 0]:0.0000}");
+            // GECICI KAMERAYLA RENDER DENENDI VE OLCUM REDDETTI.
+            //
+            // Hipotez: toplu kipte kimse cizmiyor, o yuzden ortam probu
+            // bos. Olculdu ve TERSI cikti — prob render ONCESI
+            // 0,0370/0,0421/0,0546 (mavimsi, yani gokten geliyor),
+            // gecici kamera bir kare cizdikten SONRA **0/0/0**. Yani
+            // cizim probu doldurmuyor, SIFIRLIYOR: kamera hicbir sey
+            // gormuyor (`cullingMask 0`, 64x64 hedef) ve HDRP gok
+            // hesabini o kareye gore yeniliyor.
+            //
+            // Cizim kaldirildi. Geriye kalan sayi asil ise yariyor:
+            // 0,037 bir gunduk gogu icin COK KARANLIK. Sicrama isigi
+            // ortam probunun buyuklugu kadar olur; problar bu yuzden
+            // siyah pismis olabilir. Bir sonraki turun sorusu bu —
+            // 20.000 lux'luk bir PBR gogunun ortam probu ne olmali.
+
             _imzaOnce = SemtProblari.PismisVeriImzasi();
             Debug.Log($"[Hezarfen] APV pisirme basladi — YALNIZ {semt}. "
                       + $"Onceki firin: {_imzaOnce}");
