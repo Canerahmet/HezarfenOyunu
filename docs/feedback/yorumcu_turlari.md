@@ -1004,6 +1004,22 @@ Tur artık `DistrictStreamer.LoadsInFlight` sıfıra inene kadar bekliyor
 üst sınır) ve her satırda **kaç semt yüklü, ne kadar beklendi** yazıyor.
 Bundan sonra boş çıkan bir durak gerçekten boştur.
 
+### `06_kara_surlari`: oyuncunun başının üstünde bir taş tavan
+
+Turun `tepe acik` sütunu on durakta bir kez **H** diyor ve o durak bu.
+Kareye bakıldığında ne demek olduğu görülüyor: karenin üst yarısını
+baştan başa **düz bir taş kütle** kaplıyor, oyuncunun üç metre
+üstünde, taşıyıcısı görünmeden. Oyuncu bir tavanın altında duruyor.
+
+Durak (−3300, 0, −1200). Kapı kemerinin altında durmak kendiliğinden
+kusur değil ama bu kemer karenin tamamını kaplıyor ve alt kenarı
+eğrisiz. Gölge ölçümü de aynı yeri işaret ediyor: `06_kara_surlari`
+mavi/kırmızı **0,000**, saçılım 0,006 — gökyüzü kapalı olduğu için
+zaten hiç dolaylı ışık gelmiyor.
+
+Alet kusuru zaten görüyor (`tepe acik`); sıradaki tur koşumunda
+`kadrajda` sütunu neyin üstte olduğunu **adıyla** yazacak.
+
 ### Gölgenin rengi: turun tek sayısı, artık bir aletle
 
 `tools/olcum/golge_orani.py` karenin en karanlık %25'inin
