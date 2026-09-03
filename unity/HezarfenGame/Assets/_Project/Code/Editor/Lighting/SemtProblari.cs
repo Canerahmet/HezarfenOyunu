@@ -307,7 +307,24 @@ namespace Hezarfen.Editor.Lighting
             so.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(kume);
             AssetDatabase.SaveAssets();
-            return $"{silinen} .bytes silindi, hucre listesi bosaltildi.";
+            // DONDURMA DA COZULUR — IKISI AYNI SEYIN IKI YARISI.
+            //
+            // `freezePlacement` "problari YENIDEN YERLESTIRME" demek,
+            // ve yerlestirme diskteki pismis veriden gelir. Veri
+            // silindiginde donuk kalmak, olmayan bir yerlesime baglı
+            // kalmaktir.
+            //
+            // Bu, `freezePlacement`in ne oldugunu ogrendigimiz yerdir.
+            // Onu "izgarayi sabitler, her semt kendi basina pisebilir"
+            // diye kullandim ve olcum reddetti: D_Okmeydani pisip 5
+            // hucre yazdiktan sonra D_Eyup yirmi alti dakika pisti ve
+            // diske HIC dokunmadi — cunku donuk yerlesim o bes
+            // hucreydi ve Eyup'un problari onlarin disinda kaliyordu.
+            // Dondurma bir izgara sozlesmesi degil, PISMIS YERLESIMIN
+            // kendisidir; once tam bir pisirme olmadan islevi yok.
+            YerlesimiDondur(false);
+            return $"{silinen} .bytes silindi, hucre listesi bosaltildi, "
+                   + "yerlesim dondurmasi cozuldu.";
         }
 
         /// <summary>
