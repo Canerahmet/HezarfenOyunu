@@ -1004,6 +1004,56 @@ Tur artık `DistrictStreamer.LoadsInFlight` sıfıra inene kadar bekliyor
 üst sınır) ve her satırda **kaç semt yüklü, ne kadar beklendi** yazıyor.
 Bundan sonra boş çıkan bir durak gerçekten boştur.
 
+### Fırın: dört ölçüm, dört yanlış varsayım, ve sonunda projenin kendi kuralı
+
+Bu turda pişirme dört kez "başarılı" dönüp diske hiçbir şey yazmadı.
+Her seferinde sebep başkaydı ve her seferinde **ölçüm** söyledi.
+
+1. **Prob hacimleri dünya boyuydu.** Her semtin hacmi `Mode.Global`'dı
+   ve `Global` sahnenin değil **yüklü olan her şeyin** sınırını alır;
+   kurulum sekiz semti birlikte açıyor. Kümenin kendi varlığında
+   yazılıydı: `m_Extent: {x: 7776, y: 364.5, z: 7897.5}` — 15,5 × 15,8
+   km, ve **sekizi de aynı kutu**. Bedeli: *"the number of APV probes
+   exceeds the current system limit of 67.180.350"*, yerleştirme daha
+   başta düştü. → Hacimler artık her semtin **kendi** çizicilerinden.
+
+2. **Sanal kaydırma GPU'daydı.** Fırın bir tur önce CPU'ya alınmıştı
+   (7,25 GB sahne girdisi, 8 GB kart) ama `VirtualOffsetBake` hâlâ
+   karta gidiyordu: `d3d12: Unrecoverable GPU device error`, 100 MB'lık
+   istek 20 MB'lık tampona. → İşi CPU'ya vermek, işin **tamamını**
+   vermekmiş.
+
+3. **Kısmi pişirmede her koşum kendi ızgarasını üretiyordu.** Tek semt
+   yüklüyken hücre ızgarası başka çıkıyor ve Unity sonucu *"partially
+   baking the set with an incompatible cell layout"* diyerek atıyor.
+   `partialBakeSceneList` "yalnız bunu YÜKLE" değil, "yalnız bunu
+   PİŞİR" demek. → Bütün semtler yüklendi. Ama o zaman ışık hesabı
+   bütün şehrin geometrisine karşı koşuyor: en küçük semt dokuz
+   dakikada **%6,2** ve hız düşüyordu.
+
+4. **`freezePlacement` ızgarayı değil, PİŞMİŞ YERLEŞİMİ dondurur.**
+   Onu "ızgarayı sabitler, semtler tek tek pişer" diye kullandım.
+   D_Okmeydani pişip beş hücre yazdı; sonra D_Eyup yirmi altı dakika
+   pişti ve diske **hiç dokunmadı** — donuk yerleşim o beş hücreydi ve
+   Eyüp'ün probları onların dışındaydı. Yani kısmi pişirme, önce **tam**
+   bir pişirme ister; tam pişirme de bu makineye sığmıyor.
+
+Buradan sonrası projenin kendi kuralı (ADR 0078): **referans semt
+D_Galata**, yeni katman önce orada bitirilir ve **orada ölçülür.**
+Galata tek başına pişiyor; ölçü `tools/olcum/golge_orani.py`.
+
+İki denetim de bu turda doğdu ve ikisi de bir daha aynı sessiz
+başarısızlığa izin vermeyecek:
+
+* **Yerleştirme hatası eşzamanlı yakalanır** — `Lightmapping.BakeAsync`
+  daha dönmeden düşer; artık dinleniyor ve koşum orada biter (çıkış 6),
+  on bir dakika boşa gitmez.
+* **Ürün denetimi imza karşılaştırır** — hücre sayısı, diskteki toplam
+  bayt ve son yazılma anı, pişirmeden önce ve sonra. Yalnız hücre
+  sayısına bakmak yetmiyordu: D_Eyup'un boş pişirmesi, D_Okmeydani'nin
+  yazdığı beş hücreyle "başarılı" görünüyordu. *Başkasının işiyle
+  karşılanabilen bir denetim, denetim değildir.*
+
 ### Kanadın yüzeyi kerestedeydi — ve doku denetimi artık kapandı
 
 `M_Feather`, 9,71 m'lik kanadın **bütün** yüzeyi, doku olarak
