@@ -69,8 +69,22 @@ namespace Hezarfen.Editor.Lighting
     {
         public const string SemtDizini = "Assets/_Project/Scenes/Districts";
 
-        /// <summary>Problar arası en az uzaklık (m) — tek sahibi burası.</summary>
-        public const float ProbAraligi = 3f;
+        /// <summary>
+        /// Problar arası en az uzaklık (m) — tek sahibi burası.
+        ///
+        /// <b>3 m'ydi ve ölçüm kabul etmedi.</b> Sekiz semtin hepsi
+        /// yüklüyken — kısmi pişirmenin şartı bu, hücre ızgarası küme
+        /// çapında — yerleştirme 67.180.350 prob sınırını aşıyor.
+        /// Denemeler <c>-hezarfenYerlesimDene</c> ile dakikalar içinde
+        /// koştu: <b>3 m geçmedi, 4 m geçti, 6 m geçti.</b> 4 seçildi;
+        /// prob sayısı 3'e göre 2,4 kat azalıyor ve sınırın altında
+        /// kalan en ince aralık o.
+        ///
+        /// Sıçrama ışığı alçak frekanslıdır — bir duvarın yansıttığı
+        /// ışık metrelerce yumuşak değişir — yani 3 ile 4 arasındaki
+        /// fark gözde değil, bellekte.
+        /// </summary>
+        public const float ProbAraligi = 4f;
 
         // YURUNEN BANTLA SINIRLAMA DENENDI VE ELENDI.
         //
@@ -231,6 +245,52 @@ namespace Hezarfen.Editor.Lighting
         }
 
         /// <summary>
+        /// <b>Pişmiş APV verisini siler</b> — hücre yerleşimi
+        /// değiştiğinde gerekir.
+        ///
+        /// Prob hacimleri değişince (dünya boyu <c>Global</c> kutulardan
+        /// semt boyu <c>Local</c> kutulara) hücre ızgarası da değişti,
+        /// ama kümede eski ızgarayla pişmiş hücreler duruyordu. Unity
+        /// bunu tek satırla söylüyor ve <b>sessizce sonucu atıyor</b>:
+        /// <i>"You are partially baking the set with an incompatible
+        /// cell layout."</i>
+        ///
+        /// Eski veri durdukça her kısmi pişirme kaybolur. Bu yüzden
+        /// yeni ızgarayla ilk koşum eskisini siler.
+        /// </summary>
+        public static string PismisVeriyiSil()
+        {
+            var kume = Kume();
+            if (kume == null) return "kume yok";
+            int silinen = 0;
+            string dizin = System.IO.Path.GetDirectoryName(
+                AssetDatabase.GetAssetPath(kume))?.Replace('\\', '/');
+            if (!string.IsNullOrEmpty(dizin) && Directory.Exists(dizin))
+            {
+                foreach (string y in Directory.GetFiles(dizin, "*.bytes"))
+                {
+                    string varlik = y.Replace('\\', '/');
+                    if (AssetDatabase.DeleteAsset(varlik)) silinen++;
+                }
+            }
+
+            var so = new SerializedObject(kume);
+            foreach (string ad in new[]
+                     {
+                         "cellDescs.m_Keys", "cellDescs.m_Values",
+                         "m_SerializedPerSceneCellList",
+                     })
+            {
+                var p = so.FindProperty(ad);
+                if (p != null && p.isArray) p.ClearArray();
+            }
+            so.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(kume);
+            AssetDatabase.SaveAssets();
+            return $"{silinen} .bytes silindi, hucre listesi bosaltildi.";
+        }
+
+        /// <summary>
         /// <b>Sanal kaydırmayı kapatır</b> — GPU'yu pişirmenin dışında
         /// tutar.
         ///
@@ -271,6 +331,37 @@ namespace Hezarfen.Editor.Lighting
             EditorUtility.SetDirty(kume);
             AssetDatabase.SaveAssets();
             return true;
+        }
+
+        /// <summary>
+        /// <b>Pişmiş verinin imzası</b> — hücre sayısı, veri
+        /// dosyalarının toplam boyu ve en son yazılma anı.
+        ///
+        /// Neden sayı yetmiyor: <c>cellDescs</c> <b>küme çapında</b>
+        /// bir listedir. İkinci semt hiçbir şey yazmadığı hâlde koşum
+        /// "5 hücre" gördü ve başarılı döndü — çünkü o 5 hücreyi
+        /// <b>birinci</b> semt yazmıştı. Bir denetim, başkasının işiyle
+        /// karşılanabiliyorsa denetim değildir.
+        /// </summary>
+        public static string PismisVeriImzasi()
+        {
+            var kume = Kume();
+            if (kume == null) return "kume yok";
+            string dizin = System.IO.Path.GetDirectoryName(
+                AssetDatabase.GetAssetPath(kume))?.Replace('\\', '/');
+            long bayt = 0;
+            long an = 0;
+            if (!string.IsNullOrEmpty(dizin) && Directory.Exists(dizin))
+            {
+                foreach (string y in Directory.GetFiles(dizin, "*.bytes"))
+                {
+                    var f = new FileInfo(y);
+                    bayt += f.Length;
+                    long t = f.LastWriteTimeUtc.Ticks;
+                    if (t > an) an = t;
+                }
+            }
+            return $"{HucreSayisi()} hucre, {bayt} bayt, {an}";
         }
 
         /// <summary>

@@ -945,8 +945,29 @@ namespace Hezarfen.Editor.Lighting
                 return;
             }
 
+            // BUTUN SEMTLER ACILIR — PISEN YALNIZ BIRI.
+            //
+            // Once yalniz taban + hedef semt aciliyordu ve olculdu:
+            // ikinci semtin pisirmesi 10,5 dakika kostu, "basarili"
+            // dondu, ve diskteki hucre dosyalari BIRINCI semtin saatini
+            // tasimaya devam etti. Sebep kaydin icindeydi:
+            //
+            //   You are partially baking the set with an incompatible
+            //   cell layout.
+            //
+            // APV'nin hucre izgarasi KUME capindadir ve o an YUKLU olan
+            // prob hacimlerinden turer. Her kosumda baska bir semt
+            // yuklu olunca izgara da baska cikiyor; kismi pisirme,
+            // uyusmayan bir izgaraya yazamayacagi icin sonucu atiyor.
+            //
+            // Yani `partialBakeSceneList` "yalniz sunu YUKLE" demek
+            // degil, "yalniz sunu PISIR" demek. Sahnelerin hepsi acik
+            // olmali ki izgara her kosumda ayni cikssin; kazanc,
+            // isik hesabinin bir semte inmesinden gelir.
             EditorSceneManager.OpenScene(ProbeSahnesi);
-            EditorSceneManager.OpenScene(yol, OpenSceneMode.Additive);
+            foreach (string s2 in SemtProblari.Semtler())
+                if (!EditorSceneManager.GetSceneByPath(s2).isLoaded)
+                    EditorSceneManager.OpenScene(s2, OpenSceneMode.Additive);
             // SEMT KURULUMU VE GI BAYRAKLARI BURADA KOSMAZ.
             //
             // Ikisi de butun semtleri ACAR (`SemtProblari.Kur`,
@@ -954,6 +975,12 @@ namespace Hezarfen.Editor.Lighting
             // yapmamak. Ikisi de daha once kostu ve sonuclari
             // sahnelere KAYDEDILDI; bosta kostuklarinda zaten "0"
             // diyorlar. Burada yalniz dogrulanir.
+            if (System.Array.IndexOf(
+                    System.Environment.GetCommandLineArgs(),
+                    "-hezarfenTemizle") >= 0)
+                Debug.Log("[Hezarfen] Eski firin verisi: "
+                          + SemtProblari.PismisVeriyiSil());
+
             var _pv = Object.FindAnyObjectByType<ProbeVolume>();
             if (_pv == null)
             {
@@ -1011,7 +1038,9 @@ namespace Hezarfen.Editor.Lighting
                 return;
             }
 
-            Debug.Log($"[Hezarfen] APV pisirme basladi — YALNIZ {semt}.");
+            _imzaOnce = SemtProblari.PismisVeriImzasi();
+            Debug.Log($"[Hezarfen] APV pisirme basladi — YALNIZ {semt}. "
+                      + $"Onceki firin: {_imzaOnce}");
             _pisirmeBasi = System.DateTime.UtcNow;
             _sonIlerleme = 0f;
             _ilerlemeAni = 0.0;
@@ -1096,6 +1125,7 @@ namespace Hezarfen.Editor.Lighting
         }
 
         private static string _apvHatasi;
+        private static string _imzaOnce;
         private static bool _yerlesimDenemesi;
 
         private static string KomutSatiri(string anahtar)
@@ -1278,17 +1308,20 @@ namespace Hezarfen.Editor.Lighting
             // pisti, kosum basarili dondu ve kumede `m_Values: []`
             // vardi — sifir hucre. Bir isin bittigini gormek, urununu
             // gormek degildir.
-            int hucre = SemtProblari.HucreSayisi();
-            if (hucre <= 0)
+            string imzaSonra = SemtProblari.PismisVeriImzasi();
+            if (SemtProblari.HucreSayisi() <= 0 || imzaSonra == _imzaOnce)
             {
-                Debug.LogError("[Hezarfen] APV pisirme bitti ama diske "
-                               + $"HIC HUCRE yazilmadi (hucre={hucre}). "
-                               + "Kaydin ustunde APV hatasi olmali.");
+                Debug.LogError("[Hezarfen] APV pisirme bitti ama DISKTEKI "
+                               + "FIRIN DEGISMEDI.\n"
+                               + $"  once : {_imzaOnce}\n"
+                               + $"  sonra: {imzaSonra}\n"
+                               + "Kaydin ustunde 'incompatible cell "
+                               + "layout' olabilir.");
                 EditorApplication.Exit(7);
                 return;
             }
             Debug.Log($"[Hezarfen] APV pisti ve kaydedildi "
-                      + $"({gecen / 60.0:0.0} dk, {hucre} hucre).");
+                      + $"({gecen / 60.0:0.0} dk). Firin: {imzaSonra}");
             EditorApplication.Exit(0);
         }
 
