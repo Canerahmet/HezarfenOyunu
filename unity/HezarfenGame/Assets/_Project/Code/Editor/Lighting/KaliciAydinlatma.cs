@@ -721,6 +721,8 @@ namespace Hezarfen.Editor.Lighting
 
             Debug.Log("[Hezarfen] APV pisirme basladi (toplu kip).");
             _pisirmeBasi = System.DateTime.UtcNow;
+            _sonIlerleme = 0f;
+            _ilerlemeAni = 0.0;
             AdaptiveProbeVolumes.BakeAsync();
             EditorApplication.update += PisirmeyiBekle;
         }
@@ -964,6 +966,30 @@ namespace Hezarfen.Editor.Lighting
             Debug.Log("[Hezarfen] " + GokAyari());
             EditorSceneManager.SaveOpenScenes();
 
+            // OLCUM ANAHTARLARI.
+            //
+            // `-hezarfenAralik <m>`: prob araligini kumeye yazar. Sayinin
+            // sahibi `SemtProblari.ProbAraligi`; bu anahtar yalniz
+            // "hangi aralik 67 milyon prob sinirinin altina siger"
+            // sorusunu denemek icin var.
+            //
+            // `-hezarfenYerlesimDene`: yerlestirme gecer gecmez pisirmeyi
+            // iptal edip cikar. Bir deneme boyle birkac dakika surer,
+            // saatler degil.
+            string _aralik = KomutSatiri("-hezarfenAralik");
+            if (!string.IsNullOrEmpty(_aralik)
+                && float.TryParse(_aralik,
+                    System.Globalization.NumberStyles.Float,
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    out float _ar))
+            {
+                SemtProblari.AraligiYaz(_ar);
+                Debug.Log($"[Hezarfen] Prob araligi DENEME icin {_ar:0.##} m.");
+            }
+            _yerlesimDenemesi = System.Array.IndexOf(
+                System.Environment.GetCommandLineArgs(),
+                "-hezarfenYerlesimDene") >= 0;
+
             if (!KismiPisirmeyiAyarla(new[] { ProbeSahnesi, yol }))
             {
                 Debug.LogError("[Hezarfen] Kismi pisirme alani bulunamadi "
@@ -977,6 +1003,8 @@ namespace Hezarfen.Editor.Lighting
 
             Debug.Log($"[Hezarfen] APV pisirme basladi — YALNIZ {semt}.");
             _pisirmeBasi = System.DateTime.UtcNow;
+            _sonIlerleme = 0f;
+            _ilerlemeAni = 0.0;
             _pisirmeGoruldu = false;
             // YEDEK YOL BURADA KAPALI.
             //
@@ -1001,9 +1029,64 @@ namespace Hezarfen.Editor.Lighting
             // PrepareBaking) ve `partialBakeSceneList` orada okunuyor.
             // Yani klasik cagri kismi listeyi tanir; tam pisirmeye
             // donmez.
+            // YERLESTIRME HATASI **ESZAMANLI** DUSER.
+            //
+            // Yigin izi bunu soyluyor: `Lightmapping.BakeAsync` ->
+            // `Internal_CallBakeStartedFunctions` -> `OnBakeStarted` ->
+            // `PrepareBaking` -> `DoProbePlacement`. Yani prob
+            // yerlestirme, cagri daha DONMEDEN kosuyor; bir sinir
+            // asilirsa hata tam burada, asenkron pisirme hic
+            // baslamadan dusuyor.
+            //
+            // Bunu duymadigimiz icin `D_Okmeydani` 11,7 dakika bos
+            // dondu ve kosum "pisti ve kaydedildi" dedi.
+            _apvHatasi = null;
+            Application.logMessageReceived += ApvKaydiniDinle;
             Lightmapping.BakeAsync();
+            if (_apvHatasi != null)
+            {
+                Application.logMessageReceived -= ApvKaydiniDinle;
+                Debug.LogError("[Hezarfen] APV YERLESTIRME DUSTU — "
+                               + "pisirme hic baslamadi:\n" + _apvHatasi);
+                Lightmapping.Cancel();
+                EditorApplication.Exit(6);
+                return;
+            }
+            if (_yerlesimDenemesi)
+            {
+                Application.logMessageReceived -= ApvKaydiniDinle;
+                Debug.Log($"[Hezarfen] YERLESIM GECTI ({semt}) — deneme "
+                          + "kipinde pisirme iptal ediliyor.");
+                Lightmapping.Cancel();
+                EditorApplication.Exit(0);
+                return;
+            }
             EditorApplication.update += PisirmeyiBekle;
         }
+
+        /// <summary>
+        /// APV'nin kendi hata kaydını dinler.
+        ///
+        /// Neden kaydı dinliyoruz: prob yerleştirmenin başarısız
+        /// olduğunu söyleyen tek yer o. <c>Lightmapping</c> bir dönüş
+        /// değeri vermiyor, <c>isRunning</c> yine de bir süre true
+        /// oluyor ve fırın "bitti" diyor — üretimi sıfır olsa bile.
+        /// </summary>
+        private static void ApvKaydiniDinle(string mesaj, string iz,
+                                            LogType tur)
+        {
+            if (tur != LogType.Error && tur != LogType.Exception) return;
+            if (_apvHatasi != null) return;
+            if (mesaj.IndexOf("Adaptive Probe Volume",
+                    System.StringComparison.OrdinalIgnoreCase) < 0
+                && mesaj.IndexOf("APV",
+                    System.StringComparison.Ordinal) < 0)
+                return;
+            _apvHatasi = mesaj;
+        }
+
+        private static string _apvHatasi;
+        private static bool _yerlesimDenemesi;
 
         private static string KomutSatiri(string anahtar)
         {
@@ -1066,6 +1149,21 @@ namespace Hezarfen.Editor.Lighting
         /// </summary>
         private const double EnCokPisirme = 3.0 * 3600.0;
 
+        /// <summary>
+        /// İlerleme bu kadar süre kıpırdamazsa pişirme <b>takılmış</b>
+        /// sayılır (sn).
+        ///
+        /// 25 dakika: ölçülen fırında iki ilerleme adımı arasındaki en
+        /// uzun boşluk birkaç dakikaydı; 25 onun katı ve üç saatlik
+        /// süre sınırının onda biri. Amaç yavaş bir fırını kesmek
+        /// değil, <b>ölmüş</b> bir fırını saatler sonra değil dakikalar
+        /// sonra bildirmek.
+        /// </summary>
+        private const double TakilmaSiniri = 25.0 * 60.0;
+
+        private static float _sonIlerleme;
+        private static double _ilerlemeAni;
+
         private static bool _pisirmeGoruldu;
         private static bool _yedekDenendi;
 
@@ -1073,10 +1171,53 @@ namespace Hezarfen.Editor.Lighting
         {
             double gecen = (System.DateTime.UtcNow - _pisirmeBasi)
                 .TotalSeconds;
+            // ILERLIYOR MU — SURE DEGIL, ILERLEME OLCULUR.
+            //
+            // Bekleyici yalnizca gecen dakikayi yaziyordu ve o sayi bir
+            // sey soylemiyor: 90 dakika "ilerliyor" ile 90 dakika
+            // "takildi" ayni satiri uretiyordu. Bir turda tam bunu
+            // yasadik — firin uc saat kostu ve durumu hakkinda tek
+            // bilgi gecen zamandi.
+            //
+            // `Lightmapping.buildProgress` isin oranini veriyor. Ondan
+            // hem YUZDE hem VARIS TAHMINI cikar; ikisi de gecen
+            // dakikadan fazlasini soyler.
+            float ilerleme = Lightmapping.buildProgress;
             if (gecen - _sonBildirim > 60.0)
             {
                 _sonBildirim = gecen;
-                Debug.Log($"[Hezarfen] APV pisiyor... {gecen / 60.0:0.0} dk");
+                string tahmin = "?";
+                if (ilerleme > 0.01f)
+                {
+                    double toplam = gecen / ilerleme;
+                    tahmin = $"{(toplam - gecen) / 60.0:0} dk";
+                }
+                Debug.Log($"[Hezarfen] APV pisiyor... {gecen / 60.0:0.0} dk, "
+                          + $"%{ilerleme * 100.0:0.0}, kalan ~{tahmin}");
+            }
+
+            // TAKILMA DENETIMI: ilerleme durursa bekleme durur.
+            //
+            // Ilerleme olcusu olmadan "takildi" ile "yavas" ayirt
+            // edilemiyordu ve tek koruma sure siniriydi — yani bir
+            // firinin oldugunu ancak SAATLER sonra ogreniyorduk.
+            // Esik %0,1: gercek bir ilerleme bundan buyuk adimlar atar,
+            // olcum gurultusu atmaz.
+            if (ilerleme > _sonIlerleme + 0.001f)
+            {
+                _sonIlerleme = ilerleme;
+                _ilerlemeAni = gecen;
+            }
+            else if (_pisirmeGoruldu && gecen - _ilerlemeAni > TakilmaSiniri)
+            {
+                Debug.LogError("[Hezarfen] APV pisirme TAKILDI: "
+                               + $"%{ilerleme * 100.0:0.0} oraninda "
+                               + $"{(gecen - _ilerlemeAni) / 60.0:0} dk boyunca "
+                               + "hic ilerlemedi. Bekleme sonlandirildi.");
+                EditorApplication.update -= PisirmeyiBekle;
+                Lightmapping.Cancel();
+                EditorApplication.Exit(5);
+                return;
             }
             if (Lightmapping.isRunning) _pisirmeGoruldu = true;
 
@@ -1120,8 +1261,24 @@ namespace Hezarfen.Editor.Lighting
             }
             EditorSceneManager.SaveOpenScenes();
             AssetDatabase.SaveAssets();
+
+            // URUN DENETIMI: "bitti" degil, "ne yazdi".
+            //
+            // Bu kapinin gerekcesi olculdu. D_Okmeydani 11,7 dakika
+            // pisti, kosum basarili dondu ve kumede `m_Values: []`
+            // vardi — sifir hucre. Bir isin bittigini gormek, urununu
+            // gormek degildir.
+            int hucre = SemtProblari.HucreSayisi();
+            if (hucre <= 0)
+            {
+                Debug.LogError("[Hezarfen] APV pisirme bitti ama diske "
+                               + $"HIC HUCRE yazilmadi (hucre={hucre}). "
+                               + "Kaydin ustunde APV hatasi olmali.");
+                EditorApplication.Exit(7);
+                return;
+            }
             Debug.Log($"[Hezarfen] APV pisti ve kaydedildi "
-                      + $"({gecen / 60.0:0.0} dk).");
+                      + $"({gecen / 60.0:0.0} dk, {hucre} hucre).");
             EditorApplication.Exit(0);
         }
 

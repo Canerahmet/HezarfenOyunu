@@ -24,16 +24,11 @@ MonoBehaviour:
     - 12788ae11ceaa9f4683ee5f1dd956ffb
     - 91434be0a2fec6543a7741e240036370
     m_Values:
-    - hasProbeVolume: 1
+    - hasProbeVolume: 0
       bakeScene: 1
       bounds:
-        m_Center: {x: -364.5, y: 121.5, z: 1458}
-        m_Extent: {x: 364.5, y: 121.5, z: 486}
-    - hasProbeVolume: 1
-      bakeScene: 1
-      bounds:
-        m_Center: {x: 1458, y: 121.5, z: -607.5}
-        m_Extent: {x: 7776, y: 364.5, z: 7897.5}
+        m_Center: {x: 1377, y: 121.5, z: -567}
+        m_Extent: {x: 7695, y: 202.5, z: 7695}
     - hasProbeVolume: 1
       bakeScene: 1
       bounds:
@@ -54,6 +49,11 @@ MonoBehaviour:
       bounds:
         m_Center: {x: 1458, y: 121.5, z: -607.5}
         m_Extent: {x: 7776, y: 364.5, z: 7897.5}
+    - hasProbeVolume: 1
+      bakeScene: 1
+      bounds:
+        m_Center: {x: -2794.5, y: 0, z: 3645}
+        m_Extent: {x: 121.5, y: 243, z: 486}
     - hasProbeVolume: 1
       bakeScene: 1
       bounds:

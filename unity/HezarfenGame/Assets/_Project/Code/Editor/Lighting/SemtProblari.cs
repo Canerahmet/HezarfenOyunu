@@ -85,6 +85,77 @@ namespace Hezarfen.Editor.Lighting
         // yazmadan once bunun kaydi burada duruyor ki ayni fikir
         // ikinci kez ayni hatayla denenmesin.
 
+        /// <summary>Hacmin yapı sınırının dışına taştığı pay (m).</summary>
+        public const float SinirPayi = 8f;
+
+        /// <summary>
+        /// Bir çiziciyi "yapı" saymanın üst sınırı (m, yatayda).
+        /// Bundan büyüğü deniz, arazi ya da fon düzlemidir.
+        /// </summary>
+        public const float EnBuyukYapi = 1000f;
+
+        /// <summary>Taban sahne — prob hacmi burada YAŞAMAZ.</summary>
+        public const string TabanSahne =
+            "Assets/_Project/Scenes/Faz1_Terrain.unity";
+
+        /// <summary>
+        /// Bir semt sahnesinin <b>kendi</b> yapı sınırı.
+        ///
+        /// Yalnız o sahnenin köklerinden dolaşır — <c>Mode.Global</c>'in
+        /// yaptığı gibi yüklü olan her şeyi toplamaz. Arazi dışarıda:
+        /// 15 km'lik bir arazinin çevresine prob koymak, 67 milyonluk
+        /// sınırı tek başına aşan şeydi.
+        /// </summary>
+        public static Bounds SemtSiniri(UnityEngine.SceneManagement.Scene s)
+            => SemtSiniri(s, out _);
+
+        public static Bounds SemtSiniri(UnityEngine.SceneManagement.Scene s,
+                                        out List<string> disarida)
+        {
+            bool ilk = true;
+            var b = new Bounds();
+            disarida = new List<string>();
+            foreach (var kok in s.GetRootGameObjects())
+                foreach (var r in kok.GetComponentsInChildren<MeshRenderer>(true))
+                {
+                    if (!r.enabled) continue;
+                    if (r.GetComponent<MeshFilter>() == null) continue;
+                    if (r.GetComponentInParent<Terrain>() != null) continue;
+
+                    // MANZARA YUZEYI YAPI DEGILDIR.
+                    //
+                    // Ilk olcumde D_Bogaz'in hacmi 7929 x 17 x 15284 m
+                    // cikti: 17 m yuksekliginde, 15 km uzunlugunda bir
+                    // dilim. Bu bir semt degil, DENIZ — bir su duzlemi
+                    // butun haritayi boydan boya geciyor. D_Halic ayni.
+                    //
+                    // Bunlarin cevresine prob koymak iki kez yanlis:
+                    // acik suyun sicratacak bir seyi yok, ve sinirin
+                    // kendisi 67 milyonluk prob sinirini tek basina
+                    // yiyor.
+                    //
+                    // Esik OLCULDU. Once 300 m yazildi (Suleymaniye
+                    // kulliyesi kabaca 200 m) ve yanlis seyi eledi:
+                    // sehir blok blok BIRLESTIRILMIS cizicilerden
+                    // olusuyor — `Kaideler`, `Kaldirim`,
+                    // `BahceDuvarlari` 300-340 m arasi kutular ve
+                    // hepsi gercek yapi. Iki topluluk olculdu: birlesik
+                    // bloklar ~340 m'de bitiyor, harita boyu yuzeyler
+                    // kilometrelerde. 1000 m ikisinin arasinda duruyor.
+                    var o = r.bounds.size;
+                    if (o.x > EnBuyukYapi || o.z > EnBuyukYapi)
+                    {
+                        if (disarida.Count < 12)
+                            disarida.Add($"{r.name} ({o.x:0}x{o.z:0} m)");
+                        continue;
+                    }
+
+                    if (ilk) { b = r.bounds; ilk = false; }
+                    else b.Encapsulate(r.bounds);
+                }
+            return ilk ? new Bounds() : b;
+        }
+
         /// <summary>Semt sahnelerinin yolları (alfabetik).</summary>
         public static List<string> Semtler()
         {
@@ -134,6 +205,65 @@ namespace Hezarfen.Editor.Lighting
             return eksik;
         }
 
+        /// <summary>
+        /// <b>Pişmiş hücre sayısı</b> — fırının diske ne yazdığının
+        /// ölçüsü.
+        ///
+        /// Bu ölçü bir kusurdan doğdu. <c>D_Okmeydani</c> 11,7 dakika
+        /// pişti ve koşum <i>"APV pişti ve kaydedildi"</i> dedi; küme
+        /// varlığında ise <c>m_Values: []</c> yazıyordu — <b>sıfır
+        /// hücre</b>. Sebebi kaydın içindeydi: <i>"the number of APV
+        /// probes exceeds the current system limit of 67.180.350"</i>.
+        /// Yerleştirme daha başlarken düşmüş, ama <c>Lightmapping</c>
+        /// yine de bir tur dönmüş ve bekleyici bunu bitiş saymıştı.
+        ///
+        /// Yani bekleyici, işin <b>başladığını</b> görüyordu ama
+        /// <b>ürününü</b> görmüyordu. Ölçü olmadan "başarılı" diyen bir
+        /// fırın, bu turda üçüncü kez aynı tuzağı kuruyor.
+        /// </summary>
+        public static int HucreSayisi()
+        {
+            var kume = Kume();
+            if (kume == null) return -1;
+            var so = new SerializedObject(kume);
+            var anahtarlar = so.FindProperty("cellDescs.m_Keys");
+            return anahtarlar == null ? -1 : anahtarlar.arraySize;
+        }
+
+        /// <summary>
+        /// Prob aralığını kümeye yazar — <b>yalnız ölçüm koşumları
+        /// için</b>.
+        ///
+        /// Sayının sahibi <see cref="ProbAraligi"/>'dir ve öyle kalır.
+        /// Bu yol, "hangi aralık 67 milyon prob sınırının altına
+        /// sığıyor" sorusunu her seferinde kod derleyip yeniden
+        /// başlatmadan denemek içindir; bulunan sayı sabite yazılır.
+        /// </summary>
+        public static void AraligiYaz(float aralik)
+        {
+            var kume = Kume();
+            if (kume == null) return;
+            var so = new SerializedObject(kume);
+            var p = so.FindProperty("minDistanceBetweenProbes");
+            if (p != null) p.floatValue = aralik;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(kume);
+            AssetDatabase.SaveAssets();
+        }
+
+        /// <summary>
+        /// Toplu kip girişi: kurar, sahneleri kaydeder, çıkar.
+        /// <c>-executeMethod Hezarfen.Editor.Lighting.SemtProblari.KurToplu</c>
+        /// </summary>
+        public static void KurToplu()
+        {
+            int n = Kur(out string rapor);
+            EditorSceneManager.SaveOpenScenes();
+            AssetDatabase.SaveAssets();
+            Debug.Log($"[Hezarfen] Semt problari: {n} semt hazir.\n{rapor}");
+            EditorApplication.Exit(0);
+        }
+
         [MenuItem("Hezarfen/Aydinlatma/Semt problarini kur")]
         public static void KurMenu()
         {
@@ -168,6 +298,36 @@ namespace Hezarfen.Editor.Lighting
             EditorUtility.SetDirty(kume);
             satirlar.Add($"Prob araligi {ProbAraligi:0.#} m, cok sahne kipi acik.");
 
+            // TABAN SAHNEDEKI DUNYA BOYU HACIM KALDIRILIR.
+            //
+            // Taban sahnede `mode: 2` (Global) bir prob hacmi vardi ve
+            // orada yasayan tek buyuk sey ARAZI: 15 km x 15 km. APV
+            // problari isiga katilan geometrinin cevresine koyar; 3 m
+            // aralikla bir arazi yuzeyi tek basina 27 milyon prob eder
+            // ve 67 milyonluk sinir bunun ustune sehri koyunca asilir.
+            //
+            // Arazinin sicrama isigina KATILMASI icin hacme gerek yok —
+            // katilim `ContributeGI` bayragiyla olur ve isik yolu yine
+            // arazi zeminine carpar. Gerekli olan tek sey, probun
+            // SEHRIN oldugu yerde bulunmasi.
+            {
+                var ts = EditorSceneManager.GetSceneByPath(TabanSahne);
+                if (!ts.isLoaded)
+                    ts = EditorSceneManager.OpenScene(
+                        TabanSahne, OpenSceneMode.Additive);
+                var dunya = ts.GetRootGameObjects()
+                    .SelectMany(g => g.GetComponentsInChildren<ProbeVolume>(true))
+                    .ToList();
+                foreach (var pv0 in dunya)
+                    Object.DestroyImmediate(pv0.gameObject);
+                if (dunya.Count > 0)
+                {
+                    EditorSceneManager.MarkSceneDirty(ts);
+                    satirlar.Add($"Taban sahne: {dunya.Count} dunya boyu "
+                                 + "prob hacmi KALDIRILDI.");
+                }
+            }
+
             int n = 0;
             foreach (string yol in Semtler())
             {
@@ -195,34 +355,51 @@ namespace Hezarfen.Editor.Lighting
                     EditorSceneManager.MoveGameObjectToScene(go, sahne);
                     pv = go.AddComponent<ProbeVolume>();
                 }
-                // HACIM SEMTIN KENDI SINIRI — VE YUKSEKLIK
-                // KIRPILMADI.
+                // HACIM SEMTIN KENDI SINIRI — VE ARTIK GERCEKTEN OYLE.
                 //
-                // `Mode.Global` hacmi sahnenin sinirindan turetir ve
-                // her pisirmede yeniden hesaplar; eskiyecek bir sayi
-                // kalmaz. Sinir TAM sinirdir: minarenin tepesi de icine
-                // girer ve orada probun isi yoktur — gokyuzu zaten her
-                // seyi goruyor.
+                // ONCE `Mode.Global` YAZILDI VE OLCUM ONU ELEDI.
                 //
-                // Yuksekligi "yurunen bant" kadar kirpmayi denedim ve
-                // ELEDIM: tek bir kutunun alt siniri sahnenin EN ALCAK
-                // noktasidir ve Galata bir YAMAC — zeminden 24 m,
-                // tepedeki her seyi keserdi. Bir kutu bir tepeyi
-                // izleyemez.
+                // Gerekce mantikliydi: "hacim sahnenin sinirindan
+                // turer, her pisirmede yeniden hesaplanir, eskiyecek
+                // sayi kalmaz". Ama `Global` SAHNENIN degil, YUKLU
+                // OLAN HER SEYIN sinirini alir — ve bu kurulum sekiz
+                // semti birlikte aciyor. Sonuc pisirme kumesinin kendi
+                // varliginda yaziliydi:
                 //
-                // Dogru yol semti izgaraya bolup her hucreyi kendi
-                // zeminine oturtmaktir; o ayri bir isin konusu ve
-                // olculmeden yazilmayacak. Kayit burada duruyor ki ayni
-                // fikir ikinci kez ayni hatayla denenmesin. Suanki
-                // cozum hacmi kucultmek degil, pisirmeyi SEMT SEMT
-                // bolmek (`KaliciAydinlatma.TopluPisirSemt`).
-                pv.mode = ProbeVolume.Mode.Global;
+                //   m_Extent: {x: 7776, y: 364.5, z: 7897.5}
+                //
+                // Yani her semtin "kendi" hacmi 15,5 km x 0,73 km x
+                // 15,8 km, ve SEKIZI DE AYNI KUTU. Bedeli de kayitta:
+                // "the number of APV probes exceeds the current system
+                // limit of 67.180.350". Yerlestirme daha basta dustu,
+                // sifir hucre yazildi, kosum yine "basarili" dedi.
+                //
+                // Dogru olcu semtin KENDI cizicileridir. Kutu onlarin
+                // birlesiminden turer; her pisirmede yeniden hesaplanir,
+                // yani `Global`in vaat ettigi "eskimeyen sayi" korunur
+                // ama olculen sey dogru sey olur.
+                var b = SemtSiniri(sahne, out var disarida);
+                if (b.size == Vector3.zero)
+                {
+                    satirlar.Add($"{ad}: cizici yok, hacim atlandi.");
+                    continue;
+                }
+                // PAY: prob duvarin DISINDA da olmali, yoksa cephenin
+                // onundeki hava karanlik kalir. 8 m, sokak genisligi
+                // mertebesinde.
+                b.Expand(SinirPayi * 2f);
+                pv.transform.position = b.center;
+                pv.mode = ProbeVolume.Mode.Local;
+                pv.size = b.size;
                 pv.overridesSubdivLevels = false;
                 EditorUtility.SetDirty(pv);
                 EditorSceneManager.MarkSceneDirty(sahne);
                 n++;
-                satirlar.Add($"{ad}: hacim {(yeni ? "KURULDU" : "vardi")}, "
+                satirlar.Add($"{ad}: hacim {(yeni ? "KURULDU" : "vardi")} "
+                             + $"{b.size.x:0}x{b.size.y:0}x{b.size.z:0} m, "
                              + $"kumeye {(eklendi ? "EKLENDI" : "zaten bagliydi")}.");
+                if (disarida.Count > 0)
+                    satirlar.Add($"  disarida: {string.Join(", ", disarida)}");
             }
 
             AssetDatabase.SaveAssets();

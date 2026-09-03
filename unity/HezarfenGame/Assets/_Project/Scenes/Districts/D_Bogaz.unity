@@ -6860,8 +6860,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.ProbeVolume
   version: 2
   globalVolume: 0
-  mode: 0
-  size: {x: 15340.528, y: 279.28763, z: 15340.528}
+  mode: 2
+  size: {x: 7928.547, y: 17.250982, z: 15283.673}
   overrideRendererFilters: 0
   minRendererVolumeSize: 0.1
   objectLayerMask:
@@ -6899,7 +6899,7 @@ Transform:
   m_GameObject: {fileID: 1293382259}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1362.6313, y: 126.13881, z: -591.3374}
+  m_LocalPosition: {x: 4769.463, y: 0.34469068, z: -588.78076}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

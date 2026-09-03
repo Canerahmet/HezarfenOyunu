@@ -61,8 +61,9 @@ namespace Hezarfen.Editor.Lighting
             return liste;
         }
 
-        public const string TabanSahne =
-            "Assets/_Project/Scenes/Faz1_Terrain.unity";
+        /// <summary>Taban sahne — sayının sahibi
+        /// <see cref="SemtProblari.TabanSahne"/>.</summary>
+        public const string TabanSahne = SemtProblari.TabanSahne;
 
         /// <summary>
         /// Bir çizici GI'ya katılmalı mı.
