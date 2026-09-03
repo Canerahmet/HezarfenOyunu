@@ -1267,7 +1267,21 @@ namespace Hezarfen.Editor.Lighting
             // `Lightmapping.buildProgress` isin oranini veriyor. Ondan
             // hem YUZDE hem VARIS TAHMINI cikar; ikisi de gecen
             // dakikadan fazlasini soyler.
-            float ilerleme = Lightmapping.buildProgress;
+            // ILERLEME OKUMASI SACMALAYABILIR — VE OLCULDU.
+            //
+            // `Lightmapping.buildProgress` ikinci evrede
+            // **%44.366.093,8** dondu. Bir oran degil, coplukten okunan
+            // bir sayi. Bunun bedeli tek satirda: takilma denetimi
+            // "ilerledi" sanip esigi oraya tasir, sonra hicbir gercek
+            // ilerleme o sayiyi gecemez ve SAGLIKLI bir firin takilmis
+            // sayilarak kesilir.
+            //
+            // Aralik disi okuma ilerleme degil BILGI YOKLUGUDUR: eldeki
+            // son gecerli deger korunur, sayac ilerletilmez.
+            float _ham = Lightmapping.buildProgress;
+            bool ilerlemeGecerli = _ham >= 0f && _ham <= 1f
+                                   && !float.IsNaN(_ham);
+            float ilerleme = ilerlemeGecerli ? _ham : _sonIlerleme;
             if (gecen - _sonBildirim > 60.0)
             {
                 _sonBildirim = gecen;
@@ -1278,7 +1292,9 @@ namespace Hezarfen.Editor.Lighting
                     tahmin = $"{(toplam - gecen) / 60.0:0} dk";
                 }
                 Debug.Log($"[Hezarfen] APV pisiyor... {gecen / 60.0:0.0} dk, "
-                          + $"%{ilerleme * 100.0:0.0}, kalan ~{tahmin}");
+                          + $"%{ilerleme * 100.0:0.0}"
+                          + (ilerlemeGecerli ? "" : " (okuma gecersiz)")
+                          + $", kalan ~{tahmin}");
             }
 
             // TAKILMA DENETIMI: ilerleme durursa bekleme durur.
@@ -1288,7 +1304,7 @@ namespace Hezarfen.Editor.Lighting
             // firinin oldugunu ancak SAATLER sonra ogreniyorduk.
             // Esik %0,1: gercek bir ilerleme bundan buyuk adimlar atar,
             // olcum gurultusu atmaz.
-            if (ilerleme > _sonIlerleme + 0.001f)
+            if (ilerlemeGecerli && ilerleme > _sonIlerleme + 0.001f)
             {
                 _sonIlerleme = ilerleme;
                 _ilerlemeAni = gecen;
