@@ -63,10 +63,37 @@ namespace Hezarfen.Editor.Diagnostics
                     yield break;
                 }
 
-                // Sahne otursun: ilk karelerde govdeler henuz
-                // yerlesmemis olur ve olcum yerlesmeyi degil
-                // yerlesmemisligi olcer.
-                for (int i = 0; i < 120; i++) yield return null;
+                // SAYIYLA DEGIL, DURUMLA BEKLENIR.
+                //
+                // Burada 120 kare bekleniyordu. Kare sayisi bir
+                // sayidir, kosul degil: kalabalik havuzdan doluyor ve
+                // semt akisi asenkron, yani 120 kare kimi zaman yeter
+                // kimi zaman yetmez. Yetmedigi zaman olcum yerlesmeyi
+                // degil YERLESMEMISLIGI olcer ve sonuc "havada 0"
+                // diye temiz gorunur — cunku daha kimse yok.
+                //
+                // Ayni kusur bu turda turda da bulundu (`OyunTuru`,
+                // semt akisi) ve APV firininda da: bir bekleme,
+                // bekledigi seyin oldugunu GORMEDEN bitiyorsa bekleme
+                // degildir.
+                //
+                // Kosul: aktif govde sayisi sifirdan buyuk ve otuz kare
+                // boyunca DEGISMEMIS. Ust sinir 900 kare (~15 sn) —
+                // takilan bir sahne olcumu sonsuza kadar tutmasin.
+                int _oncekiSayi = -1, _sabitKare = 0;
+                for (int i = 0; i < 900; i++)
+                {
+                    int _n = 0;
+                    foreach (var a2 in y.Sakinler)
+                        if (a2.govde != null
+                            && a2.govde.gameObject.activeInHierarchy) _n++;
+                    _sabitKare = (_n == _oncekiSayi) ? _sabitKare + 1 : 0;
+                    _oncekiSayi = _n;
+                    if (_n > 0 && _sabitKare >= 30) break;
+                    yield return null;
+                }
+                Debug.Log($"[Hezarfen] kalabalik oturdu: {_oncekiSayi} govde "
+                          + $"({_sabitKare} kare sabit).");
 
                 int sayilan = 0, havada = 0, gomulu = 0, icinde = 0;
                 float enKotuHava = 0f, enKotuGomme = 0f;
