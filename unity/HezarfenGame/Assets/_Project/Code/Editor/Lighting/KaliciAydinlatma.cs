@@ -1199,6 +1199,33 @@ namespace Hezarfen.Editor.Lighting
             return true;
         }
 
+        // ACIK KALAN SORU: PROBLAR SIYAH PISTI.
+        //
+        // D_Galata 106 dakikada pisti, diske 62 hucre ve 157 MB yazdi,
+        // imza denetimi gecti. Calisma zamani da saglam: tur raporunun
+        // `apv` sutunu `kurulu/kume var` diyor. Ama sokagin golgesi
+        // hala mavi/kirmizi **0,000**, sacilim 0,005.
+        //
+        // Verinin kendisi olculdu — `CellData.bytes` icinde tekrar eden
+        // `00 00 00 00 00 00 00 38` deseni ve baytlarin %43,8'i tam
+        // sifir. Yani problar SIYAH pisti; yol tikali degil, tasidigi
+        // sey bos.
+        //
+        // Firinda isik olmamasi bilincli (asagida) ve gokyuzu
+        // sicramasinin kalmasi gerekiyordu. Sinanmamis tek kuvvetli
+        // hipotez: `StaticLightingSky`nin ortam probu ancak boru hatti
+        // bir kare CIZDIGINDE hesaplaniyor; toplu kipte kamera hic
+        // render etmiyor, yani pisirmeye giden gok bos olabilir.
+        // Sahnenin `m_AmbientMode: 0` (Skybox) ve `m_SkyboxMaterial:
+        // {fileID: 0}` olmasi HDRP icin normal — ortam probunu HDRP
+        // dolduruyor; doldurmadiysa siyah kalir.
+        //
+        // Sinama yolu: pisirmeden once bir kamera ile bir kare render
+        // et (ya da `HDRenderPipeline`in gok guncellemesini zorla) ve
+        // `CellData.bytes` yine ayni deseni tasiyor mu diye bak. Bu not
+        // burada, cunku bir sonraki tur bu noktadan baslamali —
+        // yeniden tesis etmek bir gece aldi.
+
         // FIRINDA ISIK YOK — VE BU BILINCLI.
         //
         // Pisirme kaydi bunu tek satirda soyluyor:
