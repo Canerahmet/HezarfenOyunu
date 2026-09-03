@@ -255,13 +255,20 @@ varlığı bağlıyor ve indirilen bir dalga sesinin lisansını takip etmek,
 ### Kumaş ve ten dokuları — prosedürel, kendi eserimiz (2026-09-02)
 
 `art/textures/generated/kumas_{keten,cuha,ipek,kece,kilim}`,
-`art/textures/generated/deri_insan`, `art/textures/generated/sakal`
-ve `art/textures/generated/kosele`
+`art/textures/generated/deri_insan`, `art/textures/generated/sakal`,
+`art/textures/generated/kosele` ve `art/textures/generated/tuy`
 **bizim ürettiğimiz** dokulardır; üçüncü taraf hakkı yoktur.
 Üreteçler: `tools/textures/gen_kumas_texture.py`,
 `tools/textures/gen_deri_texture.py`,
-`tools/textures/gen_sakal_texture.py` ve
-`tools/textures/gen_kosele_texture.py`.
+`tools/textures/gen_sakal_texture.py`,
+`tools/textures/gen_kosele_texture.py` ve
+`tools/textures/gen_tuy_texture.py`.
+
+Tüy dokusunun da **girdisi yoktur**: bindirme, omurga ve tel doğrudan
+ölçüden çiziliyor (kartal birincil tüyü 5-8 cm en, tel aralığı
+0,5-1 mm). Kanat yüzeyi bu dokudan önce `weathered_planks` —
+yani **kereste** — kullanıyordu; aynı kusur köselede de vardı ve
+aynı şekilde kapandı.
 
 Sakal dokusunun **girdisi yoktur**: teller doğrudan sayıdan çiziliyor
 (yön, kümelenme, uzunluk). Kart atlası (`gen_hair_texture.py`) da

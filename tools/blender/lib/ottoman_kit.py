@@ -264,9 +264,16 @@ TEXTURE_ROLES = {
         # giydirmek icin sebep yok.
         "leather": dict(asset="kosele", tinted=True,
                         root=os.path.join("art", "textures", "generated")),
-        "feather": dict(asset="weathered_planks", tint=FEATHER,
-                        tint_factor=0.86, tint_blend="COLOR",
-                        value_gamma=0.88),
+        # KANAT YUZEYI KERESTE DEGIL, TUY.
+        #
+        # Bu satir da `weathered_planks` kullaniyordu ve gerekcesi
+        # derininkiyle ayniydi: "elde CC0 tuy dokusu yok". Dogruydu, ta
+        # ki uretilene kadar. Inceleme karesinde 9,71 m'lik kanat tahta
+        # kaplama bir guverte gibi okunuyordu; oysa varligin kendi
+        # kaynak notu yuzeyi zaten yaziyor — "ahsap cita iskelet +
+        # KARTAL TUYU YUZEY + deri kayis" (`gen_kanat.py`, SOURCE).
+        "feather": dict(asset="tuy", tinted=True,
+                        root=os.path.join("art", "textures", "generated")),
         "foliage_servi": dict(asset="foliage_servi",
                               root=os.path.join("art", "textures", "generated")),
         "foliage_cinar": dict(asset="foliage_cinar",
@@ -361,9 +368,16 @@ TEXTURE_ROLES = {
         # giydirmek icin sebep yok.
         "leather": dict(asset="kosele", tinted=True,
                         root=os.path.join("art", "textures", "generated")),
-        "feather": dict(asset="weathered_planks", tint=FEATHER,
-                        tint_factor=0.86, tint_blend="COLOR",
-                        value_gamma=0.88),
+        # KANAT YUZEYI KERESTE DEGIL, TUY.
+        #
+        # Bu satir da `weathered_planks` kullaniyordu ve gerekcesi
+        # derininkiyle ayniydi: "elde CC0 tuy dokusu yok". Dogruydu, ta
+        # ki uretilene kadar. Inceleme karesinde 9,71 m'lik kanat tahta
+        # kaplama bir guverte gibi okunuyordu; oysa varligin kendi
+        # kaynak notu yuzeyi zaten yaziyor — "ahsap cita iskelet +
+        # KARTAL TUYU YUZEY + deri kayis" (`gen_kanat.py`, SOURCE).
+        "feather": dict(asset="tuy", tinted=True,
+                        root=os.path.join("art", "textures", "generated")),
         "foliage_servi": dict(asset="foliage_servi",
                               root=os.path.join("art", "textures", "generated")),
         "foliage_cinar": dict(asset="foliage_cinar",

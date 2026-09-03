@@ -1,0 +1,29 @@
+{
+ "polyhaven_id": null,
+ "name": "tuy",
+ "resolution": "1024px",
+ "size_meters": [
+  0.4,
+  0.4
+ ],
+ "authors": {
+  "Hezarfen projesi (prosedürel üretim)": "All"
+ },
+ "license": "Kendi eserimiz — üçüncü taraf hakkı yok",
+ "source": "prosedürel; girdi yok",
+ "maps": {
+  "BC": "T_tuy_BC.png",
+  "N": "T_tuy_N.png",
+  "ARM": "T_tuy_ARM.png",
+  "R": "T_tuy_R.png",
+  "AO": "T_tuy_AO.png"
+ },
+ "normal_convention": "OpenGL (Y+) — Poly Haven nor_gl ile ayni",
+ "generated_by": "tools/textures/gen_tuy_texture.py",
+ "role": "tuy",
+ "use": "kanat yuzeyi (M_Feather)",
+ "why": "M_Feather dokusu olarak KERESTE kullaniyordu (weathered_planks) ve 9,71 m'lik kanat inceleme karesinde tahta kaplama bir guverte gibi okunuyordu. Varligin kendi kaynak notu yuzeyi zaten yaziyor: 'ahsap cita iskelet + kartal tuyu yuzey + deri kayis'.",
+ "base_color_note": "BC bilerek notr. Renk paletten gelir (FEATHER) ve malzeme onu _BaseColor ile carpar.",
+ "feather_width_mm": 65.0,
+ "barb_pitch_mm": 0.75
+}
