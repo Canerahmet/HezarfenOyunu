@@ -1054,6 +1054,47 @@ başarısızlığa izin vermeyecek:
   yazdığı beş hücreyle "başarılı" görünüyordu. *Başkasının işiyle
   karşılanabilen bir denetim, denetim değildir.*
 
+### İnceleme aletinin kendisi iki kez yanlış bakıyordu
+
+CLAUDE.md şunu yazıyor: *"Render bir gözlemdir, kanıt değil."* Bu turda
+cümlenin daha keskin bir hâli çıktı — **gözlemin kendisi yanlıştı.**
+
+**1. Çarpıştırıcı modelin üstüne çiziliyordu.** Galata Kulesi'nin
+inceleme karesinde kurşun külahın yerinde düz tepeli beyaz bir silindir
+vardı. Külah yerindeydi: blend'de ölçüldü, `Kulah` 8,5 m'lik bir koni ve
+tepesi tam 46,00 m'de — katalogun yazdığı sayı. Göreni üreten şey
+`UCXB_GalataKulesi`, yani **çarpıştırıcının kendisi**.
+
+`render_preview` yalnız `UCX_` önekini eliyordu. `UCXB_` sonradan geldi
+(içi boş, dışbükey **değil**; ev ve kule kademelerinde gerekti) ve alet
+güncellenmedi. Kural artık Unity tarafındaki iniş sözleşmesiyle aynı:
+`UCX` ile başlayıp `_` ile devam eden her önek çarpıştırıcıdır.
+
+**2. Landmark'ların hiçbirinde doku yoktu.** Çarpıştırıcı kalkınca
+altından ikincisi çıktı. Bütün kanonik ağaç tarandı
+(`tools/olcum/blend_dokusu.py`):
+
+```
+önce:  35 dokusuz / 336 blend
+sonra:  2 dokusuz / 336 blend
+```
+
+Otuz üçü landmark'tı — Ayasofya, Süleymaniye, Sultanahmet, Yedikule,
+Topkapı, kara surları, türbeler, iki bedesten. Yani **uçuş oyununun en
+çok baktığı yapılar**, `--textured` verilmeden kurulmuştu.
+
+Oyun bundan etkilenmiyor (Unity malzemeleri paletten yeniden kuruluyor);
+**inceleme** etkileniyor. Dokusuz incelenen bir yüzeyde yüzey kusuru
+görünmez — kanadın kereste dokusu turlarca tam bu yüzden fark edilmedi.
+
+Kalan iki dosya `SM_AxisCalibration` (ölçü aleti) ve `SM_BoxHouse`
+(yer tutucu kutu); ikisi de çıplak olmalı.
+
+Katalogda tek bir sayı bile kımıldamadı — geometri aynı, yalnız
+malzemeler doku kazandı. Bu yüzden **sayının kendisi kayıt oldu**:
+yeniden üretim gürültüsü kuralı, kaydı olmayan bir değişikliği geri
+aldırır ve haklıdır; eksik olan kural değil kayıttı.
+
 ### Kanadın yüzeyi kerestedeydi — ve doku denetimi artık kapandı
 
 `M_Feather`, 9,71 m'lik kanadın **bütün** yüzeyi, doku olarak
