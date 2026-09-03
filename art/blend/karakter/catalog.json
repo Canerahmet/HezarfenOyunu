@@ -88,6 +88,10 @@
    "agirliksiz_kose": 0,
    "kose_lod0": 31792,
    "kol_donusu": 33.0,
+   "sakal_sisme_mm": [
+    4.38,
+    21.66
+   ],
    "agirlik_farki_once": 0.1252,
    "agirlik_farki": 0.0118,
    "kemik": 30,
@@ -440,6 +444,10 @@
    "agirliksiz_kose": 0,
    "kose_lod0": 32032,
    "kol_donusu": 33.0,
+   "sakal_sisme_mm": [
+    4.38,
+    21.66
+   ],
    "agirlik_farki_once": 0.1248,
    "agirlik_farki": 0.0151,
    "kemik": 30,
@@ -790,6 +798,10 @@
    "agirliksiz_kose": 0,
    "kose_lod0": 31872,
    "kol_donusu": 24.9,
+   "sakal_sisme_mm": [
+    3.52,
+    21.04
+   ],
    "agirlik_farki_once": 0.124,
    "agirlik_farki": 0.0112,
    "kemik": 30,
@@ -1137,6 +1149,7 @@
    "agirliksiz_kose": 0,
    "kose_lod0": 26496,
    "kol_donusu": 18.6,
+   "sakal_sisme_mm": null,
    "agirlik_farki_once": 1.4814,
    "agirlik_farki": 0.0149,
    "kemik": 30,
@@ -1487,6 +1500,10 @@
    "agirliksiz_kose": 0,
    "kose_lod0": 31310,
    "kol_donusu": 43.6,
+   "sakal_sisme_mm": [
+    3.61,
+    21.53
+   ],
    "agirlik_farki_once": 0.1321,
    "agirlik_farki": 0.0143,
    "kemik": 30,
@@ -1832,6 +1849,7 @@
    "agirliksiz_kose": 0,
    "kose_lod0": 26850,
    "kol_donusu": 51.8,
+   "sakal_sisme_mm": null,
    "agirlik_farki_once": 1.3728,
    "agirlik_farki": 0.027,
    "kemik": 30,
@@ -2177,6 +2195,7 @@
    "agirliksiz_kose": 0,
    "kose_lod0": 26848,
    "kol_donusu": 30.1,
+   "sakal_sisme_mm": null,
    "agirlik_farki_once": 1.346,
    "agirlik_farki": 0.0187,
    "kemik": 30,
@@ -2523,6 +2542,7 @@
    "agirliksiz_kose": 0,
    "kose_lod0": 27196,
    "kol_donusu": 51.0,
+   "sakal_sisme_mm": null,
    "agirlik_farki_once": 1.3294,
    "agirlik_farki": 0.0157,
    "kemik": 30,
@@ -2870,6 +2890,7 @@
    "agirliksiz_kose": 0,
    "kose_lod0": 27092,
    "kol_donusu": 30.1,
+   "sakal_sisme_mm": null,
    "agirlik_farki_once": 1.4526,
    "agirlik_farki": 0.017,
    "kemik": 30,

@@ -146,6 +146,15 @@ for _ad, _makro, _boy, _tip, _why in skn.ARKETIPLER:
 #: imzasini degistirmek bes cagiran yeri de degistirirdi.
 _KOL_DONUS = [0.0]
 
+#: Sakal kabuguna uygulanan sismenin (mm) en az/en cok degeri.
+#:
+#: Kataloga girmesinin sebebi olculdu: sakalin kenarini inceltmek
+#: geometriyi degistirdi ama `catalog.json`da HICBIR sayi kimildamadi —
+#: ucgen sayisi ayni, olculer ayni. CLAUDE.md'nin yeniden uretim
+#: gurultusu kurali boyle bir degisikligi "gurultu" sayip geri
+#: aldirirdi. Kayit, degisikligi degil DEGISIKLIGIN OLCUSUNU tutmali.
+_SAKAL_SISME = [0.0, 0.0]
+
 
 def _kendi_uvsi_var(obj, esik=1e-6):
     """Parçanın UV katmanında **veri** var mı (boş katman sayılmaz)."""
@@ -777,6 +786,9 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
     sakal_mat = mats["beard_ak"] if ak else mats["beard"]
     # Sakalsizda cene hatti bos donerse hem kabuk hem tutam dongusu
     # kendiliginden bosa doner — ayri bir bayrak tutmaya gerek yok.
+    # Sakalsizda kayit BOS kalmali: modul hucresi bir onceki
+    # karakterin sayisini tasirdi.
+    _SAKAL_SISME[0], _SAKAL_SISME[1] = 1e9, 0.0
     hat = sk.cene_hatti(govde, boy) if skn.sakalli(tip) else []
 
     # AGIZ KOTU OLCULUR, YAZILMAZ — VE SAKAL ILE BIYIK AYNI OLCUYU
@@ -856,11 +868,32 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
                 return False
             return min((c - p).length for p in hat_p) < sakal_menzil
 
+        # KENARDA INCELIR — DUVAR DEGIL, TUY.
+        #
+        # Kabugun sismesi yalniz kota bagliydi, yani sakal bolgenin
+        # sinirinda tam kalinliginda BITIYORDU: yakin planda cene
+        # hattinin cevresinde dik bir duvar ve altinda sert bir golge
+        # okunuyordu. Sakal oyle bitmez — kenarda seyrelir.
+        #
+        # Kalinlik cene yayina uzaklikla da carpiliyor: menzilin son
+        # %30'unda tam degerden %18'ine iner. Siluet ayni kalir, kenar
+        # bir CIZGI olmaktan cikar.
+        def _sakal_sis(c):
+            t = min(1.0, max(0.0, (z_agiz - c.z) / (z_agiz - z_dip)))
+            kal = 0.006 + 0.016 * t
+            d = min((c - p).length for p in hat_p)
+            kenar = min(1.0, max(0.0,
+                                 (sakal_menzil - d) / (sakal_menzil * 0.30)))
+            v = kal * (0.18 + 0.82 * kenar)
+            if v < _SAKAL_SISME[0]:
+                _SAKAL_SISME[0] = v
+            if v > _SAKAL_SISME[1]:
+                _SAKAL_SISME[1] = v
+            return v
+
         sakal = kiy.kopya_kabuk(
             govde, "Sakal", col, tut=sakal_bolge,
-            sisme=lambda c: 0.006 + 0.016 * min(
-                1.0, max(0.0, (z_agiz - c.z) / (z_agiz - z_dip))),
-            kalinlik=0.004)
+            sisme=_sakal_sis, kalinlik=0.004)
         if sakal:
             # SAKALIN UV'SI GOVDEDEN GELIR VE ONA GORE YANLIS.
             #
@@ -1520,6 +1553,9 @@ def main():
             # sonra omza atliyordu. Karede kollar dirsekten geriye
             # kirilmis duruyordu ve hicbir sayi bunu soylemiyordu.
             kol_donusu=round(_KOL_DONUS[0], 1),
+            sakal_sisme_mm=[round(_SAKAL_SISME[0] * 1000.0, 2),
+                            round(_SAKAL_SISME[1] * 1000.0, 2)]
+            if _SAKAL_SISME[1] > 0.0 else None,
             agirlik_farki_once=round(agirlik_once, 4),
             agirlik_farki=round(rk.agirlik_farki(lod0)[1], 4),
             kemik=len(arm.data.bones),
