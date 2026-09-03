@@ -54,20 +54,39 @@ Yani **"güneş gerçek zamanlı kalsın, APV gök sıçramasını taşısın"
 kurgusu PhysicallyBasedSky ile kendi içinde tutarsız.** Gök, güneşsiz
 parlamıyor.
 
-### Caner'e soru (iki seçenek + öneri)
+### Karar: güneş fırına girer (Caner bıraktı, ölçüm seçti)
 
-1. **Güneşi `Mixed` yap ve turun saatinde pişir.** Sıçrama o saat için
-   doğru olur, günün öteki saatlerinde yanlış yönden gelir. Gün
-   döngüsü görsel olarak bozulmaz ama sıçrama onu izlemez.
-2. **Pişirme için ayrı bir gök**: sabit, açıkça parlaklığı verilmiş bir
-   statik aydınlatma göğü (HDRI ya da gradyan), çalışma zamanındaki PBR
-   göğünden bağımsız. Sıçrama saatten bağımsız ve tutarlı olur;
-   bedeli, gece ile gündüzün aynı dolaylı ışığı almasıdır.
+Caner ışık kararını bana bıraktı. **Önerim (2) idi** — pişirme için
+ayrı, sabit, açıkça parlaklığı verilmiş bir gök — ve **ölçüm onu
+eledi.** Üç deney, her biri `D_Okmeydani` üzerinde on dakika, tek
+değişkenli:
 
-**Önerim (2).** Sıçrama ışığı bu oyunda sokağın okunabilmesi için var;
-saatle dönen bir sıçramanın kazandırdığı doğruluk, gece sokağın yine
-simsiyah olmasının yanında küçük kalır. Ayrıca (2) tek bir pişirmeyle
-bütün günü kapatır — bu makinede pişirme süresi başlı başına bir kısıt.
+| # | değişen | `CellData` sonucu |
+|---|---|---|
+| 1 | fırının kendi gök profili, Lux kipinde 20.000 | **2 desen** — L0 tam sıfır |
+| 2 | fırına gerçek bir skybox malzemesi (ortam probu 0,037 → 0,18/0,23/0,30) | **2 desen** — L0 tam sıfır |
+| 3 | yönlü güneş `Mixed` | **12.106 desen** — problar ilk kez ışık taşıyor |
+
+Yani **fırın, içinde hiç ışık yoksa prob aydınlatması üretmiyor.**
+Gökyüzünü ne kadar parlatırsan parlat sonuç değişmiyor; seçenek (2)
+tek başına çalışmıyordu.
+
+**Karar: seçenek (1) — güneş `Mixed`, karma kip `IndirectOnly`.**
+
+* `IndirectOnly` (Baked Indirect) yalnız **sıçramayı** pişirir, gölge
+  haritası üretmez. `ZamanSistemi` güneşi saate göre döndürmeye devam
+  eder; doğrudan ışık ve gölgeler onu izler.
+* Donan tek şey **dolaylı terim**: sıçrama, pişirildiği saatin
+  güneşine göre gelir. Bir saat sapmış bir sıçrama, kapkara bir
+  sokağın yanında küçük kalır.
+* Seçenek (2)'nin iki parçası **kaldı**, çünkü ikisi de gerçek:
+  fırının kendi gök profili (20.000 lux, oyunun göğünden ayrı, oyunun
+  görüntüsüne dokunmadan) ve güneş diski **kapalı** bir skybox
+  malzemesi — güneş artık fırının içinde, iki kez sayılmamalı.
+
+İleride birden çok saat isteniyorsa yol açık: APV'nin *lighting
+scenario* mekanizması (`supportProbeVolumeScenarios` şu an 0) her saat
+için ayrı bir pişirme demek — bu makinede saat başına iki saat.
 
 ## Ölçülen dört sebep
 
