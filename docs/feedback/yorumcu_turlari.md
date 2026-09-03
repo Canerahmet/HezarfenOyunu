@@ -982,6 +982,40 @@ kadar indirip eteği onun altından başlatmak, (b) eteği göğsün altından
 başlatıp bel dikişini hiç kurmamak. Ölçüyle seçilecek bir şey değil;
 Caner'e soruluyor.
 
+### Feracenin üç silindiri — sorulan soru ölçümle kapandı
+
+Yukarıdaki soru ("kabuğu kalçanın altına indir" mi, "eteği göğsün
+altından başlat" mı) Caner'e soruldu ve kayda geçti; cevap beklenmeden
+ölçülerek ilerlendi (çalışma sözleşmesi: *sorular sorulur, cevabı
+beklenmez*).
+
+Kusurun kökü bir **kot uyuşmazlığı**ydı, bir biçim tercihi değil. Kabuk
+**belde** bitiyordu; eteğin üst yarıçapı ise **kalçayı** — gövdenin en
+geniş yerini — içermek zorundaydı. İki sayı iki farklı kotta ölçülünce
+aralarında bir basamak kaldı ve o basamağı bir **bant** örtüyordu. Bant
+kuşak gibi okunuyordu; ferace kuşak taşımaz.
+
+Dikiş kalçaya taşındı: kabuk kalçanın 4 cm altında biter, etek kalçadan
+başlar. Basamak `+0,018 m`'den `+0,008 m`'ye indi ve bant tamamen
+kaldırıldı.
+
+**Sıfıra indirmek denendi ve ölçüm reddetti.** `etek_acikligi`'ye
+tepeyi büyütmeyen bir kip (`ust_sabit`) eklendi ve basamak tam sıfır
+oldu (0,218/0,150 → 0,218/0,150). İnceleme karesi v15 sonucu gösterdi:
+**kırmızı şalvar eteğin içinden çıktı** — kalçada bir bant, eteğin
+önünde lekeler hâlinde. Yani 8 mm süsleme değil; şalvar kalçada kabuğun
+dış yüzeyinden geniş ve etek onu içermek zorunda. Kip geri alındı.
+
+Kabuğun eteğin ağzından 4 cm aşağı inmesi de ölçüldü ve **kaldı**:
+üstten bakıldığında görünen şey halka boşluğu değil kabuğun duvarı
+oluyor. (v14'te bu 4 cm yokken üstten bakınca figür belden aşağı açık
+bir kovanın içinde duruyordu.)
+
+Kalan sayı: `ferace dikişi: kabuk 0,218/0,150 → etek 0,226/0,153
+(basamak +0,008/+0,003 m)`, `catalog.json` üzerinden değil `[HZ]`
+kaydından okunuyor — bir sonraki tur "göze öyle geldi" ile değil bu
+sayıyla konuşsun diye.
+
 ### Fırın iki kez çöktü — sebep VRAM'di
 
 Toplu pişirme iki kez süreç hiçbir şey yazmadan yok olarak bitti,

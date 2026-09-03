@@ -248,7 +248,44 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
     # kadar inmiyor: belin biraz altinda biter ve gerisi konidir. Once
     # kalcaya kadar iniyordu ve o parca eteğin ICINDE kaliyordu — hic
     # gorunmeyen ~7 bin ucgen. Bir katman gorunmuyorsa katman degildir.
-    z_ust_alt = z_bel - boy * 0.035
+    # FERACE BIR MANTODUR — BELDE BITMEZ.
+    #
+    # Kadinin silueti UC UST USTE SILINDIR okunuyordu: govde, bel bandi,
+    # etek. Sebep yapisal — kabuk belin 3,5 cm altinda bitiyor, etek
+    # belden basliyor ve aradaki dikisi bir BANT ortuyor. Bant bir
+    # kusaktir; ferace onden kapali bir dis giysidir ve kusak tasimaz.
+    #
+    # Dogru cozum dikisi ortmek degil, dikisi KALCAYA tasimak. Eski
+    # yorumun sikayeti ("etegin ust halkasi entarinin yuzeyinden 2,4 cm
+    # disarida") bir kot uyusmazligiydi: kabuk BELDE bitiyor ama etegin
+    # ust yaricapi KALCAYI (govdenin en genis yeri) icermek zorunda. Iki
+    # sayi iki farkli kotta olculuyordu.
+    #
+    # Ikisi de kalcada olculdugunde halkalar ayni yaricapi tasir ve
+    # yuzey suregelir: omuzdan etek ucuna tek bir hat.
+    # KABUK ETEGIN AGZININ **ALTINA** INER.
+    #
+    # Ayni ilke kolda zaten yazili (`KOL_PAYI`): bir kabugun agzi hep
+    # baska bir parcanin ICINDE kalmali, yoksa kenari kenar olarak
+    # okunur. Burada dikey karsiligi — kabuk kalcanin 4 cm altinda
+    # biter, etek kalcadan baslar, yani kabugun eteği etegin icinde
+    # kalir ve disaridan hicbir aciden gorunmez.
+    #
+    # DIKEYDE BU ILKE OLCULDU VE **SINIRI BULUNDU**.
+    #
+    # Once iki halkayi esitlemeyi denedim: etegin ust yaricapini kabugun
+    # dis yaricapina cakip (`ust_sabit`) basamagi tam sifira indirdim —
+    # 0,218/0,150 -> 0,218/0,150. Inceleme karesi hipotezi curuttu:
+    # KIRMIZI SALVAR etegin icinden ciktı, kalcada bir bant ve etek
+    # onunde lekeler halinde. Yani 8 mm'lik fark suslemesizdi; salvar
+    # kalcada kabugun dis yuzeyinden GENIS ve etek onu icermek
+    # zorunda.
+    #
+    # Kalan tek dogru kurulum bu: etek kalcada baslar ve 8 mm daha
+    # genistir; kabuk 4 cm ASAGI iner, yani agzi etegin icinde kalir ve
+    # ustten bakildiginda halka bosluğu degil kabugun duvarı gorunur.
+    kadin_mi = (tip == "kadin")
+    z_ust_alt = ((z_kalca - boy * 0.040) if kadin_mi else (z_bel - boy * 0.035))
     # KOL ARTIK KABUK DEGIL, KENDI HACMI OLAN BIR GIYSI.
     #
     # Once kol da bu kabugun icindeydi (`kol(c) and c.z >= z_bilek`):
@@ -487,10 +524,18 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
     # gövdeyi icerdigi garanti degildir.
     bel_k = (kiy.kesit_merkezli(govde, z_bel, dislama=kol)
              or (boy * 0.10, boy * 0.068, 0.0))
-    bel_cy = bel_k[2]
-    etek_ust_z = z_bel
-    r_ust = (bel_k[0] + ENTARI_SIS + kiy.ENTARI_KAL + 0.002,
-             bel_k[1] + ENTARI_SIS + kiy.ENTARI_KAL + 0.002)
+    # ETEK NEREDE BASLAR: kadinda KALCA, erkekte BEL.
+    #
+    # Erkekte kusak beldedir ve dikisi o orter. Kadinda kusak yok, o
+    # yuzden dikis kabugun bittigi yerde — kalcada — olmali; oradaki
+    # halka kabugun kendi dis yaricapiyla ayni cikar ve gorunmez.
+    etek_ust_z = z_kalca if kadin_mi else z_bel
+    ust_k = (kiy.kesit_merkezli(govde, etek_ust_z, dislama=kol)
+             or bel_k) if kadin_mi else bel_k
+    bel_cy = ust_k[2]
+    r_ust = (ust_k[0] + ENTARI_SIS + kiy.ENTARI_KAL + 0.002,
+             ust_k[1] + ENTARI_SIS + kiy.ENTARI_KAL + 0.002)
+    r_kabuk = r_ust
 
     # Kisa entari daha cok acilir: hareket eden adamin adimina yer birakir.
     acilma = 1.34 if etek_orani < 0.15 else 1.52
@@ -498,11 +543,33 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
     # altindan gorunur. O yuzden zarf salvarin kot araliginda olculur.
     zarf = kiy.alt_zarf(govde, max(z_etek, z0), etek_ust_z, salvar_sis,
                         dislama=kol)
+    # ETEK-SALVAR PAYI: erkekte 1,6 cm, kadinda 0,6 cm.
+    #
+    # Buyuk pay bir kusuru kapatiyordu: etegin ust halkasi ile entarinin
+    # yuzeyi arasindaki ACIKLIKTAN kirmizi salvar goruluyordu. Kadinda o
+    # aciklik yok — dikis kalcada ve kabugun kendi yuzeyi onu ortuyor.
+    # Payi buyuk tutmak burada bedava degil: etegin ust yaricapini
+    # kabuktan 1,8 cm disari itiyor ve tam da kaldirmaya calistigimiz
+    # BASAMAGI uretiyor. Sayi olculdu, seçilmedi.
+    etek_payi = ((kiy.GOMLEK_KAL + 0.002) if kadin_mi
+                 else (kiy.GOMLEK_KAL + 0.012))
     r_ust, r_alt, bel_cy, etek_cy_alt = kiy.etek_acikligi(
         r_ust, bel_cy, etek_ust_z, z_etek, zarf,
-        kiy.GOMLEK_KAL + 0.012, acilma)
+        etek_payi, acilma)
     hz.log(f"etek: ust {r_ust[0]:.3f}/{r_ust[1]:.3f} @cy {bel_cy:+.3f} -> "
            f"alt {r_alt[0]:.3f}/{r_alt[1]:.3f} @cy {etek_cy_alt:+.3f}")
+    if kadin_mi:
+        # BASAMAK OLCULUR, VARSAYILMAZ.
+        #
+        # `etek_acikligi` ust ucu yalniz BUYUTUR. Kalcada olculen kabuk
+        # yaricapiyla etegin ust yaricapi ayrilirsa aradaki fark bir
+        # basamaktir ve siluet yine ikiye bolunur. Sayiyi kayda
+        # geciriyorum ki bir sonraki tur "goze oyle geldi" ile degil
+        # bununla konussun.
+        hz.log(f"ferace dikisi: kabuk {r_kabuk[0]:.3f}/{r_kabuk[1]:.3f}"
+               f" -> etek {r_ust[0]:.3f}/{r_ust[1]:.3f}"
+               f" (basamak {r_ust[0] - r_kabuk[0]:+.3f}/"
+               f"{r_ust[1] - r_kabuk[1]:+.3f} m)")
 
     parts.append(hz.assign(kiy.etek(
         "Entari_Etek", col, etek_ust_z, z_etek,
@@ -522,7 +589,13 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
     #
     # Dogru cozum kusagi geri koymak degil, ayni isi feracenin KENDI
     # kumasiyla yapmak: daha genis, ayni renk, bagsiz bir bel bandi.
-    kusak_var = True
+    # KADINDA BANT YOK.
+    #
+    # Bant, kabuk belde bitip etek belden basladigi icin ortada kalan
+    # dikisi ortmek uzere konmustu. Dikis artik kalcada ve kabugun
+    # kendi yuzeyi orada bitiyor; ortulecek bir sey kalmadi. Kalan tek
+    # islevi "kusak gibi gorunmek"ti ve ferace kusak tasimaz.
+    kusak_var = not kadin_mi
     bel_adi = "Ferace_Bel" if tip == "kadin" else "Kusak"
     bel_mat = ust_mat if tip == "kadin" else mats["kusak"]
     bel_yuk = 0.086 if tip == "kadin" else 0.055
@@ -1364,7 +1437,10 @@ def main():
         zorunlu = {"Gomlek", "Salvar", "Entari_Ust", "Entari_Etek",
                    "Mest_-1", "Mest_1"}
         if tip == "kadin":
-            zorunlu |= {"Yasmak", "Ferace_Bel"}
+            # `Ferace_Bel` LISTEDEN CIKTI: ferace kusak tasimaz ve dikis
+            # artik kalcada, kabugun kendi yuzeyinin altinda. Ortulecek
+            # bir sey kalmayinca ortu de kalmadi.
+            zorunlu |= {"Yasmak"}
         elif tip == "kiz":
             zorunlu |= {"Yasmak", "Kusak"}
         elif tip in ("cocuk", "genc"):
