@@ -376,6 +376,22 @@ def build_galata(p, col, asset_name, textured=False):
                 outer_d=OUTER_D, shaft_d=round(shaft_d, 3),
                 shaft_h=round(p.shaft_h, 2),
                 cone_h=round(p.cone_h, 2),
+                # DOKULU MU — KAYIT BUNU TASIMALI.
+                #
+                # Olculdu: `art/blend/landmark/SM_GalataKulesi.blend`
+                # icinde SIFIR goruntu var, yani kanonik blend
+                # `--textured` OLMADAN kurulmus. Oyun bundan etkilenmiyor
+                # (Unity malzemeleri `OttomanMaterialBuilder` ile
+                # paletten yeniden kuruluyor) ama INCELEME etkileniyor:
+                # bu deponun temel dongusu render'a bakmak ve landmark
+                # her turda dokusuz inceleniyor. Yuzey kusuru orada
+                # gorunmez.
+                #
+                # Katalogda yer almasinin sebebi de bu: `--textured` ile
+                # yeniden kurmak dosyayi bayt olarak degistirir ama
+                # katalogda hicbir sayi kimildamazdi, yani yeniden
+                # uretim gurultusu kurali onu geri aldirirdi.
+                textured=bool(textured),
                 today_total_h=TODAY_TOTAL_H)
     return lod0, lod1, ucx, info
 
