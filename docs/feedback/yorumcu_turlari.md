@@ -1004,6 +1004,34 @@ Tur artık `DistrictStreamer.LoadsInFlight` sıfıra inene kadar bekliyor
 üst sınır) ve her satırda **kaç semt yüklü, ne kadar beklendi** yazıyor.
 Bundan sonra boş çıkan bir durak gerçekten boştur.
 
+### Cevap: fırında ışık yoksa prob da yok
+
+Caner ışık kararını bana bıraktı. Önerim "pişirme için ayrı, sabit,
+parlaklığı açıkça verilmiş bir gök" idi ve **ölçüm onu eledi.**
+
+Üç deney, her biri `D_Okmeydani` üzerinde on dakika, tek değişkenli:
+
+| # | değişen | `CellData` |
+|---|---|---|
+| 1 | fırının kendi gök profili, Lux 20.000 | **2 desen** — L0 sıfır |
+| 2 | fırına gerçek skybox malzemesi (ortam probu 0,037 → 0,18/0,23/0,30) | **2 desen** — L0 sıfır |
+| 3 | güneş `Mixed` | **12.106 desen** — ışık var |
+
+Gökyüzünü beş kat parlatmak hiçbir şeyi değiştirmedi; güneşi fırına
+sokmak her şeyi değiştirdi. **Fırın, içinde hiç ışık yoksa prob
+aydınlatmasını hiç üretmiyor.**
+
+Bu, turlardır peşinde koştuğumuz kusurun kökü. Öncesinde bulunan dört
+sebep (dünya boyu hacimler, GPU'daki sanal kaydırma, her koşumda
+yeniden hesaplanan ızgara, `freezePlacement`'ın ne dondurduğu) gerçekti
+ve hepsi düzeltilmesi gerekiyordu — ama hiçbiri **bu** değildi. Fırını
+çalıştırmak, fırına ışık koymak değildir.
+
+Bedeli açıkça yazılıyor: sıçrama, pişirildiği saatin güneşine göre
+donuyor. Karma kip `IndirectOnly`, yani gölge haritası pişmiyor —
+`ZamanSistemi` güneşi döndürmeye devam ediyor ve gölgeler onu izliyor.
+Donan tek şey dolaylı terim.
+
 ### Fırın bitti — ve problar SİYAH pişti
 
 `D_Galata` 106 dakikada pişti: **62 hücre, 157 MB** prob verisi, imza
