@@ -104,6 +104,17 @@ HEZARFEN_MAKRO = {
 }
 
 #: (ad, etek_kotu_orani, dizlik_var, neden)
+#: Başlığın oturduğu kot (boy oranı) — **tek sahip**.
+#:
+#: Sarık ve takke kendi tabanlarını burada okur; saç kabuğunun üst
+#: sınırı da buradan türer. Üç sayı üç yerde yazılıyken saç başlığın
+#: 5 cm altında bitiyordu ve arada çıplak kafa derisi kalıyordu.
+BASLIK_TABANI = {
+    "sarik": 0.946,
+    "takke": 0.965,
+    "kavuk": 0.982,
+}
+
 #: Her varyant bir sozluk: ad, etek kotu, dizlik, giysi tipi, MPFB2
 #: makrosu, hedef boy, ve NEDEN.
 #:
@@ -683,8 +694,22 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
         if y:
             parts.append(hz.assign(y, mats["yasmak"]))
     elif tip in ("cocuk", "genc"):
-        t = skn.takke("Takke", col, boy * 0.965, bas_r * 1.03,
-                      boy * 0.062, cy=bas_cy)
+        # TAKKENIN YARICAPI KENDI TABANINDA OLCULUR.
+        #
+        # `bas_r * 1.03` yaziliydi ve `bas_r` bir MAKSIMUM: 0,905-0,965
+        # arasindaki EN GENIS dilim, yani kulak hizasi. Kafa yukari
+        # dogru daralir; o sayiyi 0,965'te kullanmak takkeyi kafanin
+        # cevresinde HAVADA birakiyordu. Karede sonucu su: takkenin
+        # gorunen kenari, tabanindan cok daha yukarida — kubbe kafayi
+        # kestigi yerde. Sac o kenara hic ulasamiyor ve arada ciplak
+        # kafa derisi kaliyor.
+        #
+        # Dogru olcu takkenin KENDI kotundaki kesit. 1,06: kumas kafaya
+        # yapismaz, altinda sac var.
+        _tk = kiy.kesit_merkezli(govde, boy * BASLIK_TABANI["takke"])
+        _tr = (_tk[0] if _tk else bas_r * 0.86) * 1.06
+        t = skn.takke("Takke", col, boy * BASLIK_TABANI["takke"],
+                      _tr, boy * 0.062, cy=(_tk[2] if _tk else bas_cy))
         if t:
             parts.append(hz.assign(t, mats["takke"]))
     else:
@@ -697,10 +722,12 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
         # ortmus bir silindir. Bir sarik basa GECIRILIR: alindan (kasin
         # biraz ustunden) baslar ve tepede kapanir.
         parts.append(hz.assign(kiy.band(
-            "Kavuk", col, boy * 0.982, (bas_r * 0.84, bas_r * 0.78),
+            "Kavuk", col, boy * BASLIK_TABANI["kavuk"],
+            (bas_r * 0.84, bas_r * 0.78),
             boy * 0.055, 0.006, cy=bas_cy), mats["kavuk"]))
         parts.append(hz.assign(kiy.sarik(
-            "Sarik", col, boy * 0.946, boy * (1.040 + 0.014 * (buyuk - 1.0)),
+            "Sarik", col, boy * BASLIK_TABANI["sarik"],
+            boy * (1.040 + 0.014 * (buyuk - 1.0)),
             bas_r * buyuk, cy=bas_cy), mats["sarik"]))
 
     # --- SAKAL ve SAC ----------------------------------------------------------
@@ -941,7 +968,20 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
         # Baslik tabani turden turer: sarik boy*0,946'dan, takke
         # boy*0,965'ten baslar ama kenari daha yukari oturur. Sacin
         # ustu her ikisinin de ALTINDA kalir — orasi zaten ortulu.
-        _sac_ust = boy * (0.912 if tip in ("cocuk", "genc") else 0.925)
+        # SACIN USTU BASLIGIN TABANINDAN TURER.
+        #
+        # 0,912 (takke) ve 0,925 (sarik) yaziliydi ve ikisi de basligin
+        # ALTINDA kaliyordu: takke boy*0,965'ten, sarik boy*0,946'dan
+        # basliyor. Aradaki fark cocukta boyun %5'i — 1,35 m'lik bir
+        # gövdede yedi santim CIPLAK KAFA DERISI. Karede oglanin
+        # kulagi arkasinda tek basina duran koyu bir leke goruldu:
+        # sac oradaydi ama basliga hic degmiyordu.
+        #
+        # Bir sayinin iki sahibi olmasin diye baslik tabani artik
+        # `BASLIK_TABANI`de; sac onun 0,004 USTUNDE biter, yani ucu
+        # basligin altinda kalir ve arada bakilacak bir aralik olmaz.
+        _sac_ust = boy * (BASLIK_TABANI["takke" if tip in ("cocuk", "genc")
+                                        else "sarik"] + 0.004)
         # SAKALSIZDA SAC KULAKTAN ASAGI INMEZ.
         #
         # Sinir 0,858 sakalliya gore secilmisti: orada sacin alt ucu
@@ -958,6 +998,23 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
             # sac kafanin arka ve yan yuzudur. Sinir kafanin KENDI
             # merkezinden turer, sabit bir sayidan degil.
             # Sakalsizda sac yanaga da inmez: on sinir geri cekilir.
+            #
+            # BU SINIRI ILERI TASIMAK DENENDI VE OLCUM REDDETTI.
+            #
+            # Oglanin sac kabugu olculdu: y +0,0117..+0,1575, bas
+            # merkezi +0,0425, yari-derinlik 0,0978, yuzun onu -0,0553.
+            # Yani sacin on kenari kafanin tam ORTASINDA ve takkenin
+            # kenariyla arasinda ciplak bir sakak seridi kaliyor. Sinir
+            # 0,62'ye tasindi (y -0,028, alnin 2,7 cm gerisi) ve sonuc
+            # DAHA kotu oldu: sac yanaga tasti, kulak onunde tirtikli
+            # koyu bir kutle olarak okundu.
+            #
+            # Sebep sayida degil BICIMDE: sac cizgisi bir DUZLEM degil
+            # bir egridir — alinda yukari cikar, sakakta asagi iner,
+            # kulagin onunden gecer. Tek bir y esigi bunu veremez, tipki
+            # tek bir kutunun yamaci izleyemedigi gibi
+            # (`SemtProblari`de ayni ders). Dogru cozumu kafanin kendi
+            # kesitinden turetilen bir egri; olculmeden yazilmayacak.
             return c.y > _bas_cy - _bas_ry * (
                 0.30 if skn.sakalli(tip) else 0.02)
 
@@ -968,6 +1025,11 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
                 1.0, max(0.0, (_sac_ust - c.z) / (_sac_ust - _sac_alt))),
             kalinlik=0.004)
         if _sac:
+            _sn, _sx = hz.bounds(_sac)
+            hz.log(f"sac kabugu: hedef z {_sac_alt:.4f}-{_sac_ust:.4f}, "
+                   f"olculen z {_sn[2]:.4f}-{_sx[2]:.4f}, "
+                   f"y {_sn[1]:+.4f}..{_sx[1]:+.4f} "
+                   f"(bas_cy {_bas_cy:+.4f}, bas_ry {_bas_ry:.4f})")
             # UV govdeden gelir ve dosenebilir dokuya gore yanlistir —
             # sakaldaki ayni gerekce.
             while _sac.data.uv_layers:
