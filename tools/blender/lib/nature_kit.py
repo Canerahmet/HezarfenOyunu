@@ -308,9 +308,19 @@ def build_agac(p, col, asset_name, textured=False):
 
     # Carpisma: yalnizca GOVDE. Oyuncu tacin altindan gecebilmeli; agacin
     # tepesine carpmak, sacak altindan gecememekle ayni tur hayal kirikligi.
+    # CARPISMA GOVDE BOYUNDA BITER — HAVADA DEVAM ETMEZ.
+    #
+    # Kutu her iki turde de H*0,5 idi. Servide bu dogru: servinin taci
+    # neredeyse yere kadar iner, yani o yukseklikte gercekten bir kutle
+    # var. Cinarda degil — govde 0,28H'de CATALLANIR ve ustunde yalniz
+    # dallar ile yaprak vardir. 16 m'lik bir cinarda kutu 8 m'ye
+    # cikiyordu, yani 4,5 m ile 8 m arasi **gorunmez bir duvardi**.
+    # Yerde yuruyen biri bunu hic fark etmez (bas hizasinin cok
+    # ustunde); ucan biri carpar. Bu bir ucus oyunu.
+    carp_h = trunk_h if p.kind == "cinar" else H * 0.5
     ucx = hz.make_box(f"UCX_{asset_name}",
-                      (p.trunk_r * 2.6, p.trunk_r * 2.6, H * 0.5),
-                      (0.0, 0.0, H * 0.25), col)
+                      (p.trunk_r * 2.6, p.trunk_r * 2.6, carp_h),
+                      (0.0, 0.0, carp_h * 0.5), col)
     hz.assign(ucx, mats[BARK_ROLE[p.kind]])
 
     _mn, _mx = hz.bounds(lod0)
@@ -320,6 +330,7 @@ def build_agac(p, col, asset_name, textured=False):
         kit.apply_uvs(obj, tex_sizes)
 
     mn, mx = hz.bounds(lod0)
+    _un, _ux = hz.bounds(ucx)
     info = dict(footprint_x=round(mx[0] - mn[0], 3),
                 footprint_y=round(mx[1] - mn[1], 3),
                 height=round(mx[2] - mn[2], 3),
@@ -327,6 +338,14 @@ def build_agac(p, col, asset_name, textured=False):
                 tris_lod0=kit.tri_count(lod0), tris_lod1=kit.tri_count(lod1),
                 wall_width=round(radius * 2.0, 3),
                 wall_depth=round(radius * 2.0, 3),
+                # CARPISMA KUTUSU KATALOGA GIRER.
+                #
+                # Kutunun boyu degistirildi ve `catalog.json` diff'i HIC
+                # kipirdamadi — yani depo kuralinin ("commit'lemeden once
+                # katalog diff'ine bak") dayandigi kayit, gemiye giden bir
+                # ozelligi hic tasimiyordu. Kaydedilmeyen sey olculemez;
+                # olculemeyen sey de sessizce bozulur.
+                ucx_h=round(_ux[2] - _un[2], 3),
                 kind=f"agac_{p.kind}", palette=p.palette)
     return lod0, lod1, ucx, info
 
