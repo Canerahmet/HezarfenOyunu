@@ -114,7 +114,12 @@ namespace Hezarfen.Editor.Diagnostics
             // cevresinde en cok yapi bulunan secildi — (438, -1953),
             // en yakin yapi 18,5 m, 80 m icinde 141 yapi. Bakis
             // Ayasofya'ya: atan2(112,6, 65,4) = 60 derece.
-            new Durak { ad = "05_ayasofya", nokta = new Vector3(438f, 0f, -1953f),
+            // 12 m'lik aciklik yetmedi: ilk deneme (438, -1953) bahce
+            // duvarlarinin arasina dustu ve kadraj `BahceDuvarlari @ 5 m`
+            // dedi. Esik 25 m'ye cikarildi ve yaricap 140-180 m arasinda
+            // tarandi: (429, -1958), en yakin yapi 28 m, 120 m icinde
+            // 192 yapi.
+            new Durak { ad = "05_ayasofya", nokta = new Vector3(429f, 0f, -1958f),
                         bakisYaw = 60f,
                         neden = "Landmark oturmasi ve olcek." },
             // SUR DURAGI SURLARDAN 300 M UZAKTAYDI.
@@ -171,8 +176,11 @@ namespace Hezarfen.Editor.Diagnostics
             // bir sokak genisligi kadar acik) noktalar arasindan 60 m
             // icinde en cok yapi goreni secildi: (4790, 650), en yakin
             // 8,2 m, cevrede 169 yapi.
-            new Durak { ad = "10_uskudar", nokta = new Vector3(4790f, 0f, 650f),
-                        bakisYaw = 270f,
+            // 8 m'lik sokak da yetmedi: kadraj `TR_Istanbul @ 6 m`
+            // dedi — oyuncu bir yamaca yapisik. Esik 20 m: (4789, 716),
+            // en yakin yapi 33 m, 120 m icinde 451 yapi.
+            new Durak { ad = "10_uskudar", nokta = new Vector3(4789f, 0f, 716f),
+                        bakisYaw = 260f,
                         neden = "Karsi yaka — semt akisi calisiyor mu." },
         };
 
