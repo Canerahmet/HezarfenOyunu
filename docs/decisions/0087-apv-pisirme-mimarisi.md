@@ -670,6 +670,68 @@ yaptıysa **martı/gök oranı 0,49'dan yukarı**, beyaz bir kuşun gökten
 ayırt edilebildiği yere (≥0,8) çıkmalı. İki kapı birbirinden bağımsız —
 biri sokakta yerde, öteki gökte — ve ikisi de aynı tek satırdan geçiyor.
 
+### Ortam fırını koştu: bir kapı açıldı, öteki açılmadı
+
+D_Galata `m_RealtimeEnvironmentLighting = 0` ile pişti (105,6 dk,
+62 hücre, 162.642.128 bayt, imza `639241384623296978`). İki kapı da
+sonuç görülmeden yazılmıştı; ikisi de ölçüldü.
+
+**Kapı 2 (martı) AÇILDI.** Üsküdar göğündeki koyu leke:
+
+```
+once  : gok 0,5843   marti 0,3951   oran 0,676   (461 px)
+sonra : gok 0,5791   marti 0,4509   oran 0,779   (268 px)
+```
+
+Martı **%15 aydınlandı** ve koyu piksel sayısı 461'den 268'e indi.
+Yani gök artık bir yerlere ulaşıyor: yukarı bakan, açıkta duran bir
+yüzey pişmiş problardan ışık alıyor.
+
+**Kapı 1 (sokak gölgesi) AÇILMADI — hatta koyulaştı.**
+
+```
+03_galata_sokak  once : 0,0433/0,0202/0,0033  parlaklik 0,0239  m/k 0,009
+                 sonra: 0,0310/0,0126/0,0001  parlaklik 0,0156  m/k 0,000
+05_ayasofya      once : m/k 0,140   sonra: 0,115
+```
+
+Sokak gölgesi hem karardı hem kalan mavisini kaybetti. Okunuşu şu:
+`realtimeEnvironmentLighting` kapatılınca çalışma zamanı ortam probu
+**kalktı** (gölgedeki o 0,0033 mavi ondan geliyordu) ve yerine gelmesi
+gereken pişmiş terim sokak seviyesine **ulaşmadı**. Yani bir ışık
+kaynağı çıkarıldı, yerine konan gelmedi.
+
+### İkisi birlikte tek şeyi gösteriyor: probun GEÇERLİLİĞİ
+
+Martı açık gökte, sokak gölgesi iki duvar arasında. Aynı fırın birine
+ulaşıp ötekine ulaşmıyorsa fark ışıkta değil **probun kendisinde**.
+Pişirme kümesi okundu:
+
+```
+dilationSettings:  enableDilation: 0
+virtualOffsetSettings: useVirtualOffset: 0
+```
+
+**İkisi de kapalı.** Sanal kaydırma, geometrinin içine düşen probu dışarı
+iter; genişletme (dilation), geçersiz kalan probu geçerli komşularından
+doldurur. İkisi de kapalıyken duvara, zemine ya da saçak altına düşen
+prob **geçersiz** kalıyor ve hiçbir şeyle doldurulmuyor — o probu
+örnekleyen yüzey de karanlık çıkıyor. Açık arazide ve gökyüzünde prob
+geçerli; sokak arasında değil. Ölçülen ayrım tam olarak bu.
+
+Sanal kaydırma bir GPU çökmesi yüzünden kapatılmıştı (`SemtProblari`
+`SanalKaydirmayiKapat`, d3d12 `VirtualOffsetBake` hatası) — o karar
+kayıtlı ve haklıydı. Ama **genişletme kapalı olması bir karar değil**:
+hiçbir yerde gerekçesi yazılmamış, varsayılan öyle gelmiş. Ve
+genişletme CPU'da çalışır, o GPU riskini taşımaz.
+
+`enableDilation: 1`, `dilationDistance: 1,5`, `dilationIterations: 2`
+ile D_Galata yeniden pişiyor. Beklenti yine sonuç görülmeden yazılıyor:
+sokak gölgesinin mavi/kırmızısı **0,000**'dan açık kareler ailesine
+(0,26-0,34) doğru çıkmalı; martı ise zaten geçerli bir bölgede olduğu
+için pek değişmemeli. İki farklı davranış beklemek, açıklamanın kendisi
+sınanabilir olsun diye.
+
 ## Ölçülen dört sebep
 
 1. **Prob hacimleri dünya boyuydu.** Her semtin hacmi `Mode.Global`'dı ve
