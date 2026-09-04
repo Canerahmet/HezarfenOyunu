@@ -206,6 +206,41 @@ tek küme etkin olabildiği için ayrı bir tasarım işi) gerekir.
 Bu soru buraya yazıldı çünkü cevabı **iki saatlik bir pişirmeye**
 mal oluyor ve bir sonraki tur onu yeniden keşfetmemeli.
 
+## Şu an koşan iş ve sabah ne yapılacak
+
+`D_Galata`, **gök pozu 90** ile pişiyor (04:24'te başladı, ~96 dk).
+Ölçülen kaldıraç doğrusal: poz 1,3'te ortam probu 0,18/0,23/0,30,
+poz 90'da 12,62/15,78/20,87 — tam 69,2 kat, 90/1,3 ile aynı.
+
+Bittiğinde üç komut, sırayla:
+
+```powershell
+# 1) Diskteki veri: desen sayisi 2'den buyuk olmali (isiksiz pisirmede 2).
+python tools/olcum/prob_isigi.py
+
+# 2) Tur — kareler yeniden cekilir.
+& "C:\Program Files\Unity\Hub\Editor\6000.5.8f1\Editor\Unity.exe" `
+  -batchmode -projectPath unity/HezarfenGame `
+  -executeMethod Hezarfen.Editor.Diagnostics.OyunTuru.TopluKos `
+  -logFile tur.log
+
+# 3) KAPI: golgenin mavi/kirmizi orani.
+python tools/olcum/golge_orani.py --gok-yok renders/tur/03_galata_sokak.png
+python tools/olcum/golge_orani.py --dilim 0.5 --bolge 650,455,1010,505 `
+  renders/tur/03_galata_sokak.png
+```
+
+**Okunuş.** Fırın öncesi gölge `0,0202 / 0,0061 / 0,0001`, mavi/kırmızı
+**0,000**. Aynı sahnede çıplak araziye bakan kareler 0,26-0,30 okuyor.
+Gölgenin oranı o aileye yaklaştıysa poz 90 doğru mertebedir ve
+`FirinGokyuzu.SkyboxPozu` ölçümle güncellenir. Hâlâ 0'a yakınsa çarpan
+yetmemiştir; kaldıraç doğrusal olduğu için bir sonraki deneme doğrudan
+hesaplanabilir.
+
+**Not:** `SkyboxPozu` sabiti hâlâ **1,3**. 90 bir deney ve ölçüm onu
+doğrulayana kadar sabit yazılmadı — bu depoda bir sayı, onu doğrulayan
+ölçüm olmadan yazılmaz.
+
 ## Ölçülen dört sebep
 
 1. **Prob hacimleri dünya boyuydu.** Her semtin hacmi `Mode.Global`'dı ve
