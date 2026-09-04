@@ -1004,6 +1004,40 @@ Tur artık `DistrictStreamer.LoadsInFlight` sıfıra inene kadar bekliyor
 üst sınır) ve her satırda **kaç semt yüklü, ne kadar beklendi** yazıyor.
 Bundan sonra boş çıkan bir durak gerçekten boştur.
 
+### Işık zincirinin sonu: APV çalışıyor, problar yedek ortamdan karanlık
+
+Güneş fırına girdikten sonra `D_Galata` yeniden pişti — 95,8 dk, 62
+hücre, 155 MB, `CellData` **38.238 desen** (ışıksız pişirmede 2).
+Problar ışık taşıyor. **Kare yine değişmedi.**
+
+Zincirin okunabilen her halkası "açık" diyor: veri diskte, çalışma
+zamanı `kurulu/kume var`, çiziciler `m_LightProbeUsage: 1`, dört boru
+hattı varlığında da `lightProbeSystem: 1`, ve kameranın kendi kare
+ayarına `AdaptiveProbeVolume` açıkça yazıldı.
+
+Sonra A/B koşuldu ve **yönü tersine çevirdi**:
+
+| koşum | gölge (r/g/b) |
+|---|---|
+| APV açık | 0,0202 / 0,0061 / 0,0001 |
+| APV kapalı (dört varlıkta da) | **0,0217 / 0,0075 / 0,0001** |
+| kamera kare ayarı zorla açık | 0,0203 / 0,0062 / 0,0001 |
+
+APV **kapatılınca gölge aydınlanıyor.** Yani APV uygulanıyor; uyguladığı
+şey, yerine geçtiği yedek ortamdan daha karanlık. Sorun "yol kapalı"
+değil, **problar karanlık**.
+
+Albedo da sınandı ve elendi: `albedoBoost = 8` desen sayısını
+12.106'dan 12.291'e taşıdı — yüzde bir buçuk. Tek sıçramalı bir fırında
+probun değerini ona doğrudan ulaşan ışık belirliyor.
+
+Geriye ölçülebilir tek kaldıraç kaldı: **fırının gök parlaklığı.**
+Fırının gördüğü gök `M_Firin_Skybox`'ın pozundan geliyor (ölçüldü:
+malzeme bağlanınca ortam probu 0,037 → 0,18/0,23/0,30; gök profilinin
+Lux kipi hiçbir şey değiştirmedi — yani ilerlemeli fırın HDRP'nin
+statik aydınlatma göğünü değil, Unity'nin kendi skybox yolunu okuyor).
+Hedef net: pişmiş problar, yerine geçtikleri ortamdan karanlık olmasın.
+
 ### Cevap: fırında ışık yoksa prob da yok
 
 Caner ışık kararını bana bıraktı. Önerim "pişirme için ayrı, sabit,
