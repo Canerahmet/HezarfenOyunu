@@ -294,16 +294,43 @@ def build_agac(p, col, asset_name, textured=False):
                                       z0=H * 0.10), (0.0, 0.0), 5, col),
                        mats[FOLIAGE_ROLE["servi"]]))
     else:
-        # LOD1 ayni KUTLEyi verir: 0,28H'den 0,96H'ye kadar yayvan bir tac.
-        # Uzaktan siluetin kirilmasi zaten okunmaz; okunan sey nerede
-        # baslayip nerede bittigidir.
-        l1.append(_put(_lathe(f"{asset_name}_L1",
-                              _scaled(CINAR_LOBE, p.spread, H * 0.34,
-                                      z0=H * 0.62),
-                              (0.0, 0.0), 6, col), mats[FOLIAGE_ROLE["cinar"]]))
+        # LOD1 DE KIRILIR — "uzaktan zaten okunmaz" YANLIS CIKTI.
+        #
+        # Ilk yazimda LOD1 tek bir yayvan lobdu ve gerekcesi "uzaktan
+        # siluetin kirilmasi okunmaz" idi. Uskudar durak karesinde
+        # olculdu: 150 m'deki cinarlar cubuk uzerinde koyu yesil
+        # TOPLAR olarak cikiyor — LOD0'daki butun is o mesafede
+        # kayboluyor ve agac yeniden lolipop oluyor. Siluetin kirilmasi
+        # UZAKTAN daha cok okunur, cunku uzakta siluetten baska bir sey
+        # yoktur.
+        #
+        # Dort lob: biri tepede, uc tanesi yanlarda. 84 yerine ~230
+        # ucgen — bir agac icin bu, LOD0'in %15'i.
+        # Kotlar LOD0'in BOYUNA gore secildi: en ustteki lobun tepesi
+        # (jitter dahil) 0,98H, en alttakinin tabani 0,33H. Ilk
+        # denemede lobler yukaridaydi ve LOD1 **17,49 m** olcuyordu —
+        # LOD0'dan 1,5 m uzun, yani gecis aninda goze carpan bir
+        # ziplama. Bir LOD merdiveni, basamaklarinin ayni boyda
+        # olmasiyla merdiven olur.
+        for _i, (_ox, _oy, _oz, _rs) in enumerate(
+                ((0.00, 0.00, 0.76, 0.52), (0.62, 0.10, 0.60, 0.46),
+                 (-0.36, 0.52, 0.58, 0.44), (-0.30, -0.55, 0.56, 0.43))):
+            l1.append(_put(_lathe(
+                f"{asset_name}_L1_{_i}",
+                _scaled(CINAR_LOBE, p.spread * _rs, H * 0.20,
+                        z0=H * _oz),
+                (_ox * p.spread, _oy * p.spread), 5, col,
+                jitter=0.12, seed=p.seed * 11 + _i),
+                mats[FOLIAGE_ROLE["cinar"]]))
+        # Govde TACA KADAR cikar. 0,28H'de bitiyordu ve en alttaki lob
+        # 0,33H'de basliyordu: aradaki bosluk uzaktan "havada duran
+        # tac" olarak okunuyordu. Kalinlik da 2,6'dan 3,2'ye — LOD1'de
+        # govde tek bir kutudur ve LOD0'in konik govdesinin ortalama
+        # kalinligini tasimasi gerekir.
         l1.append(_put(hz.make_box(f"{asset_name}_L1g",
-                                   (p.trunk_r * 2.6, p.trunk_r * 2.6, H * 0.28),
-                                   (0.0, 0.0, H * 0.14), col), mats[BARK_ROLE[p.kind]]))
+                                   (p.trunk_r * 3.2, p.trunk_r * 3.2, H * 0.45),
+                                   (0.0, 0.0, H * 0.225), col),
+                       mats[BARK_ROLE[p.kind]]))
     lod1 = kit.join_parts(l1, f"SM_{asset_name}_LOD1", col)
 
     # Carpisma: yalnizca GOVDE. Oyuncu tacin altindan gecebilmeli; agacin
@@ -334,12 +361,23 @@ def build_agac(p, col, asset_name, textured=False):
 
     _mn, _mx = hz.bounds(lod0)
     _boya_olcekle((lod0, lod1, ucx), H, _mx[2] - _mn[2])
+    # LOD1 AYRICA KENDI BOYUNA OTURTULUR.
+    #
+    # Basamaklarin ayni boyda olmasi elle secilen kotlarla tutturulmaya
+    # calisildi ve tutmadi: cinarda LOD1 once 17,49 m, sonra 16,79 m
+    # cikti — LOD0 16,00 iken. Kabahat kotlarda degil, yontemde:
+    # loblerin `jitter`i siluetin ucunu her tohumda baska yere tasiyor,
+    # yani boy ancak OLCULDUKTEN sonra bilinir. Olculup duzeltiliyor.
+    _l0n, _l0x = hz.bounds(lod0)
+    _l1n, _l1x = hz.bounds(lod1)
+    _boya_olcekle((lod1,), _l0x[2] - _l0n[2], _l1x[2] - _l1n[2])
 
     for obj in (lod0, lod1):
         kit.apply_uvs(obj, tex_sizes)
 
     mn, mx = hz.bounds(lod0)
     _un, _ux = hz.bounds(ucx)
+    _l1a, _l1y = hz.bounds(lod1)
     info = dict(footprint_x=round(mx[0] - mn[0], 3),
                 footprint_y=round(mx[1] - mn[1], 3),
                 height=round(mx[2] - mn[2], 3),
@@ -355,6 +393,14 @@ def build_agac(p, col, asset_name, textured=False):
                 # ozelligi hic tasimiyordu. Kaydedilmeyen sey olculemez;
                 # olculemeyen sey de sessizce bozulur.
                 ucx_h=round(_ux[2] - _un[2], 3),
+                # LOD1'IN BOYU DA KAYDA GIRER.
+                #
+                # Cinarin LOD1'i once 17,49 sonra 16,79 m olctu — LOD0
+                # 16,00 iken. Yani basamaklar ayni boyda degildi ve
+                # gecis aninda agac ziplyordu. Kusur `catalog.json`
+                # diff'inde hic gorunmuyordu, cunku kayit yalnizca
+                # LOD0'in boyunu tasiyordu. Kaydedilmeyen sey olculemez.
+                lod1_boy=round(_l1y[2] - _l1a[2], 3),
                 kind=f"agac_{p.kind}", palette=p.palette)
     return lod0, lod1, ucx, info
 
