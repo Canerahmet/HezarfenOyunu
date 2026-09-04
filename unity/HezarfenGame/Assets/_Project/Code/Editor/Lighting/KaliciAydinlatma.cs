@@ -818,16 +818,23 @@ namespace Hezarfen.Editor.Lighting
             // sicramayi malzemenin albedosundan hesaplar. Bu anahtar
             // `albedoBoost`u degistirip sonucun olceklenip
             // olceklenmedigine bakmak icin.
+            // DENEY DEGERI SIZMASIN: HER KOSUMDA ACIKCA YAZILIR.
+            //
+            // Anahtar bir kez kullanildi (`-hezarfenAlbedo 8`) ve deger
+            // `LS_Hezarfen.lighting` varliginda KALDI — sonraki pisirme
+            // farkinda olmadan sekiz kat albedo ile kostu. Bir deney
+            // anahtari, kapatildiginda dunyayi eski haline birakmiyorsa
+            // deney degil sessiz bir ayar degisikligidir.
+            float _abv = 1f;
             string _ab = KomutSatiri("-hezarfenAlbedo");
-            if (!string.IsNullOrEmpty(_ab)
-                && float.TryParse(_ab,
+            if (!string.IsNullOrEmpty(_ab))
+                float.TryParse(_ab,
                     System.Globalization.NumberStyles.Float,
                     System.Globalization.CultureInfo.InvariantCulture,
-                    out float _abv))
-            {
-                ls.albedoBoost = _abv;
+                    out _abv);
+            ls.albedoBoost = _abv;
+            if (System.Math.Abs(_abv - 1f) > 1e-3f)
                 Debug.Log($"[Hezarfen] DENEY: albedoBoost = {_abv:0.##}");
-            }
             ls.mixedBakeMode = MixedLightingMode.IndirectOnly;
             ls.directSampleCount = 16;
             ls.indirectSampleCount = 16;
