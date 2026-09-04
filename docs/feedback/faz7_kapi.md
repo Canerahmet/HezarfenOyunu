@@ -122,6 +122,22 @@ Bu fazda dört kez yanlış şeye baktım; hepsi ölçümle düzeldi.
    Savrulma yalnız 260 m içinde hesaplanıyor. (2026-09-04'te
    doğrulandı.)
 4. **Kalabalık üçgen bütçesi** — kişi başına ~62 000 üçgen.
+   *2026-09-04 açıklaması:* bu sayı **yalnız 11 m içinde** ödeniyor.
+   Karakter LOD eşikleri `ImportLanding.KarakterUc = {0,22 · 0,04 ·
+   0,010}` (ekran yüksekliği oranı) ve 1,78 m'lik bir figürde 40°
+   FOV ile bunlar şu mesafelere düşüyor:
+
+   | basamak | eşik | mesafe | üçgen |
+   |---|---:|---:|---:|
+   | LOD0 | 0,22 | **11.1 m**'ye kadar | 57-65 bin |
+   | LOD1 | 0,04 | 61 m'ye kadar | 17-19 bin |
+   | LOD2 | 0,010 | 244 m'ye kadar | 4,6 bin |
+
+   Tur karesinde "40 m'de 56-91 kişi, çizilen gövde 60" okunuyor; bu
+   dağılımla kalabalığın toplamı **~1,1 milyon üçgen** eder ve ölçülen
+   kare 7-10 ms. Yani 62 bin bir bütçe kalemi değil, en yakın birkaç
+   kişinin bedeli. (Bugün yaşmak ve etek düzeltmeleri kişi başına
+   3-4 bin ekledi; bu, o birkaç kişide ~%5 demek.)
 5. **Gerçek 30 dk oturum** — build üzerinde, elle.
    *2026-09-04: otomatik yarısı için alet yazıldı —*
    `Runtime/Diagnostics/OyuncuOlcumu.cs`. Yapılmış oyunda dört durakta
