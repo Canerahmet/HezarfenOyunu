@@ -99,8 +99,23 @@ namespace Hezarfen.Editor.Diagnostics
             new Durak { ad = "04_surici", nokta = new Vector3(-700f, 0f, -1500f),
                         bakisYaw = 90f,
                         neden = "Surici dokusu ve NPC yogunlugu." },
-            new Durak { ad = "05_ayasofya", nokta = new Vector3(549f, 0f, -1886f),
-                        bakisYaw = 270f,
+            // DURAK AYASOFYA'NIN ICINDEYDI.
+            //
+            // Nokta (549, -1886); Ayasofya sahnede (550,66, -1888,4) ve
+            // 84 x 116 x 69 m. Yani durak yapinin **2,9 m** icinde:
+            // oyuncu binanin icine dogar, yerlestirme onu disari iter
+            // (`arazi farki +1,4` — bir doseme uzerinde) ve kadrajda
+            // 77 m otedeki bir turbe kalir. Landmark duragi
+            // landmark'i gostermiyordu.
+            //
+            // Yeni nokta merkezden 130 m: bina 84 x 116 m ve bu uzaklik
+            // onu kadraja sigdirir. On iki yon 15 derece araliklarla
+            // tarandi, en yakin yapiya 12 m'den fazla olanlar arasindan
+            // cevresinde en cok yapi bulunan secildi — (438, -1953),
+            // en yakin yapi 18,5 m, 80 m icinde 141 yapi. Bakis
+            // Ayasofya'ya: atan2(112,6, 65,4) = 60 derece.
+            new Durak { ad = "05_ayasofya", nokta = new Vector3(438f, 0f, -1953f),
+                        bakisYaw = 60f,
                         neden = "Landmark oturmasi ve olcek." },
             new Durak { ad = "06_kara_surlari", nokta = new Vector3(-3300f, 0f, -1200f),
                         bakisYaw = 90f,
