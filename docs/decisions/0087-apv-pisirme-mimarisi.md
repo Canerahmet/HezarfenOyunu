@@ -510,15 +510,37 @@ neredeyse bedava. Bedeli semt başına ~95 dk fırın ve sekiz semt.
 Bugünkü işin devamı.
 
 **Seçenek B — SSGI'yi Balanced'da da aç.** `HDRP High Fidelity`'de
-zaten 1. Fırın beklemeden bugün gölgeyi doldurur. İki kusuru var:
-köşenin arkasını göremez (sokak arası gölge yine eksik kalır) ve kare
-bütçesinden yer. 16,7 ms bütçesi ölçülmeden açılmaz.
+zaten 1. Fırın beklemeden bugün gölgeyi doldurur.
 
-**Önerim: A, ve B'yi ölçüp üstüne eklemek.** HDRP ikisini birlikte
-kullanır — SSGI ekranda olanı, APV olmayanı verir. Ama önce A'nın
-çalıştığını görmek gerekiyor, yoksa B'yi açmak kusuru **gizler**:
-kare düzelir, sebep durur, ve bir sonraki kapalı mekân (girilebilir
-evler, ADR planı Faz 3-4) yine karanlık çıkar.
+**Ama bu seçenek zaten ölçülüp elenmiş.** `docs/feedback/faz7_performans.md`
+(2026-08-29, aynı makine, Balanced kademe) SSGI'nin bedelini tek
+değişkenli olarak ölçmüş:
+
+| adım | SSGI açık | SSGI kapalı | fark |
+|---|---:|---:|---:|
+| boş arazi 1440p | 16,94 | 10,03 | **−6,9 ms** |
+| 8000 yapı 1440p | 17,24 | 10,64 | **−6,6 ms** |
+| çarşı kalabalığı 1440p | 26,01 | 14,30 | **−11,7 ms** |
+
+SSGI açıkken **boş bir yamaç bile** 1080p/60'ı zor tutuyor; kalabalık
+sokakta bütçe bir buçuk katına çıkıyor. Yani `supportSSGI: 0` bir ihmal
+değil, ölçülmüş bir karar — ve ben onu "bütçesi ölçülmeden açılmaz"
+diye yazarken ölçümün zaten var olduğunu bilmiyordum. Kayda geçiyorum:
+**önce depoyu okumadan seçenek yazmak, ölçülmüş bir kararı yeniden
+tartışmaya açmak demek.**
+
+Bu, SSGI deneyimin neden hiçbir şey göstermediğini de ikinci kez
+doğruluyor: SSGI gerçekten koşsaydı kare süresi **7-12 ms** artardı.
+Kare süresi 7-8 ms'de kaldı. Yani "hiçbir şey değişmedi" sonucu
+"etkisi yok" değil, **"çalışmadı"** demekti; ve elimde o farkın ne
+kadar olması gerektiğini söyleyen sayı vardı.
+
+**Önerim (düzeltildi): A, tek başına.** HDRP ikisini birlikte kullanabilir — SSGI ekranda olanı, APV
+olmayanı verir — ama bu makinede SSGI'nin bedeli bütçenin yarısı ve
+ölçüm bunu 29 Ağustos'ta söylemiş. Geriye tek seçenek kalıyor ve o da
+zaten doğru olan: **APV'yi çalıştırmak.** Kapalı gölgeyi köşenin
+arkasından dolduran tek şey o; girilebilir evler geldiğinde (plan
+II.D) sorunun tamamı orada olacak.
 
 Bu yüzden sıradaki tek değişkenli deney B'yi bir **çözüm** olarak değil
 bir **ölçü aleti** olarak koşuyor: kaliteyi High Fidelity'ye alıp turu
