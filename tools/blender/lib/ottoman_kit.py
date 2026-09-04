@@ -61,6 +61,18 @@ import materials as mtl
 # kirmizi" diye secilmedi — render'da olculup hedefe (parlaklik ~100/255,
 # R/G ~1.9) gore ayarlandi.
 ASI_RED = (0.578, 0.144, 0.085)
+# Oyun karesinde aşı boyalı cephe **0,917/0,345/0,201** (R/G 2,66,
+# doygunluk 0,78) okuyor ve "fazla kırmızı" görünüyor. Palet SUÇLU
+# DEĞİL: pişmiş dokunun kendisi ışıksız ölçüldüğünde 144/56/42, yani
+# **R/G 2,57** — demir oksit (aşı) pigmentinin bilinen yeri. Karedeki
+# doygunluğu yapan şey albedo değil, güneşli yüzeyde kırmızının 0,92'ye
+# dayanması: pozlama ve tonemap.
+#
+# Bu yüzden ton BURADAN düzeltilmiyor. Bir karede görülen renk kusuru
+# önce dokunun kendisinde aranır (çatı kiremidinde tam bunun için
+# ölçüldü, birkaç satır aşağıda); doku hedefindeyse kusur ışıktadır ve
+# paleti oynatmak resmi düzeltirken malzemeyi bozar. Işık oturunca
+# yeniden ölçülecek.
 ASI_DARK = (0.181, 0.055, 0.035)        # gayrimuslim varyanti: daha koyu
 
 #: **Boyasız** ahşap. Aşı kırmızısı bir EV boyasıdır (ADR 0030 §5c); nöbet
