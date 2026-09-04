@@ -353,6 +353,64 @@ pay %0,65'ten **%5 mertebesine** çıkmalı, gölgenin kırmızısı
 0,0201 → **0,021 civarına**. Çıkmazsa albedo gerçekten elenir ve geriye
 fırının güneşinin probda hangi ölçekte durduğu kalır.
 
+### Kusur küçük bir yamada değil, SOKAKTA — ve rengi var
+
+Bütün gece gölgeyi 20x20 piksellik sabit bir bölgeden okudum. Oyun turu
+karesine bakınca aynı şey çok daha büyük ve çok daha açık görünüyor:
+Galata sokağında evin önünde **düz, sert kenarlı, kahverengi-siyah bir
+levha** duruyor. Ölçüldü (03_galata_sokak, zemin şeridi):
+
+```
+koyu bolge   : 0,1660 / 0,0837 / 0,0005     mavi/kirmizi 0,003
+aydinlik yer : 0,5380 / 0,4346 / 0,3174     mavi/kirmizi 0,590
+```
+
+Gölge, aydınlık zeminin kırmızıda **%31'i**, mavide **%0,16**'sı.
+
+Bu oran tek başına teşhis. Açık havada gölge, güneşten değil **gökten**
+aydınlanır; bu yüzden gerçek bir gölge güneşli yüzeyden daha MAVİdir.
+Buradaki gölge mavisini tamamen kaybetmiş: onu aydınlatan ne varsa
+(sis, dolaylı güneş) sıcak, ve **gökten hiçbir şey gelmiyor**.
+
+Yani gece boyunca 0,0001'lik bir mavi olarak okuduğum sayı, karede
+sokağa serilmiş kara bir levha olarak duruyor. Aynı kusur, görünür
+ölçekte.
+
+### Halka kapandı: gölgeye gökten ışık YALNIZ APV ile gelebilir
+
+Sahne ayarları okundu:
+
+| ne | değer |
+|---|---|
+| `D_Galata` `m_AmbientMode` | 0 (Skybox) — ama HDRP'de bu alan okunmaz |
+| `m_SkyboxMaterial` | Unity'nin **yerleşik** varsayılanı, projenin göğü değil |
+| `m_LightingSettings` | `fileID: 0` — bağlı değil |
+| `StaticLightingSky` | `Faz1_Terrain` sahnesinde, `UniqueID: 4` |
+| boru hattı `lightProbeSystem` | 1 = **Adaptive Probe Volumes** |
+
+`lightProbeSystem` APV olduğunda HDRP dolaylı yayınık ışığı **yalnızca
+APV'den** alır; göğün ortam probu kareye ancak APV'nin içine pişerek
+girer. Yani ikinci bir yol yok: **problar sönükse gölge kararır.**
+
+Zincir artık uçtan uca ölçülü:
+
+1. Boru hattı dolaylı ışığı APV'den istiyor.
+2. Pişmiş APV karenin ~%0,65'ini kuruyor (çarpan deneyi).
+3. Bu yüzden gölgeye gökten ışık gelmiyor — mavi/kırmızı 0,003.
+4. Ve bu, karede sokağa serilmiş kara bir levha olarak görünüyor.
+
+Geriye tek soru kaldı ve o da doğru soru: **probun içindeki sayı neden
+bu kadar küçük?**
+
+### Bir uyarı: %0,65 doğrusal bir oran DEĞİL
+
+Çarpan deneyinden çıkan "%0,65" tonemap'ten geçmiş karede ölçüldü.
+Tonemap sıkıştırır; ışınım uzayındaki eksiklik bundan çok daha büyük
+olabilir. Yani "150 kat" bir alt sınırdır, tahmin değil. Bu, albedonun
+tek başına (en çok 8 kat) yetmeyeceğini de söylüyor — albedo deneyi
+hâlâ değerli, çünkü **hangi kadarını açıkladığını** ölçüyor, ama
+tamamını açıklaması beklenmiyor.
+
 ## Ölçülen dört sebep
 
 1. **Prob hacimleri dünya boyuydu.** Her semtin hacmi `Mode.Global`'dı ve
@@ -442,3 +500,13 @@ Kapıyı tutan sayı tek: `tools/olcum/golge_orani.py --gok-yok --bolge
 mavi/kırmızı **0,000**, saçılım **0,001**. Fırın işini yaptıysa kapalı
 kareler, aynı sahnede ölçülen sağlıklı komşularının (0,26–0,30)
 ailesine katılır.
+
+### Bir kusur: fırın koşarken `git add -A`
+
+Yukarıdaki commit'e ADR'nin yanında **fırının o an yazdığı üç dosya**
+da girdi: `m_AlbedoBoost 1 → 8`, skybox materyali ve pişirme kümesinden
+temizlenen 876 satır. Bunlar deneyin geçici hâli, kararın kaydı değil.
+CLAUDE.md'nin *"commit'lemeden önce ölç"* kuralının aynısı: koşan bir
+üretecin altındaki dosya, ölçüm bitmeden kayda geçmez. Fırın bitince
+üçü de yerleşik hâlleriyle tek commit'te düzeltilecek; bu arada
+commit'ler **açık dosya yoluyla** yapılıyor, `-A` ile değil.
