@@ -111,6 +111,22 @@ namespace Hezarfen.Editor.Lighting
         /// <b>Yan etki yok:</b> HDRP bu malzemeyi çizimde kullanmıyor,
         /// yalnızca ilerlemeli fırın okuyor. Yani büyük bir çarpan
         /// oyunun görüntüsünü değiştirmez.
+        ///
+        /// ## Kaldıraç ölçüldü: doğrusal, tam beklendiği gibi
+        ///
+        /// `-hezarfenGokPozu 90` ile yerleştirme denemesi koşuldu:
+        ///
+        /// <code>
+        /// poz 1,3  -> ortam probu  0,1823 / 0,2279 / 0,3015
+        /// poz 90   -> ortam probu 12,6203 / 15,7793 / 20,8705
+        /// </code>
+        ///
+        /// Oran <b>69,2</b> ve 90/1,3 = 69,2. Yani `_Exposure` fırının
+        /// gördüğü göğü tam doğrusal ölçekliyor; arama iyi tanımlı.
+        ///
+        /// `D_Galata` bu poz ile pişiriliyor. <b>Sabit hâlâ 1,3</b> —
+        /// 90 bir deney, ve gölgenin mavi/kırmızı oranı ölçülene kadar
+        /// öyle kalacak.
         /// </summary>
         public const float SkyboxPozu = 1.3f;
 
@@ -231,7 +247,25 @@ namespace Hezarfen.Editor.Lighting
             // `GokLuxu` mertebesinde olsun. Prosedurel skybox fiziksel
             // birim tasimaz; 1,3 gunduk gogunun alisildik degeri ve
             // sonucu ZATEN OLCULECEK (prob L0'i sifirdan farkli mi).
-            m.SetFloat("_Exposure", SkyboxPozu);
+            // DENEY ANAHTARI: `-hezarfenGokPozu <x>`.
+            //
+            // Turetilen arama araligi 65-130 (yanda yazili) ve bu
+            // deneyle sinaniyor. Sabit degistirilmiyor: sayi ancak onu
+            // dogrulayan olcumle yazilir.
+            float poz = SkyboxPozu;
+            string ham = null;
+            foreach (string a2 in System.Environment.GetCommandLineArgs())
+            {
+                if (ham == "-hezarfenGokPozu") { ham = a2; break; }
+                ham = a2 == "-hezarfenGokPozu" ? a2 : null;
+            }
+            if (!string.IsNullOrEmpty(ham) && ham != "-hezarfenGokPozu"
+                && float.TryParse(ham,
+                    System.Globalization.NumberStyles.Float,
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    out float p2))
+                poz = p2;
+            m.SetFloat("_Exposure", poz);
             EditorUtility.SetDirty(m);
             AssetDatabase.SaveAssets();
             return m;
