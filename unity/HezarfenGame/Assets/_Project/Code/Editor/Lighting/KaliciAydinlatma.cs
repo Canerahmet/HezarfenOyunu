@@ -810,6 +810,24 @@ namespace Hezarfen.Editor.Lighting
             // golge haritasi uretmez — yani gunes saate gore donmeye
             // devam eder ve golgeler onu izler. `Shadowmask` secseydik
             // golgeler pisirildigi saate CAKILIRDI.
+            // DENEY ANAHTARI: `-hezarfenAlbedo <x>`.
+            //
+            // Problar isik tasiyor ama sicrama karanlik ve A/B, APV'nin
+            // UYGULANDIGINI soyluyor (kapatilinca golge aydinlaniyor).
+            // Geriye firinin gordugu ALBEDO kaliyor: ilerlemeli firin
+            // sicramayi malzemenin albedosundan hesaplar. Bu anahtar
+            // `albedoBoost`u degistirip sonucun olceklenip
+            // olceklenmedigine bakmak icin.
+            string _ab = KomutSatiri("-hezarfenAlbedo");
+            if (!string.IsNullOrEmpty(_ab)
+                && float.TryParse(_ab,
+                    System.Globalization.NumberStyles.Float,
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    out float _abv))
+            {
+                ls.albedoBoost = _abv;
+                Debug.Log($"[Hezarfen] DENEY: albedoBoost = {_abv:0.##}");
+            }
             ls.mixedBakeMode = MixedLightingMode.IndirectOnly;
             ls.directSampleCount = 16;
             ls.indirectSampleCount = 16;

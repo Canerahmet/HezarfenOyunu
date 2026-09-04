@@ -48,6 +48,15 @@ def olc(yol):
                 en_cok=enCok.hex(), en_cok_orani=adet / max(1, sum(desen.values())))
 
 
+# L0'I YARIM-KAYAN OLARAK OLCMEK DENENDI VE GERI ALINDI.
+#
+# `CellData` sekiz baytlik bloklar halinde IKI ayri seyi tasiyor:
+# yarim-kayan L0 dortlulari ve `0x7f` dolu bayt blogu (notr L1).
+# Dosyanin tamamini `float16` diye okumak ikisini karistiriyor ve
+# ortaya 2247 gibi anlamsiz bir ortalama cikiyor — `0x7f7f` yarim
+# kayan olarak NaN/devasa. Ayrimi yapmadan buyukluk olcmek, olctugunu
+# sandigin seyi olcmemektir; saglam sinyal desen sayisi olarak kaldi.
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--kok", default=os.path.join(
@@ -65,6 +74,7 @@ def main():
         print(f"{ad:34s} {d['bayt']:10d} bayt  sifir %{d['sifir_orani']*100:5.1f}  "
               f"{d['farkli_desen']:6d} farkli desen  "
               f"en cok {d['en_cok']} (%{d['en_cok_orani']*100:.1f})")
+
     return 0
 
 
