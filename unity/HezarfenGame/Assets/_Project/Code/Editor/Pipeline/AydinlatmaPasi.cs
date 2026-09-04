@@ -9,8 +9,16 @@ namespace Hezarfen.Editor.Pipeline
     /// <summary>
     /// <b>Kalıcı ışık profilini tamamlar.</b>
     ///
-    /// Profil beş ayar taşıyordu: küresel aydınlatma, sis, poz,
-    /// tonemap, film grain. Dördü eksikti ve eksikliği şöyle görünür:
+    /// Profil beş ayar taşıyordu: sis, poz, tonemap, film grain,
+    /// hacimsel bulut. Dördü eksikti ve eksikliği şöyle görünür:
+    ///
+    /// <b>Düzeltme (ölçüm):</b> bu satır önce "küresel aydınlatma"
+    /// yazıyordu. Profil okundu ve öyle bir bileşen <b>yok</b>; üstelik
+    /// etkin kalite seviyesi <c>Balanced</c> ve o boru hattı varlığında
+    /// <c>supportSSGI: 0</c>, yani ekran uzayı GI derlemede de kapalı.
+    /// <c>lightProbeSystem</c> ise 1 (APV). Sonuç: bu oyunda dolaylı
+    /// yayınık ışığın tek kaynağı <b>APV</b>dir — gölgeleri bugün
+    /// aydınlatan sıcak ışık hacimsel sisten geliyor (bkz. ADR 0087).
     ///
     /// | eksik | yokluğunda ne olur |
     /// |---|---|

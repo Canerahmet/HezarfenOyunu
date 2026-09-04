@@ -438,10 +438,33 @@ Korelasyon **0,702**; kameranın bir yapının altında kaldığı üç bozuk
 durak çıkarılınca **0,675**. İşaret açık ve güçlü: ekranda ne kadar çok
 aydınlık yüzey varsa gölge o kadar mavi.
 
-**Bu, ekran uzayı imzasıdır.** Dünya uzayında pişmiş bir dolaylı terim
-kameranın ne gördüğüne bakmaz. Demek ki bugün gölgeyi aydınlatan şey
-profildeki **SSGI**'dir ve APV'nin katkısı ölçüm gürültüsünün içinde
-kalıyor.
+**Dünya uzayında pişmiş bir dolaylı terim kameranın ne gördüğüne
+bakmaz.** Yani gölgeyi bugün aydınlatan şey her ne ise, dolaylı ışık
+değil.
+
+İlk yazımda bunu "SSGI yapıyor" diye yazdım. **Yanlış** — ayarlar
+okundu:
+
+| ayar | değer |
+|---|---|
+| etkin kalite seviyesi | `m_CurrentQuality: 1` = **Balanced** |
+| `HDRP Balanced.supportSSGI` | **0** |
+| `HDRP Balanced.supportVolumetrics` | 1 |
+| `HDRP Balanced.lightProbeSystem` | 1 = **APV** |
+| `VP_Kalici_Aydinlatma` bileşenleri | Bloom, ColorAdjustments, ContactShadows, Exposure, FilmGrain, **Fog**, HDShadowSettings, LiftGammaGain, SSAO, Tonemapping, Vignette, VolumetricClouds |
+
+Ekran uzayı küresel aydınlatma **derlemede kapalı** ve profilde de öyle
+bir bileşen yok. `AydinlatmaPasi`'nın kendi açıklaması profilin "küresel
+aydınlatma" taşıdığını söylüyor; taşımıyor.
+
+Geriye tek aday kalıyor ve ölçülen renk onu gösteriyor: **hacimsel
+sis**. Sis güneşin rengiyle saçılır, gökle değil — gölgenin sıcak ve
+mavisiz olmasının sebebi bu. Aydınlık alanla korelasyon da buradan:
+açık karede kamera ile ufuk arasında çok daha fazla güneşli sis vardır.
+
+**Ve asıl sonuç bu:** `lightProbeSystem` APV, `supportSSGI` 0. Yani bu
+oyunda dolaylı yayınık ışığın **tek** kaynağı APV'dir. Fırın bir
+iyileştirme değil, aydınlatmanın kendisi.
 
 Tabloda bir istisna var ve o da aynı şeyi söylüyor: `03_galata_sokak`
 %48 aydınlık alana rağmen 0,100 okuyor, `07_kirsal` ise %53 ile 0,337.
