@@ -524,6 +524,53 @@ Bu yüzden sıradaki tek değişkenli deney B'yi bir **çözüm** olarak değil
 bir **ölçü aleti** olarak koşuyor: kaliteyi High Fidelity'ye alıp turu
 tekrarlamak, teşhisin doğru olup olmadığını fırın beklemeden söyler.
 
+### Albedo pişirildi ve ELENDİ
+
+`albedoBoost 8` ile D_Galata yeniden pişti (109,0 dk, 62 hücre,
+162.642.048 bayt, imza `639241297605820068` — önceki koşumdan farklı,
+yani veri gerçekten değişti). Kapı sayısı ölçüldü:
+
+| kare | önce (albedo 1) | sonra (albedo 8) | karedeki aydınlık alan |
+|---|---:|---:|---:|
+| 03_galata_sokak | 0,100 | **0,009** | %48,1 → %33,0 |
+| 05_ayasofya | 0,111 | **0,140** | %33,6 → %30,0 |
+| 07_kirsal | 0,337 | 0,343 | %53,5 → %55,0 |
+| 09_marmara | 0,310 | 0,340 | %61,6 → %71,2 |
+
+**Uyarı — bu satırlar temiz bir A/B değil.** Aynı turda durak
+yerleştirmesi de düzeltildi ve sahneye yeni çınar ile yeni karakterler
+girdi; `03` karesinin kadrajı belirgin biçimde değişti (aydınlık alan
+%48'den %33'e). Yani `03`'ün düşüşü fırına yazılamaz.
+
+Yazılabilecek olan şu: **hiçbir kapalı karede beklenen sıçrama yok.**
+Çarpan deneyinden çıkan hesap APV'nin karenin ~%0,65'ini kurduğunu
+söylüyordu; sekiz kat albedo bunu ~%5 mertebesine çıkarmalıydı ve
+`05`'te 0,111 → 0,140 (+%26) dışında bir iz bırakmadı. Açık kareler
+(07, 09) zaten sisten aydınlandığı için hiç oynamadı — beklendiği gibi.
+
+Sonuç: **albedo, sönüklüğün sebebi değil.** `LS_Hezarfen.lighting`
+içindeki `m_AlbedoBoost` 1'e geri alındı ve testi (`FirinGokyuzuTests`)
+yeşile döndü.
+
+### Birim uyuşmazlığı da ELENDİ — ölçüldü
+
+Hipotez şuydu: HDRP fiziksel şiddeti (lux) kendi bileşeninde tutar,
+ışık haritalayıcı ise dahili `Light.intensity`yi okur; ikisi ayrışırsa
+fırın yanlış güneşle pişer. Sahne açılıp okundu
+(`Hezarfen → Denetim → Gunes siddetini oku`):
+
+```
+Gunes 'SUN_Directional': Light.intensity=100000, HDRP.intensity=100000,
+                         birim=Lux, bakeType=Mixed, aktif=True, oran=1
+Gunes 'AY'             : Light.intensity=0, bakeType=Realtime, aktif=False
+```
+
+**Oran 1.** İki alan aynı sayıyı taşıyor, yani uyuşmazlık yok. Üstelik
+100.000 dahili ışık haritalayıcı için *çok büyük* bir sayıdır — beklenen
+kusur "sönük" değil "aşırı parlak" olurdu. Hipotez tersinden de düşüyor.
+
+Geriye kalan adaylar ve sıradaki adım ADR'nin sonundaki listede.
+
 ## Ölçülen dört sebep
 
 1. **Prob hacimleri dünya boyuydu.** Her semtin hacmi `Mode.Global`'dı ve

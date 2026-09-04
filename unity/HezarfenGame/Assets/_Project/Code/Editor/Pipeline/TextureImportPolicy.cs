@@ -26,7 +26,7 @@ namespace Hezarfen.Editor.Pipeline
         /// Politika değişince yeniden import tetikler. Artırılmazsa değişiklik
         /// diskteki eski ayarlarla yaşamaya devam eder.
         /// </summary>
-        public override uint GetVersion() => 1;
+        public override uint GetVersion() => 2;   // aniso 4 -> 8
 
         public static bool IsGoverned(string assetPath) =>
             assetPath.Replace('\\', '/').ToLowerInvariant().StartsWith(Governed);
@@ -72,7 +72,27 @@ namespace Hezarfen.Editor.Pipeline
             // Clamp olsaydi duvarin ilk 2 metresinden sonrasi tek renge yayilirdi.
             t.wrapMode = TextureWrapMode.Repeat;
             t.filterMode = FilterMode.Trilinear;
-            t.anisoLevel = 4;                              // sig acili duvar/cati icin
+            // SIG ACILI YUZEY: 4 yetmiyor.
+            //
+            // Iki gerekce, biri kesin biri hipotez — ayrildi ki
+            // karistirilmasin.
+            //
+            // KESIN OLAN: arazi hatti (`TerrainCoverBuilder`) dokularini
+            // zaten 8 ile aliyor. Ayni projede ayni ozelligin iki degeri
+            // olmasi, sebebi ne olursa olsun, yanlis.
+            //
+            // HIPOTEZ: Galata karesinde uzaktaki catilar kirmizi benek
+            // yigini olarak cikiyor. Iki aciklama olculup elendi —
+            // tarama degil (`tarama_gurultusu.py`, satranc ilintisi
+            // 0,0001), LOD'lar arasi UV kaymasi da degil
+            // (`uv_yogunlugu.py`, oran 1,00). Sig aci kaldi: 80 derece
+            // gelme acisinda dokunun en-boy orani 1/cos(80) ~ 5,8'dir ve
+            // aniso 4 bunu ortmez. 8, ~83 dereceye kadar orter.
+            //
+            // Hipotez KARE ILE dogrulanmadan bu satir bir cozum diye
+            // yazilmadi: 4'ten 8'e cikis tutarlilik icin dogru, benegi
+            // kapatip kapatmadigi ayri bir olcum.
+            t.anisoLevel = 8;
             t.mipmapEnabled = true;
             t.streamingMipmaps = true;
             t.maxTextureSize = 2048;

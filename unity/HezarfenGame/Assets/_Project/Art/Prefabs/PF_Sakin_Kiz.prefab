@@ -53,12 +53,12 @@ PrefabInstance:
       value: PF_Sakin_Kiz
       objectReference: {fileID: 0}
     - target: {fileID: 4742473837712756890, guid: c94ee35e0edd90640a9ac56887bded3e, type: 3}
-      propertyPath: m_FadeMode
-      value: 1
+      propertyPath: m_Size
+      value: 1.3845562
       objectReference: {fileID: 0}
     - target: {fileID: 4742473837712756890, guid: c94ee35e0edd90640a9ac56887bded3e, type: 3}
-      propertyPath: m_LocalReferencePoint.z
-      value: -0.05043307
+      propertyPath: m_FadeMode
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4742473837712756890, guid: c94ee35e0edd90640a9ac56887bded3e, type: 3}
       propertyPath: m_LODs.Array.data[0].fadeTransitionWidth

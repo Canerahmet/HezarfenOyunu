@@ -53,10 +53,6 @@ PrefabInstance:
       value: PF_Sakin_Kadin
       objectReference: {fileID: 0}
     - target: {fileID: 4742473837712756890, guid: f1917038e1ef084409f0b9a25a523f14, type: 3}
-      propertyPath: m_Size
-      value: 1.9520515
-      objectReference: {fileID: 0}
-    - target: {fileID: 4742473837712756890, guid: f1917038e1ef084409f0b9a25a523f14, type: 3}
       propertyPath: m_FadeMode
       value: 1
       objectReference: {fileID: 0}

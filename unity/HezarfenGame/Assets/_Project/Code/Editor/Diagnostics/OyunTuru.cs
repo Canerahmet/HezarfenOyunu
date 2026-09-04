@@ -46,6 +46,20 @@ namespace Hezarfen.Editor.Diagnostics
             public string ad;
             public Vector3 nokta;      // sıfırsa oyuncunun doğduğu yer
             public float bakisYaw;
+            /// <summary>
+            /// Açı araması bu durakta koşmaz.
+            ///
+            /// Arama, 12 m'den uzakta bir şeye çarpan yönü tercih eder —
+            /// yani <b>konu arar</b>. Denize bakan bir durakta bu ters
+            /// çalışır: deniz hiçbir şeye çarpmaz, arama karayı bulur ve
+            /// kamerayı konudan çevirir. `09_marmara` karesinde ölçüldü,
+            /// açı kayması <b>+60°</b> ve karede deniz sol üst köşede
+            /// ince bir şerit.
+            ///
+            /// Konusu boşluk olan durak — deniz, ufuk, gökyüzü — yönünü
+            /// kendi bilir.
+            /// </summary>
+            public bool yonSabit;
             public bool kos;           // gidip koşsun mu
             public string neden;
         }
@@ -141,8 +155,25 @@ namespace Hezarfen.Editor.Diagnostics
             new Durak { ad = "07_kirsal", nokta = new Vector3(-2500f, 0f, -600f),
                         bakisYaw = 45f,
                         neden = "Bostan, yol ve meyvelik — bos zemin sikayeti." },
+            // HALIC DURAGI SUYA BAKMIYORDU — YON OLCULDU.
+            //
+            // Duragin gerekcesi "dere agzi ve su" ama karede bastan sona
+            // kuru bir duzluk vardi; su yalnizca sol kenarda ince bir
+            // seritti. Rapor da bunu soyluyordu: `kadrajda TR_Istanbul
+            // @ 114 m`, aci kaymasi 0. Yani arama suclu degil, yaw
+            // bastan yanlisti.
+            //
+            // Yon `data/gis/istanbul/coastline_1632_local.json`den
+            // olculdu (`shoreline_1632` katmani, 357 nokta): duraga en
+            // yakin 1632 kiyi noktasi (-2992, 2569), **128 m** otede ve
+            // yonu **57 derece**. Eski 200 derece ondan 143 derece
+            // sapiyordu — suyun kadrajin disina dusmesi bu.
+            //
+            // `yonSabit`: konusu su olan durakta aci aramasi kosmaz;
+            // arama "bir seye carpan" yonu tercih eder ve deniz hicbir
+            // seye carpmaz (09_marmara'da olculdu, +60 derece cevirmisti).
             new Durak { ad = "08_halic_basi", nokta = new Vector3(-3100f, 0f, 2500f),
-                        bakisYaw = 200f,
+                        bakisYaw = 57f, yonSabit = true,
                         neden = "Dere agzi ve su." },
             // MARMARA DURAGI: DENIZ VAR AMA KIYI YOKTU.
             //
@@ -157,7 +188,7 @@ namespace Hezarfen.Editor.Diagnostics
             // -2501) denize dogru 35 m: sehrin kenari kadrajda kalir,
             // bakis yonu hala deniz.
             new Durak { ad = "09_marmara", nokta = new Vector3(-1678f, 0f, -2526f),
-                        bakisYaw = 180f,
+                        bakisYaw = 180f, yonSabit = true,
                         neden = "Kiyi, iskele ve deniz." },
             // USKUDAR DURAGI DA OLCUMLE TASINDI — GALATA ILE AYNI KUSUR.
             //
@@ -207,10 +238,44 @@ namespace Hezarfen.Editor.Diagnostics
         /// </summary>
         public static void TopluKos()
         {
+            // KALITE SEVIYESI KOMUT SATIRINDAN SECILEBILIR.
+            //
+            // `-hezarfenKalite 0` = High Fidelity, 1 = Balanced
+            // (varsayilan), 2 = Performant. Bir deney icin var: uc boru
+            // hatti varliginin `supportSSGI` degeri farkli (0/1/0) ve
+            // etkin seviye Balanced, yani ekran uzayi GI kapali. Gölgeyi
+            // neyin aydinlattigini fırın beklemeden sinamak icin turu
+            // High Fidelity'de kosmak yeterli — ayni sahne, ayni fırın,
+            // tek degisken.
+            //
+            // Bu bir AYAR degil bir ALETtir: oyunun kalite seviyesini
+            // degistirmez, yalniz bu kosumun.
+            foreach (var (ad, deger) in Argumanlar())
+                if (ad == "-hezarfenKalite"
+                    && int.TryParse(deger, out int _k)
+                    && _k >= 0 && _k < QualitySettings.names.Length)
+                {
+                    QualitySettings.SetQualityLevel(_k, true);
+                    Debug.Log($"[Hezarfen] Kalite seviyesi: "
+                              + $"{QualitySettings.names[_k]} (deney).");
+                }
+
             UnityEditor.SceneManagement.EditorSceneManager
                 .OpenScene(OyunSahnesi);
             EditorApplication.playModeStateChanged += DurumDegisti;
             EditorApplication.EnterPlaymode();
+        }
+
+        /// <summary>
+        /// Komut satırındaki <c>-ad deger</c> çiftleri. Toplu kipte
+        /// başka türlü parametre geçirmenin yolu yok.
+        /// </summary>
+        private static System.Collections.Generic.IEnumerable<
+            (string ad, string deger)> Argumanlar()
+        {
+            var a = System.Environment.GetCommandLineArgs();
+            for (int i = 0; i < a.Length - 1; i++)
+                yield return (a[i], a[i + 1]);
         }
 
         private static void DurumDegisti(PlayModeStateChange d)
@@ -343,7 +408,8 @@ namespace Hezarfen.Editor.Diagnostics
                 satirlar.Add("| durak | konum (x, z) | ayak altinda "
                              + "| arazi farki | kamera kolu "
                              + "| 40 m'de NPC | cizilen govde | replik / menzilde "
-                             + "| kadrajda | semt (bekleme) | apv | acik dugum "
+                             + "| kadrajda | semt (bekleme) | apv "
+                             + "| acik dugum (* = ikinci pas) "
                              + "| durak sapmasi (m) "
                              + "| kayma (m) | tepe acik / neyin altinda "
                              + "| aci kaymasi "
@@ -415,6 +481,153 @@ namespace Hezarfen.Editor.Diagnostics
                 var cc = oyuncu.GetComponent<CharacterController>();
                 var dogum = oyuncu.transform.position;
 
+                // DURAGI SOKAGA OTURTAN ARAMA — IKI KEZ KOSAR.
+                //
+                // Ilk kosum semt akisi BASLAMADAN once olur ve zorunlu:
+                // oyuncu bir yere konmadan akis hangi semti yukleyecegini
+                // bilemez. Ama o anda sehir henuz YOKtur, yani her dugum
+                // "tepesi acik" gorunur. Turda olculdu: uc durakta rapor
+                // "acik dugum: E" yazdi ve ayni satirda "tepe: PF_Hamam_A
+                // @ 1,1 m" — ikisi ayni anda dogru olamaz, ve kareye
+                // bakilinca kamera gercekten hamamin altindaydi.
+                //
+                // Bu, bu turda bir kez daha dusulen ayni tuzak: ACI
+                // ARAMASI da akistan once kosuyordu ve "her yon bos"
+                // okuyordu; o blok akistan sonraya alinmisti. Yerlestirme
+                // bir blok yukarida ayni hatayla kaldi. Bu yuzden arama
+                // bir fonksiyon oldu ve akis oturduktan sonra TEKRAR
+                // cagriliyor — bu sefer sehir yerindeyken.
+                // Dugum bulunduktan sonra ZEMINE oturtur. Ayri
+                // duruyor cunku iki yerlestirme pasi da ayni oturtmayi
+                // ister; iki kopya olsaydi biri duzeltilip oteki
+                // unutulurdu — bu depoda "bir sayinin iki sahibi" olarak
+                // uc kez ciktı.
+                Vector3 ZemineOturt(Vector3 nokta)
+                {
+                    // Yuzeyi bul: arazi kotu yeterli degil, kaldirim
+                    // ve kaide arazinin USTUNDE.
+                    // ZEMIN KATINA IN — CATIYA DEGIL.
+                    //
+                    // Yukaridan atilan isin once CATIYA carpiyor ve
+                    // durak orada aciliyordu: olcumde Ayasofya'nin
+                    // kubbesinde +70,1 m, Uskudar Mihrimah'ta +41,6 m
+                    // cikti. Cati uzerinden alinan kare ne kalabaligi
+                    // ne dokuyu gosterir.
+                    //
+                    // Cozum: yuzey arazi kotundan 2 m'den fazla
+                    // yukaridaysa yok sayilir ve arazi kotu kullanilir.
+                    float ilkKot = arazi != null
+                        ? arazi.SampleHeight(nokta) + arazi.transform.position.y
+                        : 0f;
+                    float yuzey = ilkKot;
+                    var tepe = new Vector3(nokta.x, ilkKot + 6f, nokta.z);
+                    if (Physics.Raycast(tepe, Vector3.down, out var v, 12f,
+                                        ~0, QueryTriggerInteraction.Ignore)
+                        && v.point.y - ilkKot <= 2f)
+                        yuzey = v.point.y;
+                    nokta = new Vector3(nokta.x, yuzey + 0.3f, nokta.z);
+                    return nokta;
+                }
+
+                Vector3 DuragiOturt(Vector3 nokta, out bool acik)
+                {
+                    acik = false;
+                    if (graf == null || graf.dugumler.Count == 0) return nokta;
+                    // BOS dugum aranir, en yakin degil.
+                    //
+                    // En yakini almak yetmedi: dugum bir yapinin
+                    // icindeyse oyuncu orada dogar, fizik onu
+                    // disari iterken zeminden gecirir ve arazinin
+                    // 15 m altina duser. Turda uc durakta birden
+                    // oldu.
+                    var sirali = new List<Vector3>();
+                    foreach (var n in graf.dugumler) sirali.Add(n.konum);
+                    sirali.Sort((a, b) =>
+                        (new Vector2(a.x, a.z) - new Vector2(nokta.x, nokta.z))
+                            .sqrMagnitude.CompareTo(
+                        (new Vector2(b.x, b.z) - new Vector2(nokta.x, nokta.z))
+                            .sqrMagnitude));
+
+                    // IKI GECIS: once tepesi ACIK bir dugum
+                    // aranir, bulunamazsa eski davranisa dusulur
+                    // (Surici gercekten kapali olabilir ve kare
+                    // hic olmamasindan iyidir).
+                    for (int gecis = 0; gecis < 2; gecis++)
+                    {
+                    bool acikAra = gecis == 0;
+                    bool bulundu = false;
+                    foreach (var aday in sirali)
+                    {
+                        // DURAK BIR YERDIR; 2 km oteden cekilen
+                        // kare baska bir yerin karesidir.
+                        //
+                        // Liste mesafeye gore SIRALI, yani ilk
+                        // asan noktada durmak yeterli. Sinir
+                        // 150 m: bir mahalle capinin yarisi —
+                        // durak hala "orasi" sayilir, ama
+                        // sehrin obur ucuna kacamaz.
+                        if ((new Vector2(aday.x, aday.z)
+                             - new Vector2(nokta.x, nokta.z))
+                            .sqrMagnitude > EnCokDurakSapmasi
+                                            * EnCokDurakSapmasi)
+                            break;
+
+                        float ak2 = arazi != null
+                            ? arazi.SampleHeight(aday)
+                              + arazi.transform.position.y
+                            : aday.y;
+                        float yz = ak2;
+                        if (Physics.Raycast(
+                                new Vector3(aday.x, ak2 + 8f, aday.z),
+                                Vector3.down, out var vv, 20f, ~0,
+                                QueryTriggerInteraction.Ignore))
+                            yz = vv.point.y;
+                        // ZEMIN, EVIN YA DA CESMENIN USTU DEGIL.
+                        //
+                        // Esik once 2 m idi ve mektebin catisini
+                        // (+5,8 m) eledi — ama sadirvani elemedi:
+                        // kenari araziden 1,0 m yukarida ve tur
+                        // dort durakta birden oyuncuyu cesmenin
+                        // USTUNE koydu. Karelerde adam suyun
+                        // uzerinde duruyor.
+                        //
+                        // 0,35 m secildi cunku olculebilir bir
+                        // seye dayaniyor: kaldirim bir rihtta
+                        // 0,17 m yukselir (kaldirim_denetimi.md),
+                        // iki riht 0,34. Yani kaldirim gecer,
+                        // cesme kenari gecmez.
+                        if (yz - ak2 > 0.35f) continue;
+                        if (Physics.CheckCapsule(
+                                new Vector3(aday.x, yz + 0.45f, aday.z),
+                                new Vector3(aday.x, yz + 1.55f, aday.z),
+                                0.32f, ~0,
+                                QueryTriggerInteraction.Ignore))
+                            continue;
+                        // BASIN USTU DE ACIK OLMALI.
+                        //
+                        // Kapsul denetimi 1,55 m'ye bakiyor ve
+                        // cumbali bir sokakta o yukseklik hep
+                        // bostur; oysa cikma 2,5 m'de baslar.
+                        // Sonuc olculdu: on duragin dordunde kare,
+                        // oyuncunun UZERINDEKI katin tabanini
+                        // gosteriyordu — sehir degil, bir tavan.
+                        // Bir gozlem araci, gozleyecegi seyin
+                        // altinda duramaz.
+                        if (acikAra && Physics.Raycast(
+                                new Vector3(aday.x, yz + 1.8f, aday.z),
+                                Vector3.up, 3.2f, ~0,
+                                QueryTriggerInteraction.Ignore))
+                            continue;
+                        nokta = new Vector3(aday.x, nokta.y, aday.z);
+                        bulundu = true;
+                        acik = acikAra;
+                        break;
+                    }
+                    if (bulundu) break;
+                    }
+                    return nokta;
+                }
+
                 foreach (var d in duraklar)
                 {
                     // --- ISINLA ---
@@ -441,127 +654,13 @@ namespace Hezarfen.Editor.Diagnostics
                         // Yanlis yere bakan bir olcu aleti, olmayan bir
                         // kusur bildirir; bu oturumda tam olarak bu hata
                         // bes kez tekrarlandi.
-                        if (graf != null && graf.dugumler.Count > 0)
-                        {
-                            // BOS dugum aranir, en yakin degil.
-                            //
-                            // En yakini almak yetmedi: dugum bir yapinin
-                            // icindeyse oyuncu orada dogar, fizik onu
-                            // disari iterken zeminden gecirir ve arazinin
-                            // 15 m altina duser. Turda uc durakta birden
-                            // oldu.
-                            var sirali = new List<Vector3>();
-                            foreach (var n in graf.dugumler) sirali.Add(n.konum);
-                            sirali.Sort((a, b) =>
-                                (new Vector2(a.x, a.z) - new Vector2(hedef.x, hedef.z))
-                                    .sqrMagnitude.CompareTo(
-                                (new Vector2(b.x, b.z) - new Vector2(hedef.x, hedef.z))
-                                    .sqrMagnitude));
+                        hedef = DuragiOturt(hedef, out acikBulundu);
 
-                            // IKI GECIS: once tepesi ACIK bir dugum
-                            // aranir, bulunamazsa eski davranisa dusulur
-                            // (Surici gercekten kapali olabilir ve kare
-                            // hic olmamasindan iyidir).
-                            for (int gecis = 0; gecis < 2; gecis++)
-                            {
-                            bool acikAra = gecis == 0;
-                            bool bulundu = false;
-                            foreach (var aday in sirali)
-                            {
-                                // DURAK BIR YERDIR; 2 km oteden cekilen
-                                // kare baska bir yerin karesidir.
-                                //
-                                // Liste mesafeye gore SIRALI, yani ilk
-                                // asan noktada durmak yeterli. Sinir
-                                // 150 m: bir mahalle capinin yarisi —
-                                // durak hala "orasi" sayilir, ama
-                                // sehrin obur ucuna kacamaz.
-                                if ((new Vector2(aday.x, aday.z)
-                                     - new Vector2(hedef.x, hedef.z))
-                                    .sqrMagnitude > EnCokDurakSapmasi
-                                                    * EnCokDurakSapmasi)
-                                    break;
-
-                                float ak2 = arazi != null
-                                    ? arazi.SampleHeight(aday)
-                                      + arazi.transform.position.y
-                                    : aday.y;
-                                float yz = ak2;
-                                if (Physics.Raycast(
-                                        new Vector3(aday.x, ak2 + 8f, aday.z),
-                                        Vector3.down, out var vv, 20f, ~0,
-                                        QueryTriggerInteraction.Ignore))
-                                    yz = vv.point.y;
-                                // ZEMIN, EVIN YA DA CESMENIN USTU DEGIL.
-                                //
-                                // Esik once 2 m idi ve mektebin catisini
-                                // (+5,8 m) eledi — ama sadirvani elemedi:
-                                // kenari araziden 1,0 m yukarida ve tur
-                                // dort durakta birden oyuncuyu cesmenin
-                                // USTUNE koydu. Karelerde adam suyun
-                                // uzerinde duruyor.
-                                //
-                                // 0,35 m secildi cunku olculebilir bir
-                                // seye dayaniyor: kaldirim bir rihtta
-                                // 0,17 m yukselir (kaldirim_denetimi.md),
-                                // iki riht 0,34. Yani kaldirim gecer,
-                                // cesme kenari gecmez.
-                                if (yz - ak2 > 0.35f) continue;
-                                if (Physics.CheckCapsule(
-                                        new Vector3(aday.x, yz + 0.45f, aday.z),
-                                        new Vector3(aday.x, yz + 1.55f, aday.z),
-                                        0.32f, ~0,
-                                        QueryTriggerInteraction.Ignore))
-                                    continue;
-                                // BASIN USTU DE ACIK OLMALI.
-                                //
-                                // Kapsul denetimi 1,55 m'ye bakiyor ve
-                                // cumbali bir sokakta o yukseklik hep
-                                // bostur; oysa cikma 2,5 m'de baslar.
-                                // Sonuc olculdu: on duragin dordunde kare,
-                                // oyuncunun UZERINDEKI katin tabanini
-                                // gosteriyordu — sehir degil, bir tavan.
-                                // Bir gozlem araci, gozleyecegi seyin
-                                // altinda duramaz.
-                                if (acikAra && Physics.Raycast(
-                                        new Vector3(aday.x, yz + 1.8f, aday.z),
-                                        Vector3.up, 3.2f, ~0,
-                                        QueryTriggerInteraction.Ignore))
-                                    continue;
-                                hedef = new Vector3(aday.x, hedef.y, aday.z);
-                                bulundu = true;
-                                acikBulundu = acikAra;
-                                break;
-                            }
-                            if (bulundu) break;
-                            }
-                        }
-
-                        // Yuzeyi bul: arazi kotu yeterli degil, kaldirim
-                        // ve kaide arazinin USTUNDE.
-                        // ZEMIN KATINA IN — CATIYA DEGIL.
-                        //
-                        // Yukaridan atilan isin once CATIYA carpiyor ve
-                        // durak orada aciliyordu: olcumde Ayasofya'nin
-                        // kubbesinde +70,1 m, Uskudar Mihrimah'ta +41,6 m
-                        // cikti. Cati uzerinden alinan kare ne kalabaligi
-                        // ne dokuyu gosterir.
-                        //
-                        // Cozum: yuzey arazi kotundan 2 m'den fazla
-                        // yukaridaysa yok sayilir ve arazi kotu kullanilir.
-                        float ilkKot = arazi != null
-                            ? arazi.SampleHeight(hedef) + arazi.transform.position.y
-                            : 0f;
-                        float yuzey = ilkKot;
-                        var tepe = new Vector3(hedef.x, ilkKot + 6f, hedef.z);
-                        if (Physics.Raycast(tepe, Vector3.down, out var v, 12f,
-                                            ~0, QueryTriggerInteraction.Ignore)
-                            && v.point.y - ilkKot <= 2f)
-                            yuzey = v.point.y;
-                        hedef = new Vector3(hedef.x, yuzey + 0.3f, hedef.z);
+                        hedef = ZemineOturt(hedef);
                     }
 
                     var konulan = hedef;
+                    bool ikinciPas = false;
                     cc.enabled = false;
                     oyuncu.transform.position = hedef;
                     oyuncu.transform.rotation = Quaternion.Euler(0f, d.bakisYaw, 0f);
@@ -692,6 +791,80 @@ namespace Hezarfen.Editor.Diagnostics
                     // oturmasi.
                     for (int i = 0; i < 60; i++) yield return null;
 
+                    // IKINCI YERLESTIRME — SEHIR GELDIKTEN SONRA.
+                    //
+                    // Ilk yerlestirme akis baslamadan yapildi ve o anda
+                    // her dugum "tepesi acik" gorunuyordu. Sehir gelince
+                    // durum degisebilir: turda uc durakta rapor "acik
+                    // dugum: E" derken ayni satir "tepe: PF_Hamam_A @ 1,1
+                    // m" yaziyordu ve kare kamerayi gercekten bir yapinin
+                    // altinda gosteriyordu. Sapan uc durak sehrin en uzak
+                    // uclarindaydi (-3555, +4843, Surici) — yani en cok
+                    // akis bekleyenler.
+                    //
+                    // Burada yalnizca GEREKIRSE tasinir: tepe kapaliysa
+                    // ya da kapsul bir seye giriyorsa. Boylece yerinde
+                    // duran duraklar oynatilmaz ve `durak sapmasi`
+                    // sutunu anlamini korur.
+                    if (d.nokta != Vector3.zero && graf != null)
+                    {
+                        // OLCUM BOYUNCA OYUNCUNUN KAPSULU KAPALI.
+                        //
+                        // Hem "burasi kapali mi" sinavi hem de aday
+                        // noktanin zemini oyuncunun DURDUGU yerde fizik
+                        // sorgusu yapiyor. Kapsul acikken iki sorgu da
+                        // once ONA carpiyor: `CheckCapsule` her zaman
+                        // dolu diyor (yani ikinci pas her durakta
+                        // tetikleniyor) ve `ZemineOturt` yuzey diye
+                        // oyuncunun kendi basinin tepesini okuyor.
+                        // Turda ikisi birden olculdu: on duragin
+                        // sekizinde `*` isareti ve bes durakta `arazi
+                        // farki` +0,3 yerine **+2,1** — tam bir insan
+                        // boyu.
+                        //
+                        // Bir olcu aleti, olctugu seyin icinde duramaz.
+                        cc.enabled = false;
+                        Physics.SyncTransforms();
+                        var _p = oyuncu.transform.position;
+                        bool _kapali = Physics.Raycast(
+                            _p + Vector3.up * 1.8f, Vector3.up, 3.2f, ~0,
+                            QueryTriggerInteraction.Ignore);
+                        bool _giriyor = Physics.CheckCapsule(
+                            _p + Vector3.up * 0.45f, _p + Vector3.up * 1.55f,
+                            0.32f, ~0, QueryTriggerInteraction.Ignore);
+                        if (_kapali || _giriyor)
+                        {
+                            // ADAY DAHA IYI DEGILSE TASINMAZ.
+                            //
+                            // Pas tetiklenince kosulsuz tasiyordu ve
+                            // arama daha iyi bir dugum bulamadiginda ham
+                            // noktayi donduruyor; onu kabul etmek ilk
+                            // pasin dogru buldugu yeri bozmak demek.
+                            bool _bul;
+                            var _yeni = ZemineOturt(
+                                DuragiOturt(d.nokta, out _bul));
+                            bool _iyi = !Physics.Raycast(
+                                    _yeni + Vector3.up * 1.8f, Vector3.up,
+                                    3.2f, ~0,
+                                    QueryTriggerInteraction.Ignore)
+                                && !Physics.CheckCapsule(
+                                    _yeni + Vector3.up * 0.45f,
+                                    _yeni + Vector3.up * 1.55f, 0.32f, ~0,
+                                    QueryTriggerInteraction.Ignore);
+                            if (_iyi)
+                            {
+                                acikBulundu = _bul;
+                                oyuncu.transform.position = _yeni;
+                                konulan = _yeni;
+                                ikinciPas = true;
+                            }
+                        }
+                        cc.enabled = true;
+                        Physics.SyncTransforms();
+                        if (ikinciPas)
+                            for (int i = 0; i < 30; i++) yield return null;
+                    }
+
                     // ACI ARAMASI **SEMT YUKLENDIKTEN SONRA**.
                     //
                     // Bu blok akis beklemesinden ONCE kosuyordu ve
@@ -724,7 +897,7 @@ namespace Hezarfen.Editor.Diagnostics
                     // Kalabaliga donulduyse dokunulmaz: o karar bundan
                     // daha iyi bir sebebe dayaniyor.
                     float aciKaymasi = 0f;
-                    if (!kalabaligaDonuldu)
+                    if (!kalabaligaDonuldu && !d.yonSabit)
                     {
                         var goz = oyuncu.transform.position
                                   + Vector3.up * 1.6f;
@@ -1027,7 +1200,10 @@ namespace Hezarfen.Editor.Diagnostics
                                  + $"{kadrajda} @ {kadrajUzak:0} m | "
                                  + $"{akisSemt} ({akisBekleme:0.0} sn) | "
                                  + $"{apv} | "
-                                 + $"{(acikBulundu ? "E" : "H")} | "
+                                 // `*` = ikinci pas tasidi (sehir
+                                 // geldikten sonra yer kapali cikti).
+                                 + $"{(acikBulundu ? "E" : "H")}"
+                                 + $"{(ikinciPas ? "*" : "")} | "
                                  + $"{durakSapmasi:0} | "
                                  + $"{kayma:0.0} | "
                                  + $"{(tepeAcik ? "E" : tepeAd)} | "
