@@ -230,25 +230,56 @@ python tools/olcum/golge_orani.py --dilim 0.5 --bolge 650,455,1010,505 `
   renders/tur/03_galata_sokak.png
 ```
 
-### Sonucu ÖNCEDEN yazıyorum (yanlış çıkabilsin diye)
+### Tahmin yazıldı, koşuldu, **tutmadı** — ve okumam yanlışmış
 
-Poz 90 seçilirken hesap şuydu ve buraya sonuç görülmeden yazılıyor:
+Poz 90 için beklenti sonuç görülmeden yazılmıştı: gölgenin mavi/kırmızı
+oranı **0,15-0,35** bandına çıkacaktı. Fırın koştu (95,2 dk, 62 hücre,
+155 MB, 38.237 desen) ve ölçüm:
 
-* Gölgede mavi/kırmızı bugün **0,005** mertebesinde (0,0001 / 0,0202),
-  yani probun içindeki gök payı yüzde yarım kadar.
-* Kaldıraç doğrusal ölçüldü (69,2 kat). Gök terimi 69 katına çıkarsa
-  bugünkü gölgenin kabaca **dörtte biri ile üçte biri** kadar bir gök
-  katkısı eklenir.
-* O da mavi/kırmızı oranını **0,2-0,3** bandına taşır — aynı sahnede
-  çıplak araziye bakan karelerin ailesi (0,26-0,30).
+```
+poz  1,3 : golge 0,0202 / 0,0061 / 0,0001   mavi/kirmizi 0,000
+poz 90   : golge 0,0201 / 0,0061 / 0,0001   mavi/kirmizi 0,000
+```
 
-**Beklenti: gölgenin mavi/kırmızı oranı 0,15 ile 0,35 arasına çıkar.**
+Gökyüzü fırında **69 kat** parlatıldı ve karede **hiçbir şey**
+değişmedi.
 
-Çıkmazsa hesabın bir yerinde yanlış varsayım var demektir ve o zaman
-aranacak şey çarpan değil, varsayım: en muhtemel adayı, sokak
-seviyesindeki probun gördüğü gök parçasının tahmin edilenden çok daha
-dar olması. Bunu ayırt etmek için açık bir meydanda (kadraj `PF_Dukkan_B`
-yerine gökyüzü gören bir nokta) ikinci bir ölçüm yeter.
+Bu, bir saat önceki okumamı da çürütüyor. *"APV kapatılınca gölge
+aydınlanıyor (0,0217 > 0,0202), demek ki uygulanıyor"* demiştim; 69
+katlık bir değişimin sıfır fark yaptığını görünce o %7'nin koşumlar
+arası gürültü olduğu anlaşılıyor. **Doğru okuma ilkiydi: pişmiş APV
+verisi kareye hiç ulaşmıyor.**
+
+### Elenenler — hepsi okundu, hepsi "açık" diyor
+
+| halka | okunan |
+|---|---|
+| diskteki veri | 62 hücre, 155 MB, 38.237 desen |
+| çalışma zamanı | `kurulu` |
+| pişirme kümesi | `Faz1_Terrain Baking Set` bağlı |
+| aydınlatma senaryosu | `'Default'` — diskteki `-Default` ile aynı |
+| çizici `m_ReceiveGI` | semt sahnelerinde 24.367 kez **2 = LightProbes** |
+| çizici `m_LightProbeUsage` | 1 = BlendProbes |
+| boru hattı | dört varlıkta da `lightProbeSystem: 1` |
+| kamera kare ayarı | `AdaptiveProbeVolume` açıkça yazıldı |
+| `ProbeVolumesOptions` | `intensityMultiplier: 1`, `active: 1` |
+| gölgeli **duvar** (arazi değil) | mavi 0,0001 — kusur araziye özgü değil |
+| albedo | `albedoBoost 8` → %1,5 |
+| fırının gök parlaklığı | 69 kat → sıfır fark |
+
+Okunabilir her anahtar açık ve sonuç değişmiyor. Elemenin kendisi bir
+bulgu: sebep bunların hiçbirinde değil.
+
+### Sıradaki adım GUI ister — Caner'e istek
+
+Toplu kipten okunamayan tek alet **Rendering Debugger'ın Probe Volume
+sekmesi**: yüklü hücreleri ve probları sahnede gösteriyor. Bir kez
+Editor açıp Galata durağında (300, 100) bakmak *"hücreler yükleniyor mu,
+problar orada mı, değerleri ne"* sorusunu doğrudan cevaplar.
+
+CLAUDE.md, ben toplu iş koştururken Editor'ü kapalı tutuyor; bu yüzden
+bu adım Caner'in. Yol: **Window → Rendering → Rendering Debugger →
+Probe Volume**, `Display Probes` açık, `Probe Shading Mode: SH`.
 
 **Okunuş.** Fırın öncesi gölge `0,0202 / 0,0061 / 0,0001`, mavi/kırmızı
 **0,000**. Aynı sahnede çıplak araziye bakan kareler 0,26-0,30 okuyor.
