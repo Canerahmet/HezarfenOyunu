@@ -51,8 +51,16 @@ deforme olmuyor.
 3. **Olduğu gibi kalsın.** 1,60 m'lik bir figür oyunda çoğunlukla 10 m
    öteden görülüyor; dikiş o mesafede okunmuyor olabilir. Ölçülmedi.
 
-Önerim **1**: tarihsel olarak savunulabilir (feracenin beli toplanır),
-üçgen maliyeti birkaç yüz, ve kusuru kaynağında değil göründüğü yerde
+Önerim **1**, ve gerekçesi artık tercih değil **gözlem**: aynı dikiş
+erkekte de var (`Sakin_Erkek`, entari eteği belden başlıyor) ama
+inceleme karesinde **görünmüyor** — çünkü erkekte kuşak orada duruyor
+ve tam olarak o dikişi örtüyor. İki figür yan yana konunca fark
+kumaşta değil, o bantta. Kodun eski turu bunu zaten yazmıştı ("etek
+kuşağın altında başlarsa dikiş kuşakla örtülür"); kadında bant
+kaldırılınca dikiş açığa çıktı.
+
+Tarihsel olarak da savunulabilir: feracenin beli toplanır. Üçgen
+maliyeti birkaç yüz, ve kusuru kaynağında değil göründüğü yerde
 kapatıyor.
 
 ## Ayrıca kayda geçen, henüz sorulmayanlar
@@ -73,6 +81,21 @@ kapatıyor.
 - **Ön kol çıplak.** Sokak kıyafetinde ferace kolu bileğe iner; şu an
   dirsek altı ten görünüyor.
 - **Ayakkabı** sarı bir kütle; mest/pabuç ayrımı yok.
+
+## Ölçülüp ELENEN bir şüphe
+
+Kızın yüzü yetişkin gibi duruyor diye çocuk oranları ölçüldü — kafa
+boyu / boy:
+
+| figür | boy | kafa | oran |
+|---|---:|---:|---:|
+| Sakin_Erkek | 1,778 | 0,277 | 1/6,41 |
+| Sakin_Oglan | 1,246 | 0,184 | 1/6,76 |
+| Sakin_Kiz | 1,228 | 0,192 | 1/6,41 |
+
+Çocukta kafa/boy oranı 1/6 civarındadır; ölçüm bunu veriyor. Yani
+**oranlar doğru**; kızın yetişkin görünmesi orantıda değil yüz
+hatlarında. Ayrı bir soru, ve şimdilik açık.
 
 ## Onay
 
