@@ -1612,14 +1612,30 @@ def main():
         hz.log("FBX yazilmadi (--export ile): karakter rig'siz Unity'ye gitmez.")
 
     catalog.sort(key=lambda v: v["name"])
-    # Kismi kosuda katalog YAZILMAZ: `--only` ile bir varyanti uretip
-    # katalogu ustune yazmak, uretilmeyen sekizinin kaydini silerdi —
-    # ve kayit silinince "hangi varyant kac ucgen" sorusunun cevabi
-    # sessizce kaybolurdu.
-    if args.only:
-        hz.log(f"kismi kosu ({args.only}) — katalog yazilmadi")
-        return
+    # KISMI KOSUDA KATALOG BIRLESTIRILIR — ATLANMAZ.
+    #
+    # Once `--only` verildiginde katalog hic yazilmiyordu ve gerekcesi
+    # dogruydu: butun dosyayi tek varyantla ustune yazmak otekilerin
+    # kaydini silerdi. Ama atlamanin da bir bedeli var ve olculdu:
+    # `--only Sakin_Kadin` ile etek halka sayisi degistirildi, blend
+    # 53.524'ten 54.340 ucgene cikti ve **katalog 53.524 demeye devam
+    # etti**. Yani kayit varlikla celisti; ustelik depo kurali
+    # ("commit'lemeden once katalog diff'ine bak") tam da bu kayda
+    # dayaniyor — sessizce yalan soyleyen bir kayit, o kurali
+    # calismaz hale getirir.
+    #
+    # Dogru davranis ucuncu secenek: diskteki katalogu OKU, uretilen
+    # varyantlarin satirini degistir, otekileri oldugu gibi birak.
     os.makedirs(os.path.dirname(os.path.abspath(args.catalog)), exist_ok=True)
+    if args.only and os.path.exists(args.catalog):
+        with open(args.catalog, encoding="utf-8") as fh:
+            eski = json.load(fh).get("variants", [])
+        yeni_adlar = {k.get("name") for k in catalog}
+        birlesik = [k for k in eski if k.get("name") not in yeni_adlar]
+        birlesik.extend(catalog)
+        birlesik.sort(key=lambda k: str(k.get("name", "")))
+        catalog = birlesik
+        hz.log(f"kismi kosu ({args.only}) — katalog BIRLESTIRILDI")
     with open(args.catalog, "w", encoding="utf-8") as fh:
         json.dump({"variants": catalog}, fh, ensure_ascii=False, indent=1)
     hz.log(f"{len(catalog)} karakter durumu; katalog: {args.catalog}")

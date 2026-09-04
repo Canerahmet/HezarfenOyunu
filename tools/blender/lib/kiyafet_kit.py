@@ -452,7 +452,7 @@ def bilek_olc(obj, cizgi, filtre, en_cok, alt=0.45):
 # duser ve yumusatma isini yapabilir. Bedeli 64 dortgen.
 def etek(ad, col, z_ust, z_alt, r_ust, r_alt, kalinlik, segment=64,
          yarik=False, cy=0.0, cy_alt=None,
-         kirisik=9, kirisik_pay=0.035):
+         kirisik=9, kirisik_pay=0.035, halka_sayisi=5, egri=1.0):
     """Belden aşağı **serbest** düşen etek — bacakları takip etmez.
 
     Entarinin eteği gövdeye yapışmaz, konidir. Kabuk yöntemiyle üretseydim
@@ -462,13 +462,37 @@ def etek(ad, col, z_ust, z_alt, r_ust, r_alt, kalinlik, segment=64,
     `yarik`: önde açıklık (binme ve yürüme için). Plaka 20'de entari önden
     açıktır ve altındaki koyu iç entari görünür.
     """
+    # ETEK COK HALKALI — AMA PROFIL DUZ KALIYOR (egri = 1,0).
+    #
+    # Ferace incelemesinde belde keskin bir dikis okunuyordu. Once
+    # "basamak var" sanildi; olculdu ve basamak **8 mm / 3 mm** cikti
+    # (`ferace dikisi` satiri), yani goze gorunen sey yaricap farki
+    # degil, TEGET kirilmasi: kabuk asagi-iceri inerken koni birden
+    # asagi-disari aciliyor.
+    #
+    # Denendi ve OLCUM REDDETTI: yaricap `t**1,6` ile ilerletilince
+    # etek ust ucta dikeye yaklasti, dikis yumusadi — ama ayni turda
+    # etegin yan tarafinda **kirmizi salvar** goründü. Sebep yapisal:
+    # `r_ust` kabugun yaricapina, `r_alt` da altta kalanlarin zarfina
+    # (`alt_zarf`) sabit. Bu iki ucu birlestiren egrilerin ICE bukuk
+    # olani zarfin icine giriyor. Yani "ust ucu dikey baslasin" ile
+    # "altindakini ortsun" ayni anda saglanamaz — duz koni bu iki
+    # sartin TEK cozumudur.
+    #
+    # Halka sayisi yine de 2'den 5'e cikti: geometri ayni (egri 1,0
+    # dogrusaldir) ama etek animasyonda kalcadan dize kadar tek bir
+    # dortgenle deforme olmuyor. Dikis meselesi acik kaldi ve
+    # `docs/feedback/sakin_kadin.md`de Caner'e soruldu.
     bm = bmesh.new()
     halkalar = []
     cy_a = cy if cy_alt is None else cy_alt
-    for t in (0.0, 1.0):
+    hs = max(2, int(halka_sayisi))
+    for k in range(hs):
+        t = k / (hs - 1.0)
+        f = t ** egri
         z = z_ust + (z_alt - z_ust) * t
-        rx = r_ust[0] + (r_alt[0] - r_ust[0]) * t
-        ry = r_ust[1] + (r_alt[1] - r_ust[1]) * t
+        rx = r_ust[0] + (r_alt[0] - r_ust[0]) * f
+        ry = r_ust[1] + (r_alt[1] - r_ust[1]) * f
         cy_t = cy + (cy_a - cy) * t
         halka = []
         for i in range(segment):
@@ -494,12 +518,14 @@ def etek(ad, col, z_ust, z_alt, r_ust, r_alt, kalinlik, segment=64,
                  cy_t + math.sin(a) * ry * dalga, z)))
         halkalar.append(halka)
 
-    ust, alt = halkalar
+    ust, alt = halkalar[0], halkalar[-1]
     n = segment
     on = int(round(n * 0.75))          # -y yonundeki dilim
-    for i in range(n):
-        j = (i + 1) % n
-        bm.faces.new((ust[i], ust[j], alt[j], alt[i]))
+    for h in range(len(halkalar) - 1):
+        a_h, b_h = halkalar[h], halkalar[h + 1]
+        for i in range(n):
+            j = (i + 1) % n
+            bm.faces.new((a_h[i], a_h[j], b_h[j], b_h[i]))
 
     # YARIK BIR DELIK DEGIL, BIR BINDIRMEDIR.
     #
@@ -514,10 +540,11 @@ def etek(ad, col, z_ust, z_alt, r_ust, r_alt, kalinlik, segment=64,
     if yarik:
         pay = kalinlik * 2.6 + 0.004
         kanat = []
-        for halka, zt in ((ust, 0.0), (alt, 1.0)):
+        for hi, halka_h in enumerate(halkalar):
+            zt = hi / (len(halkalar) - 1.0)
             sira = []
             for d in (-1, 0, 1, 2):
-                k = halka[(on + d) % n]
+                k = halka_h[(on + d) % n]
                 v = k.co.copy()
                 cy_t = cy + (cy_a - cy) * zt
                 yon = Vector((v.x, v.y - cy_t, 0.0))
@@ -527,9 +554,10 @@ def etek(ad, col, z_ust, z_alt, r_ust, r_alt, kalinlik, segment=64,
                     v.y += yon.y * pay
                 sira.append(bm.verts.new(v))
             kanat.append(sira)
-        for i in range(len(kanat[0]) - 1):
-            bm.faces.new((kanat[0][i], kanat[0][i + 1],
-                          kanat[1][i + 1], kanat[1][i]))
+        for h in range(len(kanat) - 1):
+            for i in range(len(kanat[h]) - 1):
+                bm.faces.new((kanat[h][i], kanat[h][i + 1],
+                              kanat[h + 1][i + 1], kanat[h + 1][i]))
     bm.normal_update()
 
     obj = hz.mesh_from_bmesh(ad, bm, col)
