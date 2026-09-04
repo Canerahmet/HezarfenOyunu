@@ -425,17 +425,17 @@ en karanlık %25'in mavi/kırmızısı ve karenin **aydınlık alan yüzdesi**
 
 | kare | gölge mavi/kırmızı | aydınlık alan |
 |---|---:|---:|
-| 09_marmara | 1,665 | %61,6 |
-| 08_halic_basi | 1,140 | %74,8 |
-| 07_kirsal | 1,054 | %53,5 |
-| 02_dogum_kosu | 0,992 | %26,2 |
-| 01_dogum | 0,660 | %28,8 |
-| 05_ayasofya | 0,155 | %33,6 |
-| 03_galata_sokak | 0,179 | %48,1 |
-| 10_uskudar | 0,002 | %0,1 |
+| 07_kirsal | 0,337 | %53,5 |
+| 09_marmara | 0,310 | %61,6 |
+| 08_halic_basi | 0,302 | %74,8 |
+| 02_dogum_kosu | 0,258 | %26,2 |
+| 01_dogum | 0,242 | %28,8 |
+| **05_ayasofya** | **0,111** | %33,6 |
+| **03_galata_sokak** | **0,100** | %48,1 |
+| 10_uskudar | 0,000 | %0,1 |
 
-Korelasyon **0,754**; kameranın bir yapının altında kaldığı üç bozuk
-durak çıkarılınca **0,651**. İşaret açık ve güçlü: ekranda ne kadar çok
+Korelasyon **0,702**; kameranın bir yapının altında kaldığı üç bozuk
+durak çıkarılınca **0,675**. İşaret açık ve güçlü: ekranda ne kadar çok
 aydınlık yüzey varsa gölge o kadar mavi.
 
 **Bu, ekran uzayı imzasıdır.** Dünya uzayında pişmiş bir dolaylı terim
@@ -444,20 +444,30 @@ profildeki **SSGI**'dir ve APV'nin katkısı ölçüm gürültüsünün içinde
 kalıyor.
 
 Tabloda bir istisna var ve o da aynı şeyi söylüyor: `03_galata_sokak`
-%48 aydınlık alana rağmen 0,179 okuyor, `07_kirsal` ise %53 ile 1,054.
+%48 aydınlık alana rağmen 0,100 okuyor, `07_kirsal` ise %53 ile 0,337.
 Fark açıklık: kırda gölge **açık gökyüzünün altındadır**, sokakta iki
 duvarın **arasındadır**. Ekran uzayı köşenin arkasını göremez. Yani
 kuralı daha keskin yazmak gerekiyor: gölgeyi karartan şey kapalılıktır
 — ve kapalı gölgeyi doldurmak APV'nin var oluş sebebidir.
+
+**Sayılar aletin kendisinden.** İlk yazımda bu tabloyu ayrı bir betikle
+hesaplamıştım (gök maskesiz, ortalama oranlı) ve 0,179 / 1,054 gibi
+değerler çıkmıştı; korelasyon aynıydı ama sayılar `golge_orani.py`nin
+verdikleriyle uyuşmuyordu. Bir sayının iki sahibi olmasın diye tablo
+**aletin çıktısıyla** yeniden yazıldı (`--gok-yok`, ortanca). Aletin
+kendi belgesindeki taban ölçüm de zaten aynı aileyi söylüyordu:
+*"çıplak araziye bakan kareler 0,26-0,30 okuyor... kapalı kareler
+0,00-0,02."*
 
 ### Kapı sayısı: 03_galata_sokak gölgesinin mavi/kırmızısı
 
 Bu ölçüm fırın işine bir **kabul kriteri** veriyor ve kriter
 uydurma değil, aynı sahnenin kendi sağlıklı komşularından:
 
-> APV çalıştığında `03_galata_sokak` karesinde gölgenin mavi/kırmızısı
-> **0,179**'dan, açık kareler ailesine — **0,66-1,14** bandına — doğru
-> çıkmalı. `05_ayasofya` için aynı şey: 0,155'ten yukarı.
+> `python tools/olcum/golge_orani.py --gok-yok renders/tur/03_galata_sokak.png`
+> gölgenin mavi/kırmızısını **0,100**'den, açık kareler ailesine —
+> **0,24-0,34** bandına — doğru taşımalı. `05_ayasofya` için aynı şey:
+> 0,111'den yukarı.
 
 Çarpan deneyi bu sayıyı %0,65'lik bir katkıyla oynatamazdı; kriteri
 karşılayan bir fırın, mertebe olarak da doğru fırındır.
