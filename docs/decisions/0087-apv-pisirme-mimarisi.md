@@ -230,6 +230,26 @@ python tools/olcum/golge_orani.py --dilim 0.5 --bolge 650,455,1010,505 `
   renders/tur/03_galata_sokak.png
 ```
 
+### Sonucu ÖNCEDEN yazıyorum (yanlış çıkabilsin diye)
+
+Poz 90 seçilirken hesap şuydu ve buraya sonuç görülmeden yazılıyor:
+
+* Gölgede mavi/kırmızı bugün **0,005** mertebesinde (0,0001 / 0,0202),
+  yani probun içindeki gök payı yüzde yarım kadar.
+* Kaldıraç doğrusal ölçüldü (69,2 kat). Gök terimi 69 katına çıkarsa
+  bugünkü gölgenin kabaca **dörtte biri ile üçte biri** kadar bir gök
+  katkısı eklenir.
+* O da mavi/kırmızı oranını **0,2-0,3** bandına taşır — aynı sahnede
+  çıplak araziye bakan karelerin ailesi (0,26-0,30).
+
+**Beklenti: gölgenin mavi/kırmızı oranı 0,15 ile 0,35 arasına çıkar.**
+
+Çıkmazsa hesabın bir yerinde yanlış varsayım var demektir ve o zaman
+aranacak şey çarpan değil, varsayım: en muhtemel adayı, sokak
+seviyesindeki probun gördüğü gök parçasının tahmin edilenden çok daha
+dar olması. Bunu ayırt etmek için açık bir meydanda (kadraj `PF_Dukkan_B`
+yerine gökyüzü gören bir nokta) ikinci bir ölçüm yeter.
+
 **Okunuş.** Fırın öncesi gölge `0,0202 / 0,0061 / 0,0001`, mavi/kırmızı
 **0,000**. Aynı sahnede çıplak araziye bakan kareler 0,26-0,30 okuyor.
 Gölgenin oranı o aileye yaklaştıysa poz 90 doğru mertebedir ve
