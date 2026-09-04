@@ -147,18 +147,39 @@ Yani mesele "APV çalışmıyor" değil: **APV çalışıyor ve gölgeyi, yedek
 ortamın verdiği yapay parlaklıktan daha karanlık yapıyor.** Gölgenin
 mavisiz olması da buradan: dar gök parçası + sıcak sıva sıçraması.
 
-### Sıradaki kaldıraç: fırının gök parlaklığı
+### Hedefi düzeltiyorum: parlaklık değil, GÖĞÜN PAYI
 
-Ölçülebilir hedef var: pişmiş probların, yerine geçtikleri yedek
-ortamdan (0,18/0,23/0,30) **karanlık olmaması**. Kaldıraç
-`M_Firin_Skybox`'ın `_Exposure` değeri (şu an 1,3) — fırının gördüğü
-gök doğrudan o. Deney on dakika (`D_Okmeydani`) ve ölçü iki tane:
-ortam probu kaydı ve `tools/olcum/prob_isigi.py`.
+Bir saat önce hedefi "pişmiş problar yedek ortamdan karanlık olmasın"
+diye yazmıştım. **Yanlış hedef.** Yedek ortam gökyüzünü her yere,
+sokağın içine bile aynı şiddette uyguluyor; APV ise probun gerçekten
+gördüğü gök parçasını uyguluyor. Sokakta ikincisinin daha karanlık
+olması **doğru** — gölgeli bir sokak açık bir tarladan karanlıktır.
 
-**Dikkat:** `VP_Firin_Sky`'ın Lux kipi (20.000) burada işe yaramıyor
-gibi görünüyor — ortam probunu değiştiren şey skybox malzemesi oldu,
-gök profili değil. Yani ilerlemeli fırın HDRP'nin statik aydınlatma
-göğünü değil, Unity'nin kendi skybox yolunu okuyor. Bu da kayda geçti.
+Yanlış olan şey parlaklık değil **renk**. Ölçüm:
+
+```
+golge  rgb 0,0202 / 0,0061 / 0,0001    mavi/kirmizi 0,000
+gunes  rgb 0,3237 / 0,2547 / 0,1767    mavi/kirmizi 0,407
+```
+
+Gölgenin mavisi **tam sıfır**. Gerçek bir gölge, üstündeki gök şeridinden
+mavi alır; bizimki yalnızca sıcak sıvadan sıçrayan güneşi taşıyor.
+
+Sebep bir **oran** meselesi ve sayılarla söylenebilir: fırındaki güneş
+100.000 lux, fırının gördüğü gök ise ortam probunda 0,18-0,30. Gerçek
+gün ışığında gökyüzünün payı toplamın **%10-20'sidir**; burada
+milyonda birler mertebesinde. Yani gök, güneşin yanında yok
+hükmünde ve probun rengini tek başına güneş belirliyor.
+
+**Doğru hedef:** gölgenin mavi/kırmızı oranı, aynı sahnede çıplak
+araziye bakan karelerin ailesine (0,26-0,30) yaklaşsın. Kaldıraç
+`FirinGokyuzu.SkyboxPozu`, ama hareket ettirilecek miktar küçük değil —
+oran argümanı büyük bir çarpan istiyor, ve o çarpan **ölçümle**
+bulunacak: her denemede pişirme kaydındaki ortam probu satırı ve
+`golge_orani.py` birlikte okunur.
+
+**Uyarı:** güneşi kısmak da aynı oranı düzeltir ama sahnenin pozunu
+bozar (`Exposure` sabit 14,5 EV'de). Değiştirilecek olan gök.
 
 ## Açık soru: semtler tek kümede birikiyor mu?
 
