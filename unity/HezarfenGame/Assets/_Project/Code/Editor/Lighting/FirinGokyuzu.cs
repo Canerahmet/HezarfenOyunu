@@ -64,6 +64,29 @@ namespace Hezarfen.Editor.Lighting
         /// </summary>
         public const float GokLuxu = 20000f;
 
+        /// <summary>
+        /// Fırın skybox'ının pozu — <b>ölçülecek kaldıraç</b>.
+        ///
+        /// Fırının gördüğü gök doğrudan bu değerden geliyor. Ölçüldü:
+        /// bu malzeme bağlanınca ortam probu <c>0,037/0,042/0,055</c>'ten
+        /// <c>0,182/0,228/0,302</c>'ye çıktı — yani ortamı belirleyen
+        /// şey <see cref="GokLuxu"/> değil, <b>bu sayı</b>. İlerlemeli
+        /// fırın HDRP'nin statik aydınlatma göğünü değil, Unity'nin
+        /// kendi skybox yolunu okuyor.
+        ///
+        /// <b>Hedef ölçülebilir:</b> pişmiş probların, yerine geçtikleri
+        /// yedek ortamdan (0,18/0,23/0,30) daha karanlık olmaması. A/B
+        /// bugün tersini söylüyor — APV kapatılınca gölge aydınlanıyor
+        /// (0,0217 &gt; 0,0202), yani problar yedek ortamdan karanlık.
+        ///
+        /// Deney on dakika (`D_Okmeydani`), ölçü iki tane: pişirme
+        /// kaydındaki ortam probu satırı ve
+        /// <c>tools/olcum/prob_isigi.py</c>. 1,3 bir gündüz göğünün
+        /// alışıldık değeri; ölçüm onu tutmazsa değişecek olan sayı
+        /// budur.
+        /// </summary>
+        public const float SkyboxPozu = 1.3f;
+
         [MenuItem("Hezarfen/Aydinlatma/Firin gokyuzunu uret")]
         public static void UretMenu()
         {
@@ -181,7 +204,7 @@ namespace Hezarfen.Editor.Lighting
             // `GokLuxu` mertebesinde olsun. Prosedurel skybox fiziksel
             // birim tasimaz; 1,3 gunduk gogunun alisildik degeri ve
             // sonucu ZATEN OLCULECEK (prob L0'i sifirdan farkli mi).
-            m.SetFloat("_Exposure", 1.3f);
+            m.SetFloat("_Exposure", SkyboxPozu);
             EditorUtility.SetDirty(m);
             AssetDatabase.SaveAssets();
             return m;
