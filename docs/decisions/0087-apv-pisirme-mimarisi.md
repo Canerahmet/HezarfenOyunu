@@ -88,6 +88,31 @@ tek başına çalışmıyordu.
 scenario* mekanizması (`supportProbeVolumeScenarios` şu an 0) her saat
 için ayrı bir pişirme demek — bu makinede saat başına iki saat.
 
+## Açık soru: semtler tek kümede birikiyor mu?
+
+Bir turda `D_Okmeydani` pişip beş hücre yazdı, ardından `D_Eyup` yirmi
+altı dakika pişip diske **hiç dokunmadı**, ve bu "kısmi pişirme
+dondurulmuş yerleşime yazamıyor" diye okundu. Şimdi ikinci bir açıklama
+var ve daha basit: **o pişirmede zaten ışık yoktu.** Işıksız bir fırın
+sıfır veri üretir; imza değişmez; sonuç "hiçbir şey yazmadı" görünür.
+
+Yani `freezePlacement` hakkında çıkarılan sonuç, ışık kusuru
+düzeldikten sonra **yeniden sınanmalı**. Deney açık ve tek adım:
+
+1. `D_Galata` pişmiş hâldeyken (temizlemeden),
+2. `D_Uskudar`'ı `-hezarfenDonuk` ile, **`-hezarfenTemizle` OLMADAN**
+   pişir,
+3. `SemtProblari.HucreSayisi()` büyüdü mü diye bak — imza denetimi
+   zaten bunu yazıyor.
+
+Büyüyorsa semtler tek kümede birikiyor ve şehrin tamamı gece boyunca
+sırayla pişebilir. Büyümüyorsa kısıt gerçek ve o zaman ya tam pişirme
+(bu makinede sığmıyor) ya da semt başına ayrı küme (çalışma zamanında
+tek küme etkin olabildiği için ayrı bir tasarım işi) gerekir.
+
+Bu soru buraya yazıldı çünkü cevabı **iki saatlik bir pişirmeye**
+mal oluyor ve bir sonraki tur onu yeniden keşfetmemeli.
+
 ## Ölçülen dört sebep
 
 1. **Prob hacimleri dünya boyuydu.** Her semtin hacmi `Mode.Global`'dı ve
