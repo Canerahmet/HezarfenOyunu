@@ -28,6 +28,7 @@ taban merkezdedir.
 """
 
 import math
+import random
 
 import bmesh
 import mathutils
@@ -134,6 +135,29 @@ CINAR_LOBE = [
 ]
 
 
+# Yaprak KUMESI: lobdan yayvan, ucu kut. Kume tek basina bir agac degil,
+# bir yaprak kutlesidir; siluete cikinti versin diye tepesi duz degil sisman.
+CINAR_KUME = [
+    (0.00, -1.00), (0.62, -0.66), (0.92, -0.24), (1.00, 0.16),
+    (0.86, 0.52), (0.54, 0.82), (0.00, 1.00),
+]
+
+
+def _konumla(obj, azimut, egim, taban):
+    """Z boyunca kurulmus bir parcayi verilen noktadan azimut/egimle diker."""
+    R = (mathutils.Matrix.Rotation(azimut, 4, "Z") @
+         mathutils.Matrix.Rotation(egim, 4, "Y"))
+    obj.data.transform(mathutils.Matrix.Translation(taban) @ R)
+    return obj
+
+
+def _dal_ucu(azimut, egim, uzunluk, taban):
+    """`_konumla` ile dikilen bir dalin ust ucunun dunya konumu."""
+    return (taban[0] + uzunluk * math.sin(egim) * math.cos(azimut),
+            taban[1] + uzunluk * math.sin(egim) * math.sin(azimut),
+            taban[2] + uzunluk * math.cos(egim))
+
+
 class AgacParams(object):
     def __init__(self, **kw):
         self.kind = kw.get("kind", "servi")       # servi | cinar
@@ -154,7 +178,7 @@ class AgacParams(object):
             # servi 3,7 m genişlikte çıktı (boy/en 3,5): o bir servi değil,
             # kavaktır. Sütunsu servide boy/en oranı 6-10 arasıdır.
             # Çınarda tersi: taç boya yakın ya da ondan geniştir.
-            self.spread = self.height * (0.072 if self.kind == "servi" else 0.45)
+            self.spread = self.height * (0.072 if self.kind == "servi" else 0.50)
         return self
 
 
@@ -180,26 +204,85 @@ def build_agac(p, col, asset_name, textured=False):
                           mats[FOLIAGE_ROLE["servi"]]))
         radius = p.spread
     else:
-        trunk_h = H * 0.42
+        # ÇINAR ÇATALLANIR. İlk yazımda taç üç düzgün lobdu ve 356 üçgenlik
+        # o kütle karede "yeşil balçık" olarak okunuyordu: silueti kırılmayan
+        # bir ağaç, uzaktan ağaç değil tepedir. Servide bu kusur yok çünkü
+        # servi gerçekten düzgün bir sütundur — yani hata "az üçgen" değildi,
+        # **yanlış şekildi**.
+        #
+        # Yeni kurgu çınarın gerçek yapısını kurar: alçak ve kalın bir gövde,
+        # ondan ayrılan dört ANA DAL, her birinin ikiye ayrılması ve dal
+        # uçlarına oturan yaprak KÜMELERİ.
+        #
+        # Bir kuralı bilerek tersine çeviriyorum: eski yorum "yan loblar ana
+        # lobun içine gömülmeli, taşarsa kesişim çentik okunur" diyordu. O,
+        # DÜZGÜN bir taç için doğruydu — orada çentik kusurdu. Yaprak
+        # kütlesinde çentik tam da aranılan şeydir: silueti kıran şey yaprağı
+        # yaprak yapar. Aynı geometrik olay, bağlama göre kusur ya da çözüm.
+        S = p.spread
+        rng = random.Random(1632 + p.seed * 17)
+        trunk_h = H * 0.28
         parts.append(_put(hz.make_tube(
-            f"{asset_name}_Govde", p.trunk_r * 1.5, p.trunk_r * 0.85, trunk_h,
+            f"{asset_name}_Govde", p.trunk_r * 1.6, p.trunk_r * 0.95, trunk_h,
             (0.0, 0.0), 0.0, segments=8, cap_bottom=True, smooth=True, col=col),
             mats[BARK_ROLE[p.kind]]))
-        # Tac: uc bindirmeli lob. Tek kure "yesil top" verir.
-        # Yan loblar ANA LOBUN İÇİNE gömülür. Dışarı taşarlarsa iki kapalı
-        # kabuk siluetin kenarında kesişir ve o kesişim çentik olarak okunur —
-        # boolean birleşim olmadan tek çare, taşmayı azaltmak.
-        lobes = ((0.00, 0.00, 1.00, 0.62), (0.36, 0.11, 0.58, 0.46),
-                 (-0.27, -0.33, 0.54, 0.42))
-        for i, (ox, oy, rs, hs) in enumerate(lobes):
-            rr = p.spread * rs
+
+        catal = (0.0, 0.0, trunk_h * 0.94)
+        kume_yerleri = []
+        ana_sayi = 4
+        for i in range(ana_sayi):
+            az = 2.0 * math.pi * i / ana_sayi + rng.uniform(-0.22, 0.22)
+            egim = math.radians(48.0 + rng.uniform(-6.0, 6.0))
+            uz1 = S * 0.62 * rng.uniform(0.90, 1.10)
+            parts.append(_put(_konumla(hz.make_tube(
+                f"{asset_name}_Dal{i}", p.trunk_r * 0.62, p.trunk_r * 0.36, uz1,
+                segments=5, cap_bottom=True, smooth=True, col=col),
+                az, egim, catal), mats[BARK_ROLE[p.kind]]))
+            dirsek = _dal_ucu(az, egim, uz1 * 0.97, catal)
+
+            for j in (-1, 1):
+                az2 = az + j * math.radians(30.0 + rng.uniform(-8.0, 8.0))
+                egim2 = math.radians(34.0 + rng.uniform(-7.0, 7.0))
+                uz2 = S * 0.50 * rng.uniform(0.85, 1.15)
+                parts.append(_put(_konumla(hz.make_tube(
+                    f"{asset_name}_Dal{i}_{j}", p.trunk_r * 0.38,
+                    p.trunk_r * 0.20, uz2, segments=5, cap_bottom=True,
+                    smooth=True, col=col),
+                    az2, egim2, dirsek), mats[BARK_ROLE[p.kind]]))
+                # Yaprak dalin UCUNDA degil, dal BOYUNCA durur. Tek kume
+                # koyunca taç "sopa ucunda top" oluyordu — ilk denemenin
+                # kusuru buydu: siluet kırılmıştı ama yanlış ölçekte,
+                # yaprak arasında değil toplar arasında.
+                for t, (oran, rk) in enumerate(((0.55, 0.070), (0.95, 0.090))):
+                    kume_yerleri.append((_dal_ucu(az2, egim2, uz2 * oran, dirsek),
+                                         H * rk, H * rk * 0.66))
+
+        # Tepe kümeleri eksene yakın ve yükseklerdir: çınarın taç tepesi
+        # ortadadır, dış halka ise genişliği verir. İkisini tek halkaya
+        # yükletmek ya basık ya yumurta biçimli bir taç verir.
+        for k in range(4):
+            az = 2.0 * math.pi * k / 4.0 + 0.5
+            r = H * 0.12
+            kume_yerleri.append(((r * math.cos(az), r * math.sin(az), H * 0.80),
+                                 H * 0.115, H * 0.115))
+
+        # İç doldurma: çatalın hemen üstünde iki küme. Bunlar olmadan taç
+        # gövdeden kopuk duruyordu — tepeden bakınca ortada delik, yandan
+        # bakınca "sopa ucunda çali". Gerçek çınarda da yaprak çatala kadar iner.
+        for k in range(2):
+            az = math.pi * k + 0.9
+            r = H * 0.07
+            kume_yerleri.append(((r * math.cos(az), r * math.sin(az), H * 0.52),
+                                 H * 0.105, H * 0.075))
+
+        for i, (merkez, rk, hk) in enumerate(kume_yerleri):
             parts.append(_put(_lathe(
-                f"{asset_name}_Tac{i}",
-                _scaled(CINAR_LOBE, rr, H * 0.30 * hs / 0.62,
-                        z0=trunk_h + H * 0.30 * hs / 0.62),
-                (ox * p.spread, oy * p.spread), p.segments, col,
-                jitter=0.07, seed=p.seed * 3 + i), mats[FOLIAGE_ROLE["cinar"]]))
-        radius = p.spread
+                f"{asset_name}_Kume{i}",
+                _scaled(CINAR_KUME, rk, hk, z0=merkez[2]),
+                (merkez[0], merkez[1]), 6, col,
+                jitter=0.26, seed=p.seed * 5 + i * 3),
+                mats[FOLIAGE_ROLE["cinar"]]))
+        radius = S
 
     lod0 = kit.join_parts(parts, f"SM_{asset_name}_LOD0", col)
 
@@ -211,13 +294,16 @@ def build_agac(p, col, asset_name, textured=False):
                                       z0=H * 0.10), (0.0, 0.0), 5, col),
                        mats[FOLIAGE_ROLE["servi"]]))
     else:
+        # LOD1 ayni KUTLEyi verir: 0,28H'den 0,96H'ye kadar yayvan bir tac.
+        # Uzaktan siluetin kirilmasi zaten okunmaz; okunan sey nerede
+        # baslayip nerede bittigidir.
         l1.append(_put(_lathe(f"{asset_name}_L1",
-                              _scaled(CINAR_LOBE, p.spread, H * 0.30,
-                                      z0=H * 0.42 + H * 0.30),
+                              _scaled(CINAR_LOBE, p.spread, H * 0.34,
+                                      z0=H * 0.62),
                               (0.0, 0.0), 6, col), mats[FOLIAGE_ROLE["cinar"]]))
         l1.append(_put(hz.make_box(f"{asset_name}_L1g",
-                                   (p.trunk_r * 2.4, p.trunk_r * 2.4, H * 0.42),
-                                   (0.0, 0.0, H * 0.21), col), mats[BARK_ROLE[p.kind]]))
+                                   (p.trunk_r * 2.6, p.trunk_r * 2.6, H * 0.28),
+                                   (0.0, 0.0, H * 0.14), col), mats[BARK_ROLE[p.kind]]))
     lod1 = kit.join_parts(l1, f"SM_{asset_name}_LOD1", col)
 
     # Carpisma: yalnizca GOVDE. Oyuncu tacin altindan gecebilmeli; agacin
@@ -226,6 +312,9 @@ def build_agac(p, col, asset_name, textured=False):
                       (p.trunk_r * 2.6, p.trunk_r * 2.6, H * 0.5),
                       (0.0, 0.0, H * 0.25), col)
     hz.assign(ucx, mats[BARK_ROLE[p.kind]])
+
+    _mn, _mx = hz.bounds(lod0)
+    _boya_olcekle((lod0, lod1, ucx), H, _mx[2] - _mn[2])
 
     for obj in (lod0, lod1):
         kit.apply_uvs(obj, tex_sizes)
@@ -351,6 +440,26 @@ def _tilt(obj, angle_rad, pivot=(0.0, 0.0, 0.0)):
     T1 = mathutils.Matrix.Translation((-pivot[0], -pivot[1], -pivot[2]))
     T2 = mathutils.Matrix.Translation(pivot)
     obj.data.transform(T2 @ R @ T1)
+
+
+def _boya_olcekle(objs, hedef, olculen):
+    """
+    Taç tepesi gövde boyunun tamına çıkmaz: çınarda en üst yaprak kümesi
+    ~0,92H'de biter. İstenen boy ise AĞACIN boyudur.
+
+    İlk çözüm tepe kümelerini yukarı itmekti ve taçı ikiye böldü — aradaki
+    boşluk karede "ayrı duran şapka" olarak okundu. Şekli bozmadan boyu
+    tutturmanın tek yolu **düzgün ölçek**: bütün LOD'lar ve çarpışma aynı
+    katsayıyla büyür, oranlar aynen kalır, pivot z=0'da olduğu için taban
+    yerinde durur.
+    """
+    if olculen <= 1e-6 or abs(hedef - olculen) < 1e-4:
+        return 1.0
+    k = hedef / olculen
+    M = mathutils.Matrix.Diagonal((k, k, k, 1.0))
+    for o in objs:
+        o.data.transform(M)
+    return k
 
 
 def _drop_to_ground(obj):
