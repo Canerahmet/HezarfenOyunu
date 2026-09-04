@@ -627,6 +627,27 @@ D_Galata bu ayarla yeniden pişiyor. Kapı sayısı değişmedi:
 ailesine (**0,26-0,34**) çıkmalı. Bu sefer beklenti bir tahmin değil,
 dört ölçümün ortak açıklaması.
 
+**İkinci, bağımsız kapı — martı.** Üsküdar karesinde gökyüzünde tek bir
+koyu leke var (103 piksel) ve ölçüldü:
+
+```
+gok ortanca parlaklik 0,4758
+marti          rgb 0,2889/0,2266/0,1858   parlaklik 0,2338
+marti / gok = 0,491
+```
+
+Martı beyaz bir kuştur ve ALTTAN görülüyor: üstünü güneş aydınlatır,
+altını **gök**. Gök hiçbir yerden gelmediği için alt yüzü karanlık ve
+kuş, gökten yarı parlaklıkta koyu bir leke olarak okunuyor. Aynı
+malzeme bir tur önce "ışıksız olduğu için siyah"tan "ışıklı" hale
+getirilmişti; kalan karanlık artık malzemenin değil, eksik gök
+teriminin.
+
+Bu yüzden ikinci beklenti de sonuç görülmeden yazılıyor: fırın işini
+yaptıysa **martı/gök oranı 0,49'dan yukarı**, beyaz bir kuşun gökten
+ayırt edilebildiği yere (≥0,8) çıkmalı. İki kapı birbirinden bağımsız —
+biri sokakta yerde, öteki gökte — ve ikisi de aynı tek satırdan geçiyor.
+
 ## Ölçülen dört sebep
 
 1. **Prob hacimleri dünya boyuydu.** Her semtin hacmi `Mode.Global`'dı ve
