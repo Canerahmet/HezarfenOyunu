@@ -1179,6 +1179,33 @@ namespace Hezarfen.Editor.Lighting
                     Debug.Log($"[Hezarfen] {_kn} yonlu isik KARMA yapildi "
                               + "(dolayli isik pisirilsin diye).");
                 }
+
+                // GUNESIN IKI SIDDETI: hangisini firin okuyor?
+                //
+                // Olculen kusur, pismis APV'nin karede yaklasik yuzde
+                // yarim agirlikta kalmasi -- yani ~150 kat sonuk olmasi.
+                // Bunun en olasi sebebi bir birim uyusmazligi: HDRP'nin
+                // fiziksel siddeti (lux) `HDAdditionalLightData.intensity`
+                // icinde yasar; isik haritalayici ise dahili
+                // `Light.intensity` alanini okur. Ikisi ayni sayi degildir.
+                //
+                // Bu satirlar bir DUZELTME degil, bir OLCUMDUR: iki alani
+                // yan yana yazar. Oran 150 mertebesindeyse sebep budur;
+                // degilse bu aciklama elenir. Sabit yazmadan once olculur.
+                foreach (var l in Object.FindObjectsByType<Light>(
+                             FindObjectsSortMode.None))
+                {
+                    if (l.type != LightType.Directional) continue;
+                    var _hd = l.GetComponent<HDAdditionalLightData>();
+                    Debug.Log($"[Hezarfen] Gunes '{l.name}': "
+                              + $"Light.intensity={l.intensity:0.####}, "
+                              + $"HDRP.intensity="
+                              + (_hd != null ? $"{_hd.intensity:0.##}" : "yok")
+                              + $", bakeType={l.lightmapBakeType}, "
+                              + $"renk={l.color}, oran="
+                              + (_hd != null && l.intensity > 1e-6f
+                                 ? $"{_hd.intensity / l.intensity:0.#}" : "-"));
+                }
             }
 
             var _op = RenderSettings.ambientProbe;
