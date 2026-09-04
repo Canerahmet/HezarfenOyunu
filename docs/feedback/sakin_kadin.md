@@ -57,9 +57,19 @@ kapatıyor.
 
 ## Ayrıca kayda geçen, henüz sorulmayanlar
 
-- **Yaşmak** hâlâ sert bir kabuk gibi duruyor: ön yüzü düz, başa değil
-  kendi profiline oturuyor. Profil başın kotlarından türetilmiş
-  (`sakin_kit.yasmak`) ama omuzda 1,52 kat açılma yüzeyi levhalaştırıyor.
+- **Yaşmak düzeltildi (v22).** İki kusur vardı ve ikisi de ölçülüp
+  kapandı:
+  1. Yüz açıklığı **dikdörtgendi** — dört köşesi de dik. Çocuk için
+     aynı kusur bir tur önce bulunup kemere çevrilmiş, ama yetişkin
+     için uygulanmamıştı. Artık iki ucunda kapanan bir mercek.
+  2. İlk denemede kemer **merdiven** çıktı (v20): eğri, çocuğunkinden
+     daha kısa bir z aralığına sığıyor, yani aynı bölmeyle daha az
+     örnek. Yüz bandının bölmesi 6'dan 12'ye, dilim 40'tan 48'e
+     çıkarıldı. Çene altına da eteğinkine benzer dikey kırışıklar
+     kondu — düzgün koni kumaş değildir.
+
+  Bedeli: 54.340 → **57.340** üçgen (+%5,5). Aynı değişiklik kızın
+  başörtüsünün kenarını da düzeltti (54.692 → 57.092).
 - **Ön kol çıplak.** Sokak kıyafetinde ferace kolu bileğe iner; şu an
   dirsek altı ten görünüyor.
 - **Ayakkabı** sarı bir kütle; mest/pabuç ayrımı yok.

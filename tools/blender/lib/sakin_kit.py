@@ -89,7 +89,7 @@ def sakalli(tip):
 
 
 def yasmak(ad, col, bas_r, kotlar, cy=0.0, yuz_acik=False,
-           kalinlik=0.005, segment=40):
+           kalinlik=0.005, segment=48):
     """
     Kadının ve kızın **baş örtüsü** — başa oturur, koni değildir.
 
@@ -159,10 +159,23 @@ def yasmak(ad, col, bas_r, kotlar, cy=0.0, yuz_acik=False,
     # MERDIVEN oldu — 24 dilim 15 derecelik basamaklar, 3 bolme ise
     # goz ile alin arasinda yalnizca uc kot demek. Egri bir kenar,
     # dogru bir kenardan daha cok ornek ister.
-    ara = 6                     # iki denetim noktasi arasindaki bolme
+    # BOLME YUZ BANDINDA ARTAR.
+    #
+    # Yetiskinin yuz acikligi dikdortgenden kemere cevrildi ve ilk
+    # denemede kenar MERDIVEN cikti — cocukta bir kez ogrenilen sey
+    # (bolme 3 -> 6) yetiskinin bandi icin de yetmiyor, cunku
+    # yetiskinin kemeri daha kisa bir z araligina sigiyor: ayni egri,
+    # daha az ornek. Egrinin gectigi iki bant (alin-goz ve goz-cene)
+    # 14 bolmeye cikiyor, otekiler 6'da kaliyor — ucgen yalniz
+    # gerektigi yerde harcaniyor.
+    ARA = 6
+    ARA_YUZ = 12
     for i in range(len(profil) - 1):
         z0, k0 = profil[i]
         z1, k1 = profil[i + 1]
+        # profil: tepe, kubbe, alin, goz, cene, (omuz). Yuz acikligi
+        # alin-goz (i=2) ve goz-cene (i=3) bantlarinda.
+        ara = ARA_YUZ if i in (2, 3) else ARA
         for j in range(ara if i < len(profil) - 2 else ara + 1):
             u = j / float(ara)
             z = z0 + (z1 - z0) * u
@@ -181,9 +194,27 @@ def yasmak(ad, col, bas_r, kotlar, cy=0.0, yuz_acik=False,
                 #
                 # 1,06: kafanin kendi on-arka oranindan biraz genis —
                 # bez yuze yapismaz, uzerinden gecer.
+                # CENENIN ALTINDA BEZ KIRISIR.
+                #
+                # Ortu basa oturuyor ve yuz acikligi bir kemer — ama
+                # inceleme karesinde hala SERT bir kabuk gibi
+                # okunuyordu. Sebep cenenin altinda kalan kisim:
+                # oradan omza kadar kusursuz duzgun bir koni gidiyor
+                # ve duzgun koni kumas degildir. Ayni tespit entarinin
+                # eteginde de yapilmisti (`kiyafet_kit.etek`) ve ayni
+                # care ise yariyor: dikey kivrimlar.
+                #
+                # Genlik cene'den omza dogru buyur — bez basta gergin,
+                # asagida serbesttir. Yedi kivrim, cunku yasmak dar bir
+                # bezdir; etekteki dokuz kivrim burada kalabalik yapar.
+                if not yuz_acik and z < z_cene and z_cene > z_omuz:
+                    _t = min(1.0, (z_cene - z) / (z_cene - z_omuz))
+                    dalga = 1.0 + 0.055 * _t * math.sin(7.0 * a)
+                else:
+                    dalga = 1.0
                 halka.append(bm.verts.new(
-                    Vector((math.cos(a) * r,
-                            cy + math.sin(a) * r * 1.06, z))))
+                    Vector((math.cos(a) * r * dalga,
+                            cy + math.sin(a) * r * 1.06 * dalga, z))))
             halkalar.append(halka)
             kotlar_z.append(z)
 
@@ -204,7 +235,27 @@ def yasmak(ad, col, bas_r, kotlar, cy=0.0, yuz_acik=False,
                 return 0.0
             t = (z_alin - z) / max(1e-6, z_alin - z_goz)
             return math.radians(62) * min(1.0, max(0.0, t)) ** 0.5
-        return (math.radians(46) if z_goz <= z <= z_alin else 0.0)
+        # YETISKININ ACIKLIGI DA BIR KEMER — DIKDORTGEN DEGIL.
+        #
+        # Cocuk icin yazilan not aynen yetiskin icin de gecerliydi ama
+        # yalniz cocuga uygulanmisti: burada 46 derece SABIT donuyor ve
+        # bant z_goz..z_alin arasinda duz kesiliyor. Inceleme karesinde
+        # sonucu goruluyor — yasmak degil, yuzune DIKDORTGEN pencere
+        # acilmis bir baslik; dort kosesi de dik.
+        #
+        # Bez oyle kesilmez. Aciklik iki ucunda kapanan bir MERCEKtir:
+        # yanakta baslar, gozun biraz ustunde en genis olur, alinda
+        # kapanir. `sin` yayi bunu verir; 0,65 kuvveti ucları hizli
+        # kapatir ki kose degil yay okunsun.
+        #
+        # Alt pay: aciklik gozun 0,45 bant boyu ALTINA iner, yani alt
+        # kenar da egridir. Bu olmadan ust kose yuvarlanir, alt kose
+        # dik kalirdi — yarim duzeltme.
+        _alt = z_goz - (z_alin - z_goz) * 0.45
+        if not (_alt <= z <= z_alin):
+            return 0.0
+        v = (z - _alt) / max(1e-6, z_alin - _alt)
+        return math.radians(48) * math.sin(math.pi * v) ** 0.65
 
     for i in range(len(halkalar) - 1):
         ust, alt = halkalar[i], halkalar[i + 1]
