@@ -148,18 +148,36 @@ namespace Hezarfen.Tests.EditMode
             Assert.IsTrue(System.IO.File.Exists(yol), $"{yol} yok.");
 
             int karma = -1, arkaUc = -1;
+            float albedo = -1f;
             foreach (string satir in System.IO.File.ReadLines(yol))
             {
                 if (satir.StartsWith("  m_MixedBakeMode: "))
                     int.TryParse(satir.Substring(19).Trim(), out karma);
                 else if (satir.StartsWith("  m_BakeBackend: "))
                     int.TryParse(satir.Substring(17).Trim(), out arkaUc);
+                else if (satir.StartsWith("  m_AlbedoBoost: "))
+                    float.TryParse(satir.Substring(17).Trim(),
+                        System.Globalization.NumberStyles.Float,
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        out albedo);
             }
 
             Assert.AreEqual(1, arkaUc,
                 "Fırın arka ucu Progressive CPU olmali (m_BakeBackend 1). "
                 + "GPU firini bu makinede iki kez sessizce oldu: sahne "
                 + "girdisi 7,25 GB, kart 8 GB.");
+            // DENEY DEGERI VARLIKTA KALMASIN.
+            //
+            // `-hezarfenAlbedo 8` bir kez kullanildi ve deger bu
+            // varlikta KALDI; sonraki pisirme farkinda olmadan sekiz
+            // kat albedo ile kostu — hem de baska bir degiskeni sinayan
+            // pisirme. Bir deney anahtari, kapatildiginda dunyayi eski
+            // haline birakmiyorsa deney degil sessiz bir ayar
+            // degisikligidir.
+            Assert.AreEqual(1f, albedo, 0.001f,
+                "albedoBoost 1 olmali. Baska bir deger, kapatilmayi "
+                + "unutulmus bir deney anahtarindan kalmis demektir ve "
+                + "sonraki her pisirmeyi sessizce kirletir.");
             Assert.AreEqual(0, karma,
                 "Karma kip IndirectOnly olmali (m_MixedBakeMode 0). "
                 + "Shadowmask secilirse golgeler pisirildigi saate "
