@@ -228,6 +228,14 @@ namespace Hezarfen.Editor.Lighting
         /// sayısına bak. Gerekmiyorsa malzeme kaldırılır — HDRP onu
         /// çizimde kullanmıyor, yani sahnede duran ölü bir bağ olur.
         /// </summary>
+        // MALZEME TURETILMIS DURUMDUR, SAHIP DEGILDIR.
+        //
+        // `M_Firin_Skybox.mat` her pisirmede bu islevden yeniden
+        // yaziliyor; deponda duran degeri (su an deneyin yazdigi 90)
+        // bir KAYIT, bir ayar degil. Sayinin sahibi `SkyboxPozu`, ve
+        // anahtarsiz kosan ilk pisirme malzemeyi ona geri dondurur.
+        // Bu not, ikisi ayri gorununce "hangisi dogru" diye
+        // durulmasin diye burada.
         public static Material SkyboxUret()
         {
             var m = AssetDatabase.LoadAssetAtPath<Material>(SkyboxYolu);
