@@ -96,7 +96,19 @@ namespace Hezarfen.Editor.Diagnostics
             new Durak { ad = "08_halic_basi", nokta = new Vector3(-3100f, 0f, 2500f),
                         bakisYaw = 200f,
                         neden = "Dere agzi ve su." },
-            new Durak { ad = "09_marmara", nokta = new Vector3(-1850f, 0f, -2700f),
+            // MARMARA DURAGI: DENIZ VAR AMA KIYI YOKTU.
+            //
+            // Durak (-1850, -2700) idi ve rapor `kadrajda gok @ 0 m`
+            // diyordu. Olculdu: o noktanin **120 m icinde hicbir sey
+            // yok** — en yakin icerik 253 m'de (D_Surici_Bati), 268
+            // m'de (D_Halic tekneleri). Yani gok kadraji durustu, ama
+            // duragin kendi gerekcesi "kiyi, iskele ve deniz" diyor ve
+            // bos bir kumsal onu gostermiyor.
+            //
+            // Yeni nokta, en yakin yirmi yapinin merkezinden (-1654,
+            // -2501) denize dogru 35 m: sehrin kenari kadrajda kalir,
+            // bakis yonu hala deniz.
+            new Durak { ad = "09_marmara", nokta = new Vector3(-1678f, 0f, -2526f),
                         bakisYaw = 180f,
                         neden = "Kiyi, iskele ve deniz." },
             // USKUDAR DURAGI DA OLCUMLE TASINDI — GALATA ILE AYNI KUSUR.
