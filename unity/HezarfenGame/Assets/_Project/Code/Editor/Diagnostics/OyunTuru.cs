@@ -58,8 +58,23 @@ namespace Hezarfen.Editor.Diagnostics
         /// </summary>
         private static readonly Durak[] Duraklar =
         {
-            new Durak { ad = "01_dogum", nokta = Vector3.zero, bakisYaw = 0f,
-                        neden = "Oyuncu ilk burayi gorur." },
+            // OYUNCUNUN ILK GORDUGU SEY KULE OLMALI.
+            //
+            // Durak dunya orijininde (ADR 0007: orijin Galata Kulesi'nin
+            // tabani) ve yerlestirme oyuncuyu (25, 25)'e koyuyor — yani
+            // kulenin dibine. Ama bakis yonu 0 (+z) idi ve tur raporu
+            // ne gorundugunu yaziyordu: `kadrajda TR_Istanbul @ 28 m`.
+            // Kule sahnede ve tam yerinde (0, 52.24, 0 — 46 m boyunda),
+            // oyuncunun 35 m otesinde, ve kadrajda YOK.
+            //
+            // Bu durak "oyuncu ilk burayi gorur" diyor. Ilk goreceyi sey
+            // cıplak toprak degil, tirmanacagi kule.
+            //
+            // Aci hesapla: oyuncu (25, 25), kule (0, 0) —
+            // atan2(-25, -25) = 225 derece.
+            new Durak { ad = "01_dogum", nokta = Vector3.zero,
+                        bakisYaw = 225f,
+                        neden = "Oyuncu ilk burayi gorur — ve kuleyi." },
             new Durak { ad = "02_dogum_kosu", nokta = Vector3.zero,
                         bakisYaw = 0f, kos = true,
                         neden = "Kosarken karakter ve kamera." },
