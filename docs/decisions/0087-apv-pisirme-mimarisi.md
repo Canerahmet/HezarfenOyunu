@@ -571,6 +571,62 @@ kusur "sönük" değil "aşırı parlak" olurdu. Hipotez tersinden de düşüyor
 
 Geriye kalan adaylar ve sıradaki adım ADR'nin sonundaki listede.
 
+### Ekran uzayı GI de denendi — ve deneyin kendisi koşmamış
+
+Kaliteyi *High Fidelity*'ye almak (`supportSSGI: 1`) altı karede
+hiçbir şey değiştirmedi (0,009→0,007, 0,140→0,107, 0,259→0,282).
+Sebebi ölçüldü: boru hattı desteği bir **yetenek**tir, **istek**
+değil — profilde `GlobalIllumination` geçersiz kılması yoktu.
+
+İstek de eklendi (`SsgiDeneyi.Ac`), tur tekrar koştu ve yine hiçbir
+şey değişmedi. Kare süresi de kıpırdamadı (7-8 ms) — oysa SSGI pahalı
+bir şeydir ve koşsa görünürdü. Kontrol edildi: profilde
+`GlobalIllumination` kelimesi bile yok. `VolumeProfile.Add` bileşeni
+**bellekte** kuruyor; profil bir varlık olduğu için
+`AssetDatabase.AddObjectToAsset` çağrılmazsa diske hiç yazılmıyor.
+
+Yani komut "AÇIK" yazdı, tur koştu, sonuç okundu — ve sınanan şey hiç
+var olmadı. Bu, bu depoda bugün **üçüncü** kez: *yazıldı, diske
+geçmedi.* Komut düzeltildi ve artık kendi yazdığını **diskten geri
+okuyup doğruluyor**; doğrulayamazsa hata veriyor. Bir deney, koştuğunu
+kanıtlayamıyorsa koşmamıştır.
+
+### Ve bakılmamış tek anahtar: ortam aydınlatması PİŞMİYORDU
+
+`LS_Hezarfen.lighting` baştan sona okundu. Bütün ölçekler 1
+(`m_BounceScale`, `m_AlbedoBoost`, `m_IndirectOutputScale`), karma kip
+IndirectOnly — hepsi doğru. Bir satır dışında:
+
+```
+m_RealtimeEnvironmentLighting: 1
+```
+
+Bu 1 iken Unity, **ortamın (göğün) katkısını problara pişirmez**;
+onu çalışma zamanında ortam probuyla ekler. HDRP'de
+`lightProbeSystem` APV olduğunda o çalışma zamanı yolunun yerini APV
+alır. Yani gök ne pişiyor ne de çalışma zamanında ekleniyor — **hiçbir
+yerden gelmiyor.**
+
+Bu tek satır, gece boyunca ölçülen üç sonucu birden açıklıyor ve
+bunları açıklayan başka bir aday çıkmadı:
+
+| ölçüm | bu satırla açıklaması |
+|---|---|
+| fırın göğü **69 kat** parlatıldı, kare değişmedi | gök zaten pişmiyor |
+| gölgenin mavi/kırmızısı **0,003** | mavi gökten gelir |
+| `albedoBoost 8` beklenen sıçramayı vermedi | o yalnız **güneşin** sıçramasını büyütür; eksik olan terim gök |
+| çarpan 50 kareyi oynattı | probda bir şey var (güneş sıçraması), yalnızca eksik |
+
+Ayar hem varlıkta 0 yapıldı hem de fırın sürücüsüne **her koşumda
+açıkça yazılıyor** (`ls.realtimeEnvironmentLighting = false`) —
+albedoBoost'un sızması dersinin aynısı. `FirinGokyuzuTests` artık bunu
+da tutuyor.
+
+D_Galata bu ayarla yeniden pişiyor. Kapı sayısı değişmedi:
+`03_galata_sokak` gölgesinin mavi/kırmızısı **0,009**'dan açık kareler
+ailesine (**0,26-0,34**) çıkmalı. Bu sefer beklenti bir tahmin değil,
+dört ölçümün ortak açıklaması.
+
 ## Ölçülen dört sebep
 
 1. **Prob hacimleri dünya boyuydu.** Her semtin hacmi `Mode.Global`'dı ve

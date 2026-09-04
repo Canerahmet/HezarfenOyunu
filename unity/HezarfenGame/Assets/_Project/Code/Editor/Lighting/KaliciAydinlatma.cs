@@ -835,6 +835,27 @@ namespace Hezarfen.Editor.Lighting
             ls.albedoBoost = _abv;
             if (System.Math.Abs(_abv - 1f) > 1e-3f)
                 Debug.Log($"[Hezarfen] DENEY: albedoBoost = {_abv:0.##}");
+            // ORTAM AYDINLATMASI **PISECEK** — GERCEK ZAMANLI DEGIL.
+            //
+            // Bu, bugune kadar bakilmamis tek anahtar ve tam da
+            // olculen desene oturuyor. `m_RealtimeEnvironmentLighting`
+            // 1 iken Unity, ortamin (gogun) katkisini problara
+            // PISIRMEZ; onu calisma zamaninda ortam probuyla ekler.
+            // HDRP'de `lightProbeSystem` APV oldugunda o calisma zamani
+            // yolu APV ile YER DEGISTIRIR — yani gok hicbir yerden
+            // gelmez.
+            //
+            // Uc olcum bir anda aciklaniyor:
+            //   * Firin gogunu 69 kat parlattim, kare kilini
+            //     kipirdatmadi — cunku gok zaten pismiyor.
+            //   * Golgenin mavisi sifir (0,003) — mavi gokten gelir.
+            //   * `albedoBoost 8` beklenen sicramayi vermedi — o yalniz
+            //     gunesin sicramasini buyutuyor, eksik olan terimi degil.
+            //
+            // Deger her kosumda ACIKCA yaziliyor (albedoBoost'la ayni
+            // gerekce): yazilmayan bir ayar, bir onceki deneyden kalma
+            // olabilir.
+            ls.realtimeEnvironmentLighting = false;
             ls.mixedBakeMode = MixedLightingMode.IndirectOnly;
             ls.directSampleCount = 16;
             ls.indirectSampleCount = 16;

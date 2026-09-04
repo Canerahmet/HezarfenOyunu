@@ -147,7 +147,7 @@ namespace Hezarfen.Tests.EditMode
                 "Assets/_Project/Settings/LS_Hezarfen.lighting";
             Assert.IsTrue(System.IO.File.Exists(yol), $"{yol} yok.");
 
-            int karma = -1, arkaUc = -1;
+            int karma = -1, arkaUc = -1, gercekZamanliOrtam = -1;
             float albedo = -1f;
             foreach (string satir in System.IO.File.ReadLines(yol))
             {
@@ -155,6 +155,9 @@ namespace Hezarfen.Tests.EditMode
                     int.TryParse(satir.Substring(19).Trim(), out karma);
                 else if (satir.StartsWith("  m_BakeBackend: "))
                     int.TryParse(satir.Substring(17).Trim(), out arkaUc);
+                else if (satir.StartsWith("  m_RealtimeEnvironmentLighting: "))
+                    int.TryParse(satir.Substring(33).Trim(),
+                                 out gercekZamanliOrtam);
                 else if (satir.StartsWith("  m_AlbedoBoost: "))
                     float.TryParse(satir.Substring(17).Trim(),
                         System.Globalization.NumberStyles.Float,
@@ -178,6 +181,15 @@ namespace Hezarfen.Tests.EditMode
                 "albedoBoost 1 olmali. Baska bir deger, kapatilmayi "
                 + "unutulmus bir deney anahtarindan kalmis demektir ve "
                 + "sonraki her pisirmeyi sessizce kirletir.");
+            Assert.AreEqual(0, gercekZamanliOrtam,
+                "Ortam aydinlatmasi PISMELI (m_RealtimeEnvironmentLighting "
+                + "0). 1 iken Unity gogun katkisini problara pisirmez, "
+                + "calisma zamaninda ortam probuyla ekler — ve HDRP'de "
+                + "lightProbeSystem APV oldugunda o yolun yerini APV alir, "
+                + "yani gok hicbir yerden gelmez. Olculen uc sonuc bunu "
+                + "gosteriyor: firin gogu 69 kat parlatildi ve kare "
+                + "degismedi, golgenin mavisi 0,003, albedoBoost 8 "
+                + "beklenen sicramayi vermedi. Gerekce: ADR 0087.");
             Assert.AreEqual(0, karma,
                 "Karma kip IndirectOnly olmali (m_MixedBakeMode 0). "
                 + "Shadowmask secilirse golgeler pisirildigi saate "
