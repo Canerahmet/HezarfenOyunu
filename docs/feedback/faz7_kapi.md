@@ -102,15 +102,40 @@ Bu fazda dört kez yanlış şeye baktım; hepsi ölçümle düzeldi.
 
 ## Açık maddeler (Faz 8'e)
 
-1. **Yakın ağaç LOD'u** — çizici her mesafede kaba LOD kullanıyor.
-   Hücre başına LOD seçimi mümkün, yapılmadı.
+1. ~~**Yakın ağaç LOD'u** — çizici her mesafede kaba LOD kullanıyor.~~
+   **KAPANDI (2026-08-30, bu belgeden bir gün sonra).**
+   `AgacCizici` hücre başına seçiyor: `inceMesafe = 220 m` içindeki
+   hücreler ince LOD ile çiziliyor ve kaç ağacın öyle çizildiği
+   `InceAgac` olarak sayılıyor. Kodun kendi notu da orada:
+   *"bir servinin dibinde duruyorsun ve ağaç uzaktan görünen kaba
+   silueti taşıyor."* (2026-09-04'te doğrulandı.)
 2. **Gölge derinliği** — ton eğrisi öğle gölgelerini epey açtı (koyu
    piksel %29,8 → %0,6). Sanat kararı; inceleme paketi `Captures/mahalle/`
    altında, Caner'in notuyla yakınsanacak.
-3. **Ağaç savrulması** — rüzgâr kancası yayınlıyor, malzeme okumuyor.
-   Vertex shader gerekiyor.
+3. ~~**Ağaç savrulması** — rüzgâr kancası yayınlıyor, malzeme okumuyor.
+   Vertex shader gerekiyor.~~
+   **KAPANDI — ve tahmin edilen yoldan değil.** Vertex shader
+   gerekmedi: `AgacCizici.Savur` örnek matrislerini tabanlarından
+   döndürüyor, açı rüzgâr hızıyla ölçekleniyor ve faz **dünya
+   konumundan** geliyor, böylece komşu ağaçlar aynı anda eğilmiyor
+   (*"hepsi birlikte sallanan bir orman mekanik görünürdü"*).
+   Savrulma yalnız 260 m içinde hesaplanıyor. (2026-09-04'te
+   doğrulandı.)
 4. **Kalabalık üçgen bütçesi** — kişi başına ~62 000 üçgen.
 5. **Gerçek 30 dk oturum** — build üzerinde, elle.
+   *2026-09-04: otomatik yarısı için alet yazıldı —*
+   `Runtime/Diagnostics/OyuncuOlcumu.cs`. Yapılmış oyunda dört durakta
+   240 kare örnekleyip ortanca/p95/en kötü yazıyor ve p95 > 16,7 ms ise
+   çıkış kodu 2 ile "KALDI" diyor. `-hezarfenOlcum` bayrağı olmadan
+   hiç doğmuyor, yani sahneye ve prefaba dokunmuyor. Elle oturumun
+   yerini tutmaz (girdi yok, oyuncu davranışı yok) ama kapının sayısal
+   kısmını build üzerinde ölçülebilir kılıyor.
+
+**Not — bu liste eskiyebiliyor.** Sekiz maddenin ikisi, belge
+yazıldıktan **bir gün sonra** kapanmış ve liste öyle kalmış. Bu
+oturumda aynı şey ev iç mekânları için de çıktı: plan "başlanmamış"
+diyordu, ölçüm "büyük kısmı var" dedi. Kapanan madde üstü çizilerek ve
+**kanıtıyla** işaretlenmezse, bir sonraki tur bitmiş işi yeniden yapar.
 6. **Arap Camii yönü** — araziden geliyor, kaynaktan değil (ADR 0071).
 7. **Eyüp'ün Cuma camisi yok** (ADR 0071).
 8. **Üç iskele yalnız kayıkla erişilebiliyor** (Faz 6'dan devir).
