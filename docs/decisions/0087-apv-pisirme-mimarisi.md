@@ -88,6 +88,55 @@ tek başına çalışmıyordu.
 scenario* mekanizması (`supportProbeVolumeScenarios` şu an 0) her saat
 için ayrı bir pişirme demek — bu makinede saat başına iki saat.
 
+## Fırın ışık aldı, kare almadı — ve A/B yönü tersine çevirdi
+
+Güneş fırına girdikten sonra `D_Galata` yeniden pişti: 95,8 dk, 62
+hücre, 155 MB, `CellData` **38.238 farklı desen** (ışıksız pişirmede 2).
+Problar ışık taşıyor.
+
+Kare değişmedi. Galata sokağının gölgesi: `0,0202 / 0,0061 / 0,0001` —
+mavi kanal sıfır.
+
+Zincirin okunabilen her halkası "açık" diyor:
+
+| halka | okunan |
+|---|---|
+| diskteki veri | 62 hücre, 155 MB, 38.238 desen |
+| çalışma zamanı | `kurulu / kume var` |
+| çiziciler | `m_LightProbeUsage: 1` (BlendProbes) |
+| boru hattı | dört varlıkta da `lightProbeSystem: 1` |
+| kamera kare ayarı | açıkça `AdaptiveProbeVolume = true` yazıldı |
+
+### A/B ve okunuşu
+
+| koşum | gölge (r/g/b) |
+|---|---|
+| APV açık | 0,0202 / 0,0061 / 0,0001 |
+| APV **kapalı** (dört varlıkta da) | 0,0217 / 0,0075 / 0,0001 |
+| kamera kare ayarı zorla açık | 0,0203 / 0,0062 / 0,0001 |
+
+Önce "hiç uygulanmıyor" diye okundu. Ama sayı ondan fazlasını söylüyor:
+**APV kapatılınca gölge AYDINLANIYOR.** Yani APV uygulanıyor ve
+uygulandığında sahneyi *karartıyor* — pişmiş problar, onların yerine
+geçtiği yedek ortamdan (skybox'lı ambient probe, 0,18/0,23/0,30) daha
+karanlık.
+
+Bu, sorunun yerini değiştirir: yol açık, **probların kendisi karanlık**.
+
+### Sıradaki şüpheli: fırının gördüğü albedo
+
+Fırında artık 100.000 lux'lük bir güneş var ve +43°'de. Böyle bir
+güneşin kaldırımdan sıçraması karanlık olamaz — *fırının o kaldırımı
+karanlık görmüyorsa*. İlerlemeli fırın sıçramayı malzemenin **albedo**
+değerinden hesaplar ve HDRP malzemelerinde bu değer meta geçişinden
+gelir.
+
+Deney (bir sonraki tur, ~10 dk): `D_Okmeydani`'yi
+`LightingSettings.albedoBoost` yükseltilmiş hâlde pişir ve
+`tools/olcum/prob_isigi.py` ile L0 desenlerinin dağılımına bak. Değer
+ölçekleniyorsa albedo yolu çalışıyor demektir ve karanlık başka
+yerdendir; hiç değişmiyorsa fırın malzemeleri siyah görüyordur.
+
 ## Açık soru: semtler tek kümede birikiyor mu?
 
 Bir turda `D_Okmeydani` pişip beş hücre yazdı, ardından `D_Eyup` yirmi

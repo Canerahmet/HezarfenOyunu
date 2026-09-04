@@ -140,6 +140,34 @@ namespace Hezarfen.Editor.Lighting
             Debug.Log($"[Hezarfen] {n} kameraya APV kare ayari yazildi.");
         }
 
+        /// <summary>
+        /// <c>ProbeReferenceVolume</c>'un okunabilir üyelerini yazar.
+        ///
+        /// Zincirin okunabilen her halkası "açık" diyor ve kare
+        /// değişmiyor. Sıradaki soru — <b>hücreler gerçekten belleğe
+        /// yükleniyor mu</b> — bir sayı ister, ve o sayının adı sürümden
+        /// sürüme değişiyor. Tahmin etmek yerine sınıfın kendisine
+        /// soruluyor.
+        /// </summary>
+        [MenuItem("Hezarfen/Aydinlatma/APV uyelerini listele")]
+        public static void UyeleriListele()
+        {
+            var t = typeof(ProbeReferenceVolume);
+            var sb = new StringBuilder("[Hezarfen] ProbeReferenceVolume uyeleri\n");
+            var inst = ProbeReferenceVolume.instance;
+            foreach (var pr in t.GetProperties(
+                         System.Reflection.BindingFlags.Public
+                         | System.Reflection.BindingFlags.Instance
+                         | System.Reflection.BindingFlags.Static))
+            {
+                object v = "?";
+                try { v = pr.GetValue(pr.GetGetMethod().IsStatic ? null : inst); }
+                catch (System.Exception e) { v = "hata: " + e.GetType().Name; }
+                sb.Append($"  {pr.PropertyType.Name} {pr.Name} = {v}\n");
+            }
+            Debug.Log(sb.ToString());
+        }
+
         private static string KareAyari(HDRenderPipelineAsset asset)
         {
             var so = new SerializedObject(asset);
