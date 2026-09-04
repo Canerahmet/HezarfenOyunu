@@ -272,7 +272,19 @@ TEXTURE_ROLES = {
         # kaplama bir guverte gibi okunuyordu; oysa varligin kendi
         # kaynak notu yuzeyi zaten yaziyor — "ahsap cita iskelet +
         # KARTAL TUYU YUZEY + deri kayis" (`gen_kanat.py`, SOURCE).
-        "feather": dict(asset="tuy", tinted=True,
+        # `cift_tarafli`: kanat zari TEK YUZLU bir yamuktur.
+        #
+        # Oyun turunda olculdu: karakter arkadan gorunurken sirtindaki
+        # kanatlardan yalniz citalar ciziliyor, zar yok — "sirtinda
+        # merdiven tasiyan adam". Sebep eksik mesh degil, ARKA YUZ
+        # ELEMESI: `M_Feather` `_CullMode: 2` ile geliyordu, zar da tek
+        # yuzlu. Yani yuzey diskte de, sahnede de vardi; yalnizca alt
+        # tarafindan bakilinca cizilmiyordu.
+        #
+        # Kalinlik vermek yerine iki yuzlu isaretleniyor: gercek bir
+        # kanat bezi de iki yuzlu ince bir yuzeydir, ve ikinci bir kabuk
+        # ucgeni ikiye katlayip z-cakismasi riski getirirdi.
+        "feather": dict(asset="tuy", tinted=True, cift_tarafli=True,
                         root=os.path.join("art", "textures", "generated")),
         "foliage_servi": dict(asset="foliage_servi",
                               root=os.path.join("art", "textures", "generated")),
@@ -376,7 +388,19 @@ TEXTURE_ROLES = {
         # kaplama bir guverte gibi okunuyordu; oysa varligin kendi
         # kaynak notu yuzeyi zaten yaziyor — "ahsap cita iskelet +
         # KARTAL TUYU YUZEY + deri kayis" (`gen_kanat.py`, SOURCE).
-        "feather": dict(asset="tuy", tinted=True,
+        # `cift_tarafli`: kanat zari TEK YUZLU bir yamuktur.
+        #
+        # Oyun turunda olculdu: karakter arkadan gorunurken sirtindaki
+        # kanatlardan yalniz citalar ciziliyor, zar yok — "sirtinda
+        # merdiven tasiyan adam". Sebep eksik mesh degil, ARKA YUZ
+        # ELEMESI: `M_Feather` `_CullMode: 2` ile geliyordu, zar da tek
+        # yuzlu. Yani yuzey diskte de, sahnede de vardi; yalnizca alt
+        # tarafindan bakilinca cizilmiyordu.
+        #
+        # Kalinlik vermek yerine iki yuzlu isaretleniyor: gercek bir
+        # kanat bezi de iki yuzlu ince bir yuzeydir, ve ikinci bir kabuk
+        # ucgeni ikiye katlayip z-cakismasi riski getirirdi.
+        "feather": dict(asset="tuy", tinted=True, cift_tarafli=True,
                         root=os.path.join("art", "textures", "generated")),
         "foliage_servi": dict(asset="foliage_servi",
                               root=os.path.join("art", "textures", "generated")),

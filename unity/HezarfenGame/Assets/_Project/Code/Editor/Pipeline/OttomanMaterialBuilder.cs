@@ -45,10 +45,48 @@ namespace Hezarfen.Editor.Pipeline
 
             /// <summary>Kesme eşiği; alfa bunun altındaysa piksel çizilmez.</summary>
             public float alphaCutoff = 0.5f;
+
+            /// <summary>
+            /// İnce yüzey — iki yüzden de çizilir. Kanat zarı gibi tek
+            /// katmanlı yamuklar için; kesme (alphaClip) ile ilgisi yok.
+            /// </summary>
+            public bool doubleSided;
         }
 
         [Serializable]
         private class Manifest { public Entry[] materials; }
+
+        /// <summary>
+        /// Bildiriminde <c>doubleSided</c> yazan ama üretilmiş
+        /// malzemesinde <c>_DoubleSidedEnable</c> açık OLMAYAN
+        /// malzemelerin adları.
+        ///
+        /// Bir bayrağın kaydı ile ekrandaki karşılığını birbirine bağlar:
+        /// bildirim doğru olup malzeme eski kalırsa yüzey sessizce tek
+        /// yüzlü çizilir ve kusur ancak alttan bakan bir karede görünür —
+        /// kanat zarında olan tam olarak buydu.
+        /// </summary>
+        public static List<string> EksikCiftTarafli()
+        {
+            var eksik = new List<string>();
+            var json = AssetDatabase.LoadAssetAtPath<TextAsset>(
+                $"{TextureDir}/{ManifestFile}");
+            if (json == null) return eksik;
+            var manifest = JsonUtility.FromJson<Manifest>(json.text);
+            if (manifest?.materials == null) return eksik;
+
+            foreach (var e in manifest.materials)
+            {
+                if (e == null || !e.doubleSided) continue;
+                var mat = AssetDatabase.LoadAssetAtPath<Material>(
+                    $"{MaterialDir}/{e.name}.mat");
+                if (mat == null) { eksik.Add($"{e.name} (malzeme yok)"); continue; }
+                if (!mat.HasProperty("_DoubleSidedEnable")
+                    || mat.GetFloat("_DoubleSidedEnable") < 0.5f)
+                    eksik.Add($"{e.name} (_DoubleSidedEnable kapali)");
+            }
+            return eksik;
+        }
 
         [MenuItem("Hezarfen/Boru Hatti/Osmanli malzemelerini uret")]
         public static void BuildMenu()
@@ -211,15 +249,29 @@ namespace Hezarfen.Editor.Pipeline
             // `_AlphaCutoffEnable` yazmadan sadece dokuyu vermek yetmez —
             // HDRP alfa kanalini gormezden gelir ve sac karti DUZ BIR
             // LEVHA olur. Bu sessiz bir hatadir: doku yuklenmis gorunur.
+            // INCE YUZEY: iki yuzden de cizilir.
+            //
+            // Alfa kesmeden BAGIMSIZ bir ozellik. Once yalnizca kesmeli
+            // malzemeler iki yuzlu yapiliyordu (sac karti) ve bu, kesme
+            // istemeyen ince yuzeyleri disarida biraktı: kanat zari opak
+            // ve tek yuzlu kaldi, alt tarafindan bakilinca yok oldu.
+            if (e.doubleSided || e.alphaClip)
+            {
+                mat.SetFloat("_DoubleSidedEnable", 1f);
+                mat.SetFloat("_DoubleSidedNormalMode", 1f);   // Mirror
+                mat.SetFloat("_CullMode", 0f);                // Off
+                mat.SetFloat("_CullModeForward", 0f);
+                mat.EnableKeyword("_DOUBLESIDED_ON");
+            }
+
             if (e.alphaClip)
             {
                 mat.SetFloat("_AlphaCutoffEnable", 1f);
                 mat.SetFloat("_AlphaCutoff", Mathf.Clamp01(e.alphaCutoff));
                 mat.SetFloat("_SurfaceType", 0f);          // Opaque + cutoff
-                mat.SetFloat("_DoubleSidedEnable", 1f);    // kart iki yuzlu
-                mat.SetFloat("_DoubleSidedNormalMode", 1f);
+                // Iki yuzlulugu ustteki blok yaziyor — bir ayarin iki
+                // sahibi olmasin diye burada tekrarlanmiyor.
                 mat.EnableKeyword("_ALPHATEST_ON");
-                mat.EnableKeyword("_DOUBLESIDED_ON");
                 mat.renderQueue = 2450;                    // AlphaTest
             }
 

@@ -330,6 +330,7 @@
     0.183,
     0.128
    ],
+   "doubleSided": true,
    "baked": false,
    "maskFile": "T_Tuy_MASK.png",
    "normalFile": "T_Tuy_N.png",

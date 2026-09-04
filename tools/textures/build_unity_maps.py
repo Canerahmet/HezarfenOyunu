@@ -254,6 +254,11 @@ def main():
             if role.get("tinted"):
                 entry["baseColor"] = [round(c, 5) for c in color[:3]]
 
+            # Ince yuzey: iki yuzden de cizilir. Bayragi rol tasir cunku
+            # bunu bilen yer geometriyi kuran taraftir, Unity degil.
+            if role.get("cift_tarafli"):
+                entry["doubleSided"] = True
+
             # Maske ve normal KAYNAK dokuya aittir, role degil.
             #
             # Ilk yazimda ikisi de malzeme adiyla yaziliyordu ve `weathered_planks`

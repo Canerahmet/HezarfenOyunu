@@ -40,6 +40,31 @@ namespace Hezarfen.Tests.EditMode
                 + string.Join(", ", bos.Take(10)));
         }
 
+        /// <summary>
+        /// Bildirimde <c>doubleSided</c> yazan her malzeme gerçekten iki
+        /// yüzlü olmalı.
+        ///
+        /// Kanat zarı tek katmanlı bir yamuktur ve <c>M_Feather</c>
+        /// <c>_CullMode: 2</c> ile geliyordu. Oyun turu karesinde ölçüldü:
+        /// karakter arkadan görünürken kanatlardan yalnız çıtalar
+        /// çiziliyordu — "sırtında merdiven taşıyan adam". Mesh eksik
+        /// değildi, alt yüzü elenmişti.
+        ///
+        /// Bu, aynı varlığın ikinci sessiz kusuru (ilki macenta yuvaydı) ve
+        /// ikisi de yalnız KAREYE BAKINCA göründü. Test o bakışın yerine
+        /// geçmiyor; bulunanı bir daha kaçırmamak için duruyor.
+        /// </summary>
+        [Test]
+        public void EveryDoubleSidedMaterialIsActuallyDoubleSided()
+        {
+            var eksik = OttomanMaterialBuilder.EksikCiftTarafli();
+            Assert.IsEmpty(eksik,
+                $"{eksik.Count} malzeme bildiriminde iki yuzlu yaziyor ama "
+                + "malzemesinde kapali — ince yuzey alttan bakilinca YOK "
+                + "olur. Kur: Hezarfen > Boru Hatti > Malzemeleri uret. "
+                + string.Join(", ", eksik));
+        }
+
         [Test]
         public void NoModelStillCarriesAnEmbeddedMaterial()
         {
