@@ -250,6 +250,11 @@ katlık bir değişimin sıfır fark yaptığını görünce o %7'nin koşumlar
 arası gürültü olduğu anlaşılıyor. **Doğru okuma ilkiydi: pişmiş APV
 verisi kareye hiç ulaşmıyor.**
 
+> **Bu cümle sonradan ölçümle düzeltildi** — bkz. *"Kaldıracı
+> çevirdim"*. Veri kareye ulaşıyor; payı ölçülemeyecek kadar küçük
+> olduğu için ulaşmıyor gibi okundu. Satır, nasıl yanıldığımın kaydı
+> olarak duruyor.
+
 ### Elenenler — hepsi okundu, hepsi "açık" diyor
 
 | halka | okunan |
@@ -291,6 +296,62 @@ hesaplanabilir.
 **Not:** `SkyboxPozu` sabiti hâlâ **1,3**. 90 bir deney ve ölçüm onu
 doğrulayana kadar sabit yazılmadı — bu depoda bir sayı, onu doğrulayan
 ölçüm olmadan yazılmaz.
+
+### Kaldıracı çevirdim: APV **ulaşıyor**, yalnızca ~150 kat sönük
+
+Elemenin sonunda geriye tek okunmamış kaldıraç kaldı:
+`ProbeVolumesOptions.intensityMultiplier`. Onu 1'den **50**'ye aldım —
+başka hiçbir şeye dokunmadan, aynı fırın verisiyle, aynı durakta.
+
+```
+carpan  1 : golge 0,0201 / 0,0061 / 0,0001   gunes 0,3216 / 0,2525 / 0,1747
+carpan 50 : golge 0,0263 / 0,0092 / 0,0002   gunes 0,4310 / 0,3191 / 0,2134
+```
+
+Bu, APV tarafından yapılan bir değişikliğin kareyi **ilk kez**
+oynattığı an. Ve tek koşumluk bir gürültü olmadığını söyleyen şey
+farkın büyüklüğü değil, **iki bölgenin aynı oranda oynaması**:
+
+| bölge | çarpan 1 | çarpan 50 | artış | çözülen APV payı |
+|---|---|---|---|---|
+| gölge (kırmızı) | 0,0201 | 0,0263 | %30,8 | %0,63 |
+| güneş (kırmızı) | 0,3216 | 0,4310 | %34,0 | %0,69 |
+
+`kare = taban + çarpan × apv` kurup çözünce iki bağımsız bölge
+**%0,63** ve **%0,69** veriyor. Koşumlar arası gürültü iki bölgeyi
+birbirinden bağımsız oynatırdı; aynı oranı iki kez vermezdi. (Kare
+tonemap'ten geçtiği için bu çözüm tam doğrusal değil — mertebe
+doğrudur, ondalık değil.)
+
+**Yani ADR'nin yukarıdaki cümlesi yanlış:** *"pişmiş APV verisi kareye
+hiç ulaşmıyor"* değil, **ulaşıyor ve karenin ~%0,65'ini kuruyor.**
+Doğru olması için ~%100 mertebesinde olmalıydı; kabaca **150 kat**
+sönük.
+
+Bu, poz-90 deneyinin neden sıfır fark verdiğini de açıklıyor: göğü 69
+kat parlatmak, karenin %0,65'ini kuran bir terimin **gökten gelen
+kısmını** büyütür — ve o kısım ölçüm eşiğinin altında kalır. İki sonuç
+çelişmiyor; ikincisi birincinin sebebini veriyor.
+
+**Çarpan bir çözüm değil, bir termometre.** 50 yazıp geçmek, ölçümün
+yerine sabit koymaktır — bu depoda üç kez çıkan kusurun tam kendisi.
+Sabit 1'e geri alındı. Soru artık şu: probların içindeki sayı neden
+150 kat küçük?
+
+### Sıradaki tek değişkenli deney: albedo, bu kez doğru aletle
+
+Yukarıdaki tabloda `albedoBoost 8 → %1,5` yazıyor ve **o ölçüm yanlış
+aletle yapılmıştı**: karşılaştırılan şey `CellData` içindeki farklı
+desen sayısıydı. Desen sayısı verinin *çeşitliliğini* ölçer,
+*büyüklüğünü* değil — sekiz kat parlak bir fırın da hemen hemen aynı
+sayıda farklı desen üretir. Yani albedo elenmedi; ölçülmedi.
+
+Şimdi doğru alet var: çarpan deneyinin kurduğu "APV payı" hesabı.
+D_Galata `albedoBoost 8` ile yeniden pişiyor. Beklenti **sonuç
+görülmeden** yazılıyor: sıçrama ışığı albedoyla doğrusal olduğu için
+pay %0,65'ten **%5 mertebesine** çıkmalı, gölgenin kırmızısı
+0,0201 → **0,021 civarına**. Çıkmazsa albedo gerçekten elenir ve geriye
+fırının güneşinin probda hangi ölçekte durduğu kalır.
 
 ## Ölçülen dört sebep
 
