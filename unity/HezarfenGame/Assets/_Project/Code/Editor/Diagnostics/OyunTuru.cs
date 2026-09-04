@@ -99,7 +99,17 @@ namespace Hezarfen.Editor.Diagnostics
             new Durak { ad = "09_marmara", nokta = new Vector3(-1850f, 0f, -2700f),
                         bakisYaw = 180f,
                         neden = "Kiyi, iskele ve deniz." },
-            new Durak { ad = "10_uskudar", nokta = new Vector3(3500f, 0f, 200f),
+            // USKUDAR DURAGI DA OLCUMLE TASINDI — GALATA ILE AYNI KUSUR.
+            //
+            // Durak (3500, 200) idi ve aci aramasi duzeltildikten sonra
+            // rapor hala `kadrajda gok @ 0 m` diyordu: on uc yonun
+            // hicbirinde seksen metre icinde bir sey yok. Yani oyuncu
+            // Uskudar'in oldugu yerde durmuyor.
+            //
+            // D_Uskudar'in 10.691 yerlesim ornegi sahne dosyasindan
+            // okundu; en yogun 200 m'lik hucre **x 4600-4800, z
+            // 600-800** (313 ornek). Durak o hucrenin ortasina tasindi.
+            new Durak { ad = "10_uskudar", nokta = new Vector3(4700f, 0f, 700f),
                         bakisYaw = 270f,
                         neden = "Karsi yaka — semt akisi calisiyor mu." },
         };
