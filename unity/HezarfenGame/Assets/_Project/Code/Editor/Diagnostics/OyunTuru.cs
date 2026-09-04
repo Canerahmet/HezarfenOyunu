@@ -499,6 +499,16 @@ namespace Hezarfen.Editor.Diagnostics
                     // bakinca goruldu.
                     //
                     // Esik 12: birkac yoldan gecen kalabalik degildir.
+                    // BU BLOK DA AKIS BEKLEMESINDEN ONCE KOSUYOR.
+                    //
+                    // Aci aramasi bu turda akistan SONRAYA tasindi
+                    // (bos bir dunyayi olcuyordu). Kalabalik merkezi
+                    // hala once hesaplaniyor ve bu bilincli: `Sakinler`
+                    // NPC yoneticisinin kendi havuzu, semt akisina bagli
+                    // degil — turda duraklarda 57 NPC sayildi. Yine de
+                    // kalabalik bulunamazsa karar aci aramasina dusuyor
+                    // ve o artik yuklu dunyayi olcuyor, yani en kotu
+                    // durumda geri cekilme dogru yerde.
                     Vector3? kalabalikMerkez = null;
                     bool kalabaligaDonuldu = false;
                     if (npc != null && npc.Sakinler != null)
