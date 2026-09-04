@@ -42,9 +42,23 @@ etkiler.
 
 ## Ölçülmemiş olan
 
-- İç mekânın **kare bütçesindeki** payı. Ev LOD0'ı 2.100-2.472 üçgen ve
-  bunun ne kadarı iç? Ölçülmedi; iç mekânlar 40 m'de görünür olacaksa
-  bu sayı gerekli.
+- İç mekânın **kare bütçesindeki** payı — **kısmen ölçüldü.** Mobilya
+  üç varyantta:
+
+  | ev | LOD0 | mobilya | pay |
+  |---|---:|---:|---:|
+  | House_A_Dar | 2.100 | 204 | %10 |
+  | House_B_Orta | 2.472 | 228 | %9 |
+  | House_C_Genis | 3.016 | 156 | %5 |
+
+  Yani döşeme, evin üçgen bütçesinin onda birinden az. İç bölme ve
+  merdiven bu ölçümde **ayrıştırılamadı**: harness'ın kurduğu
+  `HouseParams` gerçek üretimdekiyle birebir olmadığı için ikisi de 0
+  döndü — oysa içeriden çekilen kare merdiveni açıkça gösteriyor.
+  (`ic_bolmeler` zaten `width < 5,8` iken boş döner ve House_A_Dar'ın
+  duvar eni 5,6; o satır doğru. Ötekiler doğrulanmadı.) Sayı gerekince
+  ölçüm üreticinin kendi içinden alınmalı, dışarıdan yeniden kurarak
+  değil.
 - İçeride **ışık**. ADR 0087'nin konusu tam da bu: kapalı gölgeye
   dolaylı ışık gelmiyor. Bir odayı inandırıcı yapan şey sıçrama
   ışığıdır; fırın oturmadan iç mekân değerlendirilemez.
