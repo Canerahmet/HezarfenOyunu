@@ -1004,6 +1004,37 @@ Tur artık `DistrictStreamer.LoadsInFlight` sıfıra inene kadar bekliyor
 üst sınır) ve her satırda **kaç semt yüklü, ne kadar beklendi** yazıyor.
 Bundan sonra boş çıkan bir durak gerçekten boştur.
 
+### Tur artık şehre bakıyor
+
+Açı araması semt akışından **önce** koşuyordu: şehir gelmemişken her yön
+"80 m, hiçbir şey" okuyor, ilk aday eşiği geçmiş sayılıyor ve arama ilk
+adımda bitiyordu. Üstelik "açık" olmak yetmiyor — hiçbir şeye çarpmayan
+bir yön de 80 m okur ve kazanır. Dört durak `kadrajda gok @ 0 m`
+diyordu; yani o kareler inceleme karesi değildi.
+
+Arama akıştan sonraya alındı, bütün adaylar taranıyor ve hem **açık**
+hem **konulu** (bir şeye çarpan) yön tercih ediliyor. Sonuç:
+
+| önce | sonra |
+|---|---|
+| 4 durakta `gok @ 0 m` | 8 durakta adıyla bir yapı |
+
+Kalan iki durak ölçümle ayrıldı:
+
+* **10_uskudar** — on üç yönün hiçbirinde 80 m içinde bir şey yok. Yani
+  durak Üsküdar'ın olduğu yerde değildi. D_Uskudar'ın 10.691 yerleşimi
+  okundu, en yoğun hücre x 4600-4800 / z 600-800 (313 örnek); durak
+  oraya taşındı. (Galata'da aynı kusur, aynı çözüm.)
+* **09_marmara** — kare dürüsttü: o noktanın **120 m içinde hiçbir şey
+  yok**, en yakın içerik 253 m'de. Ama durağın gerekçesi "kıyı, iskele
+  ve deniz" ve boş bir kumsal onu göstermiyor. Nokta, en yakın yirmi
+  yapının merkezinden denize doğru 35 m'ye alındı.
+
+Bir de replik sütunu: on durakta da 0 yazıyordu ve bu tek başına iki
+karşıt şey demek olabilir. Artık yanında **duyma menzilindeki sakin
+sayısı** var (`BarkGosterici.duyulmaMesafesi`, 12 m): "0 / 0" beklenen,
+"0 / 6" kusur.
+
 ### Işık zincirinin sonu: APV çalışıyor, problar yedek ortamdan karanlık
 
 Güneş fırına girdikten sonra `D_Galata` yeniden pişti — 95,8 dk, 62
