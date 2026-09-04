@@ -92,6 +92,54 @@ namespace Hezarfen.Editor.Lighting
             return sb.ToString();
         }
 
+        /// <summary>
+        /// <b>Kameraya APV'yi açıkça yazar</b> — varsayılan kare
+        /// ayarları okunamadığı için tek elimizde kalan kaldıraç.
+        ///
+        /// ## Neden
+        ///
+        /// A/B ölçüldü: boru hattı varlıklarının hepsinde
+        /// <c>lightProbeSystem</c> <b>kapatılıp</b> tur yeniden koşuldu
+        /// ve aynı kare, aynı gölge çıktı —
+        /// <c>0,0217/0,0075/0,0001</c> (APV kapalı) ile
+        /// <c>0,0202/0,0061/0,0001</c> (APV açık). Yani pişmiş veri
+        /// kareye <b>hiç ulaşmıyor</b>: açıp kapatmak hiçbir şeyi
+        /// değiştirmiyor.
+        ///
+        /// Zincirdeki okunabilen her halka sağlam: veri diskte ve
+        /// ışıklı (38.238 desen), çalışma zamanı `kurulu/kume var`,
+        /// çiziciler `m_LightProbeUsage: 1`, boru hattı
+        /// `lightProbeSystem: 1`. Okunamayan tek halka kameranın
+        /// <b>kare ayarı</b> — Unity 6'da varsayılanı tutan tür
+        /// internal.
+        ///
+        /// Bu yüzden kameraya kendi kare ayarı verilir ve APV biti
+        /// açıkça yazılır. Hipotez doğruysa gölge maviye döner;
+        /// yanlışsa ölçü yine değişmez ve halka elenmiş olur.
+        /// </summary>
+        [MenuItem("Hezarfen/Aydinlatma/Kameraya APV'yi ac")]
+        public static void KameraApvAc()
+        {
+            int n = 0;
+            foreach (var cam in Object.FindObjectsByType<Camera>(
+                         FindObjectsInactive.Include, FindObjectsSortMode.None))
+            {
+                var hd = cam.GetComponent<HDAdditionalCameraData>();
+                if (hd == null) continue;
+                hd.customRenderingSettings = true;
+                hd.renderingPathCustomFrameSettingsOverrideMask
+                    .mask[(uint)FrameSettingsField.AdaptiveProbeVolume] = true;
+                hd.renderingPathCustomFrameSettings.SetEnabled(
+                    FrameSettingsField.AdaptiveProbeVolume, true);
+                EditorUtility.SetDirty(hd);
+                n++;
+            }
+            if (n > 0)
+                UnityEditor.SceneManagement.EditorSceneManager
+                    .MarkAllScenesDirty();
+            Debug.Log($"[Hezarfen] {n} kameraya APV kare ayari yazildi.");
+        }
+
         private static string KareAyari(HDRenderPipelineAsset asset)
         {
             var so = new SerializedObject(asset);

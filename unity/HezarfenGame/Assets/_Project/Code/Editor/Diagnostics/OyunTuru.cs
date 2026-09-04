@@ -586,6 +586,15 @@ namespace Hezarfen.Editor.Diagnostics
                     akisSemt = 0;
                     if (akis != null)
                         foreach (var _ in akis.ResidentDistricts) akisSemt++;
+                    // KAMERA KARE AYARI DENENDI VE OLCUM ELEDI.
+                    //
+                    // Kameraya `AdaptiveProbeVolume` biti acikca
+                    // yazildi (`ApvDenetimi.KameraApvAc`) ve kare
+                    // DEGISMEDI: golge 0,0203/0,0062/0,0001 — biti
+                    // yazmadan onceki 0,0202/0,0061/0,0001 ile ayni.
+                    // Halka elendi; komut menude duruyor ama turda
+                    // kosmuyor, cunku her durakta sahneyi kirletiyordu
+                    // ve karsiliginda hicbir sey vermiyordu.
                     var _prv = ProbeReferenceVolume.instance;
                     apv = _prv == null
                         ? "yok"
