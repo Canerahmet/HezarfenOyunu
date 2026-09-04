@@ -411,6 +411,57 @@ tek başına (en çok 8 kat) yetmeyeceğini de söylüyor — albedo deneyi
 hâlâ değerli, çünkü **hangi kadarını açıkladığını** ölçüyor, ama
 tamamını açıklaması beklenmiyor.
 
+### Gölgeyi bugün aydınlatan şey EKRAN — ölçüldü
+
+Bir kare daha okundu: `04_surici_kalabalik`, 13 m yukarıdan çekilmiş.
+Orada gölgeli kaldırım **0,369 / 0,285 / 0,179** veriyor, yani mavi/kırmızı
+**0,486** — Galata sokağındaki 0,003'ün yüz katı. Aynı şehir, aynı güneş,
+aynı fırın. Bir dolaylı ışık terimi kameranın yüksekliğine göre yüz kat
+değişemez — dünya uzayında değilse.
+
+Bunu tek kareye bırakmamak için on altı kare birden ölçüldü: her karede
+en karanlık %25'in mavi/kırmızısı ve karenin **aydınlık alan yüzdesi**
+(doğrusal parlaklığı 0,25 üstü piksel oranı).
+
+| kare | gölge mavi/kırmızı | aydınlık alan |
+|---|---:|---:|
+| 09_marmara | 1,665 | %61,6 |
+| 08_halic_basi | 1,140 | %74,8 |
+| 07_kirsal | 1,054 | %53,5 |
+| 02_dogum_kosu | 0,992 | %26,2 |
+| 01_dogum | 0,660 | %28,8 |
+| 05_ayasofya | 0,155 | %33,6 |
+| 03_galata_sokak | 0,179 | %48,1 |
+| 10_uskudar | 0,002 | %0,1 |
+
+Korelasyon **0,754**; kameranın bir yapının altında kaldığı üç bozuk
+durak çıkarılınca **0,651**. İşaret açık ve güçlü: ekranda ne kadar çok
+aydınlık yüzey varsa gölge o kadar mavi.
+
+**Bu, ekran uzayı imzasıdır.** Dünya uzayında pişmiş bir dolaylı terim
+kameranın ne gördüğüne bakmaz. Demek ki bugün gölgeyi aydınlatan şey
+profildeki **SSGI**'dir ve APV'nin katkısı ölçüm gürültüsünün içinde
+kalıyor.
+
+Tabloda bir istisna var ve o da aynı şeyi söylüyor: `03_galata_sokak`
+%48 aydınlık alana rağmen 0,179 okuyor, `07_kirsal` ise %53 ile 1,054.
+Fark açıklık: kırda gölge **açık gökyüzünün altındadır**, sokakta iki
+duvarın **arasındadır**. Ekran uzayı köşenin arkasını göremez. Yani
+kuralı daha keskin yazmak gerekiyor: gölgeyi karartan şey kapalılıktır
+— ve kapalı gölgeyi doldurmak APV'nin var oluş sebebidir.
+
+### Kapı sayısı: 03_galata_sokak gölgesinin mavi/kırmızısı
+
+Bu ölçüm fırın işine bir **kabul kriteri** veriyor ve kriter
+uydurma değil, aynı sahnenin kendi sağlıklı komşularından:
+
+> APV çalıştığında `03_galata_sokak` karesinde gölgenin mavi/kırmızısı
+> **0,179**'dan, açık kareler ailesine — **0,66-1,14** bandına — doğru
+> çıkmalı. `05_ayasofya` için aynı şey: 0,155'ten yukarı.
+
+Çarpan deneyi bu sayıyı %0,65'lik bir katkıyla oynatamazdı; kriteri
+karşılayan bir fırın, mertebe olarak da doğru fırındır.
+
 ## Ölçülen dört sebep
 
 1. **Prob hacimleri dünya boyuydu.** Her semtin hacmi `Mode.Global`'dı ve
