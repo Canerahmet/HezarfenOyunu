@@ -315,12 +315,23 @@ namespace Hezarfen.Arayuz
         public static string Glif(string klavye, string kol) =>
             Gamepad.current != null ? kol : klavye;
 
-        /// <summary>Alt köşedeki kumanda satırı.</summary>
+        /// <summary>
+        /// Alt köşedeki kumanda satırı.
+        ///
+        /// YÜRÜME VE KALKIŞ DA YAZILIR. Satır yalnızca ikincil tuşları
+        /// sayarken oyunun <b>temel</b> üç eylemi — yürü, bak,
+        /// zıpla/kalkış — hiç geçmiyordu. Kanadı kuşanınca çıkan
+        /// "Space ile atla" balonu bunu bir kez söylüyor; onu kaçıran
+        /// oyuncu için ekranda başka yer yok. Bir kumanda satırı, en çok
+        /// basılan tuşu yazmıyorsa kumanda satırı değildir.
+        /// </summary>
         private static string Tuslar() =>
             Gamepad.current != null
-                ? "Start duraklat · X al · RB kanat · R3 bakış\n"
+                ? "Sol çubuk yürü · Sağ çubuk bak · A zıpla/kalkış\n"
+                  + "Start duraklat · X al · RB kanat · R3 bakış\n"
                   + "D-pad yukarı kaydet · D-pad aşağı yükle"
-                : "ESC duraklat · E al · G kanat · V bakış · Shift koş\n"
+                : "WASD yürü · Fare bak · Shift koş · Space zıpla/kalkış\n"
+                  + "ESC duraklat · E al · G kanat · V bakış\n"
                   + "F5 kaydet · F9 yükle";
 
         /// <summary>Duraklat menüsünde seçili satır.</summary>

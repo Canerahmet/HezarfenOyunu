@@ -110,7 +110,21 @@ namespace Hezarfen.Editor.Diagnostics
             new Durak { ad = "03_galata_sokak", nokta = new Vector3(300f, 0f, 100f),
                         bakisYaw = 0f,
                         neden = "Dar sokakta kamera kolu ve kalabalik." },
-            new Durak { ad = "04_surici", nokta = new Vector3(-700f, 0f, -1500f),
+            // DURAGIN AMACI YOGUNLUK — YERI DE YOGUNLUKTAN SECILDI.
+            //
+            // Durak (-700, -1500) idi ve gerekcesi "Surici dokusu ve NPC
+            // yogunlugu". Olculdu (`yakin_doku.py` yontemi, butun
+            // sahnelerdeki konumlu prefab ornekleri):
+            //
+            //   (-700, -1500)   25 m'de  8   40 m'de 32   80 m'de 110
+            //   (-150, -1650)   25 m'de 29   40 m'de 65   80 m'de 209
+            //
+            // Yani yogunlugu gostermesi gereken durak, Surici'nin en
+            // yogun yerinin dortte biri kadar dolu bir noktada
+            // duruyordu. Yeni nokta Surici Dogu'nun en sik 100 m
+            // hucrelerinden biri (37 yapi) ve eskisine 700 m uzakta —
+            // hala ayni semt, ayni doku.
+            new Durak { ad = "04_surici", nokta = new Vector3(-150f, 0f, -1650f),
                         bakisYaw = 90f,
                         neden = "Surici dokusu ve NPC yogunlugu." },
             // DURAK AYASOFYA'NIN ICINDEYDI.
