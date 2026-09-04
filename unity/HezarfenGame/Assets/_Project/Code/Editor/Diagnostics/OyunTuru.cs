@@ -668,10 +668,18 @@ namespace Hezarfen.Editor.Diagnostics
                     // kosmuyor, cunku her durakta sahneyi kirletiyordu
                     // ve karsiliginda hicbir sey vermiyordu.
                     var _prv = ProbeReferenceVolume.instance;
+                    // SENARYO DA YAZILIYOR.
+                    //
+                    // Diskteki veri `-Default` senaryosu altinda duruyor.
+                    // Calisma zamaninda senaryo bos ya da baska bir adsa
+                    // hicbir hucre yuklenmez — ve her anahtar "acik"
+                    // gorunmeye devam eder. Bu, zincirde geriye kalan
+                    // okunabilir tek halka.
                     apv = _prv == null
                         ? "yok"
                         : $"{(_prv.isInitialized ? "kurulu" : "KURULMADI")}"
-                          + $"/kume {(_prv.currentBakingSet != null ? "var" : "YOK")}";
+                          + $"/kume {(_prv.currentBakingSet != null ? _prv.currentBakingSet.name : "YOK")}"
+                          + $"/senaryo '{_prv.lightingScenario}'";
                     // Yuklenen sahnenin ciziciler ve fizik olarak
                     // oturmasi.
                     for (int i = 0; i < 60; i++) yield return null;
