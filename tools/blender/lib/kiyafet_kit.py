@@ -452,7 +452,8 @@ def bilek_olc(obj, cizgi, filtre, en_cok, alt=0.45):
 # duser ve yumusatma isini yapabilir. Bedeli 64 dortgen.
 def etek(ad, col, z_ust, z_alt, r_ust, r_alt, kalinlik, segment=64,
          yarik=False, cy=0.0, cy_alt=None,
-         kirisik=9, kirisik_pay=0.035, halka_sayisi=5, egri=1.0):
+         kirisik=9, kirisik_pay=0.035, halka_sayisi=5, egri=1.0,
+         ic_kapak=None):
     """Belden aşağı **serbest** düşen etek — bacakları takip etmez.
 
     Entarinin eteği gövdeye yapışmaz, konidir. Kabuk yöntemiyle üretseydim
@@ -517,6 +518,28 @@ def etek(ad, col, z_ust, z_alt, r_ust, r_alt, kalinlik, segment=64,
                 (math.cos(a) * rx * dalga,
                  cy_t + math.sin(a) * ry * dalga, z)))
         halkalar.append(halka)
+
+    # ETEGIN USTU ACIK KALMASIN.
+    #
+    # Etegin ust yaricapi kabuktan 8 mm DISARIDA (olculdu) ve arada
+    # kalan halka acikti: inceleme karesinde belde koyu bir serit
+    # goruluyordu ve o serit golge degil, etegin ICIYDI — figurun
+    # icine bakiliyordu. "Dikis" diye okudugum seyin buyuk kismi bu
+    # delikti.
+    #
+    # `ic_kapak` verilirse ust halkadan ICERIYE, kabugun yaricapina
+    # dogru yatay bir raf orulur ve delik kapanir. Kumas gercekte de
+    # oyle davranir: etek belde ice kivrilip govdeye dikilir.
+    if ic_kapak is not None:
+        ic = []
+        for i in range(segment):
+            a_ = 2.0 * math.pi * i / segment
+            ic.append(bm.verts.new(
+                (math.cos(a_) * ic_kapak[0],
+                 cy + math.sin(a_) * ic_kapak[1], z_ust)))
+        for i in range(segment):
+            j = (i + 1) % segment
+            bm.faces.new((ic[i], ic[j], halkalar[0][j], halkalar[0][i]))
 
     ust, alt = halkalar[0], halkalar[-1]
     n = segment

@@ -595,10 +595,15 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
                f" (basamak {r_ust[0] - r_kabuk[0]:+.3f}/"
                f"{r_ust[1] - r_kabuk[1]:+.3f} m)")
 
+    # `ic_kapak`: etegin ust halkasi ile govde kabugu arasindaki acik
+    # halkayi kapatir. Kabugun o kottaki yaricapi `r_kabuk` (kadinda
+    # kalcada, erkekte belde olculdu) ve fark 8 mm — kucuk ama ACIK bir
+    # delikti; kareden figurun icine bakiliyordu.
     parts.append(hz.assign(kiy.etek(
         "Entari_Etek", col, etek_ust_z, z_etek,
         r_ust, r_alt, kiy.ENTARI_KAL, yarik=True, cy=bel_cy,
-        cy_alt=etek_cy_alt), ust_mat))
+        cy_alt=etek_cy_alt,
+        ic_kapak=(r_kabuk[0] * 0.98, r_kabuk[1] * 0.98)), ust_mat))
 
     # --- KUSAK / FERACE BELI -------------------------------------------------
     #
@@ -619,11 +624,47 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
     # dikisi ortmek uzere konmustu. Dikis artik kalcada ve kabugun
     # kendi yuzeyi orada bitiyor; ortulecek bir sey kalmadi. Kalan tek
     # islevi "kusak gibi gorunmek"ti ve ferace kusak tasimaz.
+    # KADINDA BANT GERI GELDI — VE BU SEFER DIKISIN USTUNDE.
+    #
+    # Bant "ortulecek bir sey kalmadi" diye kaldirilmisti. Kare bunu
+    # curuttu: feracenin belinde net bir yatay cizgi var. Olculdu,
+    # basamak yalnizca 8 mm — yani gorunen sey yaricap farki degil
+    # TEGET kirilmasi (kabuk asagi-iceri, koni asagi-disari).
+    #
+    # Karsilastirma bunu kanit haline getiriyor: AYNI dikis erkekte de
+    # var (entari etegi belden basliyor) ama onun karesinde
+    # gorunmuyor, cunku kusak tam orada duruyor. Iki figur arasindaki
+    # fark kumas degil, o bant.
+    #
+    # Bir onceki bant `z_bel`deydi ve kadinin dikisi orada DEGIL:
+    # feracenin etegi KALCADAN basliyor (`etek_ust_z = z_kalca`). Yani
+    # eski bant, ortmesi gereken yerin birkac santim ustunde duruyordu.
+    # Bant artik dikisin kendi kotunda ve kesiti de oradan (`ust_k`)
+    # aliniyor.
+    #
+    # Bu bir kusak degil: feracenin KENDI kumasindan (bel_mat = ust_mat),
+    # bagsiz, dar bir toplama bandi. Ferace kusak tasimaz — beli
+    # toplanir.
+    # ... VE DENENDI, KARE REDDETTI. Bant kadinda YOK.
+    #
+    # Yukaridaki gerekce saglamdi ve yine de yanlis cikti: bant
+    # dikisin kotune tasindi, feracenin kendi kumasindan yapildi,
+    # yuksekligi 8,6 cm'den 3,3 cm'ye indirildi — ve kare bantli
+    # halin bantsizdan DAHA KOTU oldugunu gosterdi. Erkekte kusak
+    # ise yariyor cunku o KIRMIZI ve bir giysi ogesi olarak okunuyor;
+    # kadinda ayni renkte bir halka, giysinin uzerinde duran bir
+    # FICI CEMBERI gibi duruyor ve "kova" izlenimini azaltmak yerine
+    # artiriyor.
+    #
+    # Ogrenilen: erkekteki cozumun kadinda da isleyecegi bir
+    # benzetmeydi, olcum degil. Karsilastirma hipotezi uretti, kare
+    # onu eledi.
     kusak_var = not kadin_mi
     bel_adi = "Ferace_Bel" if tip == "kadin" else "Kusak"
     bel_mat = ust_mat if tip == "kadin" else mats["kusak"]
-    bel_yuk = 0.086 if tip == "kadin" else 0.055
-    bel = bel_k
+    bel_yuk = 0.033 if tip == "kadin" else 0.055
+    bel = ust_k if kadin_mi else bel_k
+    bel_z = etek_ust_z if kadin_mi else z_bel
     # Kusak entarinin USTUNDE baglanir; ic katman degildir. Ilk turda
     # yaricapi entarininkinden kucuktu (0,024 < 0,034) ve kusak entarinin
     # ICINDE kaldi — yalnizca belin ve sirtin CUKUR yerlerinde bir damla
@@ -648,7 +689,7 @@ def giydir(govde, col, mats, etek_orani, dizlik_var, tip="erkek"):
     kusak_pay = ENTARI_SIS + kiy.ENTARI_KAL + 0.002
     if kusak_var:
         parts.append(hz.assign(kiy.band(
-            bel_adi, col, z_bel, (bel[0] + kusak_pay, bel[1] + kusak_pay),
+            bel_adi, col, bel_z, (bel[0] + kusak_pay, bel[1] + kusak_pay),
             boy * bel_yuk, kiy.KUSAK_KAL, cy=bel_cy), bel_mat))
 
     # --- DIZLIK (yalniz ucus varyanti) ---------------------------------------

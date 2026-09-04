@@ -39,29 +39,31 @@ Sevk edilen sürüm **v18**: profil düz, halka sayısı 2'den 5'e çıktı.
 Geometri aynı, ama etek animasyonda kalçadan dize tek bir dörtgenle
 deforme olmuyor.
 
-**Kalan üç seçenek — hangisi?**
+**Önerimi denedim ve kare reddetti — ama başka bir şey buldu.**
 
-1. **Bel bandı geri gelsin.** Feracenin kendi kumaşından, dar, bağsız
-   bir bant dikişi örter. Kodun daha önceki turu bunu koymuş, sonra
-   "ferace kuşak taşımaz" diyerek kaldırmıştı; kare o kaldırmanın
-   bedelini gösteriyor. En ucuz ve en emin çözüm.
-2. **Etek daha yukarıdan başlasın**, üst ucu kabuğun altında kalsın.
-   Bel kalçadan dar olduğu için etek orada gövdeden ayrı durur —
-   toplanmış bir etek gerçekten böyledir, ama siluet belde şişer.
-3. **Olduğu gibi kalsın.** 1,60 m'lik bir figür oyunda çoğunlukla 10 m
-   öteden görülüyor; dikiş o mesafede okunmuyor olabilir. Ölçülmedi.
+Bandı dikişin kendi kotuna taşıdım (kadında dikiş belde değil
+**kalçada**: eski bant birkaç santim yukarıdaydı), feracenin kendi
+kumasından yaptım, boyunu 8,6 cm'den 3,3 cm'ye indirdim. Sonuç bantsız
+hâlden **daha kötü**: aynı renkte bir halka, giysinin üzerinde duran
+bir fıçı çemberi gibi okuyor ve "kova" izlenimini azaltmak yerine
+artırıyor. Erkekte kuşağın işe yaramasının sebebi **kırmızı** olması —
+orada bir giysi ögesi olarak okunuyor. Yani erkekteki çözümün kadında
+da işleyeceği bir benzetmeydi, ölçüm değil.
 
-Önerim **1**, ve gerekçesi artık tercih değil **gözlem**: aynı dikiş
-erkekte de var (`Sakin_Erkek`, entari eteği belden başlıyor) ama
-inceleme karesinde **görünmüyor** — çünkü erkekte kuşak orada duruyor
-ve tam olarak o dikişi örtüyor. İki figür yan yana konunca fark
-kumaşta değil, o bantta. Kodun eski turu bunu zaten yazmıştı ("etek
-kuşağın altında başlarsa dikiş kuşakla örtülür"); kadında bant
-kaldırılınca dikiş açığa çıktı.
+**Asıl kusur başkaymış.** Eteğin üst yarıçapı kabuktan 8 mm dışarıda
+ve aradaki halka **kapalı değildi**: belde görülen koyu şerit gölge
+değil, eteğin iç duvarıydı. Etek artık üst halkasından içeriye,
+kabuğun yarıçapına doğru yatay bir raf örüyor (`kiy.etek(...,
+ic_kapak=...)`) ve delik kapanıyor. Kumaş gerçekte de öyle davranır:
+etek belde içe kıvrılıp gövdeye dikilir.
 
-Tarihsel olarak da savunulabilir: feracenin beli toplanır. Üçgen
-maliyeti birkaç yüz, ve kusuru kaynağında değil göründüğü yerde
-kapatıyor.
+Üç hâl yan yana konunca sıra net: **yalnız kapak** > bantsız-kapaksız >
+bant+kapak. Sevk edilen sürüm **v25**: kapak var, bant yok.
+Maliyet 256 üçgen.
+
+Geriye kalan koyu çizgi iki kumaş katmanının değdiği yerdeki **temas
+gölgesi**dir ve gerçek bir bel dikişinde de vardır; kaldırılacak bir
+kusur olarak görmüyorum. Yine de karar senin.
 
 ## Ayrıca kayda geçen, henüz sorulmayanlar
 

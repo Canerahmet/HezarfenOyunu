@@ -82,18 +82,18 @@
     "Salvar",
     "Sarik"
    ],
-   "tris_lod0": 64312,
-   "tris_lod1": 19292,
-   "tris_lod2": 5144,
+   "tris_lod0": 64568,
+   "tris_lod1": 19370,
+   "tris_lod2": 5164,
    "agirliksiz_kose": 0,
-   "kose_lod0": 32200,
+   "kose_lod0": 32328,
    "kol_donusu": 33.0,
    "sakal_sisme_mm": [
     4.38,
     21.66
    ],
-   "agirlik_farki_once": 0.1251,
-   "agirlik_farki": 0.0151,
+   "agirlik_farki_once": 0.1261,
+   "agirlik_farki": 0.015,
    "kemik": 30,
    "kemikler": [
     {
@@ -438,18 +438,18 @@
     "Salvar",
     "Sarik"
    ],
-   "tris_lod0": 64792,
-   "tris_lod1": 19436,
-   "tris_lod2": 5182,
+   "tris_lod0": 65048,
+   "tris_lod1": 19514,
+   "tris_lod2": 5202,
    "agirliksiz_kose": 0,
-   "kose_lod0": 32440,
+   "kose_lod0": 32568,
    "kol_donusu": 33.0,
    "sakal_sisme_mm": [
     4.38,
     21.66
    ],
-   "agirlik_farki_once": 0.1244,
-   "agirlik_farki": 0.019,
+   "agirlik_farki_once": 0.1253,
+   "agirlik_farki": 0.0188,
    "kemik": 30,
    "kemikler": [
     {
@@ -792,18 +792,18 @@
     "Salvar",
     "Sarik"
    ],
-   "tris_lod0": 64476,
-   "tris_lod1": 19342,
-   "tris_lod2": 5158,
+   "tris_lod0": 64732,
+   "tris_lod1": 19418,
+   "tris_lod2": 5178,
    "agirliksiz_kose": 0,
-   "kose_lod0": 32280,
+   "kose_lod0": 32408,
    "kol_donusu": 24.9,
    "sakal_sisme_mm": [
     3.52,
     21.04
    ],
-   "agirlik_farki_once": 0.1245,
-   "agirlik_farki": 0.0142,
+   "agirlik_farki_once": 0.1251,
+   "agirlik_farki": 0.0141,
    "kemik": 30,
    "kemikler": [
     {
@@ -1143,15 +1143,15 @@
     "Salvar",
     "Takke"
    ],
-   "tris_lod0": 53792,
-   "tris_lod1": 16136,
-   "tris_lod2": 4302,
+   "tris_lod0": 54048,
+   "tris_lod1": 16214,
+   "tris_lod2": 4322,
    "agirliksiz_kose": 0,
-   "kose_lod0": 26904,
+   "kose_lod0": 27032,
    "kol_donusu": 18.6,
    "sakal_sisme_mm": null,
-   "agirlik_farki_once": 1.4941,
-   "agirlik_farki": 0.0201,
+   "agirlik_farki_once": 1.4986,
+   "agirlik_farki": 0.0199,
    "kemik": 30,
    "kemikler": [
     {
@@ -1494,18 +1494,18 @@
     "Salvar",
     "Sarik"
    ],
-   "tris_lod0": 63348,
-   "tris_lod1": 19004,
-   "tris_lod2": 5066,
+   "tris_lod0": 63604,
+   "tris_lod1": 19080,
+   "tris_lod2": 5088,
    "agirliksiz_kose": 0,
-   "kose_lod0": 31718,
+   "kose_lod0": 31846,
    "kol_donusu": 43.6,
    "sakal_sisme_mm": [
     3.61,
     21.53
    ],
-   "agirlik_farki_once": 0.141,
-   "agirlik_farki": 0.0184,
+   "agirlik_farki_once": 0.1438,
+   "agirlik_farki": 0.0183,
    "kemik": 30,
    "kemikler": [
     {
@@ -1843,15 +1843,15 @@
     "Salvar",
     "Yasmak"
    ],
-   "tris_lod0": 57340,
-   "tris_lod1": 17202,
-   "tris_lod2": 4586,
+   "tris_lod0": 57596,
+   "tris_lod1": 17278,
+   "tris_lod2": 4606,
    "agirliksiz_kose": 0,
-   "kose_lod0": 28906,
+   "kose_lod0": 29034,
    "kol_donusu": 51.8,
    "sakal_sisme_mm": null,
-   "agirlik_farki_once": 1.4126,
-   "agirlik_farki": 0.0329,
+   "agirlik_farki_once": 1.4173,
+   "agirlik_farki": 0.0327,
    "kemik": 30,
    "kemikler": [
     {
@@ -2189,15 +2189,15 @@
     "Salvar",
     "Yasmak"
    ],
-   "tris_lod0": 57324,
-   "tris_lod1": 17196,
-   "tris_lod2": 4584,
+   "tris_lod0": 57580,
+   "tris_lod1": 17274,
+   "tris_lod2": 4606,
    "agirliksiz_kose": 0,
-   "kose_lod0": 28904,
+   "kose_lod0": 29032,
    "kol_donusu": 30.1,
    "sakal_sisme_mm": null,
-   "agirlik_farki_once": 1.3848,
-   "agirlik_farki": 0.0218,
+   "agirlik_farki_once": 1.3896,
+   "agirlik_farki": 0.0217,
    "kemik": 30,
    "kemikler": [
     {
@@ -2536,15 +2536,15 @@
     "Salvar",
     "Yasmak"
    ],
-   "tris_lod0": 57092,
-   "tris_lod1": 17126,
-   "tris_lod2": 4566,
+   "tris_lod0": 57348,
+   "tris_lod1": 17204,
+   "tris_lod2": 4586,
    "agirliksiz_kose": 0,
-   "kose_lod0": 29156,
+   "kose_lod0": 29284,
    "kol_donusu": 51.0,
    "sakal_sisme_mm": null,
-   "agirlik_farki_once": 1.3894,
-   "agirlik_farki": 0.0182,
+   "agirlik_farki_once": 1.3942,
+   "agirlik_farki": 0.018,
    "kemik": 30,
    "kemikler": [
     {
@@ -2884,15 +2884,15 @@
     "Salvar",
     "Takke"
    ],
-   "tris_lod0": 54884,
-   "tris_lod1": 16464,
-   "tris_lod2": 4390,
+   "tris_lod0": 55140,
+   "tris_lod1": 16542,
+   "tris_lod2": 4410,
    "agirliksiz_kose": 0,
-   "kose_lod0": 27500,
+   "kose_lod0": 27628,
    "kol_donusu": 30.1,
    "sakal_sisme_mm": null,
-   "agirlik_farki_once": 1.4679,
-   "agirlik_farki": 0.0224,
+   "agirlik_farki_once": 1.4724,
+   "agirlik_farki": 0.0222,
    "kemik": 30,
    "kemikler": [
     {
