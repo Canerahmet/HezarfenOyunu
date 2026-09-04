@@ -742,6 +742,39 @@ def build_yedikule(p, col, asset_name, textured=False):
         hz.assign(f, mats["marble"])
         parts.append(f)
 
+    # --- Mermer cepheye KABARTMA -----------------------------------------
+    #
+    # Kemerler yerindeydi ama render'da Altin Kapi bir MERMER LEVHA gibi
+    # okunuyordu: 166 m'lik hisarin yaninda 40 m'lik duz bir beyaz yuzey.
+    # Kusur malzemede degildi — `M_Marble_White` dort dokusuyla yerinde
+    # (olculdu). Kusur RolYEFte: mermeri mermer yapan sey golge cizgisidir,
+    # rengi degil. Ayni hatanin bir baskasi Galata kusaklarinda olculmustu
+    # (ADR 0034): duz gecen bir yuzey, dokusu ne olursa olsun, duvar olarak
+    # okunur.
+    #
+    # Eklenenler nitel kaynakla uyumludur ve OLCU IDDIA ETMEZ: Porta Aurea'nin
+    # mermer cephesi soklu, pilastrli ve silmeli bir zafer takidir. Kaynak
+    # bu ogelerin VARLIGINI verir, olcusunu vermez — bu yuzden yapinin
+    # `status: draft` / `accuracy: D3` isareti aynen duruyor ve buradaki
+    # olculer kapinin kendi boyundan turetildi, kaynaktan degil.
+    def _mermer_kutle(ad, off, boy, yukseklik, z0, tasma):
+        b = hz.make_box(ad, (boy, p.wall_t + tasma, yukseklik),
+                        (0.0, 0.0, z0 + yukseklik * 0.5), col)
+        b.rotation_euler = (0.0, 0.0, gang)
+        b.location = (gmx + ux * off, gmy + uy * off, 0.0)
+        hz.assign(b, mats["marble"])
+        parts.append(b)
+
+    marble_w = gL - 1.0
+    sokle_h = gate_h * 0.075          # yaklasik 1,4 m — insan boyunun altinda
+    silme_h = gate_h * 0.055
+    _mermer_kutle("KapiSokle", 0.0, marble_w, sokle_h, 0.0, 0.70)
+    _mermer_kutle("KapiSilme", 0.0, marble_w, silme_h, gate_h - silme_h, 0.90)
+    # Pilastrlar kemerleri CERCEVELER: uc kemerin dort kenarinda dururlar.
+    for off in (-17.0, -7.0, +7.0, +17.0):
+        _mermer_kutle(f"KapiPilastr_{off:.0f}", off, 1.7,
+                      gate_h - sokle_h - silme_h, sokle_h, 0.50)
+
     # --- LOD1 -------------------------------------------------------------
     l1.append(hz.assign(hz.make_tube("L1_Hisar", R, R, p.wall_h, (0.0, 0.0),
                                      0.0, segments=5, col=col),
