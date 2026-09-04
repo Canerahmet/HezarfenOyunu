@@ -86,6 +86,9 @@ namespace Hezarfen.Editor.Lighting
             }
             sb.Append($"  {kamera} HDRP kamerasi, {ezen} tanesi kendi "
                       + "kare ayarini kullaniyor.\n");
+            if (kamera == 0)
+                sb.Append("  (Sahne acik degil — kamera sayimi bos. "
+                          + "Toplu kipte once bir sahne acilmali.)\n");
             return sb.ToString();
         }
 
