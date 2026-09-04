@@ -123,19 +123,42 @@ karanlık.
 
 Bu, sorunun yerini değiştirir: yol açık, **probların kendisi karanlık**.
 
-### Sıradaki şüpheli: fırının gördüğü albedo
+### Albedo sınandı ve elendi
 
-Fırında artık 100.000 lux'lük bir güneş var ve +43°'de. Böyle bir
-güneşin kaldırımdan sıçraması karanlık olamaz — *fırının o kaldırımı
-karanlık görmüyorsa*. İlerlemeli fırın sıçramayı malzemenin **albedo**
-değerinden hesaplar ve HDRP malzemelerinde bu değer meta geçişinden
-gelir.
+`D_Okmeydani`, `albedoBoost = 8` ile pişirildi. Desen sayısı
+**12.106 → 12.291** — yüzde bir buçuk. Tek sıçramalı bir fırında probun
+değerini ona **doğrudan** ulaşan ışık belirliyor; sıçrama terimini sekiz
+katına çıkarmak toplamda görünmüyor. Albedo, sıçramayı aşağıda tutan
+şey değil.
 
-Deney (bir sonraki tur, ~10 dk): `D_Okmeydani`'yi
-`LightingSettings.albedoBoost` yükseltilmiş hâlde pişir ve
-`tools/olcum/prob_isigi.py` ile L0 desenlerinin dağılımına bak. Değer
-ölçekleniyorsa albedo yolu çalışıyor demektir ve karanlık başka
-yerdendir; hiç değişmiyorsa fırın malzemeleri siyah görüyordur.
+### Kalan okuma: problar makul, YEDEK ortam fazla parlak
+
+Üç ölçüm bir araya gelince tablo değişiyor:
+
+* APV kapatılınca gölge **aydınlanıyor** (0,0217 > 0,0202) — yani APV
+  uygulanıyor ve uygulandığında sahneyi karartıyor.
+* Fırının ortamı skybox malzemesinden geliyor ve ortam probu
+  **0,18 / 0,23 / 0,30** okuyor. APV kapalıyken kareyi aydınlatan da bu.
+* Problar bu ortamdan ve 100.000 lux'lük güneşten pişiyor, ama sokak
+  seviyesinde gökyüzünün büyük kısmı **kapalı** — probun gördüğü şey
+  dar bir gök parçası.
+
+Yani mesele "APV çalışmıyor" değil: **APV çalışıyor ve gölgeyi, yedek
+ortamın verdiği yapay parlaklıktan daha karanlık yapıyor.** Gölgenin
+mavisiz olması da buradan: dar gök parçası + sıcak sıva sıçraması.
+
+### Sıradaki kaldıraç: fırının gök parlaklığı
+
+Ölçülebilir hedef var: pişmiş probların, yerine geçtikleri yedek
+ortamdan (0,18/0,23/0,30) **karanlık olmaması**. Kaldıraç
+`M_Firin_Skybox`'ın `_Exposure` değeri (şu an 1,3) — fırının gördüğü
+gök doğrudan o. Deney on dakika (`D_Okmeydani`) ve ölçü iki tane:
+ortam probu kaydı ve `tools/olcum/prob_isigi.py`.
+
+**Dikkat:** `VP_Firin_Sky`'ın Lux kipi (20.000) burada işe yaramıyor
+gibi görünüyor — ortam probunu değiştiren şey skybox malzemesi oldu,
+gök profili değil. Yani ilerlemeli fırın HDRP'nin statik aydınlatma
+göğünü değil, Unity'nin kendi skybox yolunu okuyor. Bu da kayda geçti.
 
 ## Açık soru: semtler tek kümede birikiyor mu?
 
