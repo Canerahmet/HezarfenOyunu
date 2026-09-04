@@ -117,8 +117,21 @@ namespace Hezarfen.Editor.Diagnostics
             new Durak { ad = "05_ayasofya", nokta = new Vector3(438f, 0f, -1953f),
                         bakisYaw = 60f,
                         neden = "Landmark oturmasi ve olcek." },
-            new Durak { ad = "06_kara_surlari", nokta = new Vector3(-3300f, 0f, -1200f),
-                        bakisYaw = 90f,
+            // SUR DURAGI SURLARDAN 300 M UZAKTAYDI.
+            //
+            // Nokta (-3300, -1200); taban sahnede 234 sur parcasi var ve
+            // en yakini **303 m**'de. Duragin gerekcesi "sur burclarinin
+            // oturmasi" ama o uzaklikta burc kadrajda bir dis kadar
+            // kalir. `tepe acik: H` de buradan geliyordu — oyuncu bir
+            // sey goremiyordu.
+            //
+            // Sekizgen burcun (-3589, -1108) cevresinde 70/90/110 m'lik
+            // halkalar 15 derece araliklarla tarandi; sura 25 m'den,
+            // sehre 12 m'den yakin olmayanlar arasindan 150 m icinde en
+            // cok sur parcasi goreni secildi: (-3589, -1218) — sura 41 m,
+            // sehre 42 m, cevrede 11 sur parcasi. Bakis burca: yaw 0.
+            new Durak { ad = "06_kara_surlari", nokta = new Vector3(-3589f, 0f, -1218f),
+                        bakisYaw = 0f,
                         neden = "Sur burclarinin oturmasi." },
             new Durak { ad = "07_kirsal", nokta = new Vector3(-2500f, 0f, -600f),
                         bakisYaw = 45f,
