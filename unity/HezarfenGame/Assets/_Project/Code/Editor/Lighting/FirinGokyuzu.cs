@@ -79,11 +79,38 @@ namespace Hezarfen.Editor.Lighting
         /// bugün tersini söylüyor — APV kapatılınca gölge aydınlanıyor
         /// (0,0217 &gt; 0,0202), yani problar yedek ortamdan karanlık.
         ///
-        /// Deney on dakika (`D_Okmeydani`), ölçü iki tane: pişirme
-        /// kaydındaki ortam probu satırı ve
-        /// <c>tools/olcum/prob_isigi.py</c>. 1,3 bir gündüz göğünün
-        /// alışıldık değeri; ölçüm onu tutmazsa değişecek olan sayı
-        /// budur.
+        /// ## Nereden başlamalı: 1,3 değil, iki mertebe üstü
+        ///
+        /// Kör bir tarama yerine ölçümden türetilmiş bir başlangıç var.
+        /// Karedeki sayılar:
+        ///
+        /// <code>
+        /// gunes  rgb 0,3237 / 0,2547 / 0,1767
+        /// golge  rgb 0,0202 / 0,0061 / 0,0001
+        /// </code>
+        ///
+        /// Gölgedeki mavi, kırmızının <b>iki binde biri</b>: gök payı
+        /// yok denecek kadar az. Gökten gelen terimin gölgenin yarısı
+        /// mertebesine çıkması isteniyorsa gök kabaca <b>50-100 kat</b>
+        /// güçlenmeli. `Skybox/Procedural`in `_Exposure` alanı çıktıyı
+        /// doğrusal ölçeklediği için başlangıç değeri <b>65-130</b>
+        /// aralığında aranmalı, 1,3'ün etrafında değil.
+        ///
+        /// Fiziksel çapa da aynı yöne bakıyor: gerçek gün ışığında
+        /// gökyüzünün payı toplam aydınlanmanın %10-20'sidir; fırında
+        /// güneş 100.000 lux ve gök ortam probunda 0,18-0,30 — arada
+        /// mertebeler var.
+        ///
+        /// Değer <b>ölçülmeden değiştirilmedi</b>: bu depoda bir sayı,
+        /// onu doğrulayan ölçüm olmadan yazılmaz. Deney on dakika
+        /// (`D_Okmeydani`), ölçüler pişirme kaydındaki ortam probu
+        /// satırı, <c>tools/olcum/prob_isigi.py</c> ve — asıl kapı —
+        /// <c>tools/olcum/golge_orani.py</c> ile gölgenin mavi/kırmızı
+        /// oranı.
+        ///
+        /// <b>Yan etki yok:</b> HDRP bu malzemeyi çizimde kullanmıyor,
+        /// yalnızca ilerlemeli fırın okuyor. Yani büyük bir çarpan
+        /// oyunun görüntüsünü değiştirmez.
         /// </summary>
         public const float SkyboxPozu = 1.3f;
 
