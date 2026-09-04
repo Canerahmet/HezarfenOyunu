@@ -317,6 +317,15 @@ def build_agac(p, col, asset_name, textured=False):
     # cikiyordu, yani 4,5 m ile 8 m arasi **gorunmez bir duvardi**.
     # Yerde yuruyen biri bunu hic fark etmez (bas hizasinin cok
     # ustunde); ucan biri carpar. Bu bir ucus oyunu.
+    # Servide GENISLIK de sorgulandi ve OLDUGU GIBI birakildi. Kutu
+    # 0,41 m, tacin capi 1,87 m — yani disd dallardan gecilebiliyor.
+    # Once "servi bir sutundur, icinden gecilmemeli" diye dusundum;
+    # sahne olculdu: Galata'da 266 servi var ve en yakin komsu ortanca
+    # 5,40 m. Yani kutuyu tac capina cikarmak GUVENLI olurdu (3,5 m
+    # bosluk kalirdi). Ama guvenli olmasi gerekli oldugu anlamina
+    # gelmiyor: govde zaten kapali (kutu 0,41 > govde capi 0,31) ve
+    # yumusak dal ucundan gecmek bir kusur degil. Degistirmemek icin
+    # sebep, degistirmek icin sebepten guclu cikti.
     carp_h = trunk_h if p.kind == "cinar" else H * 0.5
     ucx = hz.make_box(f"UCX_{asset_name}",
                       (p.trunk_r * 2.6, p.trunk_r * 2.6, carp_h),
