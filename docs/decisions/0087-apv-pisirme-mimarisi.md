@@ -495,6 +495,35 @@ uydurma değil, aynı sahnenin kendi sağlıklı komşularından:
 Çarpan deneyi bu sayıyı %0,65'lik bir katkıyla oynatamazdı; kriteri
 karşılayan bir fırın, mertebe olarak da doğru fırındır.
 
+### Caner'e soru: dolaylı ışığın tek kaynağı APV kalsın mı?
+
+Şüphede kalma kuralı gereği yazılıyor; cevap beklenmeden ilerleniyor.
+
+Bugün ölçülen durum: `lightProbeSystem` = APV, `supportSSGI` = 0
+(Balanced ve Performant'ta), yani dolaylı yayınık ışığın tek kaynağı
+pişmiş problar. Onlar da şu an kareye ulaşmıyor. Sonuç: kapalı gölge
+siyah.
+
+**Seçenek A — APV'de kal, fırını düzelt.** Doğru olan bu: dünya
+uzayında, kameranın ne gördüğünden bağımsız, çalışma zamanında
+neredeyse bedava. Bedeli semt başına ~95 dk fırın ve sekiz semt.
+Bugünkü işin devamı.
+
+**Seçenek B — SSGI'yi Balanced'da da aç.** `HDRP High Fidelity`'de
+zaten 1. Fırın beklemeden bugün gölgeyi doldurur. İki kusuru var:
+köşenin arkasını göremez (sokak arası gölge yine eksik kalır) ve kare
+bütçesinden yer. 16,7 ms bütçesi ölçülmeden açılmaz.
+
+**Önerim: A, ve B'yi ölçüp üstüne eklemek.** HDRP ikisini birlikte
+kullanır — SSGI ekranda olanı, APV olmayanı verir. Ama önce A'nın
+çalıştığını görmek gerekiyor, yoksa B'yi açmak kusuru **gizler**:
+kare düzelir, sebep durur, ve bir sonraki kapalı mekân (girilebilir
+evler, ADR planı Faz 3-4) yine karanlık çıkar.
+
+Bu yüzden sıradaki tek değişkenli deney B'yi bir **çözüm** olarak değil
+bir **ölçü aleti** olarak koşuyor: kaliteyi High Fidelity'ye alıp turu
+tekrarlamak, teşhisin doğru olup olmadığını fırın beklemeden söyler.
+
 ## Ölçülen dört sebep
 
 1. **Prob hacimleri dünya boyuydu.** Her semtin hacmi `Mode.Global`'dı ve
