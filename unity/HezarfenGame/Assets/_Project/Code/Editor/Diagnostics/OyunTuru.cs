@@ -121,7 +121,14 @@ namespace Hezarfen.Editor.Diagnostics
             // D_Uskudar'in 10.691 yerlesim ornegi sahne dosyasindan
             // okundu; en yogun 200 m'lik hucre **x 4600-4800, z
             // 600-800** (313 ornek). Durak o hucrenin ortasina tasindi.
-            new Durak { ad = "10_uskudar", nokta = new Vector3(4700f, 0f, 700f),
+            // Hucre ORTASI degil, hucre icinde bir SOKAK noktasi:
+            // (4700, 700) en yakin yapiya 2 m kaliyordu — oyuncu duvara
+            // yapisik dogar ve yerlestirme onu suruklerdi. Hucre 10 m
+            // araliklarla tarandi ve en yakin yapisi 8-14 m olan (yani
+            // bir sokak genisligi kadar acik) noktalar arasindan 60 m
+            // icinde en cok yapi goreni secildi: (4790, 650), en yakin
+            // 8,2 m, cevrede 169 yapi.
+            new Durak { ad = "10_uskudar", nokta = new Vector3(4790f, 0f, 650f),
                         bakisYaw = 270f,
                         neden = "Karsi yaka — semt akisi calisiyor mu." },
         };
